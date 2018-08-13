@@ -19,7 +19,12 @@ package org.blockchain_innovation.factom.client.data.model.rpc;
 import org.blockchain_innovation.factom.client.data.FactomRuntimeException;
 import org.blockchain_innovation.factom.client.data.conversion.StringUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class RpcRequest {
     private int id;

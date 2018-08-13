@@ -17,9 +17,16 @@
 package org.blockchain_innovation.factom.client;
 
 import org.blockchain_innovation.factom.client.data.FactomException;
-import org.bif.factom.client.data.model.response.*;
+import org.blockchain_innovation.factom.client.data.model.response.AdminBlockResponse;
+import org.blockchain_innovation.factom.client.data.model.response.ChainHeadResponse;
+import org.blockchain_innovation.factom.client.data.model.response.CommitChainResponse;
+import org.blockchain_innovation.factom.client.data.model.response.CommitEntryResponse;
+import org.blockchain_innovation.factom.client.data.model.response.DirectoryBlockHeadResponse;
+import org.blockchain_innovation.factom.client.data.model.response.DirectoryBlockResponse;
+import org.blockchain_innovation.factom.client.data.model.response.EntryBlockResponse;
+import org.blockchain_innovation.factom.client.data.model.response.EntryResponse;
+import org.blockchain_innovation.factom.client.data.model.response.HeightsResponse;
 import org.blockchain_innovation.factom.client.data.model.rpc.RpcMethod;
-import org.blockchain_innovation.factom.client.data.model.response.*;
 
 import java.util.Map;
 
