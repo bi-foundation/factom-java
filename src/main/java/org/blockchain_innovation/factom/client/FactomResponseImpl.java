@@ -1,0 +1,82 @@
+/*
+ * Copyright 2018 Blockchain Innovation Foundation <https://blockchain-innovation.org>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.blockchain_innovation.factom.client;
+
+import org.blockchain_innovation.factom.client.data.model.rpc.RpcErrorResponse;
+import org.blockchain_innovation.factom.client.data.model.rpc.RpcResponse;
+
+public class FactomResponseImpl<Result> implements FactomResponse {
+    private final Exchange exchange;
+    private final RpcResponse<Result> rpcResponse;
+    private final int responseCode;
+    private final String responseMessage;
+    private final RpcErrorResponse errorResponse;
+
+    protected FactomResponseImpl(Exchange exchange, RpcResponse<Result> rpcResponse, int responseCode, String responseMessage) {
+        this.exchange = exchange;
+        this.rpcResponse = rpcResponse;
+        this.responseCode = responseCode;
+        this.responseMessage = responseMessage;
+        this.errorResponse = null;
+    }
+
+    protected FactomResponseImpl(Exchange exchange, RpcErrorResponse rpcErrorResponse, int responseCode, String responseMessage) {
+        this.exchange = exchange;
+        this.responseCode = responseCode;
+        this.responseMessage = responseMessage;
+        this.errorResponse = rpcErrorResponse;
+        this.rpcResponse = null;
+    }
+
+
+    protected Exchange getExchange() {
+        return exchange;
+    }
+
+    @Override
+    public RpcResponse<Result> getRpcResponse() {
+        return rpcResponse;
+    }
+
+    @Override
+    public Result getResult() {
+        if (getRpcResponse() == null) {
+            return null;
+        }
+        return getRpcResponse().getResult();
+    }
+
+    @Override
+    public RpcErrorResponse getRpcErrorResponse() {
+        return errorResponse;
+    }
+
+    @Override
+    public int getHTTPResponseCode() {
+        return responseCode;
+    }
+
+    @Override
+    public String getHTTPResponseMessage() {
+        return responseMessage;
+    }
+
+    @Override
+    public boolean hasErrors() {
+        return getRpcResponse() == null || getRpcErrorResponse() != null;
+    }
+}
