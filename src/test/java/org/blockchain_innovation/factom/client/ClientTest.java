@@ -24,6 +24,7 @@ import org.junit.Test;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Map;
 
 public class ClientTest {
 
@@ -75,6 +76,34 @@ public class ClientTest {
     @Test
     public void testDirectoryBlockHead() throws FactomException.ClientException, InterruptedException {
         FactomResponse<DirectoryBlockHeadResponse> response = client.directoryBlockHead();
+        Assert.assertNotNull(response);
+        Assert.assertNull(response.getRpcErrorResponse());
+    }
+
+    @Test
+    public void testAckEntryTransactions() throws FactomException.ClientException, InterruptedException {
+        FactomResponse<EntryTransactionsResponse> response = client.ackEntryTransactions("e96cca381bf25f6dd4dfdf9f7009ff84ee6edaa3f47f9ccf06d2787482438f4b");
+        Assert.assertNotNull(response);
+        Assert.assertNull(response.getRpcErrorResponse());
+    }
+
+    @Test
+    public void testAckFactoidTransactions() throws FactomException.ClientException, InterruptedException {
+        FactomResponse<FactoidTransactionsResponse> response = client.ackFactoidTransactions("e96cca381bf25f6dd4dfdf9f7009ff84ee6edaa3f47f9ccf06d2787482438f4b");
+        Assert.assertNotNull(response);
+        Assert.assertNull(response.getRpcErrorResponse());
+    }
+
+    @Test
+    public void testProperties() throws FactomException.ClientException, InterruptedException {
+        FactomResponse<PropertiesResponse> response = client.properties();
+        Assert.assertNotNull(response);
+        Assert.assertNull(response.getRpcErrorResponse());
+    }
+
+    @Test
+    public void testTransactions() throws FactomException.ClientException, InterruptedException {
+        FactomResponse<TransactionResponse> response = client.transaction("e96cca381bf25f6dd4dfdf9f7009ff84ee6edaa3f47f9ccf06d2787482438f4b");
         Assert.assertNotNull(response);
         Assert.assertNull(response.getRpcErrorResponse());
     }

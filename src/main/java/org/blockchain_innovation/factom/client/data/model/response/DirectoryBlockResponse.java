@@ -20,10 +20,8 @@ import java.util.List;
 
 public class DirectoryBlockResponse {
 
-
     private DirectoryBlock dblock;
     private String rawdata;
-
 
     public class DirectoryBlock {
         private Header header;
@@ -48,8 +46,5 @@ public class DirectoryBlockResponse {
             private String chainid;
             private String keymr;
         }
-
     }
-
-
 }

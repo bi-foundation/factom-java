@@ -20,6 +20,8 @@ import com.google.common.base.Charsets;
 import org.blockchain_innovation.factom.client.data.FactomException;
 import org.blockchain_innovation.factom.client.data.conversion.json.GsonConverter;
 import org.blockchain_innovation.factom.client.data.conversion.json.JsonConverter;
+import org.blockchain_innovation.factom.client.data.model.response.CommitChainResponse;
+import org.blockchain_innovation.factom.client.data.model.response.HeightsResponse;
 import org.blockchain_innovation.factom.client.data.model.rpc.RpcMethod;
 import org.junit.*;
 import org.mockserver.junit.MockServerRule;
@@ -28,6 +30,7 @@ import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
+import java.util.Map;
 
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
@@ -79,7 +82,7 @@ public class ClientMockTest {
     @Test
     public void testExchange() throws FactomException.ClientException, MalformedURLException {
 
-        FactomResponse<List> response = client.exchange(RpcMethod.HEIGHTS.toRequest(), List.class).getFactomResponse();
+        FactomResponse<CommitChainResponse> response = client.exchange(RpcMethod.HEIGHTS.toRequest(), CommitChainResponse.class).getFactomResponse();
         Assert.assertNotNull(response);
         Assert.assertNotNull(response.getRpcResponse());
         Assert.assertNotNull(response.getResult());

@@ -20,7 +20,6 @@ import java.util.List;
 
 public class AdminBlockResponse {
 
-
     private AdminBlock ablock;
     private String rawdata;
 
@@ -47,6 +46,7 @@ public class AdminBlockResponse {
         public class Entry {
             private String identityadminchainid;
             private DBSig prevdbsig;
+            private String minutenumber;
 
             public class DBSig {
                 private String pub;

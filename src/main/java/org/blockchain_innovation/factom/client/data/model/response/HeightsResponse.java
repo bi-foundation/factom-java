@@ -17,6 +17,7 @@
 package org.blockchain_innovation.factom.client.data.model.response;
 
 public class HeightsResponse {
+
     private long directoryblockheight;
     private long leaderheight;
     private long entryblockheight;
@@ -33,7 +34,6 @@ public class HeightsResponse {
     public long getEntryBlockHeight() {
         return entryblockheight;
     }
-
 
     public long getEntryHeight() {
         return entryheight;
