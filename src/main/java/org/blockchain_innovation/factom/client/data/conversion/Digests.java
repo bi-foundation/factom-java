@@ -23,7 +23,9 @@ import java.security.NoSuchAlgorithmException;
 
 public enum Digests {
 
-    SHA_256("SHA-256"), SHA_512("SHA-512");
+    SHA_256("SHA-256"),
+    SHA_512("SHA-512"),
+    ;
 
     private final String algorithm;
 
@@ -38,7 +40,15 @@ public enum Digests {
 
     public byte[] digest(byte[] message) {
         assertMessage(message);
-        return md().digest();
+        return md().digest(message);
+    }
+
+    public byte[] doubleDigest(String message) {
+        return digest(digest(message));
+    }
+
+    public byte[] doubleDigest(byte[] message) {
+        return digest(digest(message));
     }
 
 
