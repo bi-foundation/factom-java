@@ -18,6 +18,7 @@ package org.blockchain_innovation.factom.client;
 
 import org.blockchain_innovation.factom.client.data.FactomException;
 import org.blockchain_innovation.factom.client.data.model.response.*;
+import org.blockchain_innovation.factom.client.data.model.rpc.Callback;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -47,6 +48,32 @@ public class ClientTest {
     public void testAdminBlockHeight() throws FactomException.ClientException {
         FactomResponse<AdminBlockResponse> response = client.adminBlockByHeight(10);
         Assert.assertNotNull(response);
+    }
+
+    @Test
+    public void testAdminBlockHeightAsync() throws FactomException.ClientException, InterruptedException {
+        final boolean[] done = {false};
+        Callback<AdminBlockResponse> callback = new Callback<AdminBlockResponse>() {
+            @Override
+            public void onFailure(FactomException e) {
+                done[0] = true;
+                Assert.fail(e.getMessage());
+            }
+
+            @Override
+            public void onSuccess(FactomResponse<AdminBlockResponse> factomResponse) {
+                done[0] = true;
+                Assert.assertNotNull(factomResponse);
+            }
+        };
+
+        client.adminBlockByHeight(10, callback);
+
+        int count = 0;
+        while(!done[0] || count > 100) {
+            Thread.sleep(1000);
+            count++;
+        }
     }
 
 

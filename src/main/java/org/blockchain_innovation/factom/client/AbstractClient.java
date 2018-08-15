@@ -17,6 +17,7 @@
 package org.blockchain_innovation.factom.client;
 
 import org.blockchain_innovation.factom.client.data.FactomException;
+import org.blockchain_innovation.factom.client.data.model.rpc.Callback;
 import org.blockchain_innovation.factom.client.data.model.rpc.RpcRequest;
 
 import java.net.URL;
@@ -47,5 +48,16 @@ public abstract class AbstractClient {
         return exchange.execute(rpcResultClass);
     }
 
+    public <RpcResult> Exchange<RpcResult> exchange(FactomRequestImpl factomRequest, Class<RpcResult> rpcResultClass, Callback<RpcResult> callback) throws FactomException.ClientException {
+        return exchange(factomRequest.getRpcRequest(), rpcResultClass, callback);
+    }
 
+    public <RpcResult> Exchange<RpcResult> exchange(RpcRequest.Builder rpcRequestBuilder, Class<RpcResult> rpcResultClass, Callback<RpcResult> callback) throws FactomException.ClientException {
+        return exchange(rpcRequestBuilder.build(), rpcResultClass, callback);
+    }
+
+    public <RpcResult> Exchange<RpcResult> exchange(RpcRequest rpcRequest, Class<RpcResult> rpcResultClass, Callback<RpcResult> callback) {
+        ExchangeAsync<RpcResult> exchange = new ExchangeAsync(getUrl(), rpcRequest);
+        return exchange.execute(rpcResultClass, callback);
+    }
 }
