@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.blockchain_innovation.factom.client.data.model.response;
+package org.blockchain_innovation.factom.client.data.model.response.factomd;
 
 import java.util.List;
 

@@ -14,12 +14,29 @@
  * limitations under the License.
  */
 
-package org.blockchain_innovation.factom.client.data.model.response;
+package org.blockchain_innovation.factom.client.data.model.response.factomd;
 
-public class CommitChainResponse extends CommitEntryResponse {
-    private String chainid;
+public class HeightsResponse {
 
-    public String getChainId() {
-        return chainid;
+    private long directoryblockheight;
+    private long leaderheight;
+    private long entryblockheight;
+    private long entryheight;
+
+    public long getDirectoryBlockHeight() {
+        return directoryblockheight;
     }
+
+    public long getLeaderHeight() {
+        return leaderheight;
+    }
+
+    public long getEntryBlockHeight() {
+        return entryblockheight;
+    }
+
+    public long getEntryHeight() {
+        return entryheight;
+    }
+
 }

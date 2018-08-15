@@ -1,13 +1,9 @@
 package org.blockchain_innovation.factom.client.data.conversion;
 
 import org.blockchain_innovation.factom.client.data.FactomRuntimeException;
-import org.blockchain_innovation.factom.client.data.model.response.EntryResponse;
+import org.blockchain_innovation.factom.client.data.model.response.factomd.EntryResponse;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 public class EntryOperations {
     private ByteOperations byteOps = new ByteOperations();

@@ -17,31 +17,31 @@
 package org.blockchain_innovation.factom.client;
 
 import org.blockchain_innovation.factom.client.data.FactomException;
-import org.blockchain_innovation.factom.client.data.model.response.AdminBlockResponse;
-import org.blockchain_innovation.factom.client.data.model.response.ChainHeadResponse;
-import org.blockchain_innovation.factom.client.data.model.response.CommitChainResponse;
-import org.blockchain_innovation.factom.client.data.model.response.CommitEntryResponse;
-import org.blockchain_innovation.factom.client.data.model.response.DirectoryBlockHeadResponse;
-import org.blockchain_innovation.factom.client.data.model.response.DirectoryBlockResponse;
-import org.blockchain_innovation.factom.client.data.model.response.EntryBlockResponse;
-import org.blockchain_innovation.factom.client.data.model.response.EntryCreditBalanceResponse;
-import org.blockchain_innovation.factom.client.data.model.response.EntryCreditBlockResponse;
-import org.blockchain_innovation.factom.client.data.model.response.EntryCreditRateResponse;
-import org.blockchain_innovation.factom.client.data.model.response.EntryResponse;
-import org.blockchain_innovation.factom.client.data.model.response.EntryTransactionsResponse;
-import org.blockchain_innovation.factom.client.data.model.response.FactoidBalanceResponse;
-import org.blockchain_innovation.factom.client.data.model.response.FactoidBlockResponse;
-import org.blockchain_innovation.factom.client.data.model.response.FactoidSubmitResponse;
-import org.blockchain_innovation.factom.client.data.model.response.FactoidTransactionsResponse;
-import org.blockchain_innovation.factom.client.data.model.response.HeightsResponse;
-import org.blockchain_innovation.factom.client.data.model.response.PendingEntriesResponse;
-import org.blockchain_innovation.factom.client.data.model.response.PendingTransactionsResponse;
-import org.blockchain_innovation.factom.client.data.model.response.PropertiesResponse;
-import org.blockchain_innovation.factom.client.data.model.response.RawDataResponse;
-import org.blockchain_innovation.factom.client.data.model.response.ReceiptResponse;
-import org.blockchain_innovation.factom.client.data.model.response.RevealResponse;
-import org.blockchain_innovation.factom.client.data.model.response.SendRawMessageResponse;
-import org.blockchain_innovation.factom.client.data.model.response.TransactionResponse;
+import org.blockchain_innovation.factom.client.data.model.response.factomd.AdminBlockResponse;
+import org.blockchain_innovation.factom.client.data.model.response.factomd.ChainHeadResponse;
+import org.blockchain_innovation.factom.client.data.model.response.factomd.CommitChainResponse;
+import org.blockchain_innovation.factom.client.data.model.response.factomd.CommitEntryResponse;
+import org.blockchain_innovation.factom.client.data.model.response.factomd.DirectoryBlockHeadResponse;
+import org.blockchain_innovation.factom.client.data.model.response.factomd.DirectoryBlockResponse;
+import org.blockchain_innovation.factom.client.data.model.response.factomd.EntryBlockResponse;
+import org.blockchain_innovation.factom.client.data.model.response.factomd.EntryCreditBalanceResponse;
+import org.blockchain_innovation.factom.client.data.model.response.factomd.EntryCreditBlockResponse;
+import org.blockchain_innovation.factom.client.data.model.response.factomd.EntryCreditRateResponse;
+import org.blockchain_innovation.factom.client.data.model.response.factomd.EntryResponse;
+import org.blockchain_innovation.factom.client.data.model.response.factomd.EntryTransactionsResponse;
+import org.blockchain_innovation.factom.client.data.model.response.factomd.FactoidBalanceResponse;
+import org.blockchain_innovation.factom.client.data.model.response.factomd.FactoidBlockResponse;
+import org.blockchain_innovation.factom.client.data.model.response.factomd.FactoidSubmitResponse;
+import org.blockchain_innovation.factom.client.data.model.response.factomd.FactoidTransactionsResponse;
+import org.blockchain_innovation.factom.client.data.model.response.factomd.HeightsResponse;
+import org.blockchain_innovation.factom.client.data.model.response.factomd.PendingEntriesResponse;
+import org.blockchain_innovation.factom.client.data.model.response.factomd.PendingTransactionsResponse;
+import org.blockchain_innovation.factom.client.data.model.response.factomd.PropertiesResponse;
+import org.blockchain_innovation.factom.client.data.model.response.factomd.RawDataResponse;
+import org.blockchain_innovation.factom.client.data.model.response.factomd.ReceiptResponse;
+import org.blockchain_innovation.factom.client.data.model.response.factomd.RevealResponse;
+import org.blockchain_innovation.factom.client.data.model.response.factomd.SendRawMessageResponse;
+import org.blockchain_innovation.factom.client.data.model.response.factomd.TransactionResponse;
 import org.blockchain_innovation.factom.client.data.model.rpc.RpcMethod;
 
 public class FactomdClient extends AbstractClient {
@@ -54,7 +54,7 @@ public class FactomdClient extends AbstractClient {
         return exchange(RpcMethod.ADMIN_BLOCK_BY_KEYMR.toRequestBuilder().param("keymr", keyMR), AdminBlockResponse.class);
     }
 
-    private <T> FactomResponse<T> ackTransactions(String hash, String chainId, Class<T> rpcResultClass) throws FactomException.ClientException {
+    public <T> FactomResponse<T> ackTransactions(String hash, String chainId, Class<T> rpcResultClass) throws FactomException.ClientException {
         return exchange(RpcMethod.ACK_TRANSACTION.toRequestBuilder().param("hash", hash).param("chainid", chainId), rpcResultClass);
     }
 

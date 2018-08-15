@@ -17,7 +17,16 @@
 package org.blockchain_innovation.factom.client;
 
 import org.blockchain_innovation.factom.client.data.FactomException;
-import org.blockchain_innovation.factom.client.data.model.response.*;
+import org.blockchain_innovation.factom.client.data.model.response.factomd.AdminBlockResponse;
+import org.blockchain_innovation.factom.client.data.model.response.factomd.ChainHeadResponse;
+import org.blockchain_innovation.factom.client.data.model.response.factomd.DirectoryBlockHeadResponse;
+import org.blockchain_innovation.factom.client.data.model.response.factomd.DirectoryBlockResponse;
+import org.blockchain_innovation.factom.client.data.model.response.factomd.EntryTransactionsResponse;
+import org.blockchain_innovation.factom.client.data.model.response.factomd.FactoidTransactionsResponse;
+import org.blockchain_innovation.factom.client.data.model.response.factomd.HeightsResponse;
+import org.blockchain_innovation.factom.client.data.model.response.factomd.PropertiesResponse;
+import org.blockchain_innovation.factom.client.data.model.response.factomd.RawDataResponse;
+import org.blockchain_innovation.factom.client.data.model.response.factomd.TransactionResponse;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -39,74 +48,75 @@ public class ClientTest {
     @Test
     public void testHeights() throws FactomException.ClientException {
         FactomResponse<HeightsResponse> response = client.heights();
-        Assert.assertNotNull(response);
+        assertValidResponse(response);
     }
 
     @Test
     public void testAdminBlockHeight() throws FactomException.ClientException {
         FactomResponse<AdminBlockResponse> response = client.adminBlockByHeight(10);
-        Assert.assertNotNull(response);
+        assertValidResponse(response);
     }
 
     @Test
     public void testAdminBlockKeyMr() throws FactomException.ClientException {
         FactomResponse<AdminBlockResponse> response = client.adminBlockByKeyMerkleRoot("343ffe17ca3b9775196475380feb91768e8cb3ceb888f2d617d4f0c2cc84a26a");
-        Assert.assertNotNull(response);
+        assertValidResponse(response);
     }
 
     @Test
     public void testChainHead() throws FactomException.ClientException {
         FactomResponse<ChainHeadResponse> response = client.chainHead("000000000000000000000000000000000000000000000000000000000000000a");
-        Assert.assertNotNull(response);
+        assertValidResponse(response);
 
     }
 
     @Test
-    public void testDirectoryBlockHeight() throws FactomException.ClientException, InterruptedException {
+    public void testDirectoryBlockHeight() throws FactomException.ClientException {
         FactomResponse<DirectoryBlockResponse> response = client.directoryBlockByHeight(39251);
-        Assert.assertNotNull(response);
-        Assert.assertNull(response.getRpcErrorResponse());
+        assertValidResponse(response);
     }
 
     @Test
-    public void testDirectoryBlockHead() throws FactomException.ClientException, InterruptedException {
+    public void testDirectoryBlockHead() throws FactomException.ClientException {
         FactomResponse<DirectoryBlockHeadResponse> response = client.directoryBlockHead();
-        Assert.assertNotNull(response);
-        Assert.assertNull(response.getRpcErrorResponse());
+        assertValidResponse(response);
     }
 
     @Test
-    public void testAckEntryTransactions() throws FactomException.ClientException, InterruptedException {
+    public void testAckEntryTransactions() throws FactomException.ClientException {
         FactomResponse<EntryTransactionsResponse> response = client.ackEntryTransactions("e96cca381bf25f6dd4dfdf9f7009ff84ee6edaa3f47f9ccf06d2787482438f4b");
-        Assert.assertNotNull(response);
-        Assert.assertNull(response.getRpcErrorResponse());
+        assertValidResponse(response);
     }
 
     @Test
-    public void testAckFactoidTransactions() throws FactomException.ClientException, InterruptedException {
+    public void testAckFactoidTransactions() throws FactomException.ClientException {
         FactomResponse<FactoidTransactionsResponse> response = client.ackFactoidTransactions("e96cca381bf25f6dd4dfdf9f7009ff84ee6edaa3f47f9ccf06d2787482438f4b");
-        Assert.assertNotNull(response);
-        Assert.assertNull(response.getRpcErrorResponse());
+        assertValidResponse(response);
     }
 
     @Test
-    public void testRawData() throws FactomException.ClientException, InterruptedException {
+    public void testRawData() throws FactomException.ClientException {
         FactomResponse<RawDataResponse> response = client.rawData("e84cabc86d26b548da00d28ff48bb458610b255b762be44597e5b971bd75f8d7");
-        Assert.assertNotNull(response);
-        Assert.assertNull(response.getRpcErrorResponse());
+        assertValidResponse(response);
     }
 
     @Test
-    public void testProperties() throws FactomException.ClientException, InterruptedException {
+    public void testProperties() throws FactomException.ClientException {
         FactomResponse<PropertiesResponse> response = client.properties();
-        Assert.assertNotNull(response);
-        Assert.assertNull(response.getRpcErrorResponse());
+        assertValidResponse(response);
     }
 
     @Test
-    public void testTransactions() throws FactomException.ClientException, InterruptedException {
+    public void testTransactions() throws FactomException.ClientException {
         FactomResponse<TransactionResponse> response = client.transaction("e96cca381bf25f6dd4dfdf9f7009ff84ee6edaa3f47f9ccf06d2787482438f4b");
-        Assert.assertNotNull(response);
-        Assert.assertNull(response.getRpcErrorResponse());
+        assertValidResponse(response);
+    }
+
+    private void assertValidResponse(FactomResponse<?> factomResponse) {
+        Assert.assertNotNull(factomResponse);
+        Assert.assertNotNull(factomResponse.getRpcResponse());
+        Assert.assertEquals(200, factomResponse.getHTTPResponseCode());
+        Assert.assertNull(factomResponse.getRpcErrorResponse());
+        Assert.assertFalse(factomResponse.hasErrors());
     }
 }

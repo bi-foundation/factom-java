@@ -14,23 +14,24 @@
  * limitations under the License.
  */
 
-package org.blockchain_innovation.factom.client.data.model.response;
+package org.blockchain_innovation.factom.client.data.model.response.factomd;
 
-public class CommitEntryResponse {
-    private String message;
-    private String txid;
-    private String entryhash;
+import java.util.List;
 
-    public String getMessage() {
-        return message;
+public class EntryResponse {
+    private String chainid;
+    private String content;
+    private List<String> extids;
+
+    public String getChainId() {
+        return chainid;
     }
 
-    public String getTxId() {
-        return txid;
+    public String getContent() {
+        return content;
     }
 
-    public String getEntryHash() {
-        return entryhash;
+    public List<String> getExtIds() {
+        return extids;
     }
-
 }

@@ -16,6 +16,8 @@
 
 package org.blockchain_innovation.factom.client.data.conversion;
 
+import org.blockchain_innovation.factom.client.data.FactomRuntimeException;
+
 import javax.xml.bind.DatatypeConverter;
 import java.nio.charset.StandardCharsets;
 
@@ -30,6 +32,9 @@ public enum Encoding {
 
         @Override
         public byte[] decode(String hex) {
+            if (StringUtils.isEmpty(hex)) {
+                throw new FactomRuntimeException.AssertionException("Input hex value needs to be not null/empty for hex decoding");
+            }
             return DatatypeConverter.parseHexBinary(hex);
         }
 

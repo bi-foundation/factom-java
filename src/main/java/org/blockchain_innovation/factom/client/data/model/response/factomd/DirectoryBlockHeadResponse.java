@@ -14,27 +14,12 @@
  * limitations under the License.
  */
 
-package org.blockchain_innovation.factom.client.data.model.response;
+package org.blockchain_innovation.factom.client.data.model.response.factomd;
 
-import java.util.List;
+public class DirectoryBlockHeadResponse {
+    private String keymr;
 
-public class EntryBlockResponse {
-
-    private Header header;
-    private List<Entry> entrylist;
-
-    public class Header {
-        private long blocksequencenumber;
-        private String chainid;
-        private String prevkeymr;
-        private long dbheight;
+    public String getKeyMR() {
+        return keymr;
     }
-
-
-    public class Entry {
-        private String entryhash;
-        private long timestamp;
-    }
-
-
 }

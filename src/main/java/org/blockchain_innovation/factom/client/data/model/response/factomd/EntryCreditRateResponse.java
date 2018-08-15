@@ -1,4 +1,4 @@
-package org.blockchain_innovation.factom.client.data.model.response;
+package org.blockchain_innovation.factom.client.data.model.response.factomd;
 
 public class EntryCreditRateResponse {
 

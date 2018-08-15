@@ -14,18 +14,12 @@
  * limitations under the License.
  */
 
-package org.blockchain_innovation.factom.client.data.model.response;
+package org.blockchain_innovation.factom.client.data.model.response.factomd;
 
-public class ChainHeadResponse {
-    private String chainhead;
-    private boolean chaininprocesslist;
+public class CommitChainResponse extends CommitEntryResponse {
+    private String chainid;
 
-    public String getChainHead() {
-        return chainhead;
+    public String getChainId() {
+        return chainid;
     }
-
-    public boolean isChainInProcessList() {
-        return chaininprocesslist;
-    }
-
 }
