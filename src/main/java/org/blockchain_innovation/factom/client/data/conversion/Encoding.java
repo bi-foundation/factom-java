@@ -25,7 +25,7 @@ public enum Encoding {
     HEX {
         @Override
         public String encode(byte[] input) {
-            return DatatypeConverter.printHexBinary(input);
+            return DatatypeConverter.printHexBinary(input).toLowerCase();
         }
 
         @Override
