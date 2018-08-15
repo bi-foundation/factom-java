@@ -81,15 +81,12 @@ public class ClientMockTest {
 
     @Test
     public void testExchange() throws FactomException.ClientException, MalformedURLException {
-
-        FactomResponse<CommitChainResponse> response = client.exchange(RpcMethod.HEIGHTS.toRequest(), CommitChainResponse.class).getFactomResponse();
+        FactomResponse<CommitChainResponse> response = client.exchange(RpcMethod.HEIGHTS.toRequest(), CommitChainResponse.class);
         Assert.assertNotNull(response);
         Assert.assertNotNull(response.getRpcResponse());
         Assert.assertNotNull(response.getResult());
         Assert.assertEquals(0, response.getRpcResponse().getId());
         Assert.assertEquals("2.0", response.getRpcResponse().getJsonrpc());
         System.out.println(response.getRpcResponse());
-
     }
-
 }

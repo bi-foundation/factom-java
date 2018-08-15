@@ -16,60 +16,22 @@
 
 package org.blockchain_innovation.factom.client;
 
-import org.blockchain_innovation.factom.client.data.FactomException;
-import org.blockchain_innovation.factom.client.data.model.rpc.Callback;
 import org.blockchain_innovation.factom.client.data.model.rpc.RpcRequest;
 
 import java.net.URL;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-public class ExchangeAsync<Result> extends Exchange<Result> implements Runnable {
+public class ExchangeAsync<Result> extends Exchange<Result> {
 
     private ExecutorService executorService;
-    private Callback<Result> callback;
-    private Class<Result> rpcResultClass;
 
-    protected ExchangeAsync(URL url, RpcRequest rpcRequest) {
-        super(url, rpcRequest);
+    protected ExchangeAsync(URL url, RpcRequest rpcRequest, Class<Result> rpcResultClass) {
+        super(url, rpcRequest, rpcResultClass);
     }
 
-    public static ThreadFactory threadFactory(final String name, final boolean daemon) {
-        return new ThreadFactory() {
-            @Override
-            public Thread newThread(Runnable runnable) {
-                Thread result = new Thread(runnable, name);
-                result.setDaemon(daemon);
-                return result;
-            }
-        };
-    }
-
-    public synchronized ExecutorService getExecutorService() {
-        if (executorService == null) {
-            executorService = new ThreadPoolExecutor(0, Integer.MAX_VALUE, 60, TimeUnit.SECONDS,
-                    new SynchronousQueue<Runnable>(), threadFactory("FactomApi Dispatcher", false));
-        }
-        return executorService;
-    }
-
-    public synchronized ExchangeAsync<Result> execute(Class<Result> rpcResultClass, Callback<Result> callback) {
-        this.rpcResultClass = rpcResultClass;
-        this.callback = callback;
-        getExecutorService().execute(this);
-        return this;
-    }
-
-    @Override
-    public void run() {
-        try {
-            Exchange<Result> result = execute(rpcResultClass);
-            callback.onSuccess(result.getFactomResponse());
-        } catch (FactomException e) {
-            callback.onFailure(e);
-        }
-    }
 }
