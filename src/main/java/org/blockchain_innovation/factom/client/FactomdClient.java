@@ -42,20 +42,13 @@ import org.blockchain_innovation.factom.client.data.model.response.ReceiptRespon
 import org.blockchain_innovation.factom.client.data.model.response.RevealResponse;
 import org.blockchain_innovation.factom.client.data.model.response.SendRawMessageResponse;
 import org.blockchain_innovation.factom.client.data.model.response.TransactionResponse;
-import org.blockchain_innovation.factom.client.data.model.rpc.Callback;
 import org.blockchain_innovation.factom.client.data.model.rpc.RpcMethod;
-import org.blockchain_innovation.factom.client.data.model.rpc.RpcRequest;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.Future;
 
 public class FactomdClient extends AbstractClient {
 
     public FactomResponse<AdminBlockResponse> adminBlockByHeight(long height) throws FactomException.ClientException {
         return exchange(RpcMethod.ADMIN_BLOCK_BY_HEIGHT.toRequestBuilder().param("height", height), AdminBlockResponse.class);
     }
-
 
     public FactomResponse<AdminBlockResponse> adminBlockByKeyMerkleRoot(String keyMR) throws FactomException.ClientException {
         return exchange(RpcMethod.ADMIN_BLOCK_BY_KEYMR.toRequestBuilder().param("keymr", keyMR), AdminBlockResponse.class);

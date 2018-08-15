@@ -18,14 +18,12 @@ package org.blockchain_innovation.factom.client;
 
 import org.blockchain_innovation.factom.client.data.FactomException;
 import org.blockchain_innovation.factom.client.data.model.response.*;
-import org.blockchain_innovation.factom.client.data.model.rpc.Callback;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Map;
 
 public class ClientTest {
 

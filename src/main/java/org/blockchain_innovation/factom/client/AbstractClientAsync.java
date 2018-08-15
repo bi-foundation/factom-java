@@ -17,11 +17,9 @@
 package org.blockchain_innovation.factom.client;
 
 import org.blockchain_innovation.factom.client.data.FactomException;
-import org.blockchain_innovation.factom.client.data.model.rpc.Callback;
 import org.blockchain_innovation.factom.client.data.model.rpc.RpcRequest;
 
 import java.net.URL;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.SynchronousQueue;
@@ -31,16 +29,7 @@ import java.util.concurrent.TimeUnit;
 
 public abstract class AbstractClientAsync {
 
-    public URL getUrl() {
-        return url;
-    }
-
-    public void setUrl(URL url) {
-        this.url = url;
-    }
-
     private URL url;
-
     private ExecutorService executorService;
 
     public static ThreadFactory threadFactory(final String name, final boolean daemon) {
@@ -52,6 +41,14 @@ public abstract class AbstractClientAsync {
                 return result;
             }
         };
+    }
+
+    public URL getUrl() {
+        return url;
+    }
+
+    public void setUrl(URL url) {
+        this.url = url;
     }
 
     public synchronized ExecutorService getExecutorService() {
@@ -71,7 +68,7 @@ public abstract class AbstractClientAsync {
     }
 
     public synchronized <RpcResult> Future<FactomResponse<RpcResult>> exchange(RpcRequest rpcRequest, Class<RpcResult> rpcResultClass) throws FactomException.ClientException {
-        Exchange<RpcResult> exchange = new Exchange(getUrl(), rpcRequest,rpcResultClass);
+        Exchange<RpcResult> exchange = new Exchange(getUrl(), rpcRequest, rpcResultClass);
         return getExecutorService().submit(exchange);
     }
 }

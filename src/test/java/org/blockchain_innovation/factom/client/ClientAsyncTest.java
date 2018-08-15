@@ -18,16 +18,6 @@ package org.blockchain_innovation.factom.client;
 
 import org.blockchain_innovation.factom.client.data.FactomException;
 import org.blockchain_innovation.factom.client.data.model.response.AdminBlockResponse;
-import org.blockchain_innovation.factom.client.data.model.response.ChainHeadResponse;
-import org.blockchain_innovation.factom.client.data.model.response.DirectoryBlockHeadResponse;
-import org.blockchain_innovation.factom.client.data.model.response.DirectoryBlockResponse;
-import org.blockchain_innovation.factom.client.data.model.response.EntryTransactionsResponse;
-import org.blockchain_innovation.factom.client.data.model.response.FactoidTransactionsResponse;
-import org.blockchain_innovation.factom.client.data.model.response.HeightsResponse;
-import org.blockchain_innovation.factom.client.data.model.response.PropertiesResponse;
-import org.blockchain_innovation.factom.client.data.model.response.RawDataResponse;
-import org.blockchain_innovation.factom.client.data.model.response.TransactionResponse;
-import org.blockchain_innovation.factom.client.data.model.rpc.Callback;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -39,9 +29,7 @@ import java.util.concurrent.Future;
 
 public class ClientAsyncTest {
 
-
     private final FactomdClientAsync client = new FactomdClientAsync();
-
 
     @Before
     public void setup() throws MalformedURLException {
@@ -55,4 +43,10 @@ public class ClientAsyncTest {
         Assert.assertNotNull(response);
     }
 
+    @Test
+    public void testAdminBlockKeyMr() throws FactomException.ClientException, ExecutionException, InterruptedException {
+        Future<FactomResponse<AdminBlockResponse>> future = client.adminBlockByKeyMerkleRoot("343ffe17ca3b9775196475380feb91768e8cb3ceb888f2d617d4f0c2cc84a26a");
+        FactomResponse<AdminBlockResponse> response = future.get();
+        Assert.assertNotNull(response);
+    }
 }
