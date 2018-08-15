@@ -31,28 +31,36 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
-public class Exchange<Result> {
+public class Exchange<Result> implements Callable<FactomResponse<Result>> {
 
     private HttpURLConnection connection;
     private final URL url;
     private final FactomRequestImpl factomRequest;
     private FactomResponse<Result> factomResponse;
+    private final Class<Result> rpcResultClass;
 
     //// FIXME: 06/08/2018 Only needed now to iinit the converter
     GsonConverter conv = new GsonConverter();
 
-    protected Exchange(URL url, RpcRequest rpcRequest) {
+    protected Exchange(URL url, RpcRequest rpcRequest, Class<Result> rpcResultClass) {
         this.url = url;
         this.factomRequest = new FactomRequestImpl(rpcRequest);
+        this.rpcResultClass = rpcResultClass;
     }
 
-    public Exchange<Result> execute(Class<Result> rpcResultClass) throws FactomException.ClientException {
+    @Override
+    public FactomResponse<Result> call() throws Exception {
+        return execute();
+    }
+
+    public FactomResponse<Result> execute() throws FactomException.ClientException {
         connection();
         sendRequest();
         retrieveResponse(rpcResultClass);
-        return this;
+        return getFactomResponse();
     }
 
 

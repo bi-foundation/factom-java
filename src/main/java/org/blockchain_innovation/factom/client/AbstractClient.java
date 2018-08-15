@@ -33,19 +33,39 @@ public abstract class AbstractClient {
 
     private URL url;
 
-
-    public <RpcResult> Exchange<RpcResult> exchange(FactomRequestImpl factomRequest, Class<RpcResult> rpcResultClass) throws FactomException.ClientException {
+    public <RpcResult> FactomResponse<RpcResult> exchange(FactomRequestImpl factomRequest, Class<RpcResult> rpcResultClass) throws FactomException.ClientException {
         return exchange(factomRequest.getRpcRequest(), rpcResultClass);
     }
 
-    public <RpcResult> Exchange<RpcResult> exchange(RpcRequest.Builder rpcRequestBuilder, Class<RpcResult> rpcResultClass) throws FactomException.ClientException {
+    public <RpcResult> FactomResponse<RpcResult> exchange(RpcRequest.Builder rpcRequestBuilder, Class<RpcResult> rpcResultClass) throws FactomException.ClientException {
         return exchange(rpcRequestBuilder.build(), rpcResultClass);
     }
 
-    public <RpcResult> Exchange<RpcResult> exchange(RpcRequest rpcRequest, Class<RpcResult> rpcResultClass) throws FactomException.ClientException {
-        Exchange<RpcResult> exchange = new Exchange(getUrl(), rpcRequest);
-        return exchange.execute(rpcResultClass);
+    public <RpcResult> FactomResponse<RpcResult> exchange(RpcRequest rpcRequest, Class<RpcResult> rpcResultClass) throws FactomException.ClientException {
+        Exchange<RpcResult> exchange = new Exchange(getUrl(), rpcRequest, rpcResultClass);
+        return exchange.execute();
+    }
+/*
+    public <RpcResult> FactomResponse<RpcResult> exchange(FactomRequestImpl factomRequest, Class<RpcResult> rpcResultClass) {
+        return exchange(factomRequest.getRpcRequest(), rpcResultClass);
     }
 
+    public <RpcResult> Future<FactomResponse<RpcResult>> exchange(RpcRequest.Builder rpcRequestBuilder, Class<RpcResult> rpcResultClass) {
+        return exchange(rpcRequestBuilder.build(), rpcResultClass);
+    }
 
+    public <RpcResult> Future<FactomResponse<RpcResult>> exchange(RpcRequest rpcRequest, Class<RpcResult> rpcResultClass) {
+        ExchangeAsync<RpcResult> exchange = new ExchangeAsync(getUrl(), rpcRequest, rpcResultClass);
+        return exchange.execute(exchange);
+    }
+    public <RpcResult> FactomResponse<RpcResult> get(Future<FactomResponse<RpcResult>> future) throws FactomException.ClientException {
+        try {
+            return future.get();
+        } catch (InterruptedException e) {
+            throw new FactomException.ClientException(String.format("Call interrupted: %s", e.getMessage()), e);
+        } catch (ExecutionException e) {
+            throw new FactomException.ClientException(String.format("Call failed to execute: %s", e.getMessage()), e);
+        }
+    }
+*/
 }

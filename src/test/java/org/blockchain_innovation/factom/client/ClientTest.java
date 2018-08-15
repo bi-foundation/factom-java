@@ -24,7 +24,6 @@ import org.junit.Test;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Map;
 
 public class ClientTest {
 
@@ -49,14 +48,11 @@ public class ClientTest {
         Assert.assertNotNull(response);
     }
 
-
     @Test
     public void testAdminBlockKeyMr() throws FactomException.ClientException {
-        FactomResponse<AdminBlockResponse> response = client.adminBlockByKeyMerkleRoot("000000000000000000000000000000000000000000000000000000000000000a");
+        FactomResponse<AdminBlockResponse> response = client.adminBlockByKeyMerkleRoot("343ffe17ca3b9775196475380feb91768e8cb3ceb888f2d617d4f0c2cc84a26a");
         Assert.assertNotNull(response);
-
     }
-
 
     @Test
     public void testChainHead() throws FactomException.ClientException {
@@ -64,7 +60,6 @@ public class ClientTest {
         Assert.assertNotNull(response);
 
     }
-
 
     @Test
     public void testDirectoryBlockHeight() throws FactomException.ClientException, InterruptedException {
@@ -90,6 +85,13 @@ public class ClientTest {
     @Test
     public void testAckFactoidTransactions() throws FactomException.ClientException, InterruptedException {
         FactomResponse<FactoidTransactionsResponse> response = client.ackFactoidTransactions("e96cca381bf25f6dd4dfdf9f7009ff84ee6edaa3f47f9ccf06d2787482438f4b");
+        Assert.assertNotNull(response);
+        Assert.assertNull(response.getRpcErrorResponse());
+    }
+
+    @Test
+    public void testRawData() throws FactomException.ClientException, InterruptedException {
+        FactomResponse<RawDataResponse> response = client.rawData("e84cabc86d26b548da00d28ff48bb458610b255b762be44597e5b971bd75f8d7");
         Assert.assertNotNull(response);
         Assert.assertNull(response.getRpcErrorResponse());
     }

@@ -47,20 +47,20 @@ import org.blockchain_innovation.factom.client.data.model.rpc.RpcMethod;
 public class FactomdClient extends AbstractClient {
 
     public FactomResponse<AdminBlockResponse> adminBlockByHeight(long height) throws FactomException.ClientException {
-        return exchange(RpcMethod.ADMIN_BLOCK_BY_HEIGHT.toRequestBuilder().param("height", height), AdminBlockResponse.class).getFactomResponse();
+        return exchange(RpcMethod.ADMIN_BLOCK_BY_HEIGHT.toRequestBuilder().param("height", height), AdminBlockResponse.class);
     }
 
     public FactomResponse<AdminBlockResponse> adminBlockByKeyMerkleRoot(String keyMR) throws FactomException.ClientException {
-        return exchange(RpcMethod.ADMIN_BLOCK_BY_KEYMR.toRequestBuilder().param("keymr", keyMR), AdminBlockResponse.class).getFactomResponse();
+        return exchange(RpcMethod.ADMIN_BLOCK_BY_KEYMR.toRequestBuilder().param("keymr", keyMR), AdminBlockResponse.class);
     }
 
     private <T> FactomResponse<T> ackTransactions(String hash, String chainId, Class<T> rpcResultClass) throws FactomException.ClientException {
-        return exchange(RpcMethod.ACK_TRANSACTION.toRequestBuilder().param("hash", hash).param("chainid", chainId), rpcResultClass).getFactomResponse();
+        return exchange(RpcMethod.ACK_TRANSACTION.toRequestBuilder().param("hash", hash).param("chainid", chainId), rpcResultClass);
     }
 
 /*
     public FactomResponse<Map> ackFullTransaction(String fullMarshalledTransaction, String chainId) throws FactomException.ClientException {
-        return exchange(RpcMethod.ACK_TRANSACTION.toRequestBuilder().param("fulltransaction", fullMarshalledTransaction).param("chainid", chainId), Map.class).getFactomResponse();
+        return exchange(RpcMethod.ACK_TRANSACTION.toRequestBuilder().param("fulltransaction", fullMarshalledTransaction).param("chainid", chainId), Map.class);
     }
 */
 
@@ -73,112 +73,112 @@ public class FactomdClient extends AbstractClient {
     }
 
     public FactomResponse<ChainHeadResponse> chainHead(String chainId) throws FactomException.ClientException {
-        return exchange(RpcMethod.CHAIN_HEAD.toRequestBuilder().param("chainid", chainId), ChainHeadResponse.class).getFactomResponse();
+        return exchange(RpcMethod.CHAIN_HEAD.toRequestBuilder().param("chainid", chainId), ChainHeadResponse.class);
     }
 
     public FactomResponse<CommitChainResponse> commitChain(String message) throws FactomException.ClientException {
-        return exchange(RpcMethod.COMMIT_CHAIN.toRequestBuilder().param("message", message), CommitChainResponse.class).getFactomResponse();
+        return exchange(RpcMethod.COMMIT_CHAIN.toRequestBuilder().param("message", message), CommitChainResponse.class);
     }
 
     public FactomResponse<CommitEntryResponse> commitEntry(String message) throws FactomException.ClientException {
-        return exchange(RpcMethod.COMMIT_ENTRY.toRequestBuilder().param("message", message), CommitEntryResponse.class).getFactomResponse();
+        return exchange(RpcMethod.COMMIT_ENTRY.toRequestBuilder().param("message", message), CommitEntryResponse.class);
     }
 
     public FactomResponse<DirectoryBlockResponse> directoryBlockByHeight(long height) throws FactomException.ClientException {
-        return exchange(RpcMethod.DIRECTORY_BLOCK_BY_HEIGHT.toRequestBuilder().param("height", height), DirectoryBlockResponse.class).getFactomResponse();
+        return exchange(RpcMethod.DIRECTORY_BLOCK_BY_HEIGHT.toRequestBuilder().param("height", height), DirectoryBlockResponse.class);
     }
 
     public FactomResponse<DirectoryBlockResponse> directoryBlockByKeyMerkleRoot(String keyMR) throws FactomException.ClientException {
-        return exchange(RpcMethod.DIRECTORY_BLOCK_BY_KEYMR.toRequestBuilder().param("keymr", keyMR), DirectoryBlockResponse.class).getFactomResponse();
+        return exchange(RpcMethod.DIRECTORY_BLOCK_BY_KEYMR.toRequestBuilder().param("keymr", keyMR), DirectoryBlockResponse.class);
     }
 
     public FactomResponse<DirectoryBlockHeadResponse> directoryBlockHead() throws FactomException.ClientException {
-        return exchange(RpcMethod.DIRECTORY_BLOCK_HEAD.toRequest(), DirectoryBlockHeadResponse.class).getFactomResponse();
+        return exchange(RpcMethod.DIRECTORY_BLOCK_HEAD.toRequest(), DirectoryBlockHeadResponse.class);
     }
 
     public FactomResponse<EntryCreditBlockResponse> entryCreditBlockByHeight(int height) throws FactomException.ClientException {
-        return exchange(RpcMethod.ENTRY_CREDIT_BLOCK_BY_HEIGH.toRequestBuilder().param("height", height), EntryCreditBlockResponse.class).getFactomResponse();
+        return exchange(RpcMethod.ENTRY_CREDIT_BLOCK_BY_HEIGH.toRequestBuilder().param("height", height), EntryCreditBlockResponse.class);
     }
 
     public FactomResponse<EntryResponse> entry(String entryHash) throws FactomException.ClientException {
-        return exchange(RpcMethod.ENTRY.toRequestBuilder().param("hash", entryHash), EntryResponse.class).getFactomResponse();
+        return exchange(RpcMethod.ENTRY.toRequestBuilder().param("hash", entryHash), EntryResponse.class);
     }
 
     public FactomResponse<EntryBlockResponse> entryBlockByKeyMerkleRoot(String keyMR) throws FactomException.ClientException {
-        return exchange(RpcMethod.ENTRY_BLOCK_BY_KEYMR.toRequestBuilder().param("keymr", keyMR), EntryBlockResponse.class).getFactomResponse();
+        return exchange(RpcMethod.ENTRY_BLOCK_BY_KEYMR.toRequestBuilder().param("keymr", keyMR), EntryBlockResponse.class);
     }
 
     public FactomResponse<EntryCreditBalanceResponse> entryCreditBalance(String address) throws FactomException.ClientException {
-        return exchange(RpcMethod.ENTRY_CREDIT_BALANCE.toRequestBuilder().param("address", address), EntryCreditBalanceResponse.class).getFactomResponse();
+        return exchange(RpcMethod.ENTRY_CREDIT_BALANCE.toRequestBuilder().param("address", address), EntryCreditBalanceResponse.class);
     }
 
     public FactomResponse<EntryCreditBlockResponse> entryCreditBlock(String keymr) throws FactomException.ClientException {
-        return exchange(RpcMethod.ENTRY_CREDIT_BLOCK.toRequestBuilder().param("keymr", keymr), EntryCreditBlockResponse.class).getFactomResponse();
+        return exchange(RpcMethod.ENTRY_CREDIT_BLOCK.toRequestBuilder().param("keymr", keymr), EntryCreditBlockResponse.class);
     }
 
     public FactomResponse<EntryCreditRateResponse> entryCreditRate() throws FactomException.ClientException {
-        return exchange(RpcMethod.ENTRY_CREDIT_RATE.toRequestBuilder(), EntryCreditRateResponse.class).getFactomResponse();
+        return exchange(RpcMethod.ENTRY_CREDIT_RATE.toRequestBuilder(), EntryCreditRateResponse.class);
     }
 
     public FactomResponse<FactoidBalanceResponse> factoidBalance(String address) throws FactomException.ClientException {
-        return exchange(RpcMethod.FACTOID_BALANCE.toRequestBuilder().param("address", address), FactoidBalanceResponse.class).getFactomResponse();
+        return exchange(RpcMethod.FACTOID_BALANCE.toRequestBuilder().param("address", address), FactoidBalanceResponse.class);
     }
 
     public FactomResponse<FactoidBlockResponse> factoidBlock(String keymr) throws FactomException.ClientException {
-        return exchange(RpcMethod.FACTOID_BLOCK.toRequestBuilder().param("keymr", keymr), FactoidBlockResponse.class).getFactomResponse();
+        return exchange(RpcMethod.FACTOID_BLOCK.toRequestBuilder().param("keymr", keymr), FactoidBlockResponse.class);
     }
 
     public FactomResponse<FactoidSubmitResponse> factoidSubmit(String transaction) throws FactomException.ClientException {
-        return exchange(RpcMethod.FACTOID_SUBMIT.toRequestBuilder().param("transaction", transaction), FactoidSubmitResponse.class).getFactomResponse();
+        return exchange(RpcMethod.FACTOID_SUBMIT.toRequestBuilder().param("transaction", transaction), FactoidSubmitResponse.class);
     }
 
     public FactomResponse<FactoidBlockResponse> factoidBlockByHeight(int height) throws FactomException.ClientException {
-        return exchange(RpcMethod.FACTOID_BLOCK_BY_HEIGHT.toRequestBuilder().param("height", height), FactoidBlockResponse.class).getFactomResponse();
+        return exchange(RpcMethod.FACTOID_BLOCK_BY_HEIGHT.toRequestBuilder().param("height", height), FactoidBlockResponse.class);
     }
 
     public FactomResponse<HeightsResponse> heights() throws FactomException.ClientException {
-        return exchange(RpcMethod.HEIGHTS.toRequestBuilder(), HeightsResponse.class).getFactomResponse();
+        return exchange(RpcMethod.HEIGHTS.toRequestBuilder(), HeightsResponse.class);
     }
 
     /* toRequestBuilder or toRequest....
     public FactomResponse<HeightsResponse> heights() throws FactomException.ClientException {
-        return exchange(RpcMethod.HEIGHTS.toRequest(), HeightsResponse.class).getFactomResponse();
+        return exchange(RpcMethod.HEIGHTS.toRequest(), HeightsResponse.class);
     }
     */
 
     public FactomResponse<PendingEntriesResponse> pendingEntries(int height) throws FactomException.ClientException {
-        return exchange(RpcMethod.PENDING_ENTRIES.toRequestBuilder(), PendingEntriesResponse.class).getFactomResponse();
+        return exchange(RpcMethod.PENDING_ENTRIES.toRequestBuilder(), PendingEntriesResponse.class);
     }
 
     public FactomResponse<PendingTransactionsResponse> pendingTransactions(int height) throws FactomException.ClientException {
-        return exchange(RpcMethod.PENDING_TRANSACTONS.toRequestBuilder(), PendingTransactionsResponse.class).getFactomResponse();
+        return exchange(RpcMethod.PENDING_TRANSACTONS.toRequestBuilder(), PendingTransactionsResponse.class);
     }
 
     public FactomResponse<PropertiesResponse> properties() throws FactomException.ClientException {
-        return exchange(RpcMethod.PROPERTIES.toRequestBuilder(), PropertiesResponse.class).getFactomResponse();
+        return exchange(RpcMethod.PROPERTIES.toRequestBuilder(), PropertiesResponse.class);
     }
 
     public FactomResponse<RawDataResponse> rawData(String hash) throws FactomException.ClientException {
-        return exchange(RpcMethod.RAW_DATA.toRequestBuilder().param("hash", hash), RawDataResponse.class).getFactomResponse();
+        return exchange(RpcMethod.RAW_DATA.toRequestBuilder().param("hash", hash), RawDataResponse.class);
     }
 
     public FactomResponse<ReceiptResponse> receipt(String hash) throws FactomException.ClientException {
-        return exchange(RpcMethod.RECEIPT.toRequestBuilder().param("hash", hash), ReceiptResponse.class).getFactomResponse();
+        return exchange(RpcMethod.RECEIPT.toRequestBuilder().param("hash", hash), ReceiptResponse.class);
     }
 
     public FactomResponse<RevealResponse> revealChain(String entry) throws FactomException.ClientException {
-        return exchange(RpcMethod.REVEAL_CHAIN.toRequestBuilder().param("entry", entry), RevealResponse.class).getFactomResponse();
+        return exchange(RpcMethod.REVEAL_CHAIN.toRequestBuilder().param("entry", entry), RevealResponse.class);
     }
 
     public FactomResponse<RevealResponse> revealEntry(String entry) throws FactomException.ClientException {
-        return exchange(RpcMethod.REVEAL_ENTRY.toRequestBuilder().param("entry", entry), RevealResponse.class).getFactomResponse();
+        return exchange(RpcMethod.REVEAL_ENTRY.toRequestBuilder().param("entry", entry), RevealResponse.class);
     }
 
     public FactomResponse<SendRawMessageResponse> sendRawMessage(String message) throws FactomException.ClientException {
-        return exchange(RpcMethod.SEND_RAW_MESSAGE.toRequestBuilder().param("message", message), SendRawMessageResponse.class).getFactomResponse();
+        return exchange(RpcMethod.SEND_RAW_MESSAGE.toRequestBuilder().param("message", message), SendRawMessageResponse.class);
     }
 
     public FactomResponse<TransactionResponse> transaction(String hash) throws FactomException.ClientException {
-        return exchange(RpcMethod.TRANSACTION.toRequestBuilder().param("hash", hash), TransactionResponse.class).getFactomResponse();
+        return exchange(RpcMethod.TRANSACTION.toRequestBuilder().param("hash", hash), TransactionResponse.class);
     }
 }
