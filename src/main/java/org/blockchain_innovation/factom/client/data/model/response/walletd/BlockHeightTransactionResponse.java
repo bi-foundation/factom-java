@@ -4,7 +4,7 @@ public class BlockHeightTransactionResponse extends ExecutedTransactionResponse 
 
     private int blockheight;
 
-    public int getBlockheight() {
+    public int getBlockHeight() {
         return blockheight;
     }
 }

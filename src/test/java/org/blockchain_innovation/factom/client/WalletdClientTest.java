@@ -13,7 +13,6 @@ import org.blockchain_innovation.factom.client.data.model.response.walletd.Execu
 import org.blockchain_innovation.factom.client.data.model.response.walletd.GetHeightResponse;
 import org.blockchain_innovation.factom.client.data.model.response.walletd.PropertiesResponse;
 import org.blockchain_innovation.factom.client.data.model.response.walletd.TmpTransactions;
-import org.blockchain_innovation.factom.client.data.model.response.walletd.TransactionResponse;
 import org.blockchain_innovation.factom.client.data.model.response.walletd.TransactionsResponse;
 import org.blockchain_innovation.factom.client.data.model.response.walletd.WalletBackupResponse;
 import org.junit.Assert;
@@ -25,7 +24,7 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 
-public class WalletdClientTest {
+public class WalletdClientTest extends AbstractClientTest {
 
     private final WalletdClient client = new WalletdClient();
 
@@ -187,8 +186,8 @@ public class WalletdClientTest {
 
         PropertiesResponse properties = response.getResult();
         Assert.assertNotNull(properties);
-        Assert.assertNotNull(properties.getWalletversion());
-        Assert.assertNotNull(properties.getWalletapiversion());
+        Assert.assertNotNull(properties.getWalletVersion());
+        Assert.assertNotNull(properties.getWalletApiVersion());
     }
 
     @Test
@@ -252,13 +251,5 @@ public class WalletdClientTest {
         Assert.assertNotNull(walletBackup.getAddresses());
         Assert.assertFalse(walletBackup.getAddresses().isEmpty());
 
-    }
-
-    private void assertValidResponse(FactomResponse<?> factomResponse) {
-        Assert.assertNotNull(factomResponse);
-        Assert.assertNotNull(factomResponse.getRpcResponse());
-        Assert.assertEquals(200, factomResponse.getHTTPResponseCode());
-        Assert.assertNull(factomResponse.getRpcErrorResponse());
-        Assert.assertFalse(factomResponse.hasErrors());
     }
 }

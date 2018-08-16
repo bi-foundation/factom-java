@@ -34,11 +34,9 @@ import org.junit.Test;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class ClientTest {
-
+public class FactomdClientTest extends AbstractClientTest {
 
     private final FactomdClient client = new FactomdClient();
-
 
     @Before
     public void setup() throws MalformedURLException {
@@ -110,13 +108,5 @@ public class ClientTest {
     public void testTransactions() throws FactomException.ClientException {
         FactomResponse<TransactionResponse> response = client.transaction("e96cca381bf25f6dd4dfdf9f7009ff84ee6edaa3f47f9ccf06d2787482438f4b");
         assertValidResponse(response);
-    }
-
-    private void assertValidResponse(FactomResponse<?> factomResponse) {
-        Assert.assertNotNull(factomResponse);
-        Assert.assertNotNull(factomResponse.getRpcResponse());
-        Assert.assertEquals(200, factomResponse.getHTTPResponseCode());
-        Assert.assertNull(factomResponse.getRpcErrorResponse());
-        Assert.assertFalse(factomResponse.hasErrors());
     }
 }

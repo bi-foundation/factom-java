@@ -117,7 +117,7 @@ public class FactomdClient extends AbstractClient {
     }
 
     public FactomResponse<EntryCreditRateResponse> entryCreditRate() throws FactomException.ClientException {
-        return exchange(RpcMethod.ENTRY_CREDIT_RATE.toRequestBuilder(), EntryCreditRateResponse.class);
+        return exchange(RpcMethod.ENTRY_CREDIT_RATE.toRequest(), EntryCreditRateResponse.class);
     }
 
     public FactomResponse<FactoidBalanceResponse> factoidBalance(String address) throws FactomException.ClientException {
@@ -137,17 +137,11 @@ public class FactomdClient extends AbstractClient {
     }
 
     public FactomResponse<HeightsResponse> heights() throws FactomException.ClientException {
-        return exchange(RpcMethod.HEIGHTS.toRequestBuilder(), HeightsResponse.class);
-    }
-
-    /* toRequestBuilder or toRequest....
-    public FactomResponse<HeightsResponse> heights() throws FactomException.ClientException {
         return exchange(RpcMethod.HEIGHTS.toRequest(), HeightsResponse.class);
     }
-    */
 
     public FactomResponse<PendingEntriesResponse> pendingEntries(int height) throws FactomException.ClientException {
-        return exchange(RpcMethod.PENDING_ENTRIES.toRequestBuilder(), PendingEntriesResponse.class);
+        return exchange(RpcMethod.PENDING_ENTRIES.toRequest(), PendingEntriesResponse.class);
     }
 
     public FactomResponse<PendingTransactionsResponse> pendingTransactions(int height) throws FactomException.ClientException {
@@ -155,7 +149,7 @@ public class FactomdClient extends AbstractClient {
     }
 
     public FactomResponse<PropertiesResponse> properties() throws FactomException.ClientException {
-        return exchange(RpcMethod.PROPERTIES.toRequestBuilder(), PropertiesResponse.class);
+        return exchange(RpcMethod.PROPERTIES.toRequest(), PropertiesResponse.class);
     }
 
     public FactomResponse<RawDataResponse> rawData(String hash) throws FactomException.ClientException {

@@ -6,7 +6,7 @@ public class ExecutedTransactionResponse extends TransactionResponse {
 
     private long feespaid;
 
-    public long getFeespaid() {
+    public long getFeesPaid() {
         return feespaid;
     }
 }

@@ -5,11 +5,11 @@ public class PropertiesResponse {
     private String walletversion;
     private String walletapiversion;
 
-    public String getWalletversion() {
+    public String getWalletVersion() {
         return walletversion;
     }
 
-    public String getWalletapiversion() {
+    public String getWalletApiVersion() {
         return walletapiversion;
     }
 }

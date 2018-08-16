@@ -27,7 +27,7 @@ import java.net.URL;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-public class ClientAsyncTest {
+public class FactomdClientAsyncTest extends AbstractClientTest {
 
     private final FactomdClientAsync client = new FactomdClientAsync();
 
@@ -40,13 +40,13 @@ public class ClientAsyncTest {
     public void testAdminBlockHeight() throws FactomException.ClientException, ExecutionException, InterruptedException {
         Future<FactomResponse<AdminBlockResponse>> future = client.adminBlockByHeight(10);
         FactomResponse<AdminBlockResponse> response = future.get();
-        Assert.assertNotNull(response);
+        assertValidResponse(response);
     }
 
     @Test
     public void testAdminBlockKeyMr() throws FactomException.ClientException, ExecutionException, InterruptedException {
         Future<FactomResponse<AdminBlockResponse>> future = client.adminBlockByKeyMerkleRoot("343ffe17ca3b9775196475380feb91768e8cb3ceb888f2d617d4f0c2cc84a26a");
         FactomResponse<AdminBlockResponse> response = future.get();
-        Assert.assertNotNull(response);
+        assertValidResponse(response);
     }
 }
