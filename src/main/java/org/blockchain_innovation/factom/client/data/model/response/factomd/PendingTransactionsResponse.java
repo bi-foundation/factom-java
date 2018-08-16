@@ -30,7 +30,7 @@ public class PendingTransactionsResponse {
         return fees;
     }
 
-    public class IO {
+    public abstract class IO {
         private int amount;
         private String address;
         private String useraddress;

@@ -27,7 +27,7 @@ public class FactoidBlockResponse {
             private List<String> outecs;
             private List<SigBlock> sigblocks;
 
-            public class IO {
+            public abstract class IO {
                 private int amount;
                 private String address;
                 private String useraddress;

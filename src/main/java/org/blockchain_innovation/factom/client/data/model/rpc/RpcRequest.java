@@ -18,6 +18,10 @@ package org.blockchain_innovation.factom.client.data.model.rpc;
 
 import org.blockchain_innovation.factom.client.data.FactomRuntimeException;
 import org.blockchain_innovation.factom.client.data.conversion.StringUtils;
+import org.blockchain_innovation.factom.client.data.model.Address;
+import org.blockchain_innovation.factom.client.data.model.Chain;
+import org.blockchain_innovation.factom.client.data.model.Entry;
+import org.blockchain_innovation.factom.client.data.model.Range;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,9 +31,9 @@ import java.util.List;
 import java.util.Map;
 
 public class RpcRequest {
-    private int id;
     private final String jsonrpc = "2.0";
     private final RpcMethod method;
+    private int id;
     private Map<String, Object> params;
 
 
@@ -174,6 +178,30 @@ public class RpcRequest {
         }
     }
 
+    public static class ChainParam extends Param<Chain> {
+        public ChainParam(String key, Chain value) {
+            super(key, value);
+        }
+    }
+
+    public static class EntryParam extends Param<Entry> {
+        public EntryParam(String key, Entry value) {
+            super(key, value);
+        }
+    }
+
+    public static class AddressesParam extends Param<List<Address>> {
+        public AddressesParam(String key, List<Address> value) {
+            super(key, value);
+        }
+    }
+
+    public static class RangeParam extends Param<Range> {
+        public RangeParam(String key, Range value) {
+            super(key, value);
+        }
+    }
+
     public static class Builder {
         // We allow both using the builder or not
         private int id;
@@ -202,6 +230,26 @@ public class RpcRequest {
 
         public Builder param(String paramKey, String paramValue) {
             param(new RpcRequest.StringParam(paramKey, paramValue));
+            return this;
+        }
+
+        public Builder param(String paramKey, Chain paramValue) {
+            param(new RpcRequest.ChainParam(paramKey, paramValue));
+            return this;
+        }
+
+        public Builder param(String paramKey, Entry paramValue) {
+            param(new RpcRequest.EntryParam(paramKey, paramValue));
+            return this;
+        }
+
+        public Builder param(String paramKey, List<Address> paramValue) {
+            param(new RpcRequest.AddressesParam(paramKey, paramValue));
+            return this;
+        }
+
+        public Builder param(String paramKey, Range paramValue) {
+            param(new RpcRequest.RangeParam(paramKey, paramValue));
             return this;
         }
 

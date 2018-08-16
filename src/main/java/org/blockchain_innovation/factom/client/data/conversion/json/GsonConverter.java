@@ -16,6 +16,8 @@
 
 package org.blockchain_innovation.factom.client.data.conversion.json;
 
+import com.google.gson.FieldNamingPolicy;
+import com.google.gson.FieldNamingStrategy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializationContext;
@@ -32,6 +34,7 @@ import org.blockchain_innovation.factom.client.data.model.rpc.RpcResponse;
 
 import java.io.Reader;
 import java.io.Writer;
+import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.util.Properties;
 
@@ -48,7 +51,7 @@ public class GsonConverter implements JsonConverter {
 
     @Override
     public GsonConverter configure(Properties properties) {
-        this.gson = new GsonBuilder().setPrettyPrinting().create();
+        this.gson = new GsonBuilder().setPrettyPrinting().setFieldNamingStrategy(fieldNamingStrategy()).create();
         return this;
     }
 
@@ -106,9 +109,21 @@ public class GsonConverter implements JsonConverter {
         return this;
     }
 
+    /**
+     * add naming strategy to handle response with reserved keywords and dashes.
+     * AddressResponse public member, TmpTransaction#Transaction tx-name and WalletBackupResponse wallet-seed
+     * @return custom FieldNamingStrategy
+     */
+    private FieldNamingStrategy fieldNamingStrategy() {
+        FieldNamingStrategy customPolicy = f -> {
+            return FieldNamingPolicy.LOWER_CASE_WITH_DASHES.translateName(f).replace("_", "");
+        };
+        return customPolicy;
+    }
+
     private Gson gson() {
         if (gson == null) {
-            this.gson = new GsonBuilder().registerTypeAdapter(RpcMethod.class, new RpcMethodDeserializer()).registerTypeAdapter(RpcMethod.class, new RpcMethodSerializer()).setPrettyPrinting().setLenient().create();
+            this.gson = new GsonBuilder().setFieldNamingStrategy(fieldNamingStrategy()).registerTypeAdapter(RpcMethod.class, new RpcMethodDeserializer()).registerTypeAdapter(RpcMethod.class, new RpcMethodSerializer()).setPrettyPrinting().setLenient().create();
         }
         return gson;
     }
