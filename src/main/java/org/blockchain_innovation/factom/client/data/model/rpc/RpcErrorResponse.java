@@ -16,14 +16,10 @@
 
 package org.blockchain_innovation.factom.client.data.model.rpc;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class RpcErrorResponse {
     private Error error;
     private int id;
     private String jsonrpc;
-
 
     public int getId() {
         return id;
@@ -61,8 +57,7 @@ public class RpcErrorResponse {
     public static class Error {
         private int code;
         private String message;
-
-        private Map<String, Object> data = new HashMap<>();
+        private String data;
 
         public int getCode() {
             return code;
@@ -80,12 +75,11 @@ public class RpcErrorResponse {
             this.message = message;
         }
 
-
-        public Map<String, Object> getData() {
+        public String getData() {
             return data;
         }
 
-        public void setData(Map<String, Object> data) {
+        public void setData(String data) {
             this.data = data;
         }
 
