@@ -6,4 +6,15 @@ public class RevealResponse {
     private String entryhash;
     private String chainid;
 
+    public String getMessage() {
+        return message;
+    }
+
+    public String getEntryHash() {
+        return entryhash;
+    }
+
+    public String getChainId() {
+        return chainid;
+    }
 }

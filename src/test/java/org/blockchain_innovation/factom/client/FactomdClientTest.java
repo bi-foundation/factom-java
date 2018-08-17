@@ -21,13 +21,12 @@ import org.blockchain_innovation.factom.client.data.model.response.factomd.Admin
 import org.blockchain_innovation.factom.client.data.model.response.factomd.ChainHeadResponse;
 import org.blockchain_innovation.factom.client.data.model.response.factomd.DirectoryBlockHeadResponse;
 import org.blockchain_innovation.factom.client.data.model.response.factomd.DirectoryBlockResponse;
-import org.blockchain_innovation.factom.client.data.model.response.factomd.EntryTransactionsResponse;
+import org.blockchain_innovation.factom.client.data.model.response.factomd.EntryTransactionResponse;
 import org.blockchain_innovation.factom.client.data.model.response.factomd.FactoidTransactionsResponse;
 import org.blockchain_innovation.factom.client.data.model.response.factomd.HeightsResponse;
 import org.blockchain_innovation.factom.client.data.model.response.factomd.PropertiesResponse;
 import org.blockchain_innovation.factom.client.data.model.response.factomd.RawDataResponse;
 import org.blockchain_innovation.factom.client.data.model.response.factomd.TransactionResponse;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -82,7 +81,7 @@ public class FactomdClientTest extends AbstractClientTest {
 
     @Test
     public void testAckEntryTransactions() throws FactomException.ClientException {
-        FactomResponse<EntryTransactionsResponse> response = client.ackEntryTransactions("e96cca381bf25f6dd4dfdf9f7009ff84ee6edaa3f47f9ccf06d2787482438f4b");
+        FactomResponse<EntryTransactionResponse> response = client.ackEntryTransactions("e96cca381bf25f6dd4dfdf9f7009ff84ee6edaa3f47f9ccf06d2787482438f4b");
         assertValidResponse(response);
     }
 

@@ -16,6 +16,9 @@
 
 package org.blockchain_innovation.factom.client;
 
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonParser;
+import jdk.nashorn.internal.parser.JSONParser;
 import org.blockchain_innovation.factom.client.data.FactomException;
 import org.blockchain_innovation.factom.client.data.conversion.json.GsonConverter;
 import org.blockchain_innovation.factom.client.data.conversion.json.JsonConverter;
@@ -106,7 +109,7 @@ public class Exchange<Result> implements Callable<FactomResponse<Result>> {
         try (InputStream is = connection().getInputStream()) {
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(is))) {
                 String json = reader.lines().collect(Collectors.joining());
-                System.err.println(json);
+                System.err.println("res: " + JsonConverter.Registry.newInstance().toJson(new JsonParser().parse(json))+"\n");
                 RpcResponse<Result> rpcResult = JsonConverter.Registry.newInstance().fromJson(json, rpcResultClass);
                 this.factomResponse = new FactomResponseImpl(this, rpcResult, connection().getResponseCode(), connection().getResponseMessage());
                 return factomResponse;
@@ -114,6 +117,9 @@ public class Exchange<Result> implements Callable<FactomResponse<Result>> {
         } catch (IOException e) {
             try (BufferedReader br = new BufferedReader(new InputStreamReader(connection().getErrorStream(), Charset.defaultCharset()))) {
                 String error = br.lines().collect(Collectors.joining(System.lineSeparator()));
+                // FIXME logger
+                System.err.println("err: " + JsonConverter.Registry.newInstance().toJson(new JsonParser().parse(error)) +"\n");
+
                 RpcErrorResponse errorResponse = JsonConverter.Registry.newInstance().errorFromJson(error);
                 this.factomResponse = new FactomResponseImpl(this, errorResponse, connection().getResponseCode(), connection().getResponseMessage());
                 throw new FactomException.RpcErrorException(e, factomResponse);

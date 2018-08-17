@@ -57,7 +57,7 @@ public class RpcErrorResponse {
     public static class Error {
         private int code;
         private String message;
-        private String data;
+        private Object data;
 
         public int getCode() {
             return code;
@@ -75,7 +75,7 @@ public class RpcErrorResponse {
             this.message = message;
         }
 
-        public String getData() {
+        public Object getData() {
             return data;
         }
 

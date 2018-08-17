@@ -28,7 +28,7 @@ import org.blockchain_innovation.factom.client.data.model.response.factomd.Entry
 import org.blockchain_innovation.factom.client.data.model.response.factomd.EntryCreditBlockResponse;
 import org.blockchain_innovation.factom.client.data.model.response.factomd.EntryCreditRateResponse;
 import org.blockchain_innovation.factom.client.data.model.response.factomd.EntryResponse;
-import org.blockchain_innovation.factom.client.data.model.response.factomd.EntryTransactionsResponse;
+import org.blockchain_innovation.factom.client.data.model.response.factomd.EntryTransactionResponse;
 import org.blockchain_innovation.factom.client.data.model.response.factomd.FactoidBalanceResponse;
 import org.blockchain_innovation.factom.client.data.model.response.factomd.FactoidBlockResponse;
 import org.blockchain_innovation.factom.client.data.model.response.factomd.FactoidSubmitResponse;
@@ -68,8 +68,8 @@ public class FactomdClient extends AbstractClient {
         return ackTransactions(hash, "f", FactoidTransactionsResponse.class);
     }
 
-    public FactomResponse<EntryTransactionsResponse> ackEntryTransactions(String hash) throws FactomException.ClientException {
-        return ackTransactions(hash, "c", EntryTransactionsResponse.class);
+    public FactomResponse<EntryTransactionResponse> ackEntryTransactions(String hash) throws FactomException.ClientException {
+        return ackTransactions(hash, "c", EntryTransactionResponse.class);
     }
 
     public FactomResponse<ChainHeadResponse> chainHead(String chainId) throws FactomException.ClientException {
