@@ -30,7 +30,6 @@ import org.blockchain_innovation.factom.client.data.model.response.walletd.Delet
 import org.blockchain_innovation.factom.client.data.model.response.walletd.ExecutedTransactionResponse;
 import org.blockchain_innovation.factom.client.data.model.response.walletd.GetHeightResponse;
 import org.blockchain_innovation.factom.client.data.model.response.walletd.PropertiesResponse;
-import org.blockchain_innovation.factom.client.data.model.response.walletd.TmpTransactions;
 import org.blockchain_innovation.factom.client.data.model.response.walletd.TransactionResponse;
 import org.blockchain_innovation.factom.client.data.model.response.walletd.TransactionsResponse;
 import org.blockchain_innovation.factom.client.data.model.response.walletd.WalletBackupResponse;
@@ -116,8 +115,8 @@ public class WalletdClient extends AbstractClient {
         return exchange(RpcMethod.SUB_FEE.toRequestBuilder().param("tx-name", txName).param("address", address), ExecutedTransactionResponse.class);
     }
 
-    public FactomResponse<TmpTransactions> tmpTransactions() throws FactomException.ClientException {
-        return exchange(RpcMethod.TMP_TRANSACTIONS.toRequestBuilder(), TmpTransactions.class);
+    public FactomResponse<TransactionsResponse> tmpTransactions() throws FactomException.ClientException {
+        return exchange(RpcMethod.TMP_TRANSACTIONS.toRequestBuilder(), TransactionsResponse.class);
     }
 
     public FactomResponse<BlockHeightTransactionsResponse> transactionsByRange(Range range) throws FactomException.ClientException {
