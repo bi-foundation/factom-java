@@ -33,13 +33,10 @@ public abstract class AbstractClientAsync {
     private ExecutorService executorService;
 
     public static ThreadFactory threadFactory(final String name, final boolean daemon) {
-        return new ThreadFactory() {
-            @Override
-            public Thread newThread(Runnable runnable) {
-                Thread result = new Thread(runnable, name);
-                result.setDaemon(daemon);
-                return result;
-            }
+        return runnable -> {
+            Thread result = new Thread(runnable, name);
+            result.setDaemon(daemon);
+            return result;
         };
     }
 
@@ -53,8 +50,8 @@ public abstract class AbstractClientAsync {
 
     public synchronized ExecutorService getExecutorService() {
         if (executorService == null) {
-            executorService = new ThreadPoolExecutor(0, Integer.MAX_VALUE, 60, TimeUnit.SECONDS,
-                    new SynchronousQueue<Runnable>(), threadFactory("FactomApi Dispatcher", false));
+            executorService = new ThreadPoolExecutor(2, 10, 5, TimeUnit.MINUTES,
+                    new SynchronousQueue<>(), threadFactory("FactomApi Dispatcher", false));
         }
         return executorService;
     }

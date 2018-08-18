@@ -45,7 +45,11 @@ public interface JsonConverter {
 
     <Result> RpcResponse<Result> fromJson(String json, Class<Result> resultClass);
 
+    String prettyPrint(String json);
+
     String toJson(Object source);
+
+
 
     JsonConverter toJson(Object source, Writer writer);
 

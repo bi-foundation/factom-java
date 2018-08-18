@@ -29,6 +29,8 @@ public enum RpcMethod {
     ENTRY_CREDIT_RATE("entry-credit-rate"), FACTOID_BALANCE("factoid-balance"), FACTOID_BLOCK("factoid-block"), FACTOID_SUBMIT("factoid-submit"), FACTOID_BLOCK_BY_HEIGHT("fblock-by-height"),
     PENDING_ENTRIES("pending-entries"), PENDING_TRANSACTONS("pending-transactions"), PROPERTIES("properties"), RAW_DATA("raw-data"), RECEIPT("receipt"),
     REVEAL_CHAIN("reveal-chain"), REVEAL_ENTRY("reveal-entry"), SEND_RAW_MESSAGE("send-raw-message"), TRANSACTION("transaction"),
+
+
     // wallet api
     ADD_ENTRY_CREDIT_OUTPUT("add-ec-output"),
     ADD_FEE("add-fee"),
