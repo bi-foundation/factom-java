@@ -21,13 +21,15 @@ import java.util.List;
 import java.util.Random;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class ChainEntryTest extends AbstractClientTest {
+public class ChainEntryTestIT extends AbstractClientTest {
 
-    private static String chainId = "23fc40b5d301f8c40513cb1363439bc23e6c21856073abefdb1a2a2e49baba3b";
+    public static final int SLEEP_TIME = 5000;
+    private static String chainId /*= "23fc40b5d301f8c40513cb1363439bc23e6c21856073abefdb1a2a2e49baba3b"*/;
     private static String entryHash;
+    private static FactomResponse<ComposeResponse> composeResponse;
     private final FactomdClient factomdClient = new FactomdClient();
     private final WalletdClient walletdClient = new WalletdClient();
-    private final String publicKey = "EC3cqLZPq5ypwRB5CLfXnud5vkWAV2sd235CFf9KcWcE3FH9GRxv";
+
 
     @Before
     public void setup() throws MalformedURLException {
@@ -36,7 +38,7 @@ public class ChainEntryTest extends AbstractClientTest {
     }
 
     @Test
-    public void _01_commitChain() throws FactomException.ClientException {
+    public void _01_composeChain() throws FactomException.ClientException {
         // random 8 digit number to create new chain
         int value = 10000000 + new Random().nextInt(90000000);
 
@@ -52,13 +54,20 @@ public class ChainEntryTest extends AbstractClientTest {
         Chain chain = new Chain();
         chain.setFirstEntry(firstEntry);
 
-        FactomResponse<ComposeResponse> composeResponse = walletdClient.composeChain(chain, publicKey);
+
+        composeResponse = walletdClient.composeChain(chain, EC_PUBLIC_KEY);
         assertValidResponse(composeResponse);
 
+        Assert.assertNotNull(composeResponse.getResult().getCommit());
+        Assert.assertNotNull(composeResponse.getResult().getCommit().getId());
+        Assert.assertNotNull(composeResponse.getResult().getCommit().getParams());
+
+
+    }
+
+    @Test
+    public void _02_commitChain() throws FactomException.ClientException {
         ComposeResponse composeChain = composeResponse.getResult();
-        Assert.assertNotNull(composeChain.getCommit());
-        Assert.assertNotNull(composeChain.getCommit().getId());
-        Assert.assertNotNull(composeChain.getCommit().getParams());
 
         String commitChainMessage = composeChain.getCommit().getParams().getMessage();
         Assert.assertNotNull(commitChainMessage);
@@ -76,6 +85,7 @@ public class ChainEntryTest extends AbstractClientTest {
         Assert.assertNotNull(commitChain);
         Assert.assertEquals("Chain Commit Success", commitChain.getMessage());
         Assert.assertNotNull(commitChain.getEntryHash());
+        Assert.assertNotNull(commitChain.getChainIdHash());
         Assert.assertNotNull(commitChain.getTxId());
 
         FactomResponse<RevealResponse> revealResponse = factomdClient.revealChain(revealChainEntry);
@@ -91,25 +101,10 @@ public class ChainEntryTest extends AbstractClientTest {
 
     @Test
     public void _02_verifyCommitChain() throws FactomException.ClientException, InterruptedException {
-        int count = 0;
-        boolean confirmed = false;
-        while (!confirmed && count < 120) { // wait (10m * 60) / 5 sec
-            Thread.sleep(5000);
-
-            FactomResponse<EntryTransactionResponse> transactionsResponse = factomdClient.ackEntryTransactions(entryHash);
-            assertValidResponse(transactionsResponse);
-
-            EntryTransactionResponse entryTransaction = transactionsResponse.getResult();
-
-            if (EntryTransactionResponse.CommitData.Status.DBlockConfirmed == entryTransaction.getCommitData().getStatus()) {
-                confirmed = true;
-            }
-
-            count++;
-        }
-
+        boolean confirmed = waitOnConfirmation(130, SLEEP_TIME);
         Assert.assertTrue(confirmed);
     }
+
 
     @Test
     public void _03_commitEntry() throws FactomException.ClientException {
@@ -120,7 +115,7 @@ public class ChainEntryTest extends AbstractClientTest {
         entry.setContent("abcdef");
         entry.setExternalIds(externalIds);
 
-        FactomResponse<ComposeResponse> composeResponse = walletdClient.composeEntry(entry, publicKey);
+        FactomResponse<ComposeResponse> composeResponse = walletdClient.composeEntry(entry, EC_PUBLIC_KEY);
         assertValidResponse(composeResponse);
 
         ComposeResponse composeEntry = composeResponse.getResult();
@@ -158,23 +153,32 @@ public class ChainEntryTest extends AbstractClientTest {
 
     @Test
     public void _04_verifyCommitEntry() throws FactomException.ClientException, InterruptedException {
-        int count = 0;
-        boolean confirmed = false;
-        while (!confirmed && count < 120) { // wait (10m * 60) / 5 sec
-            Thread.sleep(5000);
+        boolean confirmed = waitOnConfirmation(130, SLEEP_TIME);
+        Assert.assertTrue(confirmed);
+    }
 
-            FactomResponse<EntryTransactionResponse> transactionsResponse = factomdClient.ackEntryTransactions(entryHash);
+
+    private boolean waitOnConfirmation(int maxCount, int sleepTime) throws InterruptedException, FactomException.ClientException {
+
+        int count = 0;
+        while (count < maxCount) { // wait (11m * 60) / 5 sec
+            Thread.sleep(sleepTime);
+
+            System.out.println("At verification second: " + count * sleepTime/1000);
+            FactomResponse<EntryTransactionResponse> transactionsResponse = factomdClient.ackTransactions(entryHash, chainId, EntryTransactionResponse.class);
             assertValidResponse(transactionsResponse);
 
             EntryTransactionResponse entryTransaction = transactionsResponse.getResult();
-
-            if (EntryTransactionResponse.CommitData.Status.DBlockConfirmed == entryTransaction.getCommitData().getStatus()) {
-                confirmed = true;
+            System.out.println("---");
+            EntryTransactionResponse.Status status = entryTransaction.getCommitData().getStatus();
+            if (count > 12 && EntryTransactionResponse.Status.TransactionACK != status) {
+                System.err.println("Transaction still not acknowledged by authset after: " + count * sleepTime/1000 + "State: "+ status + ". Probably will not succeed!");
+            } else if (EntryTransactionResponse.Status.DBlockConfirmed == status) {
+                return true;
             }
-
             count++;
         }
-
-        Assert.assertTrue(confirmed);
+        return false;
     }
+
 }

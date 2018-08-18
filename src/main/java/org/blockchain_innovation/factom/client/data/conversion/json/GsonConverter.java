@@ -24,7 +24,6 @@ import org.blockchain_innovation.factom.client.data.model.rpc.RpcResponse;
 
 import java.io.Reader;
 import java.io.Writer;
-import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.util.Properties;
 
@@ -106,19 +105,22 @@ public class GsonConverter implements JsonConverter {
 
     /**
      * add naming strategy to handle response with reserved keywords and dashes.
-     * AddressResponse public member, TmpTransaction#Transaction tx-name and WalletBackupResponse wallet-seed
+     * Examples are: TmpTransaction#Transaction tx-name and WalletBackupResponse wallet-seed
+     * @see org.blockchain_innovation.factom.client.data.model.response.walletd.AddressResponse#_public public member of AddressResponse
+     *
      * @return custom FieldNamingStrategy
      */
     private FieldNamingStrategy fieldNamingStrategy() {
-        FieldNamingStrategy customPolicy = f -> {
-            return FieldNamingPolicy.LOWER_CASE_WITH_DASHES.translateName(f).replace("_", "");
-        };
+        FieldNamingStrategy customPolicy = f -> FieldNamingPolicy.LOWER_CASE_WITH_DASHES.translateName(f).replace("_", "");
         return customPolicy;
     }
 
     private Gson gson() {
         if (gson == null) {
-            this.gson = new GsonBuilder().setFieldNamingStrategy(fieldNamingStrategy()).registerTypeAdapter(RpcMethod.class, new RpcMethodDeserializer()).registerTypeAdapter(RpcMethod.class, new RpcMethodSerializer()).setPrettyPrinting().setLenient().create();
+            this.gson = new GsonBuilder().setFieldNamingStrategy(fieldNamingStrategy()).
+                    registerTypeAdapter(RpcMethod.class, new RpcMethodDeserializer()).
+                    registerTypeAdapter(RpcMethod.class, new RpcMethodSerializer()).
+                    setPrettyPrinting().setLenient().create();
         }
         return gson;
     }

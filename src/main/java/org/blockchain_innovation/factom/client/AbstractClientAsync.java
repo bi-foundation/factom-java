@@ -16,16 +16,10 @@
 
 package org.blockchain_innovation.factom.client;
 
-import org.blockchain_innovation.factom.client.data.FactomException;
 import org.blockchain_innovation.factom.client.data.model.rpc.RpcRequest;
 
 import java.net.URL;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
-import java.util.concurrent.SynchronousQueue;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 public abstract class AbstractClientAsync {
 
@@ -48,7 +42,7 @@ public abstract class AbstractClientAsync {
         this.url = url;
     }
 
-    public synchronized ExecutorService getExecutorService() {
+    protected synchronized ExecutorService getExecutorService() {
         if (executorService == null) {
             executorService = new ThreadPoolExecutor(2, 10, 5, TimeUnit.MINUTES,
                     new SynchronousQueue<>(), threadFactory("FactomApi Dispatcher", false));
@@ -56,15 +50,15 @@ public abstract class AbstractClientAsync {
         return executorService;
     }
 
-    public synchronized <RpcResult> Future<FactomResponse<RpcResult>> exchange(FactomRequestImpl factomRequest, Class<RpcResult> rpcResultClass) throws FactomException.ClientException {
+    public synchronized <RpcResult> Future<FactomResponse<RpcResult>> exchange(FactomRequestImpl factomRequest, Class<RpcResult> rpcResultClass) {
         return exchange(factomRequest.getRpcRequest(), rpcResultClass);
     }
 
-    public synchronized <RpcResult> Future<FactomResponse<RpcResult>> exchange(RpcRequest.Builder rpcRequestBuilder, Class<RpcResult> rpcResultClass) throws FactomException.ClientException {
+    public synchronized <RpcResult> Future<FactomResponse<RpcResult>> exchange(RpcRequest.Builder rpcRequestBuilder, Class<RpcResult> rpcResultClass) {
         return exchange(rpcRequestBuilder.build(), rpcResultClass);
     }
 
-    public synchronized <RpcResult> Future<FactomResponse<RpcResult>> exchange(RpcRequest rpcRequest, Class<RpcResult> rpcResultClass) throws FactomException.ClientException {
+    public synchronized <RpcResult> Future<FactomResponse<RpcResult>> exchange(RpcRequest rpcRequest, Class<RpcResult> rpcResultClass) {
         Exchange<RpcResult> exchange = new Exchange(getUrl(), rpcRequest, rpcResultClass);
         return getExecutorService().submit(exchange);
     }

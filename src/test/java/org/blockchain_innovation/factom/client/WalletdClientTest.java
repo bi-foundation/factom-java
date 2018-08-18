@@ -35,7 +35,7 @@ public class WalletdClientTest extends AbstractClientTest {
     private final WalletdClient client = new WalletdClient();
 
     private static String transactionName = "TransactionName";
-    private static String address = "EC3cqLZPq5ypwRB5CLfXnud5vkWAV2sd235CFf9KcWcE3FH9GRxv";
+    private static String address /*= "EC3cqLZPq5ypwRB5CLfXnud5vkWAV2sd235CFf9KcWcE3FH9GRxv"*/;
     private static String transactionId = "7552f169062885624ffbfb759c26c586121f43f5a49ee537ffa5ffb8f860eb10";
     private static int height = 40879;
 
@@ -262,7 +262,7 @@ public class WalletdClientTest extends AbstractClientTest {
 
     // @Test
     public void _28_transactionsByTransaction() throws FactomException.ClientException {
-        FactomResponse<TransactionsResponse> response = client.transactionsByTransaction(transactionId);
+        FactomResponse<TransactionsResponse> response = client.transactionsByTransactionId(transactionId);
         assertValidResponse(response);
 
         TransactionsResponse transactions = response.getResult();
@@ -293,7 +293,7 @@ public class WalletdClientTest extends AbstractClientTest {
         Chain chain = new Chain();
         chain.setFirstEntry(firstEntry);
 
-        FactomResponse<ComposeResponse> response = client.composeChain(chain, "EC3cqLZPq5ypwRB5CLfXnud5vkWAV2sd235CFf9KcWcE3FH9GRxv");
+        FactomResponse<ComposeResponse> response = client.composeChain(chain, EC_PUBLIC_KEY);
         assertValidResponse(response);
 
         ComposeResponse composeResponse = response.getResult();
@@ -315,7 +315,7 @@ public class WalletdClientTest extends AbstractClientTest {
         entry.setContent("abcdef");
         entry.setExternalIds(externalIds);
 
-        FactomResponse<ComposeResponse> response = client.composeEntry(entry, "EC3cqLZPq5ypwRB5CLfXnud5vkWAV2sd235CFf9KcWcE3FH9GRxv");
+        FactomResponse<ComposeResponse> response = client.composeEntry(entry, EC_PUBLIC_KEY);
         assertValidResponse(response);
 
         ComposeResponse composeResponse = response.getResult();

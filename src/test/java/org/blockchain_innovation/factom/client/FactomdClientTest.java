@@ -17,21 +17,15 @@
 package org.blockchain_innovation.factom.client;
 
 import org.blockchain_innovation.factom.client.data.FactomException;
-import org.blockchain_innovation.factom.client.data.model.response.factomd.AdminBlockResponse;
-import org.blockchain_innovation.factom.client.data.model.response.factomd.ChainHeadResponse;
-import org.blockchain_innovation.factom.client.data.model.response.factomd.DirectoryBlockHeadResponse;
-import org.blockchain_innovation.factom.client.data.model.response.factomd.DirectoryBlockResponse;
-import org.blockchain_innovation.factom.client.data.model.response.factomd.EntryTransactionResponse;
-import org.blockchain_innovation.factom.client.data.model.response.factomd.FactoidTransactionsResponse;
-import org.blockchain_innovation.factom.client.data.model.response.factomd.HeightsResponse;
-import org.blockchain_innovation.factom.client.data.model.response.factomd.PropertiesResponse;
-import org.blockchain_innovation.factom.client.data.model.response.factomd.RawDataResponse;
-import org.blockchain_innovation.factom.client.data.model.response.factomd.TransactionResponse;
+import org.blockchain_innovation.factom.client.data.model.response.factomd.*;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+
+import static org.junit.Assert.fail;
 
 public class FactomdClientTest extends AbstractClientTest {
 
@@ -107,5 +101,17 @@ public class FactomdClientTest extends AbstractClientTest {
     public void testTransactions() throws FactomException.ClientException {
         FactomResponse<TransactionResponse> response = client.transaction("e96cca381bf25f6dd4dfdf9f7009ff84ee6edaa3f47f9ccf06d2787482438f4b");
         assertValidResponse(response);
+    }
+
+    @Test
+    public void testEntryCreditBalance() throws FactomException.ClientException {
+        FactomResponse<EntryCreditBalanceResponse> response = client.entryCreditBalance(EC_PUBLIC_KEY);
+        assertValidResponse(response);
+        EntryCreditBalanceResponse entryCreditBalance = response.getResult();
+        Assert.assertNotNull(entryCreditBalance);
+        if (entryCreditBalance.getBalance() < 30) {
+            fail(String.format("EC balance (%d) of %s is too low for other tests to run properly. Please go to %s to top up the balance", entryCreditBalance.getBalance(), EC_PUBLIC_KEY, "https://faucet.factoid.org/"));
+        }
+
     }
 }

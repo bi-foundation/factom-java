@@ -17,9 +17,9 @@
 package org.blockchain_innovation.factom.client.data.model.response.factomd;
 
 public class CommitChainResponse extends CommitEntryResponse {
-    private String chainid;
+    private String chainidhash;
 
-    public String getChainId() {
-        return chainid;
+    public String getChainIdHash() {
+        return chainidhash;
     }
 }

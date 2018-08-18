@@ -123,8 +123,8 @@ public class WalletdClient extends AbstractClient {
         return exchange(RpcMethod.TRANSACTIONS.toRequestBuilder().param("range", range), BlockHeightTransactionsResponse.class);
     }
 
-    public FactomResponse<TransactionsResponse> transactionsByTransaction(String transactionId) throws FactomException.ClientException {
-        return exchange(RpcMethod.TRANSACTIONS.toRequestBuilder().param("txid", transactionId), TransactionsResponse.class);
+    public FactomResponse<TransactionsResponse> transactionsByTransactionId(String txid) throws FactomException.ClientException {
+        return exchange(RpcMethod.TRANSACTIONS.toRequestBuilder().param("txid", txid), TransactionsResponse.class);
     }
 
     public FactomResponse<BlockHeightTransactionsResponse> transactionsByAddress(String address) throws FactomException.ClientException {

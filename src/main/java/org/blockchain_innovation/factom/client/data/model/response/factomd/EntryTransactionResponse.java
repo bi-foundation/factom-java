@@ -23,14 +23,15 @@ public class EntryTransactionResponse {
         return entrydata;
     }
 
+    public enum Status {
+        Unknown,
+        NotConfirmed,
+        TransactionACK,
+        DBlockConfirmed;
+    }
+
     public static class CommitData {
 
-        public enum Status {
-            Unknown,
-            NotConfirmed,
-            TransactionACK,
-            DBlockConfirmed;
-        }
         private Status status;
 
         public Status getStatus() {

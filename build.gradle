@@ -31,9 +31,12 @@ dependencies {
 
 
 
+    api 'org.slf4j:slf4j-api:1.7.25'
     api 'com.google.code.gson:gson:2.8.5'
 
+
     // Use JUnit test framework
+    testCompile 'org.slf4j:slf4j-simple:1.7.25'
     testCompile 'org.mock-server:mockserver-netty:5.4.1'
     testCompile 'org.mock-server:mockserver-client-java:5.4.1'
     testCompile 'junit:junit:4.12'
