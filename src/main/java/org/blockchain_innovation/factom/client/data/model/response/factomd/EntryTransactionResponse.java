@@ -43,7 +43,7 @@ public class EntryTransactionResponse {
         Unknown,
         NotConfirmed,
         TransactionACK,
-        DBlockConfirmed;
+        DBlockConfirmed
     }
 
     public static class CommitData {

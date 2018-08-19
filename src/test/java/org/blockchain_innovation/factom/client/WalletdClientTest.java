@@ -43,6 +43,7 @@ import org.junit.runners.MethodSorters;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
@@ -113,7 +114,7 @@ public class WalletdClientTest extends AbstractClientTest {
 
         Address address = new Address();
         address.setSecret(secret);
-        List<Address> addresses = Arrays.asList(address);
+        List<Address> addresses = Collections.singletonList(address);
 
         FactomResponse<AddressesResponse> response = client.importAddresses(addresses);
         assertValidResponse(response);

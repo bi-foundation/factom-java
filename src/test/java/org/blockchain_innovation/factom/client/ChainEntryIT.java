@@ -39,7 +39,7 @@ import java.util.Random;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class ChainEntryIT extends AbstractClientTest {
 
-    public static final int SLEEP_TIME = 5000;
+    private static final int SLEEP_TIME = 5000;
     private static String chainId /*= "23fc40b5d301f8c40513cb1363439bc23e6c21856073abefdb1a2a2e49baba3b"*/;
     private static String entryHash;
     private static FactomResponse<ComposeResponse> composeResponse;

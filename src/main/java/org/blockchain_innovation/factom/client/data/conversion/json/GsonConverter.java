@@ -111,8 +111,7 @@ public class GsonConverter implements JsonConverter {
      * @return custom FieldNamingStrategy
      */
     private FieldNamingStrategy fieldNamingStrategy() {
-        FieldNamingStrategy customPolicy = f -> FieldNamingPolicy.LOWER_CASE_WITH_DASHES.translateName(f).replace("_", "");
-        return customPolicy;
+        return f -> FieldNamingPolicy.LOWER_CASE_WITH_DASHES.translateName(f).replace("_", "");
     }
 
     private Gson gson() {

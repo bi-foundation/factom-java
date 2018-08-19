@@ -22,7 +22,7 @@ import org.blockchain_innovation.factom.client.data.model.response.factomd.Entry
 import java.util.List;
 
 public class EntryOperations {
-    private ByteOperations byteOps = new ByteOperations();
+    private final ByteOperations byteOps = new ByteOperations();
 
     public String calculateChainId(EntryResponse entryResponse) {
         return calculateChainId(entryResponse.getExtIds());

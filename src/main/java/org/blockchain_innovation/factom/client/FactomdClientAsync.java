@@ -24,11 +24,11 @@ import java.util.concurrent.Future;
 
 public class FactomdClientAsync extends AbstractClientAsync {
 
-    public Future<FactomResponse<AdminBlockResponse>> adminBlockByHeight(long height) throws FactomException.ClientException {
+    public Future<FactomResponse<AdminBlockResponse>> adminBlockByHeight(long height) {
         return exchange(RpcMethod.ADMIN_BLOCK_BY_HEIGHT.toRequestBuilder().param("height", height), AdminBlockResponse.class);
     }
 
-    public Future<FactomResponse<AdminBlockResponse>> adminBlockByKeyMerkleRoot(String keyMR) throws FactomException.ClientException {
+    public Future<FactomResponse<AdminBlockResponse>> adminBlockByKeyMerkleRoot(String keyMR) {
         return exchange(RpcMethod.ADMIN_BLOCK_BY_KEYMR.toRequestBuilder().param("keymr", keyMR), AdminBlockResponse.class);
     }
 }

@@ -18,7 +18,7 @@ package org.blockchain_innovation.factom.client;
 
 import org.junit.Assert;
 
-public class AbstractClientTest {
+class AbstractClientTest {
 
     protected final static String EC_PUBLIC_KEY = System.getProperty("FACTOM_CLIENT_TEST_EC_PUBLIC_KEY", "EC3cqLZPq5ypwRB5CLfXnud5vkWAV2sd235CFf9KcWcE3FH9GRxv");
 

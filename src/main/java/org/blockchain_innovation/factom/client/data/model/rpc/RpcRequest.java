@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Map;
 
 public class RpcRequest {
-    private final String jsonrpc = "2.0";
+    private static final String VERSION = "2.0";
     private final RpcMethod method;
     private int id;
     private Map<String, Object> params;
@@ -56,7 +56,7 @@ public class RpcRequest {
 
     public RpcRequest(RpcMethod rpcMethod, Param<?> firstParam, Param<?>... extraParams) {
         this(rpcMethod, firstParam);
-        Arrays.stream(extraParams).forEach(param -> addParam(param));
+        Arrays.stream(extraParams).forEach(this::addParam);
     }
 
     public RpcRequest(RpcMethod rpcMethod, Collection<Param<?>> params) {
@@ -79,7 +79,7 @@ public class RpcRequest {
     }
 
     public String getJsonrpc() {
-        return jsonrpc;
+        return VERSION;
     }
 
 
@@ -205,7 +205,7 @@ public class RpcRequest {
     public static class Builder {
         // We allow both using the builder or not
         private int id;
-        private RpcMethod method;
+        private final RpcMethod method;
         private List<Param<?>> params;
 
         public Builder(RpcMethod rpcMethod) {

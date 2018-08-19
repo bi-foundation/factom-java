@@ -21,7 +21,7 @@ import org.blockchain_innovation.factom.client.data.model.rpc.RpcRequest;
 import java.net.URL;
 import java.util.concurrent.*;
 
-public abstract class AbstractClientAsync {
+abstract class AbstractClientAsync {
 
     private URL url;
     private ExecutorService executorService;
@@ -59,7 +59,7 @@ public abstract class AbstractClientAsync {
     }
 
     public synchronized <RpcResult> Future<FactomResponse<RpcResult>> exchange(RpcRequest rpcRequest, Class<RpcResult> rpcResultClass) {
-        Exchange<RpcResult> exchange = new Exchange(getUrl(), rpcRequest, rpcResultClass);
+        Exchange<RpcResult> exchange = new Exchange<>(getUrl(), rpcRequest, rpcResultClass);
         return getExecutorService().submit(exchange);
     }
 }

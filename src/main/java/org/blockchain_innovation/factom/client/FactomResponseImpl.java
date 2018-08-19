@@ -19,7 +19,7 @@ package org.blockchain_innovation.factom.client;
 import org.blockchain_innovation.factom.client.data.model.rpc.RpcErrorResponse;
 import org.blockchain_innovation.factom.client.data.model.rpc.RpcResponse;
 
-public class FactomResponseImpl<Result> implements FactomResponse {
+public class FactomResponseImpl<Result> implements FactomResponse<Result> {
     private final Exchange exchange;
     private final RpcResponse<Result> rpcResponse;
     private final int responseCode;

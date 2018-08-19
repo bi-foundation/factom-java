@@ -33,7 +33,7 @@ public class IdTests {
     public static final String CHAIN_SECOND_EXTERNAL_ID = "second external id";
     public static final String ENTRY_CONTENT = "Test Entry Content";
 
-    static List<String> EXTERNAL_IDS = Arrays.asList(CHAIN_FIRST_EXTERNAL_ID, CHAIN_SECOND_EXTERNAL_ID);
+    static final List<String> EXTERNAL_IDS = Arrays.asList(CHAIN_FIRST_EXTERNAL_ID, CHAIN_SECOND_EXTERNAL_ID);
 
 
     @Test

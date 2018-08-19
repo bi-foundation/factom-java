@@ -109,7 +109,7 @@ public class Exchange<Result> implements Callable<FactomResponse<Result>> {
                 String json = reader.lines().collect(Collectors.joining());
                 logger.debug("response({}): {}", getFactomRequest().getRpcRequest().getId(), JsonConverter.Registry.newInstance().prettyPrint(json));
                 RpcResponse<Result> rpcResult = JsonConverter.Registry.newInstance().fromJson(json, rpcResultClass);
-                this.factomResponse = new FactomResponseImpl(this, rpcResult, connection().getResponseCode(), connection().getResponseMessage());
+                this.factomResponse = new FactomResponseImpl<>(this, rpcResult, connection().getResponseCode(), connection().getResponseMessage());
                 return factomResponse;
             }
         } catch (IOException e) {
@@ -118,7 +118,7 @@ public class Exchange<Result> implements Callable<FactomResponse<Result>> {
                 error = br.lines().collect(Collectors.joining(System.lineSeparator()));
 
                 RpcErrorResponse errorResponse = JsonConverter.Registry.newInstance().errorFromJson(error);
-                this.factomResponse = new FactomResponseImpl(this, errorResponse, connection().getResponseCode(), connection().getResponseMessage());
+                this.factomResponse = new FactomResponseImpl<>(this, errorResponse, connection().getResponseCode(), connection().getResponseMessage());
 
                 // No you never log yourself and rethrow an exception. We are however a library so are reliant on the implementor to do proper logging on exception. Hence we bind to debug level to not upset everybody ;)
                 if (logger.isDebugEnabled()) {

@@ -18,7 +18,6 @@ package org.blockchain_innovation.factom.client;
 
 import org.blockchain_innovation.factom.client.data.FactomException;
 import org.blockchain_innovation.factom.client.data.model.response.factomd.AdminBlockResponse;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
