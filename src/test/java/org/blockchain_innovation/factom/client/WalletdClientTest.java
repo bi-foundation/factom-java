@@ -92,7 +92,7 @@ public class WalletdClientTest extends AbstractClientTest {
 
         AddressResponse address = response.getResult();
         Assert.assertNotNull(address);
-        this.address = address.getPublicAddress();
+        WalletdClientTest.address = address.getPublicAddress();
         Assert.assertNotNull(address);
         Assert.assertNotNull(address.getSecret());
     }

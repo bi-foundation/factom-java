@@ -36,14 +36,14 @@ public class FactomdClientAsyncTest extends AbstractClientTest {
     }
 
     @Test
-    public void testAdminBlockHeight() throws FactomException.ClientException, ExecutionException, InterruptedException {
+    public void testAdminBlockHeight() throws ExecutionException, InterruptedException {
         Future<FactomResponse<AdminBlockResponse>> future = client.adminBlockByHeight(10);
         FactomResponse<AdminBlockResponse> response = future.get();
         assertValidResponse(response);
     }
 
     @Test
-    public void testAdminBlockKeyMerkleRoot() throws FactomException.ClientException, ExecutionException, InterruptedException {
+    public void testAdminBlockKeyMerkleRoot() throws ExecutionException, InterruptedException {
         Future<FactomResponse<AdminBlockResponse>> future = client.adminBlockByKeyMerkleRoot("343ffe17ca3b9775196475380feb91768e8cb3ceb888f2d617d4f0c2cc84a26a");
         FactomResponse<AdminBlockResponse> response = future.get();
         assertValidResponse(response);
