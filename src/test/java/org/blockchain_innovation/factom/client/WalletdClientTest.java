@@ -49,12 +49,12 @@ import java.util.List;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class WalletdClientTest extends AbstractClientTest {
 
-    private final WalletdClient client = new WalletdClient();
-
     private static String transactionName = "TransactionName";
-    private static String address /*= "EC3cqLZPq5ypwRB5CLfXnud5vkWAV2sd235CFf9KcWcE3FH9GRxv"*/;
+    private static String entryCreditAddress /*= "EC3cqLZPq5ypwRB5CLfXnud5vkWAV2sd235CFf9KcWcE3FH9GRxv"*/;
     private static String transactionId = "7552f169062885624ffbfb759c26c586121f43f5a49ee537ffa5ffb8f860eb10";
     private static int height = 40879;
+    private static FactomResponse<ExecutedTransactionResponse> addFeeResponse;
+    private final WalletdClient client = new WalletdClient();
 
     @Before
     public void setup() throws MalformedURLException {
@@ -92,8 +92,8 @@ public class WalletdClientTest extends AbstractClientTest {
 
         AddressResponse address = response.getResult();
         Assert.assertNotNull(address);
-        WalletdClientTest.address = address.getPublicAddress();
-        Assert.assertNotNull(address);
+        entryCreditAddress = address.getPublicAddress();
+        Assert.assertNotNull(entryCreditAddress);
         Assert.assertNotNull(address.getSecret());
     }
 
@@ -104,8 +104,8 @@ public class WalletdClientTest extends AbstractClientTest {
 
         AddressResponse address = response.getResult();
         Assert.assertNotNull(address);
-        Assert.assertNotNull(address.getSecret());
         Assert.assertNotNull(address.getPublicAddress());
+        Assert.assertNotNull(address.getSecret());
     }
 
     @Test
@@ -136,10 +136,10 @@ public class WalletdClientTest extends AbstractClientTest {
 
     @Test
     public void _12_address() throws FactomException.ClientException {
-        FactomResponse<AddressResponse> response = client.address(address);
+        FactomResponse<AddressResponse> response = client.address(entryCreditAddress);
         assertValidResponse(response);
         AddressResponse addressResponse = response.getResult();
-        Assert.assertEquals(address, addressResponse.getPublicAddress());
+        Assert.assertEquals(entryCreditAddress, addressResponse.getPublicAddress());
         Assert.assertNotNull(addressResponse.getSecret());
     }
 
@@ -160,21 +160,7 @@ public class WalletdClientTest extends AbstractClientTest {
     }
 
     @Test
-    public void _21_addEntryCreditOutput() throws FactomException.ClientException {
-        int amount = 10000;
-        FactomResponse<TransactionResponse> response = client.addEntryCreditOutput(transactionName, address, amount);
-        assertValidResponse(response);
-
-        TransactionResponse transaction = response.getResult();
-        Assert.assertNotNull(transaction);
-        Assert.assertEquals(10000, transaction.getTotalEntryCreditOutputs());
-        Assert.assertEquals(10000, transaction.getEntryCreditOutputs().get(0).getAmount());
-        Assert.assertEquals(address, transaction.getEntryCreditOutputs().get(0).getAddress());
-        transactionId = transaction.getTxId();
-    }
-
-    @Test
-    public void _22_tmpTransactions() throws FactomException.ClientException {
+    public void _14_tmpTransactions() throws FactomException.ClientException {
         FactomResponse<TransactionsResponse> response = client.tmpTransactions();
         assertValidResponse(response);
 
@@ -192,7 +178,100 @@ public class WalletdClientTest extends AbstractClientTest {
     }
 
     @Test
-    public void _23_composeTransaction() throws FactomException.ClientException {
+    public void _15_transactionsByAddress() throws FactomException.ClientException {
+        FactomResponse<BlockHeightTransactionsResponse> response = client.transactionsByAddress(FACTOID_PUBLIC_KEY);
+        assertValidResponse(response);
+
+        BlockHeightTransactionsResponse transactions = response.getResult();
+        Assert.assertNotNull(transactions);
+        Assert.assertNotNull(transactions.getTransactions());
+        Assert.assertFalse(transactions.getTransactions().isEmpty());
+        transactionId = transactions.getTransactions().get(0).getTxId();
+    }
+
+    @Test
+    public void _16_transactionsByAddress() throws FactomException.ClientException {
+        FactomResponse<TransactionsResponse> response = client.transactionsByTransactionId(transactionId);
+        assertValidResponse(response);
+
+        TransactionsResponse transactions = response.getResult();
+        Assert.assertNotNull(transactions);
+        Assert.assertNotNull(transactions.getTransactions());
+        Assert.assertFalse(transactions.getTransactions().isEmpty());
+        Assert.assertEquals(transactionId, transactions.getTransactions().get(0).getTxId());
+    }
+
+    @Test
+    public void _21_addEntryCreditOutput() throws FactomException.ClientException {
+        long amount = 8;
+        FactomResponse<TransactionResponse> response = client.addEntryCreditOutput(transactionName, entryCreditAddress, amount);
+        assertValidResponse(response);
+
+        TransactionResponse transaction = response.getResult();
+        Assert.assertNotNull(transaction);
+        Assert.assertEquals(8, transaction.getTotalEntryCreditOutputs());
+        Assert.assertEquals(8, transaction.getEntryCreditOutputs().get(0).getAmount());
+        Assert.assertEquals(entryCreditAddress, transaction.getEntryCreditOutputs().get(0).getAddress());
+        transactionId = transaction.getTxId();
+    }
+
+    @Test
+    public void _22_addInput() throws FactomException.ClientException {
+        int amount = 10;
+        FactomResponse<ExecutedTransactionResponse> response = client.addInput(transactionName, FACTOID_PUBLIC_KEY, amount);
+        assertValidResponse(response);
+
+        TransactionResponse transaction = response.getResult();
+        Assert.assertNotNull(transaction);
+        Assert.assertEquals(transactionName, transaction.getName());
+        Assert.assertEquals(10, transaction.getTotalInputs());
+        Assert.assertFalse(transaction.getInputs().isEmpty());
+        Assert.assertEquals(10, transaction.getInputs().get(0).getAmount());
+        Assert.assertEquals(FACTOID_PUBLIC_KEY, transaction.getInputs().get(0).getAddress());
+    }
+
+    @Test
+    public void _22_addOutput() throws FactomException.ClientException {
+        int amount = 2;
+        FactomResponse<ExecutedTransactionResponse> response = client.addOutput(transactionName, FACTOID_PUBLIC_KEY, amount);
+        assertValidResponse(response);
+
+        TransactionResponse transaction = response.getResult();
+        Assert.assertNotNull(transaction);
+        Assert.assertEquals(transactionName, transaction.getName());
+        Assert.assertEquals(2, transaction.getTotalOutputs());
+        Assert.assertFalse(transaction.getInputs().isEmpty());
+        Assert.assertEquals(2, transaction.getOutputs().get(0).getAmount());
+        Assert.assertEquals(FACTOID_PUBLIC_KEY, transaction.getOutputs().get(0).getAddress());
+    }
+
+    @Test
+    public void _23_addFee() throws FactomException.ClientException {
+        addFeeResponse = client.addFee(transactionName, FACTOID_PUBLIC_KEY);
+        assertValidResponse(addFeeResponse);
+
+        TransactionResponse transaction = addFeeResponse.getResult();
+        Assert.assertNotNull(transaction);
+    }
+
+    //@Test
+    public void _25_subFee() throws FactomException.ClientException {
+        // make input and output equal again
+        FactomResponse<TransactionResponse> addECOutputResponse = client.addEntryCreditOutput(transactionName, EC_PUBLIC_KEY, addFeeResponse.getResult().getFeesRequired());
+        assertValidResponse(addECOutputResponse);
+        long amount = addFeeResponse.getResult().getTotalInputs() + addFeeResponse.getResult().getTotalEntryCreditOutputs() + addFeeResponse.getResult().getFeesRequired();
+        FactomResponse<ExecutedTransactionResponse> addOutputResponse = client.addOutput(transactionName, FACTOID_PUBLIC_KEY, amount);
+        assertValidResponse(addOutputResponse);
+
+        FactomResponse<ExecutedTransactionResponse> response = client.subFee(transactionName, FACTOID_PUBLIC_KEY);
+        assertValidResponse(response);
+
+        TransactionResponse transaction = response.getResult();
+        Assert.assertNotNull(transaction);
+    }
+
+    @Test
+    public void _26_composeTransaction() throws FactomException.ClientException {
         FactomResponse<ComposeTransactionResponse> response = client.composeTransaction(transactionName);
         assertValidResponse(response);
 
@@ -202,91 +281,15 @@ public class WalletdClientTest extends AbstractClientTest {
         Assert.assertNotNull(composeTransaction.getParams().getTransaction());
     }
 
-    //@Test
-    public void _24_signTransaction() throws FactomException.ClientException {
+    @Test
+    public void _27_signTransaction() throws FactomException.ClientException {
         FactomResponse<ExecutedTransactionResponse> response = client.signTransaction(transactionName);
         assertValidResponse(response);
 
         ExecutedTransactionResponse executedTransaction = response.getResult();
         Assert.assertNotNull(executedTransaction);
         Assert.assertTrue(executedTransaction.isSigned());
-    }
-
-    //@Test
-    public void _25_addInput() throws FactomException.ClientException {
-        int amount = 10000;
-        FactomResponse<ExecutedTransactionResponse> response = client.addInput(transactionName, address, amount);
-        assertValidResponse(response);
-
-        TransactionResponse transaction = response.getResult();
-        Assert.assertNotNull(transaction);
-        Assert.assertEquals(transactionName, transaction.getName());
-        Assert.assertEquals(10000, transaction.getTotalEntryCreditOutputs());
-        Assert.assertEquals(10000, transaction.getEntryCreditOutputs().get(0).getAmount());
-        Assert.assertEquals(address, transaction.getEntryCreditOutputs().get(0).getAddress());
-    }
-
-    //@Test
-    public void _25_addOutput() throws FactomException.ClientException {
-        int amount = 10000;
-        FactomResponse<ExecutedTransactionResponse> response = client.addOutput(transactionName, address, amount);
-        assertValidResponse(response);
-
-        TransactionResponse transaction = response.getResult();
-        Assert.assertNotNull(transaction);
-        Assert.assertEquals(transactionName, transaction.getName());
-        Assert.assertEquals(10000, transaction.getTotalEntryCreditOutputs());
-        Assert.assertEquals(10000, transaction.getEntryCreditOutputs().get(0).getAmount());
-        Assert.assertEquals(address, transaction.getEntryCreditOutputs().get(0).getAddress());
-    }
-
-    //@Test
-    public void _26_addFee() throws FactomException.ClientException {
-        FactomResponse<ExecutedTransactionResponse> response = client.addFee(transactionName, address);
-        assertValidResponse(response);
-
-        TransactionResponse transaction = response.getResult();
-        Assert.assertNotNull(transaction);
-        Assert.assertEquals(10000, transaction.getTotalEntryCreditOutputs());
-        Assert.assertEquals(10000, transaction.getEntryCreditOutputs().get(0).getAmount());
-        Assert.assertEquals(address, transaction.getEntryCreditOutputs().get(0).getAddress());
-    }
-
-    //@Test
-    public void _26_subFee() throws FactomException.ClientException {
-        FactomResponse<ExecutedTransactionResponse> response = client.subFee(transactionName, address);
-        assertValidResponse(response);
-
-        TransactionResponse transaction = response.getResult();
-        Assert.assertNotNull(transaction);
-        Assert.assertEquals(1000, transaction.getTotalEntryCreditOutputs());
-        Assert.assertEquals(1000, transaction.getEntryCreditOutputs().get(0).getAmount());
-        Assert.assertEquals(address, transaction.getEntryCreditOutputs().get(0).getAddress());
-    }
-
-    //@Test
-    public void _27_transactionsByAddress() throws FactomException.ClientException {
-        FactomResponse<BlockHeightTransactionsResponse> response = client.transactionsByAddress(address);
-        assertValidResponse(response);
-
-        BlockHeightTransactionsResponse transactions = response.getResult();
-        Assert.assertNotNull(transactions);
-        Assert.assertNotNull(transactions.getTransactions());
-        Assert.assertFalse(transactions.getTransactions().isEmpty());
-        Assert.assertTrue(transactions.getTransactions().get(0).isSigned());
-        Assert.assertNotNull(transactions.getTransactions().get(0).getTxId());
-    }
-
-    // @Test
-    public void _28_transactionsByTransaction() throws FactomException.ClientException {
-        FactomResponse<TransactionsResponse> response = client.transactionsByTransactionId(transactionId);
-        assertValidResponse(response);
-
-        TransactionsResponse transactions = response.getResult();
-        Assert.assertNotNull(transactions);
-        Assert.assertNotNull(transactions.getTransactions());
-        Assert.assertFalse(transactions.getTransactions().isEmpty());
-        Assert.assertEquals(transactionId, transactions.getTransactions().get(0).getTxId());
+        transactionId = executedTransaction.getTxId();
     }
 
     @Test
