@@ -39,7 +39,7 @@ import java.util.List;
 
 public class WalletdClient extends AbstractClient {
 
-    public FactomResponse<TransactionResponse> addEntryCreditOutput(String txName, String address, int amount) throws FactomException.ClientException {
+    public FactomResponse<TransactionResponse> addEntryCreditOutput(String txName, String address, long amount) throws FactomException.ClientException {
         return exchange(RpcMethod.ADD_ENTRY_CREDIT_OUTPUT.toRequestBuilder().param("tx-name", txName).param("address", address).param("amount", amount), TransactionResponse.class);
     }
 
@@ -47,11 +47,11 @@ public class WalletdClient extends AbstractClient {
         return exchange(RpcMethod.ADD_FEE.toRequestBuilder().param("tx-name", txName).param("address", address), ExecutedTransactionResponse.class);
     }
 
-    public FactomResponse<ExecutedTransactionResponse> addInput(String txName, String address, int amount) throws FactomException.ClientException {
+    public FactomResponse<ExecutedTransactionResponse> addInput(String txName, String address, long amount) throws FactomException.ClientException {
         return exchange(RpcMethod.ADD_INPUT.toRequestBuilder().param("tx-name", txName).param("address", address).param("amount", amount), ExecutedTransactionResponse.class);
     }
 
-    public FactomResponse<ExecutedTransactionResponse> addOutput(String txName, String address, int amount) throws FactomException.ClientException {
+    public FactomResponse<ExecutedTransactionResponse> addOutput(String txName, String address, long amount) throws FactomException.ClientException {
         return exchange(RpcMethod.ADD_OUTPUT.toRequestBuilder().param("tx-name", txName).param("address", address).param("amount", amount), ExecutedTransactionResponse.class);
     }
 
