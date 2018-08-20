@@ -30,6 +30,9 @@ public class FactomRuntimeException extends RuntimeException {
     }
 
     public static class AssertionException extends FactomRuntimeException {
+        public AssertionException(Throwable cause) {
+            super(cause);
+        }
 
         public AssertionException(String message) {
             super(message);

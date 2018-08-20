@@ -85,7 +85,7 @@ public class EntryOperations {
 
         for (String externalId : externalIds) {
             if (externalId == null) {
-                throw new FactomRuntimeException.AssertionException("External Id needs a value");
+                throw new FactomRuntimeException.AssertionException("External Id needs a value or not be in the list at all");
             }
             byte[] extIdAsBytes = Encoding.UTF_8.decode(externalId);
             int length = extIdAsBytes.length;

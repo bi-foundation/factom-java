@@ -47,6 +47,7 @@ public class ExceptionTest {
             Assert.assertNotNull(response.getRpcErrorResponse().getError());
             Assert.assertEquals("Invalid params", response.getRpcErrorResponse().getError().getMessage());
             Assert.assertEquals("Invalid Commit Chain", response.getRpcErrorResponse().getError().getData());
+            Assert.assertNull(response.getResult());
         }
     }
 

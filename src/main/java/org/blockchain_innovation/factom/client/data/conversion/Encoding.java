@@ -27,16 +27,21 @@ public enum Encoding {
     HEX {
         @Override
         public String encode(byte[] input) {
+            assertNotNull(input);
             return DatatypeConverter.printHexBinary(input).toLowerCase();
         }
 
         @Override
         public byte[] decode(String hex) {
-            if (StringUtils.isEmpty(hex)) {
-                throw new FactomRuntimeException.AssertionException("Input hex value needs to be not null/empty for hex decoding");
+            assertNotNull(hex);
+            try {
+                return DatatypeConverter.parseHexBinary(hex);
+            } catch (IllegalArgumentException e) {
+                throw new FactomRuntimeException.AssertionException(e);
             }
-            return DatatypeConverter.parseHexBinary(hex);
         }
+
+
 
     },
 
@@ -74,4 +79,16 @@ public enum Encoding {
     protected abstract String encode(byte[] toEncode);
 
     protected abstract byte[] decode(String toDecode);
+
+    protected void assertNotNull(String input) {
+        if (StringUtils.isEmpty(input)) {
+            throw new FactomRuntimeException.AssertionException(String.format("Input value needs to be not null/empty for %s en- or decoding", name()));
+        }
+    }
+
+    protected void assertNotNull(byte[] input) {
+        if (input == null) {
+            throw new FactomRuntimeException.AssertionException(String.format("Input value needs to be not null/empty for %s en- or decoding", name()));
+        }
+    }
 }

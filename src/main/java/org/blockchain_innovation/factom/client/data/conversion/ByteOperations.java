@@ -32,6 +32,9 @@ public class ByteOperations {
      * @return
      */
     public byte[] concat(byte[] first, byte[] append) {
+        if (append == null || append.length == 0) {
+            return Arrays.copyOf(first, first.length);
+        }
         byte[] result = Arrays.copyOf(first, first.length + append.length);
         System.arraycopy(append, 0, result, first.length, append.length);
         return result;

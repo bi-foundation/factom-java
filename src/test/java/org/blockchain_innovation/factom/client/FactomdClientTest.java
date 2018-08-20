@@ -18,12 +18,15 @@ package org.blockchain_innovation.factom.client;
 
 import org.blockchain_innovation.factom.client.data.FactomException;
 import org.blockchain_innovation.factom.client.data.model.response.factomd.*;
+import org.blockchain_innovation.factom.client.data.model.rpc.RpcMethod;
+import org.blockchain_innovation.factom.client.data.model.rpc.RpcRequest;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Map;
 
 import static org.junit.Assert.fail;
 
@@ -34,6 +37,18 @@ public class FactomdClientTest extends AbstractClientTest {
     @Before
     public void setup() throws MalformedURLException {
         client.setUrl(new URL("http://136.144.204.97:8088/v2"));
+    }
+
+    @Test
+    public void manualRequest() throws FactomException.ClientException {
+        Assert.assertNull(new FactomRequestImpl(null).toString());
+
+        FactomRequestImpl factomRequest = new FactomRequestImpl(RpcMethod.PROPERTIES.toRequestBuilder().id(5).build());
+        Assert.assertNotNull(factomRequest.toString());
+        FactomResponse<Map> response = client.exchange(factomRequest, Map.class);
+        assertValidResponse(response);
+        Assert.assertEquals(5, response.getRpcResponse().getId());
+        Assert.assertEquals("2.0", response.getRpcResponse().getJsonrpc());
     }
 
     @Test

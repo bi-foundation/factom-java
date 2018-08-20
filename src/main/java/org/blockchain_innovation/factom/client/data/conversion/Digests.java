@@ -54,7 +54,7 @@ public enum Digests {
 
     private void assertMessage(Object message) {
         if (message == null) {
-            throw new FactomRuntimeException("You cannot get a digest of a null input");
+            throw new FactomRuntimeException.AssertionException("You cannot get a digest of a null input");
         }
     }
 

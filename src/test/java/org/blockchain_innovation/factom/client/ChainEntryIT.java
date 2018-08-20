@@ -39,7 +39,6 @@ import java.util.Random;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class ChainEntryIT extends AbstractClientTest {
 
-    private static final int SLEEP_TIME = 5000;
     private static String chainId /*= "23fc40b5d301f8c40513cb1363439bc23e6c21856073abefdb1a2a2e49baba3b"*/;
     private static String entryHash;
     private static FactomResponse<ComposeResponse> composeResponse;
@@ -117,8 +116,9 @@ public class ChainEntryIT extends AbstractClientTest {
 
     @Test
     public void _02_verifyCommitChain() throws FactomException.ClientException, InterruptedException {
-        boolean confirmed = waitOnConfirmation(130, SLEEP_TIME);
+        boolean confirmed = waitOnConfirmation(EntryTransactionResponse.Status.TransactionACK, 15);
         Assert.assertTrue(confirmed);
+        Thread.sleep(1000);
     }
 
 
@@ -169,30 +169,29 @@ public class ChainEntryIT extends AbstractClientTest {
 
     @Test
     public void _04_verifyCommitEntry() throws FactomException.ClientException, InterruptedException {
-        boolean confirmed = waitOnConfirmation(130, SLEEP_TIME);
+        boolean confirmed = waitOnConfirmation(EntryTransactionResponse.Status.TransactionACK, 10);
         Assert.assertTrue(confirmed);
     }
 
 
-    private boolean waitOnConfirmation(int maxCount, int sleepTime) throws InterruptedException, FactomException.ClientException {
+    private boolean waitOnConfirmation(EntryTransactionResponse.Status desiredStatus, int maxSeconds) throws InterruptedException, FactomException.ClientException {
 
-        int count = 0;
-        while (count < maxCount) { // wait (11m * 60) / 5 sec
-            Thread.sleep(sleepTime);
-
-            System.out.println("At verification second: " + count * sleepTime/1000);
+        int seconds = 0;
+        while (seconds < maxSeconds) {
+            System.out.println("At verification second: " + seconds);
             FactomResponse<EntryTransactionResponse> transactionsResponse = factomdClient.ackTransactions(entryHash, chainId, EntryTransactionResponse.class);
             assertValidResponse(transactionsResponse);
 
             EntryTransactionResponse entryTransaction = transactionsResponse.getResult();
             System.out.println("---");
             EntryTransactionResponse.Status status = entryTransaction.getCommitData().getStatus();
-            if (count > 12 && EntryTransactionResponse.Status.TransactionACK != status) {
-                System.err.println("Transaction still not acknowledged by authset after: " + count * sleepTime/1000 + "State: "+ status + ". Probably will not succeed!");
-            } else if (EntryTransactionResponse.Status.DBlockConfirmed == status) {
+            if (seconds > 12 && seconds % 6 == 0 && EntryTransactionResponse.Status.TransactionACK != status) {
+                System.err.println("Transaction still not in desired status after: " + seconds + "State: " + status + ". Probably will not succeed!");
+            } else if (desiredStatus == status) {
                 return true;
             }
-            count++;
+            seconds++;
+            Thread.sleep(1000);
         }
         return false;
     }

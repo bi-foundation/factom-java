@@ -25,25 +25,16 @@ public class RpcErrorResponse {
         return id;
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
 
     public String getJsonrpc() {
         return jsonrpc;
     }
 
-    public void setJsonrpc(String jsonrpc) {
-        this.jsonrpc = jsonrpc;
-    }
 
     public Error getError() {
         return error;
     }
 
-    public void setError(Error error) {
-        this.error = error;
-    }
 
     @Override
     public String toString() {
@@ -63,25 +54,14 @@ public class RpcErrorResponse {
             return code;
         }
 
-        public void setCode(int code) {
-            this.code = code;
-        }
-
         public String getMessage() {
             return message;
-        }
-
-        public void setMessage(String message) {
-            this.message = message;
         }
 
         public Object getData() {
             return data;
         }
 
-        public void setData(String data) {
-            this.data = data;
-        }
 
         @Override
         public String toString() {

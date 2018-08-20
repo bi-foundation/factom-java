@@ -16,13 +16,14 @@
 
 package org.blockchain_innovation.factom.client.data.conversion;
 
+import org.blockchain_innovation.factom.client.data.FactomRuntimeException;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.List;
 
-public class IdTests {
+public class EntryOperationsTest {
 
     private static final EntryOperations OPS = new EntryOperations();
 
@@ -32,6 +33,8 @@ public class IdTests {
     public static final String CHAIN_FIRST_EXTERNAL_ID = "first external id";
     public static final String CHAIN_SECOND_EXTERNAL_ID = "second external id";
     public static final String ENTRY_CONTENT = "Test Entry Content";
+
+    public static final String NULL_ENTRY_CHAIN_ID = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855";
 
     static final List<String> EXTERNAL_IDS = Arrays.asList(CHAIN_FIRST_EXTERNAL_ID, CHAIN_SECOND_EXTERNAL_ID);
 
@@ -45,6 +48,31 @@ public class IdTests {
         Assert.assertEquals(ENTRY_HASH_WITH_CONTENT, OPS.calculateEntryHash(EXTERNAL_IDS, ENTRY_CONTENT, CHAIN_ID));
     }
 
-    // TODO: 14-8-2018 Add more tests
+    @Test
+    public void testNulls() {
+        String chainId = OPS.calculateChainId((List<String>) null);
+        Assert.assertEquals(NULL_ENTRY_CHAIN_ID, chainId);
+        String firstEntryHash = OPS.calculateFirstEntryHash(null, null);
+
+        Assert.assertEquals("f64d788c2d8ae0549e8424060d4271f42f89b445b4b534e9aad5529bedfe9d61", firstEntryHash);
+        Assert.assertEquals(firstEntryHash, OPS.calculateEntryHash(null, null, null));
+        Assert.assertEquals(firstEntryHash, OPS.calculateEntryHash(null, null, NULL_ENTRY_CHAIN_ID));
+
+        try {
+            OPS.calculateChainId(Arrays.asList(CHAIN_FIRST_EXTERNAL_ID, CHAIN_SECOND_EXTERNAL_ID, null));
+            Assert.fail("Assertion exception should be thrown when a null external id is passed in the list");
+        } catch (FactomRuntimeException.AssertionException e) {
+        }
+        try {
+            OPS.externalIdsToBytes(Arrays.asList(CHAIN_FIRST_EXTERNAL_ID, CHAIN_SECOND_EXTERNAL_ID, null));
+            Assert.fail("Assertion exception should be thrown when a null external id is passed in the list");
+        } catch (FactomRuntimeException.AssertionException e) {
+        }
+        try {
+            OPS.entryToBytes(Arrays.asList(CHAIN_FIRST_EXTERNAL_ID, CHAIN_SECOND_EXTERNAL_ID, null), CHAIN_ID);
+            Assert.fail("Assertion exception should be thrown when a null external id is passed in the list");
+        } catch (FactomRuntimeException.AssertionException e) {
+        }
+    }
 
 }
