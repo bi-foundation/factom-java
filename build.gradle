@@ -23,7 +23,7 @@ repositories {
     // Use jcenter for resolving your dependencies.
     // You can declare any Maven/Ivy/file repository here.
     jcenter()
-    maven { url 'http://repo1.maven.org/maven2' }
+//    maven { url 'http://repo1.maven.org/maven2' }
 }
 
 dependencies {
@@ -36,7 +36,7 @@ dependencies {
 
 
     // Use JUnit test framework
-    testCompile 'org.slf4j:slf4j-simple:1.7.25'
+//    testCompile 'org.slf4j:slf4j-simple:1.7.25'
     testCompile 'org.mock-server:mockserver-netty:5.4.1'
     testCompile 'org.mock-server:mockserver-client-java:5.4.1'
     testCompile 'junit:junit:4.12'
