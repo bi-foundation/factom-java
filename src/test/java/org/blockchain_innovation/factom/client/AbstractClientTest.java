@@ -21,6 +21,7 @@ import org.junit.Assert;
 class AbstractClientTest {
 
     protected final static String EC_PUBLIC_KEY = System.getProperty("FACTOM_CLIENT_TEST_EC_PUBLIC_KEY", "EC3cqLZPq5ypwRB5CLfXnud5vkWAV2sd235CFf9KcWcE3FH9GRxv");
+    protected final static String FACTOID_PUBLIC_KEY = System.getProperty("FACTOM_CLIENT_TEST_FACTOID_PUBLIC_KEY", "FA2ZrcG8xkwWWNfdMRw5pGNjMPEkLaxRGqacvzfLS6TGHEHZqAA4");
 
     static {
         System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "debug");
