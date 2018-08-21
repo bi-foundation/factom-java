@@ -16,7 +16,6 @@
 
 package org.blockchain_innovation.factom.client.data.conversion;
 
-import org.blockchain_innovation.factom.client.data.FactomException;
 import org.blockchain_innovation.factom.client.data.FactomRuntimeException;
 import org.junit.Assert;
 import org.junit.Test;

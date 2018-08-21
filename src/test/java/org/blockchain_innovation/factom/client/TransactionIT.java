@@ -8,13 +8,9 @@ import org.blockchain_innovation.factom.client.data.model.response.walletd.Compo
 import org.blockchain_innovation.factom.client.data.model.response.walletd.ExecutedTransactionResponse;
 import org.blockchain_innovation.factom.client.data.model.response.walletd.TransactionResponse;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
-
-import java.net.MalformedURLException;
-import java.net.URL;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TransactionIT extends AbstractClientTest {
@@ -24,14 +20,7 @@ public class TransactionIT extends AbstractClientTest {
     private static FactomResponse<TransactionResponse> newTransactionResponse;
     private static FactomResponse<AddressResponse> toAddressResponse;
     private static FactomResponse<ComposeTransactionResponse> composeTransactionResponse;
-    private final FactomdClient factomdClient = new FactomdClient();
-    private final WalletdClient walletdClient = new WalletdClient();
 
-    @Before
-    public void setup() throws MalformedURLException {
-        factomdClient.setUrl(new URL("http://136.144.204.97:8088/v2"));
-        walletdClient.setUrl(new URL("http://136.144.204.97:8089/v2"));
-    }
 
     @Test
     public void _01_getExchangeRate() throws FactomException.ClientException {

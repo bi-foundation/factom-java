@@ -25,13 +25,10 @@ import org.blockchain_innovation.factom.client.data.model.response.factomd.Entry
 import org.blockchain_innovation.factom.client.data.model.response.factomd.RevealResponse;
 import org.blockchain_innovation.factom.client.data.model.response.walletd.ComposeResponse;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
@@ -42,15 +39,10 @@ public class ChainEntryIT extends AbstractClientTest {
     private static String chainId /*= "23fc40b5d301f8c40513cb1363439bc23e6c21856073abefdb1a2a2e49baba3b"*/;
     private static String entryHash;
     private static FactomResponse<ComposeResponse> composeResponse;
-    private final FactomdClient factomdClient = new FactomdClient();
-    private final WalletdClient walletdClient = new WalletdClient();
 
 
-    @Before
-    public void setup() throws MalformedURLException {
-        factomdClient.setUrl(new URL("http://136.144.204.97:8088/v2"));
-        walletdClient.setUrl(new URL("http://136.144.204.97:8089/v2"));
-    }
+
+
 
     @Test
     public void _01_composeChain() throws FactomException.ClientException {

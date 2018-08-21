@@ -22,11 +22,14 @@ import org.blockchain_innovation.factom.client.data.conversion.json.JsonConverte
 import org.blockchain_innovation.factom.client.data.model.rpc.RpcErrorResponse;
 import org.blockchain_innovation.factom.client.data.model.rpc.RpcRequest;
 import org.blockchain_innovation.factom.client.data.model.rpc.RpcResponse;
+import org.blockchain_innovation.factom.client.settings.RpcSettings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.net.HttpURLConnection;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.concurrent.Callable;
@@ -36,6 +39,7 @@ public class Exchange<Result> implements Callable<FactomResponse<Result>> {
 
     private HttpURLConnection connection;
     private final URL url;
+    private final RpcSettings settings;
     private final FactomRequestImpl factomRequest;
     private FactomResponse<Result> factomResponse;
     private final Class<Result> rpcResultClass;
@@ -46,8 +50,9 @@ public class Exchange<Result> implements Callable<FactomResponse<Result>> {
     GsonConverter conv = new GsonConverter();
 
 
-    protected Exchange(URL url, RpcRequest rpcRequest, Class<Result> rpcResultClass) {
-        this.url = url;
+    protected Exchange(RpcSettings settings, RpcRequest rpcRequest, Class<Result> rpcResultClass) {
+        this.settings = settings;
+        this.url = settings.getServer().getURL();
         this.factomRequest = new FactomRequestImpl(rpcRequest);
         this.rpcResultClass = rpcResultClass;
     }
@@ -139,16 +144,14 @@ public class Exchange<Result> implements Callable<FactomResponse<Result>> {
     protected HttpURLConnection createConnection(URL url) throws FactomException.ClientException {
         HttpURLConnection connection;
         try {
-            if (true) {
+            if (settings.getProxy() == null) {
                 connection = (HttpURLConnection) url.openConnection();
             } else {
-                // FIXME: 6-7-2018 Settings
-                connection = (HttpURLConnection) url.openConnection(null);
+                RpcSettings.Proxy proxySettings = settings.getProxy();
+                connection = (HttpURLConnection) url.openConnection(new Proxy(Proxy.Type.HTTP, new InetSocketAddress(proxySettings.getHost(), proxySettings.getPort())));
             }
-
-            // TODO: 6-7-2018 Make settings
-            connection.setConnectTimeout(60000);
-            connection.setReadTimeout(60000);
+            connection.setConnectTimeout(settings.getServer().getTimeout() * 1000);
+            connection.setReadTimeout(settings.getServer().getTimeout() * 1000);
             connection.setInstanceFollowRedirects(false);
             connection.setUseCaches(false);
 

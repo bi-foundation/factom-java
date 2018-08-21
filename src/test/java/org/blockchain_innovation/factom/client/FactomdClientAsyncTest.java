@@ -16,13 +16,13 @@
 
 package org.blockchain_innovation.factom.client;
 
-import org.blockchain_innovation.factom.client.data.FactomException;
 import org.blockchain_innovation.factom.client.data.model.response.factomd.AdminBlockResponse;
+import org.blockchain_innovation.factom.client.settings.RpcSettings;
+import org.blockchain_innovation.factom.client.settings.RpcSettingsImpl;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -31,8 +31,8 @@ public class FactomdClientAsyncTest extends AbstractClientTest {
     private final FactomdClientAsync client = new FactomdClientAsync();
 
     @Before
-    public void setup() throws MalformedURLException {
-        client.setUrl(new URL("http://136.144.204.97:8088/v2"));
+    public void setup() throws IOException {
+        client.setSettings(new RpcSettingsImpl(RpcSettings.SubSystem.FACTOMD, getProperties()));
     }
 
     @Test

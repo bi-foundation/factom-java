@@ -18,10 +18,21 @@ package org.blockchain_innovation.factom.client;
 
 import org.blockchain_innovation.factom.client.data.FactomException;
 import org.blockchain_innovation.factom.client.data.model.rpc.RpcRequest;
+import org.blockchain_innovation.factom.client.settings.RpcSettings;
 
 import java.net.URL;
 
 abstract class AbstractClient {
+    private RpcSettings settings;
+
+    public RpcSettings getSettings() {
+        return settings;
+    }
+
+    public void setSettings(RpcSettings settings) {
+        this.settings = settings;
+        setUrl(settings.getServer().getURL());
+    }
 
     public URL getUrl() {
         return url;
@@ -42,7 +53,7 @@ abstract class AbstractClient {
     }
 
     public <RpcResult> FactomResponse<RpcResult> exchange(RpcRequest rpcRequest, Class<RpcResult> rpcResultClass) throws FactomException.ClientException {
-        Exchange<RpcResult> exchange = new Exchange<>(getUrl(), rpcRequest, rpcResultClass);
+        Exchange<RpcResult> exchange = new Exchange<>(getSettings(), rpcRequest, rpcResultClass);
         return exchange.execute();
     }
 }
