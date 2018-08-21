@@ -18,9 +18,9 @@ package org.blockchain_innovation.factom.client.data.model.response.factomd;
 
 public class FactoidBalanceResponse {
 
-    private int balance;
+    private long balance;
 
-    public int getBalance() {
+    public long getBalance() {
         return balance;
     }
 }

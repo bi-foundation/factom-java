@@ -16,59 +16,73 @@
 
 package org.blockchain_innovation.factom.client.data.model.response.factomd;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class PendingTransactionsResponse {
+public class PendingTransactionsResponse extends ArrayList<PendingTransactionsResponse.PendingTransaction> {
 
-    private String transactionid;
-    private String status;
-    private List<Input> inputs;
-    private List<String> ecoutputs;
-    private int fees;
+    public class PendingTransaction {
 
-    public String getTransactionId() {
-        return transactionid;
-    }
+        private String transactionid;
+        private String status;
+        private List<Input> inputs;
+        private List<Output> outputs;
+        private List<EntryCreditOutput> ecoutputs;
+        private long fees;
 
-    public String getStatus() {
-        return status;
-    }
-
-    public List<Input> getInputs() {
-        return inputs;
-    }
-
-    public List<String> getEntryCreditOutputs() {
-        return ecoutputs;
-    }
-
-    public int getFees() {
-        return fees;
-    }
-
-    public abstract class IO {
-        private int amount;
-        private String address;
-        private String useraddress;
-
-        public int getAmount() {
-            return amount;
+        public String getTransactionId() {
+            return transactionid;
         }
 
-        public String getAddress() {
-            return address;
+        public String getStatus() {
+            return status;
         }
 
-        public String getUserAddress() {
-            return useraddress;
+        public List<Input> getInputs() {
+            return inputs;
         }
-    }
 
-    public class Input extends IO {
+        public List<Output> getOutputs() {
+            return outputs;
+        }
 
-    }
+        public List<EntryCreditOutput> getEntryCreditOutputs() {
+            return ecoutputs;
+        }
 
-    public class Output extends IO {
+        public long getFees() {
+            return fees;
+        }
 
+        public abstract class IO {
+            private long amount;
+            private String address;
+            private String useraddress;
+
+            public long getAmount() {
+                return amount;
+            }
+
+            public String getAddress() {
+                return address;
+            }
+
+            public String getUserAddress() {
+                return useraddress;
+            }
+        }
+
+        public class Input extends IO {
+
+        }
+
+
+        public class Output extends IO {
+
+        }
+
+        public class EntryCreditOutput extends IO {
+
+        }
     }
 }

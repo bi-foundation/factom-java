@@ -254,12 +254,10 @@ public class WalletdClientTest extends AbstractClientTest {
         Assert.assertNotNull(transaction);
     }
 
-    //@Test
-    public void _25_subFee() throws FactomException.ClientException {
-        // make input and output equal again
-        FactomResponse<TransactionResponse> addECOutputResponse = client.addEntryCreditOutput(transactionName, EC_PUBLIC_KEY, addFeeResponse.getResult().getFeesRequired());
-        assertValidResponse(addECOutputResponse);
-        long amount = addFeeResponse.getResult().getTotalInputs() + addFeeResponse.getResult().getTotalEntryCreditOutputs() + addFeeResponse.getResult().getFeesRequired();
+    // @Test
+    public void _24_subFee() throws FactomException.ClientException {
+        // make output + ec equal to input after the fee is subtracted
+        long amount = addFeeResponse.getResult().getTotalInputs() + addFeeResponse.getResult().getFeesRequired() - addFeeResponse.getResult().getTotalEntryCreditOutputs();
         FactomResponse<ExecutedTransactionResponse> addOutputResponse = client.addOutput(transactionName, FACTOID_PUBLIC_KEY, amount);
         assertValidResponse(addOutputResponse);
 

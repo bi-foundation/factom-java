@@ -23,18 +23,47 @@ public class EntryBlockResponse {
     private Header header;
     private List<Entry> entrylist;
 
+    public Header getHeader() {
+        return header;
+    }
+
+    public List<Entry> getEntryList() {
+        return entrylist;
+    }
+
     public class Header {
         private long blocksequencenumber;
         private String chainid;
         private String prevkeymr;
         private long dbheight;
-    }
 
+        public long getBlockSequenceNumber() {
+            return blocksequencenumber;
+        }
+
+        public String getChainId() {
+            return chainid;
+        }
+
+        public String getPreviousKeyMR() {
+            return prevkeymr;
+        }
+
+        public long getDirectoryBlockHeight() {
+            return dbheight;
+        }
+    }
 
     public class Entry {
         private String entryhash;
         private long timestamp;
+
+        public String getEntryHash() {
+            return entryhash;
+        }
+
+        public long getTimestamp() {
+            return timestamp;
+        }
     }
-
-
 }

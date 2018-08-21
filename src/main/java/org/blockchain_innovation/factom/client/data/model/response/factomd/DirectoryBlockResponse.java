@@ -20,31 +20,45 @@ import java.util.List;
 
 public class DirectoryBlockResponse {
 
-    private DirectoryBlock dblock;
-    private String rawdata;
+    private Header header;
+    private List<Entry> entryblocklist;
 
-    public class DirectoryBlock {
-        private Header header;
-        private List<Entry> dbentries;
+    public Header getHeader() {
+        return header;
+    }
 
-        private String dbhash;
-        private String keymr;
+    public List<Entry> getEntryblockList() {
+        return entryblocklist;
+    }
 
-        public class Header {
-            private int version;
-            private long networkid;
-            private String bodymr;
-            private String prevkeymr;
-            private String prevfullhash;
-            private long timestamp;
-            private long dbheight;
-            private long blockcount;
-            private String chainid;
+    public class Header {
+        private String prevblockkeymr;
+        private long sequencenumber;
+        private long timestamp;
+
+        public String getPreviousBlockKeyMR() {
+            return prevblockkeymr;
         }
 
-        public class Entry {
-            private String chainid;
-            private String keymr;
+        public long getSequenceNumber() {
+            return sequencenumber;
+        }
+
+        public long getTimestamp() {
+            return timestamp;
+        }
+    }
+
+    public class Entry {
+        private String chainid;
+        private String keymr;
+
+        public String getChainId() {
+            return chainid;
+        }
+
+        public String getKeyMR() {
+            return keymr;
         }
     }
 }

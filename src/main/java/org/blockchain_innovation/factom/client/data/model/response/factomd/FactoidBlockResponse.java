@@ -23,38 +23,131 @@ public class FactoidBlockResponse {
     private FactoidBlock fblock;
     private String rawdata;
 
+    public FactoidBlock getFactoidBlock() {
+        return fblock;
+    }
+
+    public String getRawData() {
+        return rawdata;
+    }
+
     public class FactoidBlock {
         private String bodymr;
         private String prevkeymr;
         private String prevledgerkeymr;
-        private int exchrate;
-        private int dbheight;
+        private long exchrate;
+        private long dbheight;
         private List<Transaction> transactions;
         private String chainid;
         private String keymr;
         private String ledgerkeymr;
 
+        public String getBodyMR() {
+            return bodymr;
+        }
+
+        public String getPreviousKeyMR() {
+            return prevkeymr;
+        }
+
+        public String getPreviousLedgerKeyMR() {
+            return prevledgerkeymr;
+        }
+
+        public long getExchangeRate() {
+            return exchrate;
+        }
+
+        public long getDirectoryBlockHeight() {
+            return dbheight;
+        }
+
+        public List<Transaction> getTransactions() {
+            return transactions;
+        }
+
+        public String getChainId() {
+            return chainid;
+        }
+
+        public String getKeyMR() {
+            return keymr;
+        }
+
+        public String getLedgerKeyMR() {
+            return ledgerkeymr;
+        }
+
         public class Transaction {
             private String txid;
-            private int blockheight;
+            private long blockheight;
             private long millitimestamp;
             private List<Input> inputs;
             private List<Output> outputs;
-            private List<String> outecs;
+            private List<OutputEntryCredit> outecs;
             private List<SigBlock> sigblocks;
 
-            public abstract class IO {
-                private int amount;
-                private String address;
-                private String useraddress;
+            public String getTxId() {
+                return txid;
             }
 
-            public class Input extends IO { }
+            public long getBlockHeight() {
+                return blockheight;
+            }
 
-            public class Output extends IO { }
+            public long getMilliTimestamp() {
+                return millitimestamp;
+            }
+
+            public List<Input> getInputs() {
+                return inputs;
+            }
+
+            public List<Output> getOutputs() {
+                return outputs;
+            }
+
+            public List<OutputEntryCredit> getOutputEntryCredits() {
+                return outecs;
+            }
+
+            public List<SigBlock> getSignatureBlocks() {
+                return sigblocks;
+            }
+
+            public abstract class IO {
+                private long amount;
+                private String address;
+                private String useraddress;
+
+                public long getAmount() {
+                    return amount;
+                }
+
+                public String getAddress() {
+                    return address;
+                }
+
+                public String getUserAddress() {
+                    return useraddress;
+                }
+            }
+
+            public class Input extends IO {
+            }
+
+            public class Output extends IO {
+            }
+
+            public class OutputEntryCredit extends IO {
+            }
 
             public class SigBlock {
                 private List<String> signatures;
+
+                public List<String> getSignatures() {
+                    return signatures;
+                }
             }
         }
     }

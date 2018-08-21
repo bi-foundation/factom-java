@@ -18,9 +18,9 @@ package org.blockchain_innovation.factom.client.data.model.response.factomd;
 
 public class EntryCreditRateResponse {
 
-    private int rate;
+    private long rate;
 
-    public int getRate() {
+    public long getRate() {
         return rate;
     }
 }

@@ -22,6 +22,7 @@ import org.blockchain_innovation.factom.client.data.model.response.factomd.Chain
 import org.blockchain_innovation.factom.client.data.model.response.factomd.CommitChainResponse;
 import org.blockchain_innovation.factom.client.data.model.response.factomd.CommitEntryResponse;
 import org.blockchain_innovation.factom.client.data.model.response.factomd.DirectoryBlockHeadResponse;
+import org.blockchain_innovation.factom.client.data.model.response.factomd.DirectoryBlockHeightResponse;
 import org.blockchain_innovation.factom.client.data.model.response.factomd.DirectoryBlockResponse;
 import org.blockchain_innovation.factom.client.data.model.response.factomd.EntryBlockResponse;
 import org.blockchain_innovation.factom.client.data.model.response.factomd.EntryCreditBalanceResponse;
@@ -84,8 +85,8 @@ public class FactomdClient extends AbstractClient {
         return exchange(RpcMethod.COMMIT_ENTRY.toRequestBuilder().param("message", message), CommitEntryResponse.class);
     }
 
-    public FactomResponse<DirectoryBlockResponse> directoryBlockByHeight(long height) throws FactomException.ClientException {
-        return exchange(RpcMethod.DIRECTORY_BLOCK_BY_HEIGHT.toRequestBuilder().param("height", height), DirectoryBlockResponse.class);
+    public FactomResponse<DirectoryBlockHeightResponse> directoryBlockByHeight(long height) throws FactomException.ClientException {
+        return exchange(RpcMethod.DIRECTORY_BLOCK_BY_HEIGHT.toRequestBuilder().param("height", height), DirectoryBlockHeightResponse.class);
     }
 
     public FactomResponse<DirectoryBlockResponse> directoryBlockByKeyMerkleRoot(String keyMR) throws FactomException.ClientException {

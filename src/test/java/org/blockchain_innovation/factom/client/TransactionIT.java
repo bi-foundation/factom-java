@@ -126,7 +126,7 @@ public class TransactionIT extends AbstractClientTest {
 
     private long calculateCost() {
         int entryCreditAmount = 1000;
-        int entryCreditRate = entryCreditRateResponse.getResult().getRate();
+        long entryCreditRate = entryCreditRateResponse.getResult().getRate();
         long fctCost = Math.round((entryCreditAmount * entryCreditRate) + .49);
         return fctCost;
     }

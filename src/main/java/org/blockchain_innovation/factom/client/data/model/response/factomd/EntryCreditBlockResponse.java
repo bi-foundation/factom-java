@@ -47,9 +47,9 @@ public class EntryCreditBlockResponse {
             private String bodyhash;
             private String prevheaderhash;
             private String prevfullhash;
-            private int dbheight;
+            private long dbheight;
             private String headerexpansionarea;
-            private int bodysize;
+            private long bodysize;
             private String chainid;
             private String ecchainid;
 
@@ -65,7 +65,7 @@ public class EntryCreditBlockResponse {
                 return prevfullhash;
             }
 
-            public int getDbHeight() {
+            public long getDirectoryBlockHeight() {
                 return dbheight;
             }
 
@@ -73,7 +73,7 @@ public class EntryCreditBlockResponse {
                 return headerexpansionarea;
             }
 
-            public int getBodySize() {
+            public long getBodySize() {
                 return bodysize;
             }
 
@@ -89,21 +89,25 @@ public class EntryCreditBlockResponse {
         public class Body {
             private List<Entry> entries;
 
+            public List<Entry> getEntries() {
+                return entries;
+            }
+
             public class Entry {
-                private int serverindexnumber;
-                private int number;
+                private long serverindexnumber;
+                private long number;
                 private int version;
                 private String millitime;
                 private String entryhash;
-                private int credits;
+                private long credits;
                 private String ecpubkey;
                 private String sig;
 
-                public int getServerIndexNumber() {
+                public long getServerIndexNumber() {
                     return serverindexnumber;
                 }
 
-                public int getNumber() {
+                public long getNumber() {
                     return number;
                 }
 
@@ -119,7 +123,7 @@ public class EntryCreditBlockResponse {
                     return entryhash;
                 }
 
-                public int getCredits() {
+                public long getCredits() {
                     return credits;
                 }
 
@@ -127,7 +131,7 @@ public class EntryCreditBlockResponse {
                     return ecpubkey;
                 }
 
-                public String getSig() {
+                public String getSiganture() {
                     return sig;
                 }
             }

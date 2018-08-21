@@ -23,6 +23,13 @@ public class AdminBlockResponse {
     private AdminBlock ablock;
     private String rawdata;
 
+    public AdminBlock getAdminBlock() {
+        return ablock;
+    }
+
+    public String getRawData() {
+        return rawdata;
+    }
 
     public class AdminBlock {
         private Header header;
@@ -30,6 +37,22 @@ public class AdminBlockResponse {
 
         private String backreferencehash;
         private String lookuphash;
+
+        public Header getHeader() {
+            return header;
+        }
+
+        public List<Entry> getAdminBlockEntries() {
+            return abentries;
+        }
+
+        public String getBackReferenceHash() {
+            return backreferencehash;
+        }
+
+        public String getLookUpHash() {
+            return lookuphash;
+        }
 
         public class Header {
 
@@ -41,16 +64,68 @@ public class AdminBlockResponse {
             private long bodysize;
             private String adminchainid;
             private String chainid;
+
+            public String getPreviousBackReferenceHash() {
+                return prevbackrefhash;
+            }
+
+            public long getDirectoryBlockHeight() {
+                return dbheight;
+            }
+
+            public int getHeaderExpansionSize() {
+                return headerexpansionsize;
+            }
+
+            public String getHeaderExpansionArea() {
+                return headerexpansionarea;
+            }
+
+            public long getMessageCount() {
+                return messagecount;
+            }
+
+            public long getBodySize() {
+                return bodysize;
+            }
+
+            public String getAdminChainId() {
+                return adminchainid;
+            }
+
+            public String getChainId() {
+                return chainid;
+            }
         }
 
         public class Entry {
             private String identityadminchainid;
-            private DBSig prevdbsig;
+            private DirectoryBlockSignature prevdbsig;
             private String minutenumber;
 
-            public class DBSig {
+            public String getIdentityAdminChainId() {
+                return identityadminchainid;
+            }
+
+            public DirectoryBlockSignature getPreviousDirectoryBlockSignature() {
+                return prevdbsig;
+            }
+
+            public String getMinuteNumber() {
+                return minutenumber;
+            }
+
+            public class DirectoryBlockSignature {
                 private String pub;
                 private String sig;
+
+                public String getPublicKey() {
+                    return pub;
+                }
+
+                public String getSignature() {
+                    return sig;
+                }
             }
         }
 
