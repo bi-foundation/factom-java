@@ -391,18 +391,17 @@ public class FactomdClientTest extends AbstractClientTest {
         Assert.assertTrue(heights.getDirectoryBlockHeight() > 0);
     }
 
-    // TODO  test with valid height
-    // @Test
+    @Test
     public void testPendingEntries() throws FactomException.ClientException {
         FactomResponse<PendingEntriesResponse> response = factomdClient.pendingEntries(41579);
         assertValidResponse(response);
 
         PendingEntriesResponse pendingEntries = response.getResult();
         Assert.assertNotNull(pendingEntries);
-        Assert.assertNotNull(pendingEntries.getChainId());
-        Assert.assertNotNull(pendingEntries.getEntryHash());
-        Assert.assertNotNull(pendingEntries.getStatus());
-
+        Assert.assertFalse(pendingEntries.isEmpty());
+        Assert.assertNotNull(pendingEntries.get(0).getChainId());
+        Assert.assertNotNull(pendingEntries.get(0).getEntryHash());
+        Assert.assertNotNull(pendingEntries.get(0).getStatus());
     }
 
     @Test
@@ -456,15 +455,32 @@ public class FactomdClientTest extends AbstractClientTest {
     }
 
     @Test
-    public void testRevealChain() {
+    public void testRevealChain() throws FactomException.ClientException {
+        FactomResponse<RevealResponse> response = factomdClient.revealChain("00527dd7ee7168adf6f4e1493bfb8f5dddb42a325371d3b2df3f490eb62b9aa10100120004268808420004616263640004313233343132333461626364");
+        assertValidResponse(response);
+
+        RevealResponse reveal = response.getResult();
+        Assert.assertNotNull(reveal);
+        Assert.assertEquals("Entry Reveal Success", reveal.getMessage());
+        Assert.assertNotNull(reveal.getChainId());
+        Assert.assertNotNull(reveal.getEntryHash());
     }
 
     @Test
-    public void testRevealEntry() {
+    public void testRevealEntry() throws FactomException.ClientException {
+        FactomResponse<RevealResponse> response = factomdClient.revealEntry("00527dd7ee7168adf6f4e1493bfb8f5dddb42a325371d3b2df3f490eb62b9aa10100080002cd90000290cdabcdef");
+        assertValidResponse(response);
+
+        RevealResponse reveal = response.getResult();
+        Assert.assertNotNull(reveal);
+        Assert.assertEquals("Entry Reveal Success", reveal.getMessage());
+        Assert.assertNotNull(reveal.getChainId());
+        Assert.assertNotNull(reveal.getEntryHash());
     }
 
     @Test
-    public void testSendRawMessage() {
+    public void testSendRawMessage() throws FactomException.ClientException {
+
     }
 
     @Test

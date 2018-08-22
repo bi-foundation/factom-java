@@ -16,21 +16,25 @@
 
 package org.blockchain_innovation.factom.client.data.model.response.factomd;
 
-public class PendingEntriesResponse {
+import java.util.ArrayList;
 
-    private String entryhash;
-    private String chainid;
-    private String status;
+public class PendingEntriesResponse extends ArrayList<PendingEntriesResponse.PendingEntry> {
 
-    public String getEntryHash() {
-        return entryhash;
-    }
+    public class PendingEntry {
+        private String entryhash;
+        private String chainid;
+        private String status;
 
-    public String getChainId() {
-        return chainid;
-    }
+        public String getEntryHash() {
+            return entryhash;
+        }
 
-    public String getStatus() {
-        return status;
+        public String getChainId() {
+            return chainid;
+        }
+
+        public String getStatus() {
+            return status;
+        }
     }
 }
