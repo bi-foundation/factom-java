@@ -25,7 +25,10 @@ import java.net.URL;
 abstract class AbstractClient {
     private RpcSettings settings;
 
-    public RpcSettings getSettings() {
+    public RpcSettings getSettings() throws FactomException.ClientException {
+        if (settings == null) {
+            throw new FactomException.ClientException("settings not provided");
+        }
         return settings;
     }
 

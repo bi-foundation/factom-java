@@ -17,8 +17,12 @@
 package org.blockchain_innovation.factom.client;
 
 import org.blockchain_innovation.factom.client.data.FactomException;
+import org.blockchain_innovation.factom.client.settings.RpcSettings;
+import org.blockchain_innovation.factom.client.settings.RpcSettingsImpl;
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.util.Properties;
 
 public class ExceptionTest extends AbstractClientTest {
 
@@ -58,5 +62,20 @@ public class ExceptionTest extends AbstractClientTest {
     @Test(expected = FactomException.ClientException.class)
     public void testCommitNullChain() throws FactomException.ClientException {
         walletdClient.composeChain(null, "");
+    }
+
+    @Test(expected = FactomException.ClientException.class)
+    public void testNoSettings() throws FactomException.ClientException {
+        FactomdClient factomdClient = new FactomdClient();
+        factomdClient.properties();
+    }
+
+    @Test(expected = FactomException.ClientException.class)
+    public void testInvalidURLSettings() throws FactomException.ClientException {
+        Properties properties = new Properties();
+        RpcSettings settings = new RpcSettingsImpl(RpcSettings.SubSystem.WALLETD, properties);
+        FactomdClient factomdClient = new FactomdClient();
+        factomdClient.setSettings(settings);
+        factomdClient.properties();
     }
 }
