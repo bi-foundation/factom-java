@@ -13,9 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*
-// To declare projects as part of a multi-project build use the 'include' method
-*/
-include ':factom-client-api', ':factom-client-impl', ':json-converter-gson', ':factom-client-tests'
-rootProject.name = 'factom-java'
 
+package org.blockchain_innovation.factom.client.api;
+
+import org.blockchain_innovation.factom.client.api.rpc.RpcErrorResponse;
+import org.blockchain_innovation.factom.client.api.rpc.RpcResponse;
+
+public interface FactomResponse<Result> {
+    RpcResponse getRpcResponse();
+
+    Result getResult();
+
+    RpcErrorResponse getRpcErrorResponse();
+
+    int getHTTPResponseCode();
+
+    String getHTTPResponseMessage();
+
+    boolean hasErrors();
+}

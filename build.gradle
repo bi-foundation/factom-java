@@ -16,30 +16,59 @@
 
 // Apply the java-library plugin to add support for Java Library
 //apply plugin: 'idea'
-apply plugin: 'java-library'
+
+//
+//plugins {
+//    id 'org.asciidoctor.convert' version '1.5.6' apply false
+//}
 
 // In this section you declare where to find the dependencies of your project
-repositories {
-    // Use jcenter for resolving your dependencies.
-    // You can declare any Maven/Ivy/file repository here.
-    jcenter()
-//    maven { url 'http://repo1.maven.org/maven2' }
+allprojects {
+    repositories {
+        jcenter()
+    }
+
+    apply plugin: 'java-library'
 }
+
+project(':factom-client-api') {
+    dependencies {
+        api 'org.slf4j:slf4j-api:1.7.25'
+    }
+}
+
+project(':factom-client-impl') {
+    dependencies {
+        compile project(':factom-client-api')
+
+        testCompile 'org.mock-server:mockserver-netty:5.4.1'
+        testCompile 'org.mock-server:mockserver-client-java:5.4.1'
+        testCompile 'junit:junit:4.12'
+
+    }
+}
+project(':json-converter-gson') {
+    dependencies {
+        compile project(':factom-client-api')
+        api 'com.google.code.gson:gson:2.8.5'
+    }
+}
+
+project(':factom-client-tests') {
+    dependencies {
+        api project(':factom-client-impl')
+        api project(':json-converter-gson')
+        testCompile 'org.mock-server:mockserver-netty:5.4.1'
+        testCompile 'org.mock-server:mockserver-client-java:5.4.1'
+        testCompile 'junit:junit:4.12'
+
+    }
+}
+
 
 dependencies {
     // This dependency is exported to consumers, that is to say found on their compile classpath.
 
-
-
-    api 'org.slf4j:slf4j-api:1.7.25'
-    api 'com.google.code.gson:gson:2.8.5'
-
-
-    // Use JUnit test framework
-//    testCompile 'org.slf4j:slf4j-simple:1.7.25'
-    testCompile 'org.mock-server:mockserver-netty:5.4.1'
-    testCompile 'org.mock-server:mockserver-client-java:5.4.1'
-    testCompile 'junit:junit:4.12'
 
 
 }

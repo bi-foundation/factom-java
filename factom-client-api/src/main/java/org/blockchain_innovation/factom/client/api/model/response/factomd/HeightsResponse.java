@@ -13,9 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*
-// To declare projects as part of a multi-project build use the 'include' method
-*/
-include ':factom-client-api', ':factom-client-impl', ':json-converter-gson', ':factom-client-tests'
-rootProject.name = 'factom-java'
 
+package org.blockchain_innovation.factom.client.api.model.response.factomd;
+
+public class HeightsResponse {
+
+    private long directoryblockheight;
+    private long leaderheight;
+    private long entryblockheight;
+    private long entryheight;
+
+    public long getDirectoryBlockHeight() {
+        return directoryblockheight;
+    }
+
+    public long getLeaderHeight() {
+        return leaderheight;
+    }
+
+    public long getEntryBlockHeight() {
+        return entryblockheight;
+    }
+
+    public long getEntryHeight() {
+        return entryheight;
+    }
+
+}

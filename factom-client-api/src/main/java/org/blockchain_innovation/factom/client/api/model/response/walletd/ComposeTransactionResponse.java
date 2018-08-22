@@ -13,9 +13,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*
-// To declare projects as part of a multi-project build use the 'include' method
-*/
-include ':factom-client-api', ':factom-client-impl', ':json-converter-gson', ':factom-client-tests'
-rootProject.name = 'factom-java'
 
+package org.blockchain_innovation.factom.client.api.model.response.walletd;
+
+public class ComposeTransactionResponse {
+
+    private String jsonrpc;
+    private int id;
+    private Params params;
+    private String method;
+
+    public String getJsonRpc() {
+        return jsonrpc;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public Params getParams() {
+        return params;
+    }
+
+    public String getMethod() {
+        return method;
+    }
+
+    public class Params {
+        private String transaction;
+
+        public String getTransaction() {
+            return transaction;
+        }
+    }
+}

@@ -13,9 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*
-// To declare projects as part of a multi-project build use the 'include' method
-*/
-include ':factom-client-api', ':factom-client-impl', ':json-converter-gson', ':factom-client-tests'
-rootProject.name = 'factom-java'
 
+package org.blockchain_innovation.factom.client.api;
+
+public class StringUtils {
+    public static boolean isEmpty(String input) {
+        return input == null || "".equals(input);
+    }
+
+    public static boolean isNotEmpty(String input) {
+        return !isEmpty(input);
+    }
+}
