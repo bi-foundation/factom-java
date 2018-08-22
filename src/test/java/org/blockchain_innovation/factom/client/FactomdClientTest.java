@@ -17,7 +17,28 @@
 package org.blockchain_innovation.factom.client;
 
 import org.blockchain_innovation.factom.client.data.FactomException;
-import org.blockchain_innovation.factom.client.data.model.response.factomd.*;
+import org.blockchain_innovation.factom.client.data.model.response.factomd.AdminBlockResponse;
+import org.blockchain_innovation.factom.client.data.model.response.factomd.ChainHeadResponse;
+import org.blockchain_innovation.factom.client.data.model.response.factomd.DirectoryBlockHeadResponse;
+import org.blockchain_innovation.factom.client.data.model.response.factomd.DirectoryBlockHeightResponse;
+import org.blockchain_innovation.factom.client.data.model.response.factomd.DirectoryBlockResponse;
+import org.blockchain_innovation.factom.client.data.model.response.factomd.EntryBlockResponse;
+import org.blockchain_innovation.factom.client.data.model.response.factomd.EntryCreditBalanceResponse;
+import org.blockchain_innovation.factom.client.data.model.response.factomd.EntryCreditBlockResponse;
+import org.blockchain_innovation.factom.client.data.model.response.factomd.EntryCreditRateResponse;
+import org.blockchain_innovation.factom.client.data.model.response.factomd.EntryTransactionResponse;
+import org.blockchain_innovation.factom.client.data.model.response.factomd.FactoidBalanceResponse;
+import org.blockchain_innovation.factom.client.data.model.response.factomd.FactoidBlockResponse;
+import org.blockchain_innovation.factom.client.data.model.response.factomd.FactoidSubmitResponse;
+import org.blockchain_innovation.factom.client.data.model.response.factomd.FactoidTransactionsResponse;
+import org.blockchain_innovation.factom.client.data.model.response.factomd.HeightsResponse;
+import org.blockchain_innovation.factom.client.data.model.response.factomd.PendingEntriesResponse;
+import org.blockchain_innovation.factom.client.data.model.response.factomd.PendingTransactionsResponse;
+import org.blockchain_innovation.factom.client.data.model.response.factomd.PropertiesResponse;
+import org.blockchain_innovation.factom.client.data.model.response.factomd.RawDataResponse;
+import org.blockchain_innovation.factom.client.data.model.response.factomd.ReceiptResponse;
+import org.blockchain_innovation.factom.client.data.model.response.factomd.RevealResponse;
+import org.blockchain_innovation.factom.client.data.model.response.factomd.TransactionResponse;
 import org.blockchain_innovation.factom.client.data.model.rpc.RpcMethod;
 import org.junit.Assert;
 import org.junit.Test;
@@ -71,8 +92,18 @@ public class FactomdClientTest extends AbstractClientTest {
     }
 
     @Test
-    public void testAckTransactions() {
+    public void testAckTransactions() throws FactomException.ClientException {
+        FactomResponse<EntryTransactionResponse> response = factomdClient.ackTransactions("0fb1b4c917e933d1d7aeb157398360fa36af6902131ea5037b04af510483caa3", "2b079f0f6b1e84315827f5b2f799a9d3219fdd975ea59aafa2dcb7dfb0fc02f6", EntryTransactionResponse.class);
+        assertValidResponse(response);
 
+        EntryTransactionResponse entryTransaction = response.getResult();
+        Assert.assertNotNull(entryTransaction);
+        Assert.assertNotNull(entryTransaction.getCommitTxId());
+        Assert.assertNotNull(entryTransaction.getEntryHash());
+        Assert.assertNotNull(entryTransaction.getCommitData());
+        Assert.assertNotNull(entryTransaction.getCommitData().getStatus());
+        Assert.assertNotNull(entryTransaction.getEntryData());
+        Assert.assertNotNull(entryTransaction.getEntryData().getStatus());
     }
 
     @Test
@@ -248,10 +279,9 @@ public class FactomdClientTest extends AbstractClientTest {
     public void testEntry() {
     }
 
-    // TODO find entry block key mr
-    // @Test
+    @Test
     public void testEntryBlockByKeyMerkleRoot() throws FactomException.ClientException {
-        FactomResponse<EntryBlockResponse> response = factomdClient.entryBlockByKeyMerkleRoot("a39efedcabc916833799bf1380664eb9d15dafddfe49b5165972dd80cf6f9bcb");
+        FactomResponse<EntryBlockResponse> response = factomdClient.entryBlockByKeyMerkleRoot("6272ed26f9e1b416f4b93672507270ecd5253c27af6365345ad0d1f68c23be91");
         assertValidResponse(response);
 
         EntryBlockResponse entryBlock = response.getResult();
@@ -264,7 +294,7 @@ public class FactomdClientTest extends AbstractClientTest {
         Assert.assertNotNull(entryBlock.getHeader());
         Assert.assertNotNull(entryBlock.getHeader().getChainId());
         Assert.assertNotNull(entryBlock.getHeader().getPreviousKeyMR());
-        Assert.assertTrue(entryBlock.getHeader().getBlockSequenceNumber() > 0);
+        Assert.assertTrue(entryBlock.getHeader().getBlockSequenceNumber() >= 0);
         Assert.assertTrue(entryBlock.getHeader().getDirectoryBlockHeight() > 0);
     }
 
@@ -351,8 +381,14 @@ public class FactomdClientTest extends AbstractClientTest {
     }
 
     @Test
-    public void testFactoidSubmit() {
+    public void testFactoidSubmit() throws FactomException.ClientException {
+        FactomResponse<FactoidSubmitResponse> response = factomdClient.factoidSubmit("0201656165ce80010001bde2204ef701663ab1b4a32eb31e658e471bdea484da4dfd9fd48caa09c53b09c2db6ebd84404f028c1f0d877cf15922169c2f05f3e972649159e4b6a9842e0a0b6da2da63b501e1061b8dcf36c1bb89b004533153478afc6cbc50813804c7f9b9540c3261a3bf42234354dc9082176e7ba56b5cfcf77e1eedf51ef21bc3dc1e8dc20637e7b75ca89144986410550df85b472622d4d792eb007d326b8138dea03224316a1ce504");
+        assertValidResponse(response);
 
+        FactoidSubmitResponse factoidSubmit = response.getResult();
+        Assert.assertNotNull(factoidSubmit);
+        Assert.assertNotNull(factoidSubmit.getTxId());
+        Assert.assertEquals("Successfully submitted the transaction", factoidSubmit.getMessage());
     }
 
     @Test
@@ -398,10 +434,6 @@ public class FactomdClientTest extends AbstractClientTest {
 
         PendingEntriesResponse pendingEntries = response.getResult();
         Assert.assertNotNull(pendingEntries);
-        Assert.assertFalse(pendingEntries.isEmpty());
-        Assert.assertNotNull(pendingEntries.get(0).getChainId());
-        Assert.assertNotNull(pendingEntries.get(0).getEntryHash());
-        Assert.assertNotNull(pendingEntries.get(0).getStatus());
     }
 
     @Test
@@ -437,21 +469,23 @@ public class FactomdClientTest extends AbstractClientTest {
         Assert.assertNotNull(rawData.getData());
     }
 
-    // TODO test with valid hash
-    // @Test
+    @Test
     public void testReceipt() throws FactomException.ClientException {
-        FactomResponse<ReceiptResponse> response = factomdClient.receipt("0ae2ab2cf543eed52a13a5a405bded712444cc8f8b6724a00602e1c8550a4ec2");
+        FactomResponse<ReceiptResponse> response = factomdClient.receipt("1f9f3030597cca90365d2852c5e498cf412939076265c553133fe3adf415465b");
         assertValidResponse(response);
 
         ReceiptResponse receipt = response.getResult();
         Assert.assertNotNull(receipt);
-        Assert.assertNotNull(receipt.getBitcoinBlockHash());
-        Assert.assertNotNull(receipt.getBitcoinTransactionHash());
-        Assert.assertNotNull(receipt.getDirectoryBlockKeyMR());
-        Assert.assertNotNull(receipt.getEntryBlockKeyMR());
-        Assert.assertNotNull(receipt.getEntry());
-        Assert.assertNotNull(receipt.getEntry().getEntryHash());
-
+        Assert.assertNotNull(receipt.getReceipt());
+        Assert.assertNotNull(receipt.getReceipt().getDirectoryBlockKeyMR());
+        Assert.assertNotNull(receipt.getReceipt().getEntryBlockKeyMR());
+        Assert.assertNotNull(receipt.getReceipt().getEntry());
+        Assert.assertNotNull(receipt.getReceipt().getEntry().getEntryHash());
+        Assert.assertNotNull(receipt.getReceipt().getMerkleBranch());
+        Assert.assertFalse(receipt.getReceipt().getMerkleBranch().isEmpty());
+        Assert.assertNotNull(receipt.getReceipt().getMerkleBranch().get(0).getLeft());
+        Assert.assertNotNull(receipt.getReceipt().getMerkleBranch().get(0).getRight());
+        Assert.assertNotNull(receipt.getReceipt().getMerkleBranch().get(0).getTop());
     }
 
     @Test

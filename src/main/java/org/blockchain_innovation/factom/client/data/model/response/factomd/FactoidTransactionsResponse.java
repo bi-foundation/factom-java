@@ -23,7 +23,7 @@ public class FactoidTransactionsResponse {
     private String transactiondatestring;
     private long blockdate;
     private String blockdatestring;
-    private String status;
+    private Status status;
 
     public String getTxId() {
         return txid;
@@ -45,7 +45,14 @@ public class FactoidTransactionsResponse {
         return blockdatestring;
     }
 
-    public String getStatus() {
+    public Status getStatus() {
         return status;
+    }
+
+    public enum Status {
+        Unknown,
+        NotConfirmed,
+        TransactionACK,
+        DBlockConfirmed
     }
 }

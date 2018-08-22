@@ -39,7 +39,6 @@ public class ExceptionTest extends AbstractClientTest {
         }
     }
 
-
     @Test
     public void testIncorrectTxName() throws FactomException.ClientException {
         try {
@@ -54,5 +53,10 @@ public class ExceptionTest extends AbstractClientTest {
             Assert.assertEquals("Internal error", response.getRpcErrorResponse().getError().getMessage());
             Assert.assertEquals("wallet: Transaction name was not found", response.getRpcErrorResponse().getError().getData());
         }
+    }
+
+    @Test(expected = FactomException.ClientException.class)
+    public void testCommitNullChain() throws FactomException.ClientException {
+        walletdClient.composeChain(null, "");
     }
 }
