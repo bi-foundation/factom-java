@@ -1,0 +1,28 @@
+= Factom-Java Changelog
+:uri-bif: https://blockchain-innovation.org
+:uri-repo: https://github.com/bi-foundation/factom-java
+:icons: font
+:star: icon:star[role=red]
+ifndef::icons[]
+:star: &#9733;
+endif::[]
+
+{uri-repo}[Factom-Java] is a Java Enterprise client for the Factom blockchain.
+
+This document provides a high-level overview of the changes introduced in Factom-Java by release.
+For a detailed view of what has changed, refer to our {uri-repo}/commits/master[commit history] on GitHub.
+
+== Unreleased
+
+Added::
+
+ * factomd and walletd lowlevel synchronous and asynchronous clients
+ * Full POJO responses
+ * JSON pluggable (de)serialization, with GSON plugin
+ * SLF4J logging (requires https://www.slf4j.org/[SLF4J] implementation on classpath):
+
+Changed::
+Deprecated::
+Removed::
+Fixed::
+Security::

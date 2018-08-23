@@ -1,0 +1,29 @@
+= Factom Java
+
+A Factom Java enterprise client to interact with Factom. Please see the docs module for documentation.
+
+Currently the client implements all factomd and factom-walletd lowlevel API calls both synchronously and asynchronously. Higher level functions are being worked on.
+
+The client consists of several modules to support the following use cases:
+
+* Java Standard Edition &gt;= 1.8
+* Java Enterprise Edition (JEE)
+** Dependency Injection
+** Managed Threads
+** JSON processing using javax.json
+* Spring (boot)
+** Dependency Injection
+** Managed Threads
+** Configuration
+
+To minimize dependencies and allow the implementor to choose, it has plugable JSON (de)serialization support
+
+* GSON
+* JEE (javax.json)
+* Jackson (not implemented yet)
+
+Whenever one of the JSON plugins is on the classpath it will use that plugin to do the (de)serialization. Please note that at least one plugin is needed for this library to function.
+
+== Active Development
+
+IMPORTANT: This software still is in early development stage. As such you should expect breaking changes in APIs.

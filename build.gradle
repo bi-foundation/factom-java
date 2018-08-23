@@ -1,0 +1,120 @@
+/*
+ * Copyright 2018 Blockchain Innovation Foundation <https://blockchain-innovation.org>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+// Apply the java-library plugin to add support for Java Library
+//apply plugin: 'idea'
+import org.asciidoctor.gradle.AsciidoctorTask
+
+plugins {
+    id 'org.asciidoctor.convert' version '1.5.6' apply false
+}
+// In this section you declare where to find the dependencies of your project
+allprojects {
+    repositories {
+        jcenter()
+    }
+
+    version = '0.2.1'
+    group = 'org.blockchain_innovation.factom'
+}
+
+project(':factom-client-api') {
+    apply plugin: 'java'
+
+    dependencies {
+//        api 'org.slf4j:slf4j-api:1.7.25'
+    }
+}
+
+project(':factom-client-impl') {
+
+    apply plugin: 'java'
+    dependencies {
+        compile project(':factom-client-api')
+        compile 'org.slf4j:slf4j-api:1.7.25'
+
+        testCompile 'org.mock-server:mockserver-netty:5.4.1'
+        testCompile 'org.mock-server:mockserver-client-java:5.4.1'
+        testCompile 'junit:junit:4.12'
+
+    }
+}
+project(':json-converter-gson') {
+    apply plugin: 'java'
+
+    dependencies {
+        compile project(':factom-client-api')
+        compile 'com.google.code.gson:gson:2.8.5'
+    }
+}
+
+project(':factom-client-tests') {
+    apply plugin: 'java'
+    dependencies {
+        compile project(':factom-client-impl')
+        compile project(':json-converter-gson')
+        testCompile 'org.mock-server:mockserver-netty:5.4.1'
+        testCompile 'org.mock-server:mockserver-client-java:5.4.1'
+        testCompile 'junit:junit:4.12'
+
+    }
+}
+
+
+project(':docs') {
+
+
+    buildscript {
+        repositories {
+            jcenter()
+        }
+
+        dependencies {
+            classpath 'org.asciidoctor:asciidoctor-gradle-plugin:1.5.6'
+            classpath 'org.asciidoctor:asciidoctorj-epub3:1.5.0-alpha.6'
+            classpath 'org.asciidoctor:asciidoctorj-pdf:1.5.0-alpha.15'
+        }
+    }
+    apply plugin: 'java'
+    apply plugin: 'org.asciidoctor.convert'
+
+
+    tasks.withType(AsciidoctorTask) { task ->
+
+        sources {
+            include 'README.adoc'
+        }
+        attributes 'sourcedir': project.sourceSets.main.java.srcDirs[0],
+                'source-highlighter': 'coderay',
+                experimental: true,
+                toc: 'right',
+                idprefix: '',
+                idseparator: '-'
+    }
+
+    task html5(type: AsciidoctorTask, description: 'Generates single page HTML') {
+        backends 'html5'
+    }
+
+    task pdf(type: AsciidoctorTask, description: 'Generates PDF') {
+        backends 'pdf'
+    }
+
+    task epub3(type: AsciidoctorTask, description: 'Generates EPUB3') {
+        backends 'epub3'
+    }
+    defaultTasks 'html5'
+}
