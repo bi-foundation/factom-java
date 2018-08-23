@@ -17,7 +17,9 @@
 package org.blockchain_innovation.factom.client.impl;
 
 import org.blockchain_innovation.factom.client.api.FactomException;
+import org.blockchain_innovation.factom.client.api.FactomRequest;
 import org.blockchain_innovation.factom.client.api.FactomResponse;
+import org.blockchain_innovation.factom.client.api.FactomRuntimeException;
 import org.blockchain_innovation.factom.client.api.json.JsonConverter;
 import org.blockchain_innovation.factom.client.api.rpc.RpcErrorResponse;
 import org.blockchain_innovation.factom.client.api.rpc.RpcRequest;
@@ -32,20 +34,19 @@ import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.util.concurrent.Callable;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-public class Exchange<Result> implements Callable<FactomResponse<Result>> {
+public class Exchange<Result> implements Supplier<FactomResponse<Result>> {
 
     private HttpURLConnection connection;
     private final URL url;
     private final RpcSettings settings;
-    private final FactomRequestImpl factomRequest;
+    private final FactomRequest factomRequest;
     private FactomResponse<Result> factomResponse;
     private final Class<Result> rpcResultClass;
 
     private final Logger logger = LoggerFactory.getLogger(Exchange.class);
-
 
 
     protected Exchange(RpcSettings settings, RpcRequest rpcRequest, Class<Result> rpcResultClass) {
@@ -55,9 +56,14 @@ public class Exchange<Result> implements Callable<FactomResponse<Result>> {
         this.rpcResultClass = rpcResultClass;
     }
 
+
     @Override
-    public FactomResponse<Result> call() throws Exception {
-        return execute();
+    public FactomResponse<Result> get() {
+        try {
+            return execute();
+        } catch (FactomException.ClientException e) {
+            throw new FactomRuntimeException(e);
+        }
     }
 
     public FactomResponse<Result> execute() throws FactomException.ClientException {
@@ -68,7 +74,7 @@ public class Exchange<Result> implements Callable<FactomResponse<Result>> {
     }
 
 
-    public FactomRequestImpl getFactomRequest() {
+    public FactomRequest getFactomRequest() {
         return factomRequest;
     }
 

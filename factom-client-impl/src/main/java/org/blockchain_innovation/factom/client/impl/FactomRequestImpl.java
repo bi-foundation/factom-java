@@ -16,9 +16,10 @@
 
 package org.blockchain_innovation.factom.client.impl;
 
+import org.blockchain_innovation.factom.client.api.FactomRequest;
 import org.blockchain_innovation.factom.client.api.rpc.RpcRequest;
 
-public class FactomRequestImpl {
+public class FactomRequestImpl implements FactomRequest {
     private final RpcRequest rpcRequest;
 
 
@@ -26,6 +27,7 @@ public class FactomRequestImpl {
         this.rpcRequest = rpcRequest;
     }
 
+    @Override
     public RpcRequest getRpcRequest() {
         return rpcRequest;
     }

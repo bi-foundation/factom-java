@@ -20,15 +20,15 @@ import org.blockchain_innovation.factom.client.api.FactomResponse;
 import org.blockchain_innovation.factom.client.api.model.response.factomd.AdminBlockResponse;
 import org.blockchain_innovation.factom.client.api.rpc.RpcMethod;
 
-import java.util.concurrent.Future;
+import java.util.concurrent.CompletableFuture;
 
 public class FactomdClientAsync extends AbstractClientAsync {
 
-    public Future<FactomResponse<AdminBlockResponse>> adminBlockByHeight(long height) {
+    public CompletableFuture<FactomResponse<AdminBlockResponse>> adminBlockByHeight(long height) {
         return exchange(RpcMethod.ADMIN_BLOCK_BY_HEIGHT.toRequestBuilder().param("height", height), AdminBlockResponse.class);
     }
 
-    public Future<FactomResponse<AdminBlockResponse>> adminBlockByKeyMerkleRoot(String keyMR) {
+    public CompletableFuture<FactomResponse<AdminBlockResponse>> adminBlockByKeyMerkleRoot(String keyMR) {
         return exchange(RpcMethod.ADMIN_BLOCK_BY_KEYMR.toRequestBuilder().param("keymr", keyMR), AdminBlockResponse.class);
     }
 }

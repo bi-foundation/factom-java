@@ -26,7 +26,7 @@ import java.util.concurrent.*;
 abstract class AbstractClientAsync {
 
     private URL url;
-    private ExecutorService executorService;
+    private ThreadPoolExecutor executorService;
     private RpcSettings settings;
 
     public RpcSettings getSettings() {
@@ -62,16 +62,17 @@ abstract class AbstractClientAsync {
         return executorService;
     }
 
-    public synchronized <RpcResult> Future<FactomResponse<RpcResult>> exchange(FactomRequestImpl factomRequest, Class<RpcResult> rpcResultClass) {
+    public <RpcResult> CompletableFuture<FactomResponse<RpcResult>> exchange(FactomRequestImpl factomRequest, Class<RpcResult> rpcResultClass) {
         return exchange(factomRequest.getRpcRequest(), rpcResultClass);
     }
 
-    public synchronized <RpcResult> Future<FactomResponse<RpcResult>> exchange(RpcRequest.Builder rpcRequestBuilder, Class<RpcResult> rpcResultClass) {
+    public <RpcResult> CompletableFuture<FactomResponse<RpcResult>> exchange(RpcRequest.Builder rpcRequestBuilder, Class<RpcResult> rpcResultClass) {
         return exchange(rpcRequestBuilder.build(), rpcResultClass);
     }
 
-    public synchronized <RpcResult> Future<FactomResponse<RpcResult>> exchange(RpcRequest rpcRequest, Class<RpcResult> rpcResultClass) {
+    public <RpcResult> CompletableFuture<FactomResponse<RpcResult>> exchange(RpcRequest rpcRequest, Class<RpcResult> rpcResultClass) {
         Exchange<RpcResult> exchange = new Exchange<>(getSettings(), rpcRequest, rpcResultClass);
-        return getExecutorService().submit(exchange);
+        return CompletableFuture.supplyAsync(exchange, getExecutorService());
+
     }
 }
