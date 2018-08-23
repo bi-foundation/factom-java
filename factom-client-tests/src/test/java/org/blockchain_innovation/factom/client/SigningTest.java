@@ -10,6 +10,7 @@ import org.blockchain_innovation.factom.client.api.FactomException;
 import org.blockchain_innovation.factom.client.api.FactomResponse;
 import org.blockchain_innovation.factom.client.api.model.Chain;
 import org.blockchain_innovation.factom.client.api.model.Entry;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.CommitChainResponse;
 import org.blockchain_innovation.factom.client.api.model.response.factomd.CommitEntryResponse;
 import org.blockchain_innovation.factom.client.impl.ops.ByteOperations;
 import org.blockchain_innovation.factom.client.impl.ops.EntryOperations;
@@ -62,15 +63,17 @@ public class SigningTest extends AbstractClientTest {
         Entry entry = entry();
 
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
-            // write version
-            outputStream.write(new byte[]{0});
+            // 1 byte version
+            byte[] version = {0};
+            outputStream.write(version);
 
-            // 6 byte milliTimestamp (truncated unix time)
-            outputStream.write(currentTimeMillis());
+            // 6 byte milliTimestamp
+            byte[] millis = currentTimeMillis();
+            outputStream.write(millis);
 
             // 32 byte Entry Hash
             String entryHash = entryOperations.calculateEntryHash(entry.getExternalIds(), entry.getContent(), entry.getChainId());
-            byte[] entryHashBytes = Encoding.UTF_8.decode(entryHash);
+            byte[] entryHashBytes = Encoding.HEX.decode(entryHash);
             outputStream.write(entryHashBytes);
 
             // 1 byte number of entry credits to pay
@@ -102,10 +105,12 @@ public class SigningTest extends AbstractClientTest {
 
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
             // 1 byte version
-            outputStream.write(new byte[] {0});
+            byte[] version = {0};
+            outputStream.write(version);
 
             // 6 byte milliTimestamp
-            outputStream.write(currentTimeMillis());
+            byte[] millis = currentTimeMillis();
+            outputStream.write(millis);
 
             // 32 byte ChainID Hash
             Chain.Entry firstEntry = chain.getFirstEntry();
@@ -139,12 +144,18 @@ public class SigningTest extends AbstractClientTest {
             System.out.println("entryParams = " + Encoding.UTF_8.encode(entryParams));
             System.out.println("entryParams = " + Encoding.HEX.encode(entryParams));
         }
-
     }
 
+
+
+    @Test
+    public void testChain() throws FactomException.ClientException {
+        FactomResponse<CommitChainResponse> response = factomdClient.commitChain("0001656742ef407c67a99e7e8f25dbb625040789dda87f66431f91fee25a214dd8fdb91eec0df397acf73670c195dcb970a926753372f77b26d96e8f6ce3fde882b0051c22f99736b7cd9f204aeb4300d45f1e451dacffcbd50eca8148fbfac151ae13c6ae9c9d0b102ddca8b64fab9ca9c1107908b7d79ee779be4580576b1ddb7e4215ff4a716704dc51fd191c6f49325f76fa67a2ed62d7d6787b952fe072bd621bba82220f56a5a905377b8a48076d04fc67cee014f7b03b74996e01ca626b3e4657726c5060358bf3682e1207");
+        assertValidResponse(response);
+    }
     @Test
     public void testEntry() throws FactomException.ClientException {
-        FactomResponse<CommitEntryResponse> response = factomdClient.commitEntry("00016566e7a79c3230343762393637366537396561396661653431303533613739303933383038303762663833616331303634643838313765313062643636343832313831326501102ddca8b64fab9ca9c1107908b7d79ee779be4580576b1ddb7e4215ff4a716704dc51fd191c6f41cf7b2d37ae42dc6a371e18972c9626ddefcb7000d96574af0ba451d5f10021e3cb0bcbe07ae3c12e9ff6dbc7da5cd676563b9e222c21aac0fc242549685400");
+        FactomResponse<CommitEntryResponse> response = factomdClient.commitEntry("000165674cd9182047b9676e79ea9fae41053a7909380807bf83ac1064d8817e10bd664821812e01102ddca8b64fab9ca9c1107908b7d79ee779be4580576b1ddb7e4215ff4a716704dc51fd191c6f2339fc55d2e760556c1afc5a72e1ff7a79973acabaf73f1c8935324e96f9d5837ef3ba44e67ebd50cdfbde4e2a076ac4aa0d47ebbecec583656f586ea4d35700");
         assertValidResponse(response);
     }
 
@@ -201,12 +212,12 @@ public class SigningTest extends AbstractClientTest {
         }
 
         // cost is the capacity of the entry payment in KB
-        int cost = 10 + (int) Math.ceil(length / 1024);
+        int cost = (int) Math.ceil(length / 1024);
         if (cost < 1) {
             cost = 1;
         }
 
-        return (byte) cost;
+        return (byte) (10+ cost);
     }
 
     private byte[] currentTimeMillis() {
