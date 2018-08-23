@@ -62,6 +62,7 @@ project(':factom-client-tests') {
         testCompile 'org.mock-server:mockserver-client-java:5.4.1'
         testCompile 'junit:junit:4.12'
 
+        testCompile 'net.i2p.crypto:eddsa:0.3.0'
     }
 }
 
