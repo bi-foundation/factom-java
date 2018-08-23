@@ -83,8 +83,9 @@ public class SigningTest extends AbstractClientTest {
             // 32 byte Entry Credit Address Public Key + 64 byte Signature
             byte[] message = outputStream.toByteArray();
             byte[] signature = sign(message, secret);
+            byte[] entryCreditKey = getKey(entryCreditPublicKey);
 
-            outputStream.write(Encoding.BASE64.decode(entryCreditPublicKey));
+            outputStream.write(entryCreditKey);
             outputStream.write(signature);
 
             byte[] entryParams = outputStream.toByteArray();
@@ -135,8 +136,9 @@ public class SigningTest extends AbstractClientTest {
             // 32 byte Entry Credit Address Public Key + 64 byte Signature
             byte[] message = outputStream.toByteArray();
             byte[] signature = sign(message, secret);
+            byte[] entryCreditKey = getKey(entryCreditPublicKey);
 
-            outputStream.write(Encoding.BASE64.decode(entryCreditPublicKey));
+            outputStream.write(entryCreditKey);
             outputStream.write(signature);
 
             byte[] entryParams = outputStream.toByteArray();
@@ -150,20 +152,17 @@ public class SigningTest extends AbstractClientTest {
 
     @Test
     public void testChain() throws FactomException.ClientException {
-        FactomResponse<CommitChainResponse> response = factomdClient.commitChain("0001656742ef407c67a99e7e8f25dbb625040789dda87f66431f91fee25a214dd8fdb91eec0df397acf73670c195dcb970a926753372f77b26d96e8f6ce3fde882b0051c22f99736b7cd9f204aeb4300d45f1e451dacffcbd50eca8148fbfac151ae13c6ae9c9d0b102ddca8b64fab9ca9c1107908b7d79ee779be4580576b1ddb7e4215ff4a716704dc51fd191c6f49325f76fa67a2ed62d7d6787b952fe072bd621bba82220f56a5a905377b8a48076d04fc67cee014f7b03b74996e01ca626b3e4657726c5060358bf3682e1207");
+        FactomResponse<CommitChainResponse> response = factomdClient.commitChain("0001656758e2457c67a99e7e8f25dbb625040789dda87f66431f91fee25a214dd8fdb91eec0df397acf73670c195dcb970a926753372f77b26d96e8f6ce3fde882b0051c22f99736b7cd9f204aeb4300d45f1e451dacffcbd50eca8148fbfac151ae13c6ae9c9d0bf48167f7f868d6163b4afb49a357829d9bdb2de092374d357424e2318c6f894a49be00e624283ff6c4b40e97b42aee1720f3711d999c251b1d22bf0305b695eec42f98d8dde00d2527e7e6f6e50e09d361b2c5702e3aeb3fd67a1af852a31b0b");
         assertValidResponse(response);
     }
     @Test
     public void testEntry() throws FactomException.ClientException {
-        FactomResponse<CommitEntryResponse> response = factomdClient.commitEntry("000165674cd9182047b9676e79ea9fae41053a7909380807bf83ac1064d8817e10bd664821812e01102ddca8b64fab9ca9c1107908b7d79ee779be4580576b1ddb7e4215ff4a716704dc51fd191c6f2339fc55d2e760556c1afc5a72e1ff7a79973acabaf73f1c8935324e96f9d5837ef3ba44e67ebd50cdfbde4e2a076ac4aa0d47ebbecec583656f586ea4d35700");
+        FactomResponse<CommitEntryResponse> response = factomdClient.commitEntry("000165675d3d892047b9676e79ea9fae41053a7909380807bf83ac1064d8817e10bd664821812e01f48167f7f868d6163b4afb49a357829d9bdb2de092374d357424e2318c6f894a3f1726ed7185c3c6e00f5c47b646ab8ad664004a949e9945d7600ab8f4fb66085864d30f7a1c68c0e3d7db6df4fa8fdc3b3b0539397550a9a031c7a6ea2e5204");
         assertValidResponse(response);
     }
 
     private byte[] sign(byte[] message, String secret) throws Exception {
-        ByteOperations byteOperations = new ByteOperations();
-
-        byte[] decodeKey = Base58.decodeChecked(secret);
-        byte[] privateKey = Arrays.copyOfRange(decodeKey,2, 34);
+        byte[] privateKey = getKey(secret);
 
         PKCS8EncodedKeySpec encoded = new PKCS8EncodedKeySpec(privateKey);
 
@@ -178,6 +177,13 @@ public class SigningTest extends AbstractClientTest {
 
 
         return signed;
+    }
+
+    private byte[] getKey(String key) {
+        ByteOperations byteOperations = new ByteOperations();
+
+        byte[] decodeKey = Base58.decodeChecked(key);
+        return Arrays.copyOfRange(decodeKey,2, 34);
     }
 
     private byte entryCost(Entry entry) throws FactomException.ClientException {
