@@ -19,7 +19,6 @@ package org.blockchain_innovation.factom.client.impl;
 import org.blockchain_innovation.factom.client.api.FactomException;
 import org.blockchain_innovation.factom.client.api.FactomRequest;
 import org.blockchain_innovation.factom.client.api.FactomResponse;
-import org.blockchain_innovation.factom.client.api.FactomRuntimeException;
 import org.blockchain_innovation.factom.client.api.json.JsonConverter;
 import org.blockchain_innovation.factom.client.api.rpc.RpcErrorResponse;
 import org.blockchain_innovation.factom.client.api.rpc.RpcRequest;
@@ -34,10 +33,10 @@ import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.util.function.Supplier;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
-public class Exchange<Result> implements Supplier<FactomResponse<Result>> {
+public class Exchange<Result> {
 
     private HttpURLConnection connection;
     private final URL url;
@@ -57,20 +56,15 @@ public class Exchange<Result> implements Supplier<FactomResponse<Result>> {
     }
 
 
-    @Override
-    public FactomResponse<Result> get() {
-        try {
-            return execute();
-        } catch (FactomException.ClientException e) {
-            throw new FactomRuntimeException(e);
-        }
-    }
+    public CompletableFuture<FactomResponse<Result>> execute() {
+        CompletableFuture<FactomResponse<Result>> promise = CompletableFuture.supplyAsync(() -> {
+            connection();
+            sendRequest();
+            retrieveResponse(rpcResultClass);
+            return getFactomResponse();
+        });
 
-    public FactomResponse<Result> execute() throws FactomException.ClientException {
-        connection();
-        sendRequest();
-        retrieveResponse(rpcResultClass);
-        return getFactomResponse();
+        return promise;
     }
 
 
@@ -134,18 +128,18 @@ public class Exchange<Result> implements Supplier<FactomResponse<Result>> {
                     logger.error("RPC Server returned an error response. HTTP code: {}, message: {}", getFactomResponse().getHTTPResponseCode(), getFactomResponse().getHTTPResponseMessage());
                     logger.error("error response({}): {}", getFactomRequest().getRpcRequest().getId(), JsonConverter.Registry.newInstance().prettyPrint(error) + "\n");
                 }
-                throw new FactomException.RpcErrorException(e, factomResponse);
             } catch (RuntimeException | IOException e2) {
                 logger.error("Error after handling an error response of the server: " + e2.getMessage() + ". Error body: " + error, e2);
+                // Fallback to client exception when we could not retrieve the error response
+                throw new FactomException.ClientException(e);
             }
+            throw new FactomException.RpcErrorException(e, factomResponse);
 
-            // Fallback to client exception when we could not retrieve the error response
-            throw new FactomException.ClientException(e);
         }
     }
 
 
-    protected HttpURLConnection createConnection(URL url) throws FactomException.ClientException {
+    protected HttpURLConnection createConnection(URL url) throws FactomException.RpcErrorException {
         HttpURLConnection connection;
         try {
             if (settings.getProxy() == null) {
@@ -166,7 +160,7 @@ public class Exchange<Result> implements Supplier<FactomResponse<Result>> {
 
             return connection;
         } catch (IOException e) {
-            throw new FactomException.ClientException(e);
+            throw new FactomException.RpcErrorException(e, getFactomResponse());
         }
 
 

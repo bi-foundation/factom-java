@@ -21,6 +21,8 @@ import org.blockchain_innovation.factom.client.api.FactomResponse;
 import org.blockchain_innovation.factom.client.api.rpc.RpcErrorResponse;
 import org.blockchain_innovation.factom.client.api.rpc.RpcResponse;
 
+import java.util.concurrent.CompletableFuture;
+
 public class FactomResponseImpl<Result> implements FactomResponse<Result> {
     private final Exchange exchange;
     private final RpcResponse<Result> rpcResponse;
