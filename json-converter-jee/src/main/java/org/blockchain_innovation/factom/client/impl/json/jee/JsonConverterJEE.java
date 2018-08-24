@@ -21,7 +21,6 @@ import org.blockchain_innovation.factom.client.api.rpc.RpcErrorResponse;
 import org.blockchain_innovation.factom.client.api.rpc.RpcMethod;
 import org.blockchain_innovation.factom.client.api.rpc.RpcResponse;
 
-import javax.json.Json;
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
 import javax.json.bind.JsonbConfig;
@@ -40,14 +39,10 @@ import java.util.Properties;
 
 public class JsonConverterJEE implements JsonConverter {
 
-    private Reader reader;
-    private Writer writer;
-
     static {
         Registry.register(JsonConverterJEE.class);
     }
 
-    //// TODO: 06/08/2018 Implement readers/writers
 
     @Override
     public JsonConverterJEE configure(Properties properties) {
@@ -55,22 +50,6 @@ public class JsonConverterJEE implements JsonConverter {
         return this;
     }
 
-    @Override
-    public JsonConverter setJsonReader(Reader reader) {
-        this.reader = reader;
-        return this;
-    }
-
-    @Override
-    public Reader getJsonReader() {
-        return reader;
-    }
-
-    @Override
-    public JsonConverter setJsonWriter(Writer writer) {
-        this.writer = writer;
-        return this;
-    }
 
     private Jsonb jsonb() {
         JsonbConfig config = new JsonbConfig().
@@ -78,11 +57,6 @@ public class JsonConverterJEE implements JsonConverter {
                 withSerializers(new RpcMethodSerializer()).
                 withDeserializers(new RpcMethodDeserializer()).withPropertyNamingStrategy(propertyNamingStrategy());
         return JsonbBuilder.create(config);
-    }
-
-    @Override
-    public Writer getJsonWriter() {
-        return writer;
     }
 
     @Override

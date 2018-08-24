@@ -16,7 +16,18 @@
 
 package org.blockchain_innovation.factom.client.impl.json.gson;
 
-import com.google.gson.*;
+import com.google.gson.FieldNamingPolicy;
+import com.google.gson.FieldNamingStrategy;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
 import com.google.gson.reflect.TypeToken;
 import org.blockchain_innovation.factom.client.api.json.JsonConverter;
 import org.blockchain_innovation.factom.client.api.rpc.RpcErrorResponse;
@@ -30,41 +41,15 @@ import java.util.Properties;
 
 public class JsonConverterGSON implements JsonConverter {
     private Gson gson;
-    private Reader reader;
-    private Writer writer;
 
     static {
         Registry.register(JsonConverterGSON.class);
     }
 
-    //// TODO: 06/08/2018 Implement readers/writers
-
     @Override
     public JsonConverterGSON configure(Properties properties) {
         this.gson = new GsonBuilder().setPrettyPrinting().setFieldNamingStrategy(fieldNamingStrategy()).create();
         return this;
-    }
-
-    @Override
-    public JsonConverter setJsonReader(Reader reader) {
-        this.reader = reader;
-        return this;
-    }
-
-    @Override
-    public Reader getJsonReader() {
-        return reader;
-    }
-
-    @Override
-    public JsonConverter setJsonWriter(Writer writer) {
-        this.writer = writer;
-        return this;
-    }
-
-    @Override
-    public Writer getJsonWriter() {
-        return writer;
     }
 
     @Override
@@ -107,9 +92,9 @@ public class JsonConverterGSON implements JsonConverter {
     /**
      * add naming strategy to handle response with reserved keywords and dashes.
      * Examples are: TmpTransaction#Transaction tx-name and WalletBackupResponse wallet-seed
-     * @see org.blockchain_innovation.factom.client.api.model.response.walletd.AddressResponse#_public public member of AddressResponse
      *
      * @return custom FieldNamingStrategy
+     * @see org.blockchain_innovation.factom.client.api.model.response.walletd.AddressResponse#_public public member of AddressResponse
      */
     private FieldNamingStrategy fieldNamingStrategy() {
         return f -> FieldNamingPolicy.LOWER_CASE_WITH_DASHES.translateName(f).replace("_", "");

@@ -28,15 +28,6 @@ public interface JsonConverter {
 
     JsonConverter configure(Properties properties);
 
-    JsonConverter setJsonReader(Reader reader);
-
-    Reader getJsonReader();
-
-    JsonConverter setJsonWriter(Writer writer);
-
-    Writer getJsonWriter();
-
-
     RpcErrorResponse errorFromJson(Reader reader);
 
     RpcErrorResponse errorFromJson(String json);
@@ -48,7 +39,6 @@ public interface JsonConverter {
     String prettyPrint(String json);
 
     String toJson(Object source);
-
 
 
     JsonConverter toJson(Object source, Writer writer);
