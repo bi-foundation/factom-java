@@ -20,7 +20,7 @@ import org.blockchain_innovation.factom.client.api.FactomResponse;
 import org.blockchain_innovation.factom.client.api.settings.RpcSettings;
 import org.blockchain_innovation.factom.client.impl.FactomdClient;
 import org.blockchain_innovation.factom.client.impl.WalletdClient;
-import org.blockchain_innovation.factom.client.impl.json.gson.GsonConverter;
+import org.blockchain_innovation.factom.client.impl.json.gson.JsonConverterGSON;
 import org.blockchain_innovation.factom.client.impl.settings.RpcSettingsImpl;
 import org.junit.Assert;
 import org.junit.Before;
@@ -41,7 +41,7 @@ class AbstractClientTest {
     public void setup() throws IOException {
 
         //// FIXME: 06/08/2018 Only needed now to iinit the converter
-        GsonConverter conv = new GsonConverter();
+        JsonConverterGSON conv = new JsonConverterGSON();
 
         factomdClient.setSettings(new RpcSettingsImpl(RpcSettings.SubSystem.FACTOMD, getProperties()));
         walletdClient.setSettings(new RpcSettingsImpl(RpcSettings.SubSystem.WALLETD, getProperties()));

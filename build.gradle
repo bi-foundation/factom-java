@@ -64,6 +64,19 @@ project(':json-converter-gson') {
     }
 }
 
+project(':json-converter-jee') {
+    apply plugin: 'java'
+
+    dependencies {
+        compile project(':factom-client-api')
+        compile 'javax.json:javax.json-api:1.1.2'
+        compile 'javax.json.bind:javax.json.bind-api:1.0.0-RC2'
+        testCompile 'org.glassfish:javax.json:1.1.2'
+        testCompile 'org.eclipse:yasson:1.0.1'
+    }
+}
+
+
 project(':factom-client-tests') {
     apply plugin: 'java'
     dependencies {

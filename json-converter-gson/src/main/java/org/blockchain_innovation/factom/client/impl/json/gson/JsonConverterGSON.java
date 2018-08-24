@@ -28,19 +28,19 @@ import java.io.Writer;
 import java.lang.reflect.Type;
 import java.util.Properties;
 
-public class GsonConverter implements JsonConverter {
+public class JsonConverterGSON implements JsonConverter {
     private Gson gson;
     private Reader reader;
     private Writer writer;
 
     static {
-        Registry.register(GsonConverter.class);
+        Registry.register(JsonConverterGSON.class);
     }
 
     //// TODO: 06/08/2018 Implement readers/writers
 
     @Override
-    public GsonConverter configure(Properties properties) {
+    public JsonConverterGSON configure(Properties properties) {
         this.gson = new GsonBuilder().setPrettyPrinting().setFieldNamingStrategy(fieldNamingStrategy()).create();
         return this;
     }
@@ -99,7 +99,7 @@ public class GsonConverter implements JsonConverter {
     }
 
     @Override
-    public GsonConverter toJson(Object source, Writer writer) {
+    public JsonConverterGSON toJson(Object source, Writer writer) {
         gson().toJson(source, writer);
         return this;
     }
