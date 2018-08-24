@@ -13,9 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*
-// To declare projects as part of a multi-project build use the 'include' method
-*/
-include ':factom-client-api', ':factom-client-impl', ':json-converter-gson', ':factom-client-tests', ':docs', 'osgi'
-rootProject.name = 'factom-java'
 
+
+plugins {
+    id "java"
+    id "com.athaydes.osgi-run" version "1.6.0"
+    id "org.dm.bundle" version "0.8.4"
+}
+runOsgi {
+    bundles += project
+}
+
+repositories {
+    jcenter()
+}
+
+group = 'blockchain-innovation'
+version = '0.2.1'
+group = 'org.blockchain_innovation.factom'
+
+dependencies {
+    compile project(':factom-client-api')
+    compile project(':factom-client-impl')
+    compile project(':json-converter-gson')
+    compile 'org.slf4j:slf4j-simple:1.7.25'
+}
