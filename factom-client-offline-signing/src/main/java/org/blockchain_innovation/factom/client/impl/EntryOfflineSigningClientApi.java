@@ -100,8 +100,8 @@ public class EntryOfflineSigningClientApi extends AbstractClient {
      */
     public String composeChainCommit(Chain chain, String entryCreditPublicKey, String secret) throws FactomException.ClientException {
         Chain.Entry firstEntry = chain.getFirstEntry();
-        String chainIdHex = entryOperations.calculateChainId(firstEntry.getExternalIds());
-        byte[] chainId = Encoding.HEX.decode(chainIdHex);
+        byte[] chainId = entryOperations.calculateChainId(firstEntry.getExternalIds());
+        String chainIdHex = Encoding.HEX.encode(chainId);
 
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
             // 1 byte version
@@ -117,7 +117,7 @@ public class EntryOfflineSigningClientApi extends AbstractClient {
             outputStream.write(chainIdHash);
 
             // 32 byte Weld; sha256(sha256(EntryHash + ChainID))
-            byte[] entryHash = Encoding.HEX.decode(entryOperations.calculateEntryHash(firstEntry.getExternalIds(), firstEntry.getContent(), Encoding.HEX.encode(chainId)));
+            byte[] entryHash = entryOperations.calculateEntryHash(firstEntry.getExternalIds(), firstEntry.getContent(), chainIdHex);
             byte[] weld = byteOperations.concat(entryHash, chainId);
             byte[] entryChainWeld = Digests.SHA_256.doubleDigest(weld);
             outputStream.write(entryChainWeld);
@@ -176,9 +176,8 @@ public class EntryOfflineSigningClientApi extends AbstractClient {
             outputStream.write(millis);
 
             // 32 byte Entry Hash
-            String entryHash = entryOperations.calculateEntryHash(entry.getExternalIds(), entry.getContent(), entry.getChainId());
-            byte[] entryHashBytes = Encoding.HEX.decode(entryHash);
-            outputStream.write(entryHashBytes);
+            byte[] entryHash = entryOperations.calculateEntryHash(entry.getExternalIds(), entry.getContent(), entry.getChainId());
+            outputStream.write(entryHash);
 
             // 1 byte number of entry credits to pay
             byte cost = entryCost(entry.getExternalIds(), entry.getContent(), entry.getChainId());

@@ -17,6 +17,7 @@
 package org.blockchain_innovation.factom.client.impl.ops;
 
 
+import org.blockchain_innovation.factom.client.api.Encoding;
 import org.blockchain_innovation.factom.client.api.FactomRuntimeException;
 import org.junit.Assert;
 import org.junit.Test;
@@ -42,22 +43,22 @@ public class EntryOperationsTest {
 
     @Test
     public void testFirstChainIds() {
-        Assert.assertEquals(CHAIN_ID, OPS.calculateChainId(EXTERNAL_IDS));
-        Assert.assertEquals(ENTRY_HASH_NO_CONTENT, OPS.calculateFirstEntryHash(EXTERNAL_IDS, null));
-        Assert.assertEquals(ENTRY_HASH_WITH_CONTENT, OPS.calculateFirstEntryHash(EXTERNAL_IDS, ENTRY_CONTENT));
-        Assert.assertEquals(ENTRY_HASH_NO_CONTENT, OPS.calculateEntryHash(EXTERNAL_IDS, null, CHAIN_ID));
-        Assert.assertEquals(ENTRY_HASH_WITH_CONTENT, OPS.calculateEntryHash(EXTERNAL_IDS, ENTRY_CONTENT, CHAIN_ID));
+        Assert.assertEquals(CHAIN_ID, Encoding.HEX.encode(OPS.calculateChainId(EXTERNAL_IDS)));
+        Assert.assertEquals(ENTRY_HASH_NO_CONTENT, Encoding.HEX.encode(OPS.calculateFirstEntryHash(EXTERNAL_IDS, null)));
+        Assert.assertEquals(ENTRY_HASH_WITH_CONTENT, Encoding.HEX.encode(OPS.calculateFirstEntryHash(EXTERNAL_IDS, ENTRY_CONTENT)));
+        Assert.assertEquals(ENTRY_HASH_NO_CONTENT, Encoding.HEX.encode(OPS.calculateEntryHash(EXTERNAL_IDS, null, CHAIN_ID)));
+        Assert.assertEquals(ENTRY_HASH_WITH_CONTENT, Encoding.HEX.encode(OPS.calculateEntryHash(EXTERNAL_IDS, ENTRY_CONTENT, CHAIN_ID)));
     }
 
     @Test
     public void testNulls() {
-        String chainId = OPS.calculateChainId((List<String>) null);
+        String chainId = Encoding.HEX.encode(OPS.calculateChainId((List<String>) null));
         Assert.assertEquals(NULL_ENTRY_CHAIN_ID, chainId);
-        String firstEntryHash = OPS.calculateFirstEntryHash(null, null);
+        String firstEntryHash = Encoding.HEX.encode(OPS.calculateFirstEntryHash(null, null));
 
         Assert.assertEquals("f64d788c2d8ae0549e8424060d4271f42f89b445b4b534e9aad5529bedfe9d61", firstEntryHash);
-        Assert.assertEquals(firstEntryHash, OPS.calculateEntryHash(null, null, null));
-        Assert.assertEquals(firstEntryHash, OPS.calculateEntryHash(null, null, NULL_ENTRY_CHAIN_ID));
+        Assert.assertEquals(firstEntryHash, Encoding.HEX.encode(OPS.calculateEntryHash(null, null, null)));
+        Assert.assertEquals(firstEntryHash, Encoding.HEX.encode(OPS.calculateEntryHash(null, null, NULL_ENTRY_CHAIN_ID)));
 
         try {
             OPS.calculateChainId(Arrays.asList(CHAIN_FIRST_EXTERNAL_ID, CHAIN_SECOND_EXTERNAL_ID, null));

@@ -27,11 +27,11 @@ import java.util.List;
 public class EntryOperations {
     private final ByteOperations byteOps = new ByteOperations();
 
-    public String calculateChainId(EntryResponse entryResponse) {
+    public byte[] calculateChainId(EntryResponse entryResponse) {
         return calculateChainId(entryResponse.getExtIds());
     }
 
-    public String calculateChainId(List<String> externalIds) {
+    public byte[] calculateChainId(List<String> externalIds) {
         byte[] bytes = new byte[0];
         if (externalIds != null) {
             for (String externalId : externalIds) {
@@ -40,17 +40,17 @@ public class EntryOperations {
         }
         // TODO: 14-8-2018 Check empty/null list
         byte[] chainId = Digests.SHA_256.digest(bytes);
-        return Encoding.HEX.encode(chainId);
+        return chainId;
     }
 
-    public String calculateFirstEntryHash(List<String> externalIds, String content) {
+    public byte[] calculateFirstEntryHash(List<String> externalIds, String content) {
         return calculateEntryHash(externalIds, content, null);
     }
 
-    public String calculateEntryHash(List<String> externalIds, String content, String chainId) {
+    public byte[] calculateEntryHash(List<String> externalIds, String content, String chainId) {
         byte[] entryBytes = entryToBytes(externalIds, content, chainId);
         byte[] bytes = byteOps.concat(Digests.SHA_512.digest(entryBytes), entryBytes);
-        return Encoding.HEX.encode(Digests.SHA_256.digest(bytes));
+        return Digests.SHA_256.digest(bytes);
 
     }
 
@@ -64,7 +64,7 @@ public class EntryOperations {
         if (StringUtils.isNotEmpty(chainId)) {
             chainIdBytes = Encoding.HEX.decode(chainId);
         } else {
-            chainIdBytes = Encoding.HEX.decode(calculateChainId(externalIds));
+            chainIdBytes = calculateChainId(externalIds);
         }
 
         // Version 0
