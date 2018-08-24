@@ -41,7 +41,7 @@ public class TransactionIT extends AbstractClientTest {
 
     @Test
     public void _01_getExchangeRate() throws FactomException.ClientException {
-        entryCreditRateResponse = factomdClient.entryCreditRate();
+        entryCreditRateResponse = factomdClient.entryCreditRate().join();
         assertValidResponse(entryCreditRateResponse);
 
         Assert.assertTrue(entryCreditRateResponse.getResult().getRate() > 0);
@@ -49,7 +49,7 @@ public class TransactionIT extends AbstractClientTest {
 
     @Test
     public void _02_newTransaction() throws FactomException.ClientException {
-        newTransactionResponse = walletdClient.newTransaction(TRANSACTION_NAME);
+        newTransactionResponse = walletdClient.newTransaction(TRANSACTION_NAME).join();
         assertValidResponse(newTransactionResponse);
 
         Assert.assertNotNull(newTransactionResponse.getResult().getTxId());
@@ -64,7 +64,7 @@ public class TransactionIT extends AbstractClientTest {
 
     @Test
     public void _03_newToAddress() throws FactomException.ClientException {
-        toAddressResponse = walletdClient.generateEntryCreditAddress();
+        toAddressResponse = walletdClient.generateEntryCreditAddress().join();
         assertValidResponse(toAddressResponse);
 
         Assert.assertNotNull(toAddressResponse.getResult().getPublicAddress());
@@ -75,7 +75,7 @@ public class TransactionIT extends AbstractClientTest {
     public void _04_addInput() throws FactomException.ClientException {
         long fctCost = calculateCost();
 
-        FactomResponse<ExecutedTransactionResponse> response = walletdClient.addInput(TRANSACTION_NAME, FACTOID_PUBLIC_KEY, fctCost);
+        FactomResponse<ExecutedTransactionResponse> response = walletdClient.addInput(TRANSACTION_NAME, FACTOID_PUBLIC_KEY, fctCost).join();
         assertValidResponse(response);
 
         Assert.assertFalse(response.getResult().getInputs().isEmpty());
@@ -88,7 +88,7 @@ public class TransactionIT extends AbstractClientTest {
         String toAddress = toAddressResponse.getResult().getPublicAddress();
         long fctCost = calculateCost();
 
-        FactomResponse<TransactionResponse> response = walletdClient.addEntryCreditOutput(TRANSACTION_NAME, toAddress, fctCost);
+        FactomResponse<TransactionResponse> response = walletdClient.addEntryCreditOutput(TRANSACTION_NAME, toAddress, fctCost).join();
         assertValidResponse(response);
 
         Assert.assertFalse(response.getResult().getEntryCreditOutputs().isEmpty());
@@ -98,7 +98,7 @@ public class TransactionIT extends AbstractClientTest {
 
     @Test
     public void _06_addFee() throws FactomException.ClientException {
-        FactomResponse<ExecutedTransactionResponse> response = walletdClient.addFee(TRANSACTION_NAME, FACTOID_PUBLIC_KEY);
+        FactomResponse<ExecutedTransactionResponse> response = walletdClient.addFee(TRANSACTION_NAME, FACTOID_PUBLIC_KEY).join();
         assertValidResponse(response);
 
         Assert.assertNotNull(response.getResult().getInputs().isEmpty());
@@ -106,7 +106,7 @@ public class TransactionIT extends AbstractClientTest {
 
     @Test
     public void _07_signTransaction() throws FactomException.ClientException {
-        FactomResponse<ExecutedTransactionResponse> response = walletdClient.signTransaction(TRANSACTION_NAME);
+        FactomResponse<ExecutedTransactionResponse> response = walletdClient.signTransaction(TRANSACTION_NAME).join();
         assertValidResponse(response);
 
         Assert.assertTrue(response.getResult().isSigned());
@@ -114,7 +114,7 @@ public class TransactionIT extends AbstractClientTest {
 
     @Test
     public void _08_composeTransaction() throws FactomException.ClientException {
-        composeTransactionResponse = walletdClient.composeTransaction(TRANSACTION_NAME);
+        composeTransactionResponse = walletdClient.composeTransaction(TRANSACTION_NAME).join();
         assertValidResponse(composeTransactionResponse);
 
         Assert.assertNotNull(composeTransactionResponse.getResult().getParams().getTransaction());
@@ -123,7 +123,7 @@ public class TransactionIT extends AbstractClientTest {
     @Test
     public void _09_submitTransaction() throws FactomException.ClientException {
         String transaction = composeTransactionResponse.getResult().getParams().getTransaction();
-        FactomResponse<FactoidSubmitResponse> response = factomdClient.factoidSubmit(transaction);
+        FactomResponse<FactoidSubmitResponse> response = factomdClient.factoidSubmit(transaction).join();
         assertValidResponse(response);
 
         Assert.assertNotNull(response.getResult().getTxId());

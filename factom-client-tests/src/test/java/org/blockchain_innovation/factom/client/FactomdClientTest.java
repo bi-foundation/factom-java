@@ -36,7 +36,7 @@ public class FactomdClientTest extends AbstractClientTest {
 
         FactomRequestImpl factomRequest = new FactomRequestImpl(RpcMethod.PROPERTIES.toRequestBuilder().id(5).build());
         Assert.assertNotNull(factomRequest.toString());
-        FactomResponse<Map> response = factomdClient.exchange(factomRequest, Map.class);
+        FactomResponse<Map> response = factomdClient.exchange(factomRequest, Map.class).join();
         assertValidResponse(response);
         Assert.assertEquals(5, response.getRpcResponse().getId());
         Assert.assertEquals("2.0", response.getRpcResponse().getJsonrpc());
@@ -44,7 +44,7 @@ public class FactomdClientTest extends AbstractClientTest {
 
     @Test
     public void testAdminBlockByHeight() throws FactomException.ClientException {
-        FactomResponse<AdminBlockResponse> response = factomdClient.adminBlockByHeight(10);
+        FactomResponse<AdminBlockResponse> response = factomdClient.adminBlockByHeight(10).join();
         assertValidResponse(response);
 
         AdminBlockResponse adminBlock = response.getResult();
@@ -74,7 +74,7 @@ public class FactomdClientTest extends AbstractClientTest {
 
     @Test
     public void testAckTransactions() throws FactomException.ClientException {
-        FactomResponse<EntryTransactionResponse> response = factomdClient.ackTransactions("0fb1b4c917e933d1d7aeb157398360fa36af6902131ea5037b04af510483caa3", "2b079f0f6b1e84315827f5b2f799a9d3219fdd975ea59aafa2dcb7dfb0fc02f6", EntryTransactionResponse.class);
+        FactomResponse<EntryTransactionResponse> response = factomdClient.ackTransactions("0fb1b4c917e933d1d7aeb157398360fa36af6902131ea5037b04af510483caa3", "2b079f0f6b1e84315827f5b2f799a9d3219fdd975ea59aafa2dcb7dfb0fc02f6", EntryTransactionResponse.class).join();
         assertValidResponse(response);
 
         EntryTransactionResponse entryTransaction = response.getResult();
@@ -89,7 +89,7 @@ public class FactomdClientTest extends AbstractClientTest {
 
     @Test
     public void testAckEntryTransactions() throws FactomException.ClientException {
-        FactomResponse<EntryTransactionResponse> response = factomdClient.ackEntryTransactions("e96cca381bf25f6dd4dfdf9f7009ff84ee6edaa3f47f9ccf06d2787482438f4b");
+        FactomResponse<EntryTransactionResponse> response = factomdClient.ackEntryTransactions("e96cca381bf25f6dd4dfdf9f7009ff84ee6edaa3f47f9ccf06d2787482438f4b").join();
         assertValidResponse(response);
 
         EntryTransactionResponse entryTransaction = response.getResult();
@@ -104,7 +104,7 @@ public class FactomdClientTest extends AbstractClientTest {
 
     @Test
     public void testAckFactoidTransactions() throws FactomException.ClientException {
-        FactomResponse<FactoidTransactionsResponse> response = factomdClient.ackFactoidTransactions("0f4e09dd02236880b3bb7d22cda6c8f29fd4fabc02aba1229b2d8680b9043a2a");
+        FactomResponse<FactoidTransactionsResponse> response = factomdClient.ackFactoidTransactions("0f4e09dd02236880b3bb7d22cda6c8f29fd4fabc02aba1229b2d8680b9043a2a").join();
         assertValidResponse(response);
 
         FactoidTransactionsResponse entryTransaction = response.getResult();
@@ -119,7 +119,7 @@ public class FactomdClientTest extends AbstractClientTest {
 
     @Test
     public void testChainHead() throws FactomException.ClientException {
-        FactomResponse<ChainHeadResponse> response = factomdClient.chainHead("000000000000000000000000000000000000000000000000000000000000000a");
+        FactomResponse<ChainHeadResponse> response = factomdClient.chainHead("000000000000000000000000000000000000000000000000000000000000000a").join();
         assertValidResponse(response);
 
         ChainHeadResponse chainHead = response.getResult();
@@ -129,7 +129,7 @@ public class FactomdClientTest extends AbstractClientTest {
 
     @Test
     public void testAdminBlockByKeyMerkleRoot() throws FactomException.ClientException {
-        FactomResponse<AdminBlockResponse> response = factomdClient.adminBlockByKeyMerkleRoot("343ffe17ca3b9775196475380feb91768e8cb3ceb888f2d617d4f0c2cc84a26a");
+        FactomResponse<AdminBlockResponse> response = factomdClient.adminBlockByKeyMerkleRoot("343ffe17ca3b9775196475380feb91768e8cb3ceb888f2d617d4f0c2cc84a26a").join();
         assertValidResponse(response);
 
         AdminBlockResponse adminBlock = response.getResult();
@@ -168,7 +168,7 @@ public class FactomdClientTest extends AbstractClientTest {
 
     @Test
     public void testDirectoryBlockByHeight() throws FactomException.ClientException {
-        FactomResponse<DirectoryBlockHeightResponse> response = factomdClient.directoryBlockByHeight(39251);
+        FactomResponse<DirectoryBlockHeightResponse> response = factomdClient.directoryBlockByHeight(39251).join();
         assertValidResponse(response);
 
         DirectoryBlockHeightResponse directoryBlock = response.getResult();
@@ -196,7 +196,7 @@ public class FactomdClientTest extends AbstractClientTest {
 
     @Test
     public void testDirectoryBlockByKeyMerkleRoot() throws FactomException.ClientException {
-        FactomResponse<DirectoryBlockResponse> response = factomdClient.directoryBlockByKeyMerkleRoot("549e01d3815b521038fa3d29808dea1b06105e4dfc8c75d165033f7c1a08ee25");
+        FactomResponse<DirectoryBlockResponse> response = factomdClient.directoryBlockByKeyMerkleRoot("549e01d3815b521038fa3d29808dea1b06105e4dfc8c75d165033f7c1a08ee25").join();
         assertValidResponse(response);
 
         DirectoryBlockResponse directoryBlock = response.getResult();
@@ -214,7 +214,7 @@ public class FactomdClientTest extends AbstractClientTest {
 
     @Test
     public void testDirectoryBlockHead() throws FactomException.ClientException {
-        FactomResponse<DirectoryBlockHeadResponse> response = factomdClient.directoryBlockHead();
+        FactomResponse<DirectoryBlockHeadResponse> response = factomdClient.directoryBlockHead().join();
         assertValidResponse(response);
 
         DirectoryBlockHeadResponse directoryBlockHead = response.getResult();
@@ -224,7 +224,7 @@ public class FactomdClientTest extends AbstractClientTest {
 
     @Test
     public void testEntryCreditBlockByHeight() throws FactomException.ClientException {
-        FactomResponse<EntryCreditBlockResponse> response = factomdClient.entryCreditBlockByHeight(41565);
+        FactomResponse<EntryCreditBlockResponse> response = factomdClient.entryCreditBlockByHeight(41565).join();
         assertValidResponse(response);
 
         EntryCreditBlockResponse entryCreditBlock = response.getResult();
@@ -262,7 +262,7 @@ public class FactomdClientTest extends AbstractClientTest {
 
     @Test
     public void testEntryBlockByKeyMerkleRoot() throws FactomException.ClientException {
-        FactomResponse<EntryBlockResponse> response = factomdClient.entryBlockByKeyMerkleRoot("6272ed26f9e1b416f4b93672507270ecd5253c27af6365345ad0d1f68c23be91");
+        FactomResponse<EntryBlockResponse> response = factomdClient.entryBlockByKeyMerkleRoot("6272ed26f9e1b416f4b93672507270ecd5253c27af6365345ad0d1f68c23be91").join();
         assertValidResponse(response);
 
         EntryBlockResponse entryBlock = response.getResult();
@@ -281,7 +281,7 @@ public class FactomdClientTest extends AbstractClientTest {
 
     @Test
     public void testEntryCreditBalance() throws FactomException.ClientException {
-        FactomResponse<EntryCreditBalanceResponse> response = factomdClient.entryCreditBalance(EC_PUBLIC_KEY);
+        FactomResponse<EntryCreditBalanceResponse> response = factomdClient.entryCreditBalance(EC_PUBLIC_KEY).join();
         assertValidResponse(response);
         EntryCreditBalanceResponse entryCreditBalance = response.getResult();
         Assert.assertNotNull(entryCreditBalance);
@@ -292,7 +292,7 @@ public class FactomdClientTest extends AbstractClientTest {
 
     @Test
     public void testEntryCreditBlock() throws FactomException.ClientException {
-        FactomResponse<EntryCreditBlockResponse> response = factomdClient.entryCreditBlock("1064d10c37cca2c6ea819dd69586b5c1fef10f8b956f5960a12a36604ea31f8d");
+        FactomResponse<EntryCreditBlockResponse> response = factomdClient.entryCreditBlock("1064d10c37cca2c6ea819dd69586b5c1fef10f8b956f5960a12a36604ea31f8d").join();
         assertValidResponse(response);
 
         EntryCreditBlockResponse entryCreditBlock = response.getResult();
@@ -318,7 +318,7 @@ public class FactomdClientTest extends AbstractClientTest {
 
     @Test
     public void testEntryCreditRate() throws FactomException.ClientException {
-        FactomResponse<EntryCreditRateResponse> response = factomdClient.entryCreditRate();
+        FactomResponse<EntryCreditRateResponse> response = factomdClient.entryCreditRate().join();
         assertValidResponse(response);
 
         EntryCreditRateResponse creditRate = response.getResult();
@@ -328,7 +328,7 @@ public class FactomdClientTest extends AbstractClientTest {
 
     @Test
     public void testFactoidBalance() throws FactomException.ClientException {
-        FactomResponse<FactoidBalanceResponse> response = factomdClient.factoidBalance(FACTOID_PUBLIC_KEY);
+        FactomResponse<FactoidBalanceResponse> response = factomdClient.factoidBalance(FACTOID_PUBLIC_KEY).join();
         assertValidResponse(response);
 
         FactoidBalanceResponse factoidBalance = response.getResult();
@@ -340,7 +340,7 @@ public class FactomdClientTest extends AbstractClientTest {
 
     @Test
     public void testFactoidBlock() throws FactomException.ClientException {
-        FactomResponse<FactoidBlockResponse> response = factomdClient.factoidBlock("d1b0eb5b8045c055272dd5816527f9e9f0506f928392fe0b21b7cbca61580427");
+        FactomResponse<FactoidBlockResponse> response = factomdClient.factoidBlock("d1b0eb5b8045c055272dd5816527f9e9f0506f928392fe0b21b7cbca61580427").join();
         assertValidResponse(response);
 
         FactoidBlockResponse factoidBlock = response.getResult();
@@ -363,7 +363,7 @@ public class FactomdClientTest extends AbstractClientTest {
 
     @Test
     public void testFactoidSubmit() throws FactomException.ClientException {
-        FactomResponse<FactoidSubmitResponse> response = factomdClient.factoidSubmit("0201656165ce80010001bde2204ef701663ab1b4a32eb31e658e471bdea484da4dfd9fd48caa09c53b09c2db6ebd84404f028c1f0d877cf15922169c2f05f3e972649159e4b6a9842e0a0b6da2da63b501e1061b8dcf36c1bb89b004533153478afc6cbc50813804c7f9b9540c3261a3bf42234354dc9082176e7ba56b5cfcf77e1eedf51ef21bc3dc1e8dc20637e7b75ca89144986410550df85b472622d4d792eb007d326b8138dea03224316a1ce504");
+        FactomResponse<FactoidSubmitResponse> response = factomdClient.factoidSubmit("0201656165ce80010001bde2204ef701663ab1b4a32eb31e658e471bdea484da4dfd9fd48caa09c53b09c2db6ebd84404f028c1f0d877cf15922169c2f05f3e972649159e4b6a9842e0a0b6da2da63b501e1061b8dcf36c1bb89b004533153478afc6cbc50813804c7f9b9540c3261a3bf42234354dc9082176e7ba56b5cfcf77e1eedf51ef21bc3dc1e8dc20637e7b75ca89144986410550df85b472622d4d792eb007d326b8138dea03224316a1ce504").join();
         assertValidResponse(response);
 
         FactoidSubmitResponse factoidSubmit = response.getResult();
@@ -374,7 +374,7 @@ public class FactomdClientTest extends AbstractClientTest {
 
     @Test
     public void testFactoidBlockByHeight() throws FactomException.ClientException {
-        FactomResponse<FactoidBlockResponse> response = factomdClient.factoidBlockByHeight(100);
+        FactomResponse<FactoidBlockResponse> response = factomdClient.factoidBlockByHeight(100).join();
         assertValidResponse(response);
 
         FactoidBlockResponse factoidBlock = response.getResult();
@@ -397,7 +397,7 @@ public class FactomdClientTest extends AbstractClientTest {
 
     @Test
     public void testHeights() throws FactomException.ClientException {
-        FactomResponse<HeightsResponse> response = factomdClient.heights();
+        FactomResponse<HeightsResponse> response = factomdClient.heights().join();
         assertValidResponse(response);
 
         HeightsResponse heights = response.getResult();
@@ -410,7 +410,7 @@ public class FactomdClientTest extends AbstractClientTest {
 
     @Test
     public void testPendingEntries() throws FactomException.ClientException {
-        FactomResponse<PendingEntriesResponse> response = factomdClient.pendingEntries(41579);
+        FactomResponse<PendingEntriesResponse> response = factomdClient.pendingEntries(41579).join();
         assertValidResponse(response);
 
         PendingEntriesResponse pendingEntries = response.getResult();
@@ -419,7 +419,7 @@ public class FactomdClientTest extends AbstractClientTest {
 
     @Test
     public void testPendingTransactions() throws FactomException.ClientException {
-        FactomResponse<PendingTransactionsResponse> response = factomdClient.pendingTransactions(41579);
+        FactomResponse<PendingTransactionsResponse> response = factomdClient.pendingTransactions(41579).join();
         assertValidResponse(response);
 
         PendingTransactionsResponse pendingEntries = response.getResult();
@@ -433,7 +433,7 @@ public class FactomdClientTest extends AbstractClientTest {
 
     @Test
     public void testProperties() throws FactomException.ClientException {
-        FactomResponse<PropertiesResponse> response = factomdClient.properties();
+        FactomResponse<PropertiesResponse> response = factomdClient.properties().join();
         assertValidResponse(response);
 
         PropertiesResponse properties = response.getResult();
@@ -443,7 +443,7 @@ public class FactomdClientTest extends AbstractClientTest {
 
     @Test
     public void testRawData() throws FactomException.ClientException {
-        FactomResponse<RawDataResponse> response = factomdClient.rawData("e84cabc86d26b548da00d28ff48bb458610b255b762be44597e5b971bd75f8d7");
+        FactomResponse<RawDataResponse> response = factomdClient.rawData("e84cabc86d26b548da00d28ff48bb458610b255b762be44597e5b971bd75f8d7").join();
         assertValidResponse(response);
 
         RawDataResponse rawData = response.getResult();
@@ -452,7 +452,7 @@ public class FactomdClientTest extends AbstractClientTest {
 
     @Test
     public void testReceipt() throws FactomException.ClientException {
-        FactomResponse<ReceiptResponse> response = factomdClient.receipt("1f9f3030597cca90365d2852c5e498cf412939076265c553133fe3adf415465b");
+        FactomResponse<ReceiptResponse> response = factomdClient.receipt("1f9f3030597cca90365d2852c5e498cf412939076265c553133fe3adf415465b").join();
         assertValidResponse(response);
 
         ReceiptResponse receipt = response.getResult();
@@ -471,7 +471,7 @@ public class FactomdClientTest extends AbstractClientTest {
 
     @Test
     public void testRevealChain() throws FactomException.ClientException {
-        FactomResponse<RevealResponse> response = factomdClient.revealChain("00527dd7ee7168adf6f4e1493bfb8f5dddb42a325371d3b2df3f490eb62b9aa10100120004268808420004616263640004313233343132333461626364");
+        FactomResponse<RevealResponse> response = factomdClient.revealChain("00527dd7ee7168adf6f4e1493bfb8f5dddb42a325371d3b2df3f490eb62b9aa10100120004268808420004616263640004313233343132333461626364").join();
         assertValidResponse(response);
 
         RevealResponse reveal = response.getResult();
@@ -483,7 +483,7 @@ public class FactomdClientTest extends AbstractClientTest {
 
     @Test
     public void testRevealEntry() throws FactomException.ClientException {
-        FactomResponse<RevealResponse> response = factomdClient.revealEntry("00527dd7ee7168adf6f4e1493bfb8f5dddb42a325371d3b2df3f490eb62b9aa10100080002cd90000290cdabcdef");
+        FactomResponse<RevealResponse> response = factomdClient.revealEntry("00527dd7ee7168adf6f4e1493bfb8f5dddb42a325371d3b2df3f490eb62b9aa10100080002cd90000290cdabcdef").join();
         assertValidResponse(response);
 
         RevealResponse reveal = response.getResult();
@@ -500,7 +500,7 @@ public class FactomdClientTest extends AbstractClientTest {
 
     @Test
     public void testTransactions() throws FactomException.ClientException {
-        FactomResponse<TransactionResponse> response = factomdClient.transaction("092ebeb0865d8bb06a059aabc58eeafa92efa10d477150600937b635cd2805f4");
+        FactomResponse<TransactionResponse> response = factomdClient.transaction("092ebeb0865d8bb06a059aabc58eeafa92efa10d477150600937b635cd2805f4").join();
         assertValidResponse(response);
 
         TransactionResponse transaction = response.getResult();

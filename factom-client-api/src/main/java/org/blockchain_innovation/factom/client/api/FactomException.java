@@ -31,7 +31,7 @@ public class FactomException extends Exception {
         super(cause);
     }
 
-    public static class ClientException extends FactomException {
+    public static class ClientException extends FactomRuntimeException {
         public ClientException(String message) {
             super(message);
         }

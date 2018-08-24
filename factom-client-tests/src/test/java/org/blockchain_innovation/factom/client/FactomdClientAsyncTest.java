@@ -19,7 +19,7 @@ package org.blockchain_innovation.factom.client;
 import org.blockchain_innovation.factom.client.api.FactomResponse;
 import org.blockchain_innovation.factom.client.api.model.response.factomd.AdminBlockResponse;
 import org.blockchain_innovation.factom.client.api.settings.RpcSettings;
-import org.blockchain_innovation.factom.client.impl.FactomdClientAsync;
+import org.blockchain_innovation.factom.client.impl.FactomdClient;
 import org.blockchain_innovation.factom.client.impl.json.gson.GsonConverter;
 import org.blockchain_innovation.factom.client.impl.settings.RpcSettingsImpl;
 import org.junit.Before;
@@ -28,11 +28,10 @@ import org.junit.Test;
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 
 public class FactomdClientAsyncTest extends AbstractClientTest {
 
-    private final FactomdClientAsync client = new FactomdClientAsync();
+    private final FactomdClient client = new FactomdClient();
 
     @Before
     public void setup() throws IOException {
@@ -45,7 +44,7 @@ public class FactomdClientAsyncTest extends AbstractClientTest {
     @Test
     public void testAdminBlockHeight() throws ExecutionException, InterruptedException {
         CompletableFuture<FactomResponse<AdminBlockResponse>> future = client.adminBlockByHeight(10);
-        FactomResponse<AdminBlockResponse> response = future.get();
+        FactomResponse<AdminBlockResponse> response = future.join();
         assertValidResponse(response);
     }
 

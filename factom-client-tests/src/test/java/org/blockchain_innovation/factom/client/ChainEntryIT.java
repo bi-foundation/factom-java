@@ -16,6 +16,7 @@
 
 package org.blockchain_innovation.factom.client;
 
+import org.blockchain_innovation.factom.client.api.FactomException;
 import org.blockchain_innovation.factom.client.api.FactomResponse;
 import org.blockchain_innovation.factom.client.api.model.Chain;
 import org.blockchain_innovation.factom.client.api.model.Entry;
@@ -24,7 +25,6 @@ import org.blockchain_innovation.factom.client.api.model.response.factomd.Commit
 import org.blockchain_innovation.factom.client.api.model.response.factomd.EntryTransactionResponse;
 import org.blockchain_innovation.factom.client.api.model.response.factomd.RevealResponse;
 import org.blockchain_innovation.factom.client.api.model.response.walletd.ComposeResponse;
-import org.blockchain_innovation.factom.client.api.FactomException;
 import org.junit.Assert;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -33,6 +33,7 @@ import org.junit.runners.MethodSorters;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ExecutionException;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class ChainEntryIT extends AbstractClientTest {
@@ -46,7 +47,7 @@ public class ChainEntryIT extends AbstractClientTest {
 
 
     @Test
-    public void _01_composeChain() throws FactomException.ClientException {
+    public void _01_composeChain() throws FactomException.ClientException, ExecutionException, InterruptedException {
         // random 8 digit number to create new chain
         int value = 10000000 + new Random().nextInt(90000000);
 
@@ -63,7 +64,7 @@ public class ChainEntryIT extends AbstractClientTest {
         chain.setFirstEntry(firstEntry);
 
 
-        composeResponse = walletdClient.composeChain(chain, EC_PUBLIC_KEY);
+        composeResponse = walletdClient.composeChain(chain, EC_PUBLIC_KEY).join();
         assertValidResponse(composeResponse);
 
         Assert.assertNotNull(composeResponse.getResult().getCommit());
@@ -86,7 +87,7 @@ public class ChainEntryIT extends AbstractClientTest {
         String revealChainEntry = composeChain.getReveal().getParams().getEntry();
         Assert.assertNotNull(revealChainEntry);
 
-        FactomResponse<CommitChainResponse> commitChainResponse = factomdClient.commitChain(commitChainMessage);
+        FactomResponse<CommitChainResponse> commitChainResponse = factomdClient.commitChain(commitChainMessage).join();
         assertValidResponse(commitChainResponse);
 
         CommitChainResponse commitChain = commitChainResponse.getResult();
@@ -96,7 +97,7 @@ public class ChainEntryIT extends AbstractClientTest {
         Assert.assertNotNull(commitChain.getChainIdHash());
         Assert.assertNotNull(commitChain.getTxId());
 
-        FactomResponse<RevealResponse> revealResponse = factomdClient.revealChain(revealChainEntry);
+        FactomResponse<RevealResponse> revealResponse = factomdClient.revealChain(revealChainEntry).join();
         assertValidResponse(revealResponse);
 
         RevealResponse revealChain = revealResponse.getResult();
@@ -124,7 +125,7 @@ public class ChainEntryIT extends AbstractClientTest {
         entry.setContent("abcdef");
         entry.setExternalIds(externalIds);
 
-        FactomResponse<ComposeResponse> composeResponse = walletdClient.composeEntry(entry, EC_PUBLIC_KEY);
+        FactomResponse<ComposeResponse> composeResponse = walletdClient.composeEntry(entry, EC_PUBLIC_KEY).join();
         assertValidResponse(composeResponse);
 
         ComposeResponse composeEntry = composeResponse.getResult();
@@ -141,7 +142,7 @@ public class ChainEntryIT extends AbstractClientTest {
         String revealCommitMessage = composeEntry.getReveal().getParams().getEntry();
         Assert.assertNotNull(revealCommitMessage);
 
-        FactomResponse<CommitEntryResponse> commitEntryResponse = factomdClient.commitEntry(commitEntryMessage);
+        FactomResponse<CommitEntryResponse> commitEntryResponse = factomdClient.commitEntry(commitEntryMessage).join();
         assertValidResponse(commitEntryResponse);
 
         CommitEntryResponse commitEntry = commitEntryResponse.getResult();
@@ -149,7 +150,7 @@ public class ChainEntryIT extends AbstractClientTest {
         Assert.assertNotNull(commitEntry.getTxId());
         Assert.assertNotNull(commitEntry.getEntryHash());
 
-        FactomResponse<RevealResponse> revealResponse = factomdClient.revealChain(revealCommitMessage);
+        FactomResponse<RevealResponse> revealResponse = factomdClient.revealChain(revealCommitMessage).join();
         assertValidResponse(revealResponse);
 
         RevealResponse revealEntry = revealResponse.getResult();
@@ -172,7 +173,7 @@ public class ChainEntryIT extends AbstractClientTest {
         int seconds = 0;
         while (seconds < maxSeconds) {
             System.out.println("At verification second: " + seconds);
-            FactomResponse<EntryTransactionResponse> transactionsResponse = factomdClient.ackTransactions(entryHash, chainId, EntryTransactionResponse.class);
+            FactomResponse<EntryTransactionResponse> transactionsResponse = factomdClient.ackTransactions(entryHash, chainId, EntryTransactionResponse.class).join();
             assertValidResponse(transactionsResponse);
 
             EntryTransactionResponse entryTransaction = transactionsResponse.getResult();

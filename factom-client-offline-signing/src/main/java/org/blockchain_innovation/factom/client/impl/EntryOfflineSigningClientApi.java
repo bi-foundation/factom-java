@@ -11,10 +11,11 @@ import org.blockchain_innovation.factom.client.api.FactomResponse;
 import org.blockchain_innovation.factom.client.api.StringUtils;
 import org.blockchain_innovation.factom.client.api.model.Chain;
 import org.blockchain_innovation.factom.client.api.model.Entry;
+import org.blockchain_innovation.factom.client.api.model.response.CommitChain;
+import org.blockchain_innovation.factom.client.api.model.response.CommitEntry;
 import org.blockchain_innovation.factom.client.api.model.response.factomd.CommitChainResponse;
 import org.blockchain_innovation.factom.client.api.model.response.factomd.CommitEntryResponse;
 import org.blockchain_innovation.factom.client.api.model.response.factomd.RevealResponse;
-import org.blockchain_innovation.factom.client.api.model.response.walletd.ComposeResponse;
 import org.blockchain_innovation.factom.client.impl.ops.ByteOperations;
 import org.blockchain_innovation.factom.client.impl.ops.EntryOperations;
 
@@ -26,14 +27,26 @@ import java.security.Signature;
 import java.security.SignatureException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 public class EntryOfflineSigningClientApi extends AbstractClient {
+
+    public static final int ENTRY_REVEAL_WAIT = 2000;
 
     private EntryOperations entryOperations = new EntryOperations();
     private ByteOperations byteOperations = new ByteOperations();
 
     private WalletdClient walletdClient;
     private FactomdClient factomdClient;
+
+    private CompletableFuture<Void> waitFuture = CompletableFuture.runAsync(() -> {
+        try {
+            TimeUnit.SECONDS.sleep(ENTRY_REVEAL_WAIT);
+        } catch (InterruptedException e) {
+            throw new IllegalStateException(e);
+        }
+    });
 
     private WalletdClient getWalletdClient() throws FactomException.ClientException {
         if (walletdClient == null) {
@@ -59,15 +72,23 @@ public class EntryOfflineSigningClientApi extends AbstractClient {
      * @param secret
      * @throws FactomException.ClientException
      */
-    public void commitChain(Chain chain, String entryCreditAddress, String secret) throws FactomException.ClientException {
-        FactomResponse<ComposeResponse> composeResponse = getWalletdClient().composeChain(chain, entryCreditAddress);
-        ComposeResponse composeChain = composeResponse.getResult();
-
+    public CompletableFuture<CommitChain> commitChain(Chain chain, String entryCreditAddress, String secret) throws FactomException.ClientException {
         String commitChainMessage = composeChainCommit(chain, entryCreditAddress, secret);
         String revealChainEntry = composeChainReveal(chain);
 
-        FactomResponse<CommitChainResponse> commitChainResponse = getFactomdClient().commitChain(commitChainMessage);
-        FactomResponse<RevealResponse> revealChainResponse = getFactomdClient().revealChain(revealChainEntry);
+        CompletableFuture<FactomResponse<CommitChainResponse>> commitChainResponse = getFactomdClient().commitChain(commitChainMessage);
+        CompletableFuture<FactomResponse<RevealResponse>> revealChainResponse = getFactomdClient().revealChain(revealChainEntry);
+
+        CompletableFuture<CommitChain> commitChainFuture = commitChainResponse
+                .thenCombine(waitFuture, (_commitChainResponse, _void) -> {
+                    CommitChain commitChain = new CommitChain();
+                    commitChain.setCommitChainResponse(_commitChainResponse.getResult());
+                    return commitChain;
+                }).thenCombine(revealChainResponse, (_commitChain, _revealChainResponse) -> {
+                    _commitChain.setRevealResponse(_revealChainResponse.getResult());
+                    return _commitChain;
+                });
+        return commitChainFuture;
     }
 
     /**
@@ -78,15 +99,23 @@ public class EntryOfflineSigningClientApi extends AbstractClient {
      * @param secret
      * @throws FactomException.ClientException
      */
-    public void commitEntry(Entry entry, String entryCreditAddress, String secret) throws FactomException.ClientException {
-        FactomResponse<ComposeResponse> composeResponse = getWalletdClient().composeEntry(entry, entryCreditAddress);
-
-        ComposeResponse composeEntry = composeResponse.getResult();
+    public CompletableFuture<CommitEntry> commitEntry(Entry entry, String entryCreditAddress, String secret) throws FactomException.ClientException {
         String commitEntryMessage = composeEntryCommit(entry, entryCreditAddress, secret);
-        FactomResponse<CommitEntryResponse> commitEntryResponse = getFactomdClient().commitEntry(commitEntryMessage);
-
         String revealCommitMessage = composeEntryReveal(entry);
-        FactomResponse<RevealResponse> revealResponse = getFactomdClient().revealChain(revealCommitMessage);
+
+        CompletableFuture<FactomResponse<CommitEntryResponse>> commitEntryResponse = getFactomdClient().commitEntry(commitEntryMessage);
+        CompletableFuture<FactomResponse<RevealResponse>> revealEntryResponse = getFactomdClient().revealChain(revealCommitMessage);
+
+        CompletableFuture<CommitEntry> commitEntryFuture = commitEntryResponse
+                .thenCombine(waitFuture, (_commitEntryResponse, _void) -> {
+                    CommitEntry commitChain = new CommitEntry();
+                    commitChain.setCommitEntryResponse(_commitEntryResponse.getResult());
+                    return commitChain;
+                }).thenCombine(revealEntryResponse, (_commitEntry, _revealEntryResponse) -> {
+                    _commitEntry.setRevealResponse(_revealEntryResponse.getResult());
+                    return _commitEntry;
+                });
+        return commitEntryFuture;
     }
 
     /**

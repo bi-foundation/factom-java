@@ -1,6 +1,6 @@
 = Factom Java
 
-A Factom Java enterprise client to interact with Factom. Please see the docs module for documentation.
+A Factom Java enterprise client to interact with Factom.
 
 Currently the client implements all factomd and factom-walletd lowlevel API calls both synchronously and asynchronously. Higher level functions are being worked on.
 

@@ -24,11 +24,11 @@ public class SigningTest extends AbstractClientTest {
         Entry entry = entry();
 
         String composeEntryCommit = entryClient.composeEntryCommit(entry, entryCreditPublicKey, secret);
-        FactomResponse<CommitEntryResponse> commitEntryResponse = factomdClient.commitEntry(composeEntryCommit);
+        FactomResponse<CommitEntryResponse> commitEntryResponse = factomdClient.commitEntry(composeEntryCommit).join();
         assertValidResponse(commitEntryResponse);
 
         String composeEntryReveal = entryClient.composeEntryReveal(entry);
-        FactomResponse<RevealResponse> revealEntryResponse = factomdClient.revealEntry(composeEntryCommit);
+        FactomResponse<RevealResponse> revealEntryResponse = factomdClient.revealEntry(composeEntryCommit).join();
         assertValidResponse(revealEntryResponse);
     }
 
@@ -41,12 +41,12 @@ public class SigningTest extends AbstractClientTest {
 
         String composeChainCommit = entryClient.composeChainCommit(chain, entryCreditPublicKey, secret);
         System.out.println("composeChainCommit = " + composeChainCommit);
-        FactomResponse<CommitChainResponse> commitChainResponse = factomdClient.commitChain(composeChainCommit);
+        FactomResponse<CommitChainResponse> commitChainResponse = factomdClient.commitChain(composeChainCommit).join();
         assertValidResponse(commitChainResponse);
 
         String composeChainReveal = entryClient.composeChainReveal(chain);
         System.out.println("composeChainReveal = " + composeChainReveal);
-        FactomResponse<RevealResponse> revealChainResponse = factomdClient.revealChain(composeChainReveal);
+        FactomResponse<RevealResponse> revealChainResponse = factomdClient.revealChain(composeChainReveal).join();
         assertValidResponse(revealChainResponse);
     }
 

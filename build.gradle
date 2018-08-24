@@ -16,11 +16,11 @@
 
 // Apply the java-library plugin to add support for Java Library
 //apply plugin: 'idea'
+import org.asciidoctor.gradle.AsciidoctorTask
 
-//
-//plugins {
-//    id 'org.asciidoctor.convert' version '1.5.6' apply false
-//}
+plugins {
+    id 'org.asciidoctor.convert' version '1.5.6' apply false
+}
 
 // In this section you declare where to find the dependencies of your project
 allprojects {
@@ -28,18 +28,26 @@ allprojects {
         jcenter()
     }
 
-    apply plugin: 'java-library'
+    version = '0.2.1'
+    group = 'org.blockchain_innovation.factom'
 }
 
 project(':factom-client-api') {
+
+
+    apply plugin: 'java'
+
     dependencies {
-        api 'org.slf4j:slf4j-api:1.7.25'
+//        api 'org.slf4j:slf4j-api:1.7.25'
     }
 }
 
 project(':factom-client-impl') {
+
+    apply plugin: 'java'
     dependencies {
         compile project(':factom-client-api')
+        compile 'org.slf4j:slf4j-api:1.7.25'
 
         testCompile 'org.mock-server:mockserver-netty:5.4.1'
         testCompile 'org.mock-server:mockserver-client-java:5.4.1'
@@ -47,9 +55,14 @@ project(':factom-client-impl') {
 
     }
 }
+
 project(':factom-client-offline-signing') {
+
+    apply plugin: 'java'
     dependencies {
         compile project(':factom-client-api')
+        compile project(':factom-client-impl')
+        compile 'org.slf4j:slf4j-api:1.7.25'
         compile 'net.i2p.crypto:eddsa:0.3.0'
 
         testCompile 'org.mock-server:mockserver-netty:5.4.1'
@@ -59,41 +72,69 @@ project(':factom-client-offline-signing') {
     }
 }
 project(':json-converter-gson') {
+    apply plugin: 'java'
+
     dependencies {
         compile project(':factom-client-api')
-        api 'com.google.code.gson:gson:2.8.5'
+        compile 'com.google.code.gson:gson:2.8.5'
     }
 }
 
 project(':factom-client-tests') {
+    apply plugin: 'java'
     dependencies {
-        api project(':factom-client-offline-signing')
-        api project(':factom-client-impl')
-        api project(':json-converter-gson')
+        compile project(':factom-client-impl')
+        compile project(':factom-client-offline-signing')
+        compile project(':json-converter-gson')
         testCompile 'org.mock-server:mockserver-netty:5.4.1'
         testCompile 'org.mock-server:mockserver-client-java:5.4.1'
         testCompile 'junit:junit:4.12'
+
     }
 }
 
 
-dependencies {
-    // This dependency is exported to consumers, that is to say found on their compile classpath.
+project(':docs') {
 
 
+    buildscript {
+        repositories {
+            jcenter()
+        }
 
-}
-
-sourceSets {
-    main {
-        java {
-            srcDir 'src/main/java'
+        dependencies {
+            classpath 'org.asciidoctor:asciidoctor-gradle-plugin:1.5.6'
+            classpath 'org.asciidoctor:asciidoctorj-epub3:1.5.0-alpha.6'
+            classpath 'org.asciidoctor:asciidoctorj-pdf:1.5.0-alpha.15'
         }
     }
-    test {
-        java {
-            srcDir 'src/test/java'
-        }
-    }
-}
+    apply plugin: 'java'
+    apply plugin: 'org.asciidoctor.convert'
 
+
+    tasks.withType(AsciidoctorTask) { task ->
+
+        sources {
+            include 'README.adoc'
+        }
+        attributes 'sourcedir': project.sourceSets.main.java.srcDirs[0],
+                'source-highlighter': 'coderay',
+                experimental: true,
+                toc: 'right',
+                idprefix: '',
+                idseparator: '-'
+    }
+
+    task html5(type: AsciidoctorTask, description: 'Generates single page HTML') {
+        backends 'html5'
+    }
+
+    task pdf(type: AsciidoctorTask, description: 'Generates PDF') {
+        backends 'pdf'
+    }
+
+    task epub3(type: AsciidoctorTask, description: 'Generates EPUB3') {
+        backends 'epub3'
+    }
+    defaultTasks 'html5'
+}

@@ -26,102 +26,103 @@ import org.blockchain_innovation.factom.client.api.model.response.walletd.*;
 import org.blockchain_innovation.factom.client.api.rpc.RpcMethod;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 public class WalletdClient extends AbstractClient {
 
-    public FactomResponse<TransactionResponse> addEntryCreditOutput(String txName, String address, long amount) throws FactomException.ClientException {
+    public CompletableFuture<FactomResponse<TransactionResponse>> addEntryCreditOutput(String txName, String address, long amount) throws FactomException.ClientException {
         return exchange(RpcMethod.ADD_ENTRY_CREDIT_OUTPUT.toRequestBuilder().param("tx-name", txName).param("address", address).param("amount", amount), TransactionResponse.class);
     }
 
-    public FactomResponse<ExecutedTransactionResponse> addFee(String txName, String address) throws FactomException.ClientException {
+    public CompletableFuture<FactomResponse<ExecutedTransactionResponse>> addFee(String txName, String address) throws FactomException.ClientException {
         return exchange(RpcMethod.ADD_FEE.toRequestBuilder().param("tx-name", txName).param("address", address), ExecutedTransactionResponse.class);
     }
 
-    public FactomResponse<ExecutedTransactionResponse> addInput(String txName, String address, long amount) throws FactomException.ClientException {
+    public CompletableFuture<FactomResponse<ExecutedTransactionResponse>> addInput(String txName, String address, long amount) throws FactomException.ClientException {
         return exchange(RpcMethod.ADD_INPUT.toRequestBuilder().param("tx-name", txName).param("address", address).param("amount", amount), ExecutedTransactionResponse.class);
     }
 
-    public FactomResponse<ExecutedTransactionResponse> addOutput(String txName, String address, long amount) throws FactomException.ClientException {
+    public CompletableFuture<FactomResponse<ExecutedTransactionResponse>> addOutput(String txName, String address, long amount) throws FactomException.ClientException {
         return exchange(RpcMethod.ADD_OUTPUT.toRequestBuilder().param("tx-name", txName).param("address", address).param("amount", amount), ExecutedTransactionResponse.class);
     }
 
-    public FactomResponse<AddressResponse> address(String address) throws FactomException.ClientException {
+    public CompletableFuture<FactomResponse<AddressResponse>> address(String address) throws FactomException.ClientException {
         return exchange(RpcMethod.ADDRESS.toRequestBuilder().param("address", address), AddressResponse.class);
     }
 
-    public FactomResponse<AddressesResponse> allAddresses() throws FactomException.ClientException {
+    public CompletableFuture<FactomResponse<AddressesResponse>> allAddresses() throws FactomException.ClientException {
         return exchange(RpcMethod.ALL_ADDRESSES.toRequestBuilder(), AddressesResponse.class);
     }
 
-    public FactomResponse<ComposeResponse> composeChain(Chain chain, String entryCreditPublicKey) throws FactomException.ClientException {
+    public CompletableFuture<FactomResponse<ComposeResponse>> composeChain(Chain chain, String entryCreditPublicKey) throws FactomException.ClientException {
         return exchange(RpcMethod.COMPOSE_CHAIN.toRequestBuilder().param("chain", chain).param("ecpub", entryCreditPublicKey), ComposeResponse.class);
     }
 
-    public FactomResponse<ComposeResponse> composeEntry(Entry entry, String entryCreditPublicKey) throws FactomException.ClientException {
+    public CompletableFuture<FactomResponse<ComposeResponse>> composeEntry(Entry entry, String entryCreditPublicKey) throws FactomException.ClientException {
         return exchange(RpcMethod.COMPOSE_ENTRY.toRequestBuilder().param("entry", entry).param("ecpub", entryCreditPublicKey), ComposeResponse.class);
     }
 
-    public FactomResponse<ComposeTransactionResponse> composeTransaction(String txName) throws FactomException.ClientException {
+    public CompletableFuture<FactomResponse<ComposeTransactionResponse>> composeTransaction(String txName) throws FactomException.ClientException {
         return exchange(RpcMethod.COMPOSE_TRANSACTION.toRequestBuilder().param("tx-name", txName), ComposeTransactionResponse.class);
     }
 
-    public FactomResponse<DeleteTransactionResponse> deleteTransaction(String txName) throws FactomException.ClientException {
+    public CompletableFuture<FactomResponse<DeleteTransactionResponse>> deleteTransaction(String txName) throws FactomException.ClientException {
         return exchange(RpcMethod.DELETE_TRANSACTION.toRequestBuilder().param("tx-name", txName), DeleteTransactionResponse.class);
     }
 
-    public FactomResponse<AddressResponse> generateEntryCreditAddress() throws FactomException.ClientException {
+    public CompletableFuture<FactomResponse<AddressResponse>> generateEntryCreditAddress() throws FactomException.ClientException {
         return exchange(RpcMethod.GENERATE_ENTRY_CREDIT_ADDRESS.toRequestBuilder(), AddressResponse.class);
     }
 
-    public FactomResponse<AddressResponse> generateFactoidAddress() throws FactomException.ClientException {
+    public CompletableFuture<FactomResponse<AddressResponse>> generateFactoidAddress() throws FactomException.ClientException {
         return exchange(RpcMethod.GENERATE_FACTOID_ADDRESS.toRequestBuilder(), AddressResponse.class);
     }
 
-    public FactomResponse<GetHeightResponse> getHeight() throws FactomException.ClientException {
+    public CompletableFuture<FactomResponse<GetHeightResponse>> getHeight() throws FactomException.ClientException {
         return exchange(RpcMethod.GET_HEIGHT.toRequestBuilder(), GetHeightResponse.class);
     }
 
-    public FactomResponse<AddressesResponse> importAddresses(List<Address> addresses) throws FactomException.ClientException {
+    public CompletableFuture<FactomResponse<AddressesResponse>> importAddresses(List<Address> addresses) throws FactomException.ClientException {
         return exchange(RpcMethod.IMPORT_ADDRESSES.toRequestBuilder().param("addresses", addresses), AddressesResponse.class);
     }
 
-    public FactomResponse<AddressResponse> importKoinify(String words) throws FactomException.ClientException {
+    public CompletableFuture<FactomResponse<AddressResponse>> importKoinify(String words) throws FactomException.ClientException {
         return exchange(RpcMethod.IMPORT_KOINIFY.toRequestBuilder().param("words", words), AddressResponse.class);
     }
 
-    public FactomResponse<TransactionResponse> newTransaction(String txName) throws FactomException.ClientException {
+    public CompletableFuture<FactomResponse<TransactionResponse>> newTransaction(String txName) throws FactomException.ClientException {
         return exchange(RpcMethod.NEW_TRANSACTION.toRequestBuilder().param("tx-name", txName), TransactionResponse.class);
     }
 
-    public FactomResponse<PropertiesResponse> properties() throws FactomException.ClientException {
+    public CompletableFuture<FactomResponse<PropertiesResponse>> properties() throws FactomException.ClientException {
         return exchange(RpcMethod.PROPERTIES.toRequestBuilder(), PropertiesResponse.class);
     }
 
-    public FactomResponse<ExecutedTransactionResponse> signTransaction(String txName) throws FactomException.ClientException {
+    public CompletableFuture<FactomResponse<ExecutedTransactionResponse>> signTransaction(String txName) throws FactomException.ClientException {
         return exchange(RpcMethod.SIGN_TRANSACTION.toRequestBuilder().param("tx-name", txName), ExecutedTransactionResponse.class);
     }
 
-    public FactomResponse<ExecutedTransactionResponse> subFee(String txName, String address) throws FactomException.ClientException {
+    public CompletableFuture<FactomResponse<ExecutedTransactionResponse>> subFee(String txName, String address) throws FactomException.ClientException {
         return exchange(RpcMethod.SUB_FEE.toRequestBuilder().param("tx-name", txName).param("address", address), ExecutedTransactionResponse.class);
     }
 
-    public FactomResponse<TransactionsResponse> tmpTransactions() throws FactomException.ClientException {
+    public CompletableFuture<FactomResponse<TransactionsResponse>> tmpTransactions() throws FactomException.ClientException {
         return exchange(RpcMethod.TMP_TRANSACTIONS.toRequestBuilder(), TransactionsResponse.class);
     }
 
-    public FactomResponse<BlockHeightTransactionsResponse> transactionsByRange(Range range) throws FactomException.ClientException {
+    public CompletableFuture<FactomResponse<BlockHeightTransactionsResponse>> transactionsByRange(Range range) throws FactomException.ClientException {
         return exchange(RpcMethod.TRANSACTIONS.toRequestBuilder().param("range", range), BlockHeightTransactionsResponse.class);
     }
 
-    public FactomResponse<TransactionsResponse> transactionsByTransactionId(String txid) throws FactomException.ClientException {
+    public CompletableFuture<FactomResponse<TransactionsResponse>> transactionsByTransactionId(String txid) throws FactomException.ClientException {
         return exchange(RpcMethod.TRANSACTIONS.toRequestBuilder().param("txid", txid), TransactionsResponse.class);
     }
 
-    public FactomResponse<BlockHeightTransactionsResponse> transactionsByAddress(String address) throws FactomException.ClientException {
+    public CompletableFuture<FactomResponse<BlockHeightTransactionsResponse>> transactionsByAddress(String address) throws FactomException.ClientException {
         return exchange(RpcMethod.TRANSACTIONS.toRequestBuilder().param("address", address), BlockHeightTransactionsResponse.class);
     }
 
-    public FactomResponse<WalletBackupResponse> walletBackup() throws FactomException.ClientException {
+    public CompletableFuture<FactomResponse<WalletBackupResponse>> walletBackup() throws FactomException.ClientException {
         return exchange(RpcMethod.WALLET_BACKUP.toRequestBuilder(), WalletBackupResponse.class);
     }
 }
