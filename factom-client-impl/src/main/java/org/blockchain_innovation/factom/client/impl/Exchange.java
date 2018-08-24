@@ -33,7 +33,7 @@ import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 public class Exchange<Result> {
@@ -46,6 +46,7 @@ public class Exchange<Result> {
     private final Class<Result> rpcResultClass;
 
     private final Logger logger = LoggerFactory.getLogger(Exchange.class);
+    private ExecutorService executorService;
 
 
     protected Exchange(RpcSettings settings, RpcRequest rpcRequest, Class<Result> rpcResultClass) {
@@ -62,7 +63,7 @@ public class Exchange<Result> {
             sendRequest();
             retrieveResponse(rpcResultClass);
             return getFactomResponse();
-        });
+        }, getExecutorService());
 
         return promise;
     }
@@ -164,6 +165,25 @@ public class Exchange<Result> {
         }
 
 
+    }
+
+
+
+    public static ThreadFactory threadFactory(final String name, final boolean daemon) {
+        return runnable -> {
+            Thread result = new Thread(runnable, name);
+            result.setDaemon(daemon);
+            return result;
+        };
+    }
+
+
+    protected synchronized ExecutorService getExecutorService() {
+        if (executorService == null) {
+            executorService = new ThreadPoolExecutor(2, 10, 5, TimeUnit.MINUTES,
+                    new SynchronousQueue<>(), threadFactory("FactomApi Dispatcher", false));
+        }
+        return executorService;
     }
 
 
