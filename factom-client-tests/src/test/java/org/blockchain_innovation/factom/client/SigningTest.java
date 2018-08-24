@@ -3,10 +3,13 @@ package org.blockchain_innovation.factom.client;
 import org.blockchain_innovation.factom.client.api.FactomResponse;
 import org.blockchain_innovation.factom.client.api.model.Chain;
 import org.blockchain_innovation.factom.client.api.model.Entry;
+import org.blockchain_innovation.factom.client.api.model.response.CommitAndRevealChainResponse;
+import org.blockchain_innovation.factom.client.api.model.response.CommitAndRevealEntryResponse;
 import org.blockchain_innovation.factom.client.api.model.response.factomd.CommitChainResponse;
 import org.blockchain_innovation.factom.client.api.model.response.factomd.CommitEntryResponse;
 import org.blockchain_innovation.factom.client.api.model.response.factomd.RevealResponse;
 import org.blockchain_innovation.factom.client.impl.EntryOfflineSigningClientApi;
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -17,37 +20,73 @@ public class SigningTest extends AbstractClientTest {
     private EntryOfflineSigningClientApi entryClient = new EntryOfflineSigningClientApi();
 
     @Test
-    public void testEntry() throws Exception {
-        String entryCreditPublicKey = "EC3cqLZPq5ypwRB5CLfXnud5vkWAV2sd235CFf9KcWcE3FH9GRxv";
-        String secret = "Es3Y6U6H1Pfg4wYag8VMtRZEGuEJnfkJ2ZuSyCVcQKweB6y4WvGH";
+    public void testChain() {
+        Chain chain = chain();
+        CommitAndRevealChainResponse commitAndRevealChain = entryClient.commitAndRevealChain(chain, EC_PUBLIC_KEY, EC_SECRET_KEY).join();
 
-        Entry entry = entry();
-
-        String composeEntryCommit = entryClient.composeEntryCommit(entry, entryCreditPublicKey, secret);
-        FactomResponse<CommitEntryResponse> commitEntryResponse = factomdClient.commitEntry(composeEntryCommit).join();
-        assertValidResponse(commitEntryResponse);
-
-        String composeEntryReveal = entryClient.composeEntryReveal(entry);
-        FactomResponse<RevealResponse> revealEntryResponse = factomdClient.revealEntry(composeEntryCommit).join();
-        assertValidResponse(revealEntryResponse);
+        Assert.assertEquals("Entry Commit Success",commitAndRevealChain.getCommitChainResponse().getMessage());
+        Assert.assertEquals("Entry Reveal Success",commitAndRevealChain.getRevealResponse().getMessage());
+        Assert.assertEquals(commitAndRevealChain.getCommitChainResponse().getEntryHash(), commitAndRevealChain.getRevealResponse().getEntryHash());
     }
 
     @Test
-    public void testChain() throws Exception {
-        String entryCreditPublicKey = "EC3cqLZPq5ypwRB5CLfXnud5vkWAV2sd235CFf9KcWcE3FH9GRxv";
-        String secret = "Es3Y6U6H1Pfg4wYag8VMtRZEGuEJnfkJ2ZuSyCVcQKweB6y4WvGH";
-
+    public void testComposeChain() {
         Chain chain = chain();
 
-        String composeChainCommit = entryClient.composeChainCommit(chain, entryCreditPublicKey, secret);
+        String composeChainCommit = entryClient.composeChainCommit(chain, EC_PUBLIC_KEY, EC_SECRET_KEY);
         System.out.println("composeChainCommit = " + composeChainCommit);
         FactomResponse<CommitChainResponse> commitChainResponse = factomdClient.commitChain(composeChainCommit).join();
         assertValidResponse(commitChainResponse);
+
+        CommitChainResponse commitChain = commitChainResponse.getResult();
+        Assert.assertEquals("Chain Commit Success",commitChain.getMessage());
+        Assert.assertNotNull(commitChain.getChainIdHash());
+        Assert.assertNotNull(commitChain.getEntryHash());
+        Assert.assertNotNull(commitChain.getTxId());
 
         String composeChainReveal = entryClient.composeChainReveal(chain);
         System.out.println("composeChainReveal = " + composeChainReveal);
         FactomResponse<RevealResponse> revealChainResponse = factomdClient.revealChain(composeChainReveal).join();
         assertValidResponse(revealChainResponse);
+
+        RevealResponse revealEntry = revealChainResponse.getResult();
+        Assert.assertEquals("Entry Reveal Success",revealEntry.getMessage());
+        Assert.assertNotNull(revealEntry.getChainId());
+        Assert.assertEquals(commitChain.getEntryHash(), revealEntry.getEntryHash());
+    }
+
+    @Test
+    public void testEntry() {
+        Entry entry = entry();
+        CommitAndRevealEntryResponse commitAndRevealChain = entryClient.commitAndRevealEntry(entry, EC_PUBLIC_KEY, EC_SECRET_KEY).join();
+
+        Assert.assertEquals("Entry Commit Success",commitAndRevealChain.getCommitEntryResponse().getMessage());
+        Assert.assertEquals("Entry Reveal Success",commitAndRevealChain.getRevealResponse().getMessage());
+        Assert.assertEquals(commitAndRevealChain.getCommitEntryResponse().getEntryHash(), commitAndRevealChain.getRevealResponse().getEntryHash());
+    }
+
+    @Test
+    public void testComposeEntry() {
+        Entry entry = entry();
+
+        String composeEntryCommit = entryClient.composeEntryCommit(entry, EC_PUBLIC_KEY, EC_SECRET_KEY);
+        FactomResponse<CommitEntryResponse> commitEntryResponse = factomdClient.commitEntry(composeEntryCommit).join();
+        assertValidResponse(commitEntryResponse);
+
+        CommitEntryResponse commitEntry = commitEntryResponse.getResult();
+        Assert.assertEquals("Entry Commit Success",commitEntry.getMessage());
+        Assert.assertNotNull(commitEntry.getTxId());
+        Assert.assertNotNull(commitEntry.getEntryHash());
+
+        String composeEntryReveal = entryClient.composeEntryReveal(entry);
+        FactomResponse<RevealResponse> revealEntryResponse = factomdClient.revealEntry(composeEntryReveal).join();
+        assertValidResponse(revealEntryResponse);
+
+        RevealResponse revealEntry = revealEntryResponse.getResult();
+        Assert.assertEquals("Entry Reveal Success",revealEntry.getMessage());
+        Assert.assertNotNull(revealEntry.getChainId());
+        Assert.assertEquals(commitEntry.getEntryHash(), revealEntry.getEntryHash());
+
     }
 
     private Chain chain() {

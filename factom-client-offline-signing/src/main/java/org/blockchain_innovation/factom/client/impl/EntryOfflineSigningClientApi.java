@@ -11,8 +11,8 @@ import org.blockchain_innovation.factom.client.api.FactomResponse;
 import org.blockchain_innovation.factom.client.api.StringUtils;
 import org.blockchain_innovation.factom.client.api.model.Chain;
 import org.blockchain_innovation.factom.client.api.model.Entry;
-import org.blockchain_innovation.factom.client.api.model.response.CommitChain;
-import org.blockchain_innovation.factom.client.api.model.response.CommitEntry;
+import org.blockchain_innovation.factom.client.api.model.response.CommitAndRevealChainResponse;
+import org.blockchain_innovation.factom.client.api.model.response.CommitAndRevealEntryResponse;
 import org.blockchain_innovation.factom.client.api.model.response.factomd.CommitChainResponse;
 import org.blockchain_innovation.factom.client.api.model.response.factomd.CommitEntryResponse;
 import org.blockchain_innovation.factom.client.api.model.response.factomd.RevealResponse;
@@ -72,21 +72,21 @@ public class EntryOfflineSigningClientApi extends AbstractClient {
      * @param secret
      * @throws FactomException.ClientException
      */
-    public CompletableFuture<CommitChain> commitChain(Chain chain, String entryCreditAddress, String secret) throws FactomException.ClientException {
+    public CompletableFuture<CommitAndRevealChainResponse> commitAndRevealChain(Chain chain, String entryCreditAddress, String secret) throws FactomException.ClientException {
         String commitChainMessage = composeChainCommit(chain, entryCreditAddress, secret);
         String revealChainEntry = composeChainReveal(chain);
 
         CompletableFuture<FactomResponse<CommitChainResponse>> commitChainResponse = getFactomdClient().commitChain(commitChainMessage);
         CompletableFuture<FactomResponse<RevealResponse>> revealChainResponse = getFactomdClient().revealChain(revealChainEntry);
 
-        CompletableFuture<CommitChain> commitChainFuture = commitChainResponse
+        CompletableFuture<CommitAndRevealChainResponse> commitChainFuture = commitChainResponse
                 .thenCombine(waitFuture, (_commitChainResponse, _void) -> {
-                    CommitChain commitChain = new CommitChain();
-                    commitChain.setCommitChainResponse(_commitChainResponse.getResult());
-                    return commitChain;
-                }).thenCombine(revealChainResponse, (_commitChain, _revealChainResponse) -> {
-                    _commitChain.setRevealResponse(_revealChainResponse.getResult());
-                    return _commitChain;
+                    CommitAndRevealChainResponse response = new CommitAndRevealChainResponse();
+                    response.setCommitChainResponse(_commitChainResponse.getResult());
+                    return response;
+                }).thenCombine(revealChainResponse, (_response, _revealChainResponse) -> {
+                    _response.setRevealResponse(_revealChainResponse.getResult());
+                    return _response;
                 });
         return commitChainFuture;
     }
@@ -99,21 +99,21 @@ public class EntryOfflineSigningClientApi extends AbstractClient {
      * @param secret
      * @throws FactomException.ClientException
      */
-    public CompletableFuture<CommitEntry> commitEntry(Entry entry, String entryCreditAddress, String secret) throws FactomException.ClientException {
+    public CompletableFuture<CommitAndRevealEntryResponse> commitAndRevealEntry(Entry entry, String entryCreditAddress, String secret) throws FactomException.ClientException {
         String commitEntryMessage = composeEntryCommit(entry, entryCreditAddress, secret);
         String revealCommitMessage = composeEntryReveal(entry);
 
         CompletableFuture<FactomResponse<CommitEntryResponse>> commitEntryResponse = getFactomdClient().commitEntry(commitEntryMessage);
         CompletableFuture<FactomResponse<RevealResponse>> revealEntryResponse = getFactomdClient().revealChain(revealCommitMessage);
 
-        CompletableFuture<CommitEntry> commitEntryFuture = commitEntryResponse
+        CompletableFuture<CommitAndRevealEntryResponse> commitEntryFuture = commitEntryResponse
                 .thenCombine(waitFuture, (_commitEntryResponse, _void) -> {
-                    CommitEntry commitChain = new CommitEntry();
-                    commitChain.setCommitEntryResponse(_commitEntryResponse.getResult());
-                    return commitChain;
-                }).thenCombine(revealEntryResponse, (_commitEntry, _revealEntryResponse) -> {
-                    _commitEntry.setRevealResponse(_revealEntryResponse.getResult());
-                    return _commitEntry;
+                    CommitAndRevealEntryResponse response = new CommitAndRevealEntryResponse();
+                    response.setCommitEntryResponse(_commitEntryResponse.getResult());
+                    return response;
+                }).thenCombine(revealEntryResponse, (_response, _revealEntryResponse) -> {
+                    _response.setRevealResponse(_revealEntryResponse.getResult());
+                    return _response;
                 });
         return commitEntryFuture;
     }
