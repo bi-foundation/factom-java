@@ -38,9 +38,6 @@ public enum Encoding {
                 throw new FactomRuntimeException.AssertionException(e);
             }
         }
-
-
-
     },
 
 
@@ -53,6 +50,18 @@ public enum Encoding {
         @Override
         public byte[] decode(String base64) {
             return DatatypeConverter.parseBase64Binary(base64);
+        }
+    },
+
+    BASE58 {
+        @Override
+        public String encode(byte[] input) {
+            return Base58.encode(input);
+        }
+
+        @Override
+        public byte[] decode(String base64) {
+            return Base58.decode(base64);
         }
     },
 

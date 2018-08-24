@@ -47,6 +47,17 @@ project(':factom-client-impl') {
 
     }
 }
+project(':factom-client-offline-signing') {
+    dependencies {
+        compile project(':factom-client-api')
+        compile 'net.i2p.crypto:eddsa:0.3.0'
+
+        testCompile 'org.mock-server:mockserver-netty:5.4.1'
+        testCompile 'org.mock-server:mockserver-client-java:5.4.1'
+        testCompile 'junit:junit:4.12'
+
+    }
+}
 project(':json-converter-gson') {
     dependencies {
         compile project(':factom-client-api')
@@ -56,13 +67,12 @@ project(':json-converter-gson') {
 
 project(':factom-client-tests') {
     dependencies {
+        api project(':factom-client-offline-signing')
         api project(':factom-client-impl')
         api project(':json-converter-gson')
         testCompile 'org.mock-server:mockserver-netty:5.4.1'
         testCompile 'org.mock-server:mockserver-client-java:5.4.1'
         testCompile 'junit:junit:4.12'
-
-        testCompile 'net.i2p.crypto:eddsa:0.3.0'
     }
 }
 
