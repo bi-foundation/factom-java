@@ -48,13 +48,23 @@ public class JsonConverterGSON implements JsonConverter {
 
     @Override
     public JsonConverterGSON configure(Properties properties) {
-        this.gson = new GsonBuilder().setPrettyPrinting().setFieldNamingStrategy(fieldNamingStrategy()).create();
-        return this;
-    }
+        GsonBuilder builder = builder();
 
-    @Override
-    public RpcErrorResponse errorFromJson(Reader reader) {
-        return gson().fromJson(reader, RpcErrorResponse.class);
+        // Init new properties so we get default values
+        if (properties == null) {
+            properties = new Properties();
+        }
+        boolean lenient = Boolean.parseBoolean(properties.getProperty("json.lenient", "true"));
+        if (lenient) {
+            builder.setLenient();
+        }
+        boolean prettyprint = Boolean.parseBoolean(properties.getProperty("json.prettyprint", "true"));
+        if (prettyprint) {
+            builder.setPrettyPrinting();
+        }
+
+        this.gson = builder.create();
+        return this;
     }
 
     @Override
@@ -64,18 +74,14 @@ public class JsonConverterGSON implements JsonConverter {
 
 
     @Override
-    public <T> RpcResponse<T> fromJson(Reader reader, Class<T> resultClass) {
-        return gson().fromJson(reader, TypeToken.getParameterized(RpcResponse.class, resultClass).getType());
-    }
-
-    @Override
     public <T> RpcResponse<T> fromJson(String json, Class<T> resultClass) {
         return gson().fromJson(json, TypeToken.getParameterized(RpcResponse.class, resultClass).getType());
     }
 
     @Override
     public String prettyPrint(String json) {
-        return toJson(new JsonParser().parse(json));
+        // New builder since we will always pretty print. The parser is necesary to force pretty printing the sting input
+        return builder().setLenient().setPrettyPrinting().create().toJson(new JsonParser().parse(json));
     }
 
     @Override
@@ -83,11 +89,6 @@ public class JsonConverterGSON implements JsonConverter {
         return gson().toJson(input);
     }
 
-    @Override
-    public JsonConverterGSON toJson(Object source, Writer writer) {
-        gson().toJson(source, writer);
-        return this;
-    }
 
     /**
      * add naming strategy to handle response with reserved keywords and dashes.
@@ -100,12 +101,16 @@ public class JsonConverterGSON implements JsonConverter {
         return f -> FieldNamingPolicy.LOWER_CASE_WITH_DASHES.translateName(f).replace("_", "");
     }
 
+    private GsonBuilder builder() {
+        return new GsonBuilder().setFieldNamingStrategy(fieldNamingStrategy()).
+//                    registerTypeAdapter(RpcMethod.class, new RpcMethodDeserializer()).
+        registerTypeAdapter(RpcMethod.class, new RpcMethodSerializer());
+    }
+
     private Gson gson() {
         if (gson == null) {
-            this.gson = new GsonBuilder().setFieldNamingStrategy(fieldNamingStrategy()).
-                    registerTypeAdapter(RpcMethod.class, new RpcMethodDeserializer()).
-                    registerTypeAdapter(RpcMethod.class, new RpcMethodSerializer()).
-                    setPrettyPrinting().setLenient().create();
+            configure(null);
+
         }
         return gson;
     }
@@ -117,10 +122,10 @@ public class JsonConverterGSON implements JsonConverter {
         }
     }
 
-    private class RpcMethodDeserializer implements JsonDeserializer<RpcMethod> {
+    /*private class RpcMethodDeserializer implements JsonDeserializer<RpcMethod> {
         public RpcMethod deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
                 throws JsonParseException {
             return RpcMethod.fromJsonValue(json.getAsJsonPrimitive().getAsString());
         }
-    }
+    }*/
 }

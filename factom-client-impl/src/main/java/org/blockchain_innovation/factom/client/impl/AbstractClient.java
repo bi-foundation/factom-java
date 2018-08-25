@@ -42,7 +42,7 @@ abstract class AbstractClient {
         setUrl(settings.getServer().getURL());
     }
 
-    public static ThreadFactory threadFactory(final String name, final boolean daemon) {
+    private static ThreadFactory threadFactory(final String name, final boolean daemon) {
         return runnable -> {
             Thread result = new Thread(runnable, name);
             result.setDaemon(daemon);

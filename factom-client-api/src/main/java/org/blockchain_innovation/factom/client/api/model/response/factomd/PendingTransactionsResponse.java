@@ -21,7 +21,7 @@ import java.util.List;
 
 public class PendingTransactionsResponse extends ArrayList<PendingTransactionsResponse.PendingTransaction> {
 
-    public class PendingTransaction {
+    public static class PendingTransaction {
 
         private String transactionid;
         private String status;
@@ -54,7 +54,7 @@ public class PendingTransactionsResponse extends ArrayList<PendingTransactionsRe
             return fees;
         }
 
-        public abstract class IO {
+        public static abstract class IO {
             private long amount;
             private String address;
             private String useraddress;
@@ -72,16 +72,16 @@ public class PendingTransactionsResponse extends ArrayList<PendingTransactionsRe
             }
         }
 
-        public class Input extends IO {
+        public static class Input extends IO {
 
         }
 
 
-        public class Output extends IO {
+        public static class Output extends IO {
 
         }
 
-        public class EntryCreditOutput extends IO {
+        public static class EntryCreditOutput extends IO {
 
         }
     }

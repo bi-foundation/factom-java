@@ -61,7 +61,7 @@ public class FactomException extends Exception {
             return getFactomResponse().getRpcErrorResponse();
         }
 
-        public FactomResponse getFactomResponse() {
+        public FactomResponse<?> getFactomResponse() {
             return factomErrorResponse;
         }
     }
