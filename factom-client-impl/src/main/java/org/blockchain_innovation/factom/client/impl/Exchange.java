@@ -65,7 +65,6 @@ public class Exchange<Result> {
             retrieveResponse(rpcResultClass);
             return getFactomResponse();
         }, getExecutorService());
-        });
     }
 
 
