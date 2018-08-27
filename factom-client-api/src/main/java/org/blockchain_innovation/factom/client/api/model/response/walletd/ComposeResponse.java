@@ -29,7 +29,7 @@ public class ComposeResponse {
         return reveal;
     }
 
-    public class Commit {
+    public static class Commit {
         private String jsonrpc;
         private int id;
         private Params params;
@@ -51,7 +51,7 @@ public class ComposeResponse {
             return method;
         }
 
-        public class Params {
+        public static class Params {
             private String message;
 
             public String getMessage() {
@@ -60,7 +60,7 @@ public class ComposeResponse {
         }
     }
 
-    public class Reveal {
+    public static class Reveal {
         private String jsonrpc;
         private int id;
         private Params params;
@@ -82,7 +82,7 @@ public class ComposeResponse {
             return method;
         }
 
-        public class Params {
+        public static class Params {
             private String entry;
 
             public String getEntry() {

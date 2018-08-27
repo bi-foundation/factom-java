@@ -41,7 +41,7 @@ public class TransactionResponse {
         return includedindirectoryblockheight;
     }
 
-    public class Transaction {
+    public static class Transaction {
 
         private long millitimestamp;
         private List<Input> inputs;
@@ -79,7 +79,7 @@ public class TransactionResponse {
             return blockheight;
         }
 
-        public abstract class IO {
+        public static abstract class IO {
             private long amount;
             private String address;
             private String useraddress;
@@ -97,16 +97,16 @@ public class TransactionResponse {
             }
         }
 
-        public class Input extends IO {
+        public static class Input extends IO {
         }
 
-        public class Output extends IO {
+        public static class Output extends IO {
         }
 
-        public class OutputEntryCredit extends IO {
+        public static class OutputEntryCredit extends IO {
         }
 
-        public class SigBlock {
+        public static class SigBlock {
             private List<String> signatures;
         }
     }

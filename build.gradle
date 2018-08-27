@@ -61,6 +61,8 @@ project(':json-converter-gson') {
     dependencies {
         compile project(':factom-client-api')
         compile 'com.google.code.gson:gson:2.8.5'
+        testCompile 'junit:junit:4.12'
+        testCompile project(':factom-client-impl')
     }
 }
 
@@ -73,6 +75,8 @@ project(':json-converter-jee') {
         compile 'javax.json.bind:javax.json.bind-api:1.0.0-RC2'
         testCompile 'org.glassfish:javax.json:1.1.2'
         testCompile 'org.eclipse:yasson:1.0.1'
+        testCompile 'junit:junit:4.12'
+        testCompile project(':factom-client-impl')
     }
 }
 
@@ -80,10 +84,13 @@ project(':json-converter-jee') {
 project(':factom-client-tests') {
     apply plugin: 'java'
     dependencies {
-        compile project(':factom-client-impl')
-        compile project(':json-converter-gson')
+        testCompile project(':factom-client-impl')
+        testCompile project(':json-converter-gson')
+        testCompile project(':json-converter-jee')
         testCompile 'org.mock-server:mockserver-netty:5.4.1'
         testCompile 'org.mock-server:mockserver-client-java:5.4.1'
+        testCompile 'org.glassfish:javax.json:1.1.2'
+        testCompile 'org.eclipse:yasson:1.0.1'
         testCompile 'junit:junit:4.12'
 
     }

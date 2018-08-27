@@ -58,14 +58,14 @@ public class Exchange<Result> {
 
 
     public CompletableFuture<FactomResponse<Result>> execute() {
-        CompletableFuture<FactomResponse<Result>> promise = CompletableFuture.supplyAsync(() -> {
+
+        return CompletableFuture.supplyAsync(() -> {
             connection();
             sendRequest();
             retrieveResponse(rpcResultClass);
             return getFactomResponse();
         }, getExecutorService());
-
-        return promise;
+        });
     }
 
 

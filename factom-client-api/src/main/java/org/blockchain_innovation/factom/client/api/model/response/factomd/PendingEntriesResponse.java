@@ -20,7 +20,7 @@ import java.util.ArrayList;
 
 public class PendingEntriesResponse extends ArrayList<PendingEntriesResponse.PendingEntry> {
 
-    public class PendingEntry {
+    public static class PendingEntry {
         private String entryhash;
         private String chainid;
         private String status;

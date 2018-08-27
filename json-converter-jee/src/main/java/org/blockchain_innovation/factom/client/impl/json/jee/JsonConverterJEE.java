@@ -25,19 +25,19 @@ import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
 import javax.json.bind.JsonbConfig;
 import javax.json.bind.config.PropertyNamingStrategy;
-import javax.json.bind.serializer.DeserializationContext;
-import javax.json.bind.serializer.JsonbDeserializer;
+import javax.json.bind.config.PropertyVisibilityStrategy;
 import javax.json.bind.serializer.JsonbSerializer;
 import javax.json.bind.serializer.SerializationContext;
 import javax.json.stream.JsonGenerator;
-import javax.json.stream.JsonParser;
-import java.io.Reader;
-import java.io.Writer;
-import java.lang.reflect.Type;
+import java.lang.reflect.*;
 import java.util.Objects;
 import java.util.Properties;
 
+import static javax.json.bind.config.PropertyOrderStrategy.LEXICOGRAPHICAL;
+
 public class JsonConverterJEE implements JsonConverter {
+    protected static final String RPC_METHOD = "method";
+    private Jsonb jsonb;
 
     static {
         Registry.register(JsonConverterJEE.class);
@@ -46,22 +46,35 @@ public class JsonConverterJEE implements JsonConverter {
 
     @Override
     public JsonConverterJEE configure(Properties properties) {
-//        this.gson = new GsonBuilder().setPrettyPrinting().setFieldNamingStrategy(propertyNamingStrategy()).create();
+
+        JsonbConfig jsonbConfig = config();
+        // Init new properties so we get default values
+        if (properties == null) {
+            properties = new Properties();
+        }
+        boolean prettyprint = Boolean.parseBoolean(properties.getProperty("json.prettyprint", "true"));
+        jsonbConfig.withFormatting(prettyprint);
+        this.jsonb = JsonbBuilder.create(jsonbConfig);
         return this;
+    }
+
+    private JsonbConfig config() {
+        JsonbConfig config = new JsonbConfig().
+                withFormatting(true).
+                withPropertyOrderStrategy(LEXICOGRAPHICAL).
+                withSerializers(new RpcMethodSerializer()).
+//                withDeserializers(new RpcMethodDeserializer()).
+                withPropertyVisibilityStrategy(propertyVisibilityStrategy()).
+                withPropertyNamingStrategy(propertyNamingStrategy());
+        return config;
     }
 
 
     private Jsonb jsonb() {
-        JsonbConfig config = new JsonbConfig().
-                withFormatting(true).
-                withSerializers(new RpcMethodSerializer()).
-                withDeserializers(new RpcMethodDeserializer()).withPropertyNamingStrategy(propertyNamingStrategy());
-        return JsonbBuilder.create(config);
-    }
-
-    @Override
-    public RpcErrorResponse errorFromJson(Reader reader) {
-        return jsonb().fromJson(reader, RpcErrorResponse.class);
+        if (jsonb == null) {
+            configure(null);
+        }
+        return jsonb;
     }
 
     @Override
@@ -71,15 +84,9 @@ public class JsonConverterJEE implements JsonConverter {
 
 
     @Override
-    public <T> RpcResponse<T> fromJson(Reader reader, Class<T> resultClass) {
-        Class<RpcResponse<T>> responseClass = (Class<RpcResponse<T>>) new RpcResponse().getClass();
-        return jsonb().fromJson(reader, responseClass);
-    }
-
-    @Override
     public <T> RpcResponse<T> fromJson(String json, Class<T> resultClass) {
-        Class<RpcResponse<T>> responseClass = (Class<RpcResponse<T>>) new RpcResponse().getClass();
-        return jsonb().fromJson(json, responseClass);
+        ParameterizedType parameterizedType = new ResolvedParameterizedType(RpcResponse.class, new Type[]{resultClass});
+        return jsonb().fromJson(json, parameterizedType);
     }
 
     @Override
@@ -92,11 +99,6 @@ public class JsonConverterJEE implements JsonConverter {
         return jsonb().toJson(input);
     }
 
-    @Override
-    public JsonConverterJEE toJson(Object source, Writer writer) {
-        jsonb().toJson(source, writer);
-        return this;
-    }
 
     /**
      * add naming strategy to handle response with reserved keywords and dashes.
@@ -110,9 +112,33 @@ public class JsonConverterJEE implements JsonConverter {
             Objects.requireNonNull(propertyName);
             String translated = propertyName;
             if (propertyName.startsWith("_")) {
-                translated.replaceFirst("_", "");
+                translated = translated.replaceFirst("_", "");
             }
             return translated.toLowerCase();
+        };
+    }
+
+    private PropertyVisibilityStrategy propertyVisibilityStrategy() {
+        return new PropertyVisibilityStrategy() {
+            @Override
+            public boolean isVisible(Field field) {
+                if (Modifier.isStatic(field.getModifiers())) {
+                    return false;
+                }
+                return Modifier.isPrivate(field.getModifiers()) || Modifier.isProtected(field.getModifiers());
+            }
+
+            @Override
+            public boolean isVisible(Method method) {
+
+                if ("getJsonRPC".equals(method.getName())) {
+                    return false;
+                }
+                if (method.getName().equals("getId") || method.getName().equals("getParams") || method.getName().equals("getMethod") || method.getName().startsWith("set")) {
+                    return Modifier.isProtected(method.getModifiers()) || Modifier.isPublic(method.getModifiers());
+                }
+                return false;
+            }
         };
     }
 
@@ -120,21 +146,20 @@ public class JsonConverterJEE implements JsonConverter {
     private class RpcMethodSerializer implements JsonbSerializer<RpcMethod> {
         public void serialize(RpcMethod rpcMethod, JsonGenerator jsonGenerator, SerializationContext serializationContext) {
             if (rpcMethod != null) {
-                serializationContext.serialize(rpcMethod.toJsonValue(), rpcMethod, jsonGenerator);
-            } else {
-                serializationContext.serialize(null, jsonGenerator);
+                serializationContext.serialize(rpcMethod.toJsonValue(), jsonGenerator);
             }
         }
     }
 
-    private class RpcMethodDeserializer implements JsonbDeserializer<RpcMethod> {
+   /* private class RpcMethodDeserializer implements JsonbDeserializer<RpcMethod> {
+
         public RpcMethod deserialize(JsonParser jsonParser, DeserializationContext deserializationContext, Type type) {
             RpcMethod rpcMethod = null;
             while (jsonParser.hasNext()) {
                 JsonParser.Event event = jsonParser.next();
                 if (event == JsonParser.Event.KEY_NAME) {
                     String key = jsonParser.getString();
-                    if ("rpcmethod".equalsIgnoreCase(key)) {
+                    if (RPC_METHOD.equalsIgnoreCase(key)) {
 //                        jsonParser.next();
 
                         rpcMethod = RpcMethod.fromJsonValue(jsonParser.getValue().toString());
@@ -143,7 +168,6 @@ public class JsonConverterJEE implements JsonConverter {
             }
             return rpcMethod;
         }
-    }
-
+    }*/
 
 }

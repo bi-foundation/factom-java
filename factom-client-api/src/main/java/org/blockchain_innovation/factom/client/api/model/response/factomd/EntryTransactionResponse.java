@@ -55,7 +55,7 @@ public class EntryTransactionResponse {
         }
     }
 
-    public class EntryData {
+    public static class EntryData {
         private String status;
 
         public String getStatus() {

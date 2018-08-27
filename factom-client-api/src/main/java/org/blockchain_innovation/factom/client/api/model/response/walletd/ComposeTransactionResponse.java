@@ -39,7 +39,7 @@ public class ComposeTransactionResponse {
         return method;
     }
 
-    public class Params {
+    public static class Params {
         private String transaction;
 
         public String getTransaction() {

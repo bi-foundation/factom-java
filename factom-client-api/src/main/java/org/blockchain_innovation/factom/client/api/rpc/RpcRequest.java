@@ -27,8 +27,8 @@ import java.util.*;
 
 public class RpcRequest {
     private static final String VERSION = "2.0";
-    private final String jsonrpc = VERSION;
-    private final RpcMethod method;
+    private String jsonrpc = VERSION;
+    private RpcMethod method;
     private int id;
     private Map<String, Object> params;
 
@@ -79,7 +79,11 @@ public class RpcRequest {
     }
 
 
-    public List<Param<?>> getParams() {
+    public Map<String,Object> getParams() {
+        return params;
+    }
+
+    private List<Param<?>> getParamsAsList() {
         if (params == null) {
             return null;
         }
@@ -104,7 +108,7 @@ public class RpcRequest {
         } else if (params == null) {
             this.params = new HashMap<>();
         }
-        param.addToMap(params);
+        this.params = param.addToMap(params);
         return this;
     }
 
@@ -112,10 +116,10 @@ public class RpcRequest {
         if (getMethod() == null) {
             throw new FactomRuntimeException("Cannot build a request without an RPC method specified");
         }
-        if (getParams() == null) {
+        if (getParamsAsList() == null) {
             return this;
         }
-        getParams().forEach(RpcRequest.Param::assertValid);
+        getParamsAsList().forEach(RpcRequest.Param::assertValid);
         return this;
     }
 
@@ -157,7 +161,7 @@ public class RpcRequest {
             if (result == null) {
                 result = new HashMap<>();
             }
-            map.put(getKey(), getValue());
+            result.put(getKey(), getValue());
             return result;
         }
     }
@@ -215,7 +219,7 @@ public class RpcRequest {
         }
 
         public Builder param(RpcRequest.Param<?> param) {
-            params.add(param);
+            this.params.add(param);
             return this;
         }
 
