@@ -25,45 +25,51 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.Properties;
+import java.util.concurrent.CompletionException;
 
 public class ExceptionTest extends AbstractClientTest {
 
     @Test
     public void testIncorrectCommitChainMessage() throws FactomException.ClientException {
-        try {
-            factomdClient.commitChain("incorrect-message");
-        } catch (FactomException.RpcErrorException e) {
-            FactomResponse response = e.getFactomResponse();
-            Assert.assertEquals(400, response.getHTTPResponseCode());
-            Assert.assertEquals("Bad Request", response.getHTTPResponseMessage());
-            Assert.assertNotNull(response.getRpcErrorResponse());
-            Assert.assertNotNull(response.getRpcErrorResponse().getError());
-            Assert.assertEquals(-32602, response.getRpcErrorResponse().getError().getCode());
-            Assert.assertEquals("Invalid params", response.getRpcErrorResponse().getError().getMessage());
-            Assert.assertEquals("Invalid Commit Chain", response.getRpcErrorResponse().getError().getData());
-            Assert.assertNull(response.getResult());
-        }
+
+        factomdClient.commitChain("incorrect-message").exceptionally(throwable -> {
+                    FactomException.RpcErrorException e = (FactomException.RpcErrorException) throwable.getCause();
+                    FactomResponse<?> response = e.getFactomResponse();
+                    Assert.assertEquals(400, response.getHTTPResponseCode());
+                    Assert.assertEquals("Bad Request", response.getHTTPResponseMessage());
+                    Assert.assertNotNull(response.getRpcErrorResponse());
+                    Assert.assertNotNull(response.getRpcErrorResponse().getError());
+                    Assert.assertEquals(-32602, response.getRpcErrorResponse().getError().getCode());
+                    Assert.assertEquals("Invalid params", response.getRpcErrorResponse().getError().getMessage());
+                    Assert.assertEquals("Invalid Commit Chain", response.getRpcErrorResponse().getError().getData());
+                    Assert.assertNull(response.getResult());
+                    return null;
+                }
+        ).join();
+
     }
 
     @Test
     public void testIncorrectTxName() throws FactomException.ClientException {
-        try {
-            walletdClient.composeTransaction("incorrect-tx-name");
-        } catch (FactomException.RpcErrorException e) {
-            FactomResponse response = e.getFactomResponse();
-            Assert.assertEquals(400, response.getHTTPResponseCode());
-            Assert.assertEquals("Bad Request", response.getHTTPResponseMessage());
-            Assert.assertNotNull(response.getRpcErrorResponse());
-            Assert.assertNotNull(response.getRpcErrorResponse().getError());
-            Assert.assertEquals(-32603, response.getRpcErrorResponse().getError().getCode());
-            Assert.assertEquals("Internal error", response.getRpcErrorResponse().getError().getMessage());
-            Assert.assertEquals("wallet: Transaction name was not found", response.getRpcErrorResponse().getError().getData());
-        }
+
+        walletdClient.composeTransaction("incorrect-tx-name").exceptionally(throwable -> {
+                    FactomException.RpcErrorException e = (FactomException.RpcErrorException) throwable.getCause();
+                    FactomResponse<?> response = e.getFactomResponse();
+                    Assert.assertEquals(400, response.getHTTPResponseCode());
+                    Assert.assertEquals("Bad Request", response.getHTTPResponseMessage());
+                    Assert.assertNotNull(response.getRpcErrorResponse());
+                    Assert.assertNotNull(response.getRpcErrorResponse().getError());
+                    Assert.assertEquals(-32603, response.getRpcErrorResponse().getError().getCode());
+                    Assert.assertEquals("Internal error", response.getRpcErrorResponse().getError().getMessage());
+                    Assert.assertEquals("wallet: Transaction name was not found", response.getRpcErrorResponse().getError().getData());
+                    return null;
+                }
+        ).join();
     }
 
-    @Test(expected = FactomException.ClientException.class)
-    public void testCommitNullChain() throws FactomException.ClientException {
-        walletdClient.composeChain(null, "");
+    @Test(expected = CompletionException.class)
+    public void testCommitNullChain() {
+        walletdClient.composeChain(null, "").join();
     }
 
     @Test(expected = FactomException.ClientException.class)
@@ -72,12 +78,12 @@ public class ExceptionTest extends AbstractClientTest {
         factomdClient.properties();
     }
 
-    @Test(expected = FactomException.ClientException.class)
+    @Test(expected = CompletionException.class)
     public void testInvalidURLSettings() throws FactomException.ClientException {
         Properties properties = new Properties();
         RpcSettings settings = new RpcSettingsImpl(RpcSettings.SubSystem.WALLETD, properties);
         FactomdClient factomdClient = new FactomdClient();
         factomdClient.setSettings(settings);
-        factomdClient.properties();
+        factomdClient.properties().join();
     }
 }

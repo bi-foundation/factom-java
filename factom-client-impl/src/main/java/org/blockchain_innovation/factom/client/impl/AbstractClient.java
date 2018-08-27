@@ -22,11 +22,14 @@ import org.blockchain_innovation.factom.client.api.rpc.RpcRequest;
 import org.blockchain_innovation.factom.client.api.settings.RpcSettings;
 
 import java.net.URL;
+import java.util.concurrent.CompletableFuture;
 
 abstract class AbstractClient {
+
+    private URL url;
     private RpcSettings settings;
 
-    public RpcSettings getSettings() throws FactomException.ClientException {
+    public RpcSettings getSettings() {
         if (settings == null) {
             throw new FactomException.ClientException("settings not provided");
         }
@@ -46,18 +49,17 @@ abstract class AbstractClient {
         this.url = url;
     }
 
-    private URL url;
-
-    public <RpcResult> FactomResponse<RpcResult> exchange(FactomRequestImpl factomRequest, Class<RpcResult> rpcResultClass) throws FactomException.ClientException {
+    public <RpcResult> CompletableFuture<FactomResponse<RpcResult>> exchange(FactomRequestImpl factomRequest, Class<RpcResult> rpcResultClass) {
         return exchange(factomRequest.getRpcRequest(), rpcResultClass);
     }
 
-    public <RpcResult> FactomResponse<RpcResult> exchange(RpcRequest.Builder rpcRequestBuilder, Class<RpcResult> rpcResultClass) throws FactomException.ClientException {
+    public <RpcResult> CompletableFuture<FactomResponse<RpcResult>> exchange(RpcRequest.Builder rpcRequestBuilder, Class<RpcResult> rpcResultClass) {
         return exchange(rpcRequestBuilder.build(), rpcResultClass);
     }
 
-    public <RpcResult> FactomResponse<RpcResult> exchange(RpcRequest rpcRequest, Class<RpcResult> rpcResultClass) throws FactomException.ClientException {
+    public <RpcResult> CompletableFuture<FactomResponse<RpcResult>> exchange(RpcRequest rpcRequest, Class<RpcResult> rpcResultClass) {
         Exchange<RpcResult> exchange = new Exchange<>(getSettings(), rpcRequest, rpcResultClass);
         return exchange.execute();
+
     }
 }

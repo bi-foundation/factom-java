@@ -31,7 +31,7 @@ public class FactomException extends Exception {
         super(cause);
     }
 
-    public static class ClientException extends FactomException {
+    public static class ClientException extends FactomRuntimeException {
         public ClientException(String message) {
             super(message);
         }
@@ -61,7 +61,7 @@ public class FactomException extends Exception {
             return getFactomResponse().getRpcErrorResponse();
         }
 
-        public FactomResponse getFactomResponse() {
+        public FactomResponse<?> getFactomResponse() {
             return factomErrorResponse;
         }
     }

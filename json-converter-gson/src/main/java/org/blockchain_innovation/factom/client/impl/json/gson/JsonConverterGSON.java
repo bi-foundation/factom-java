@@ -16,7 +16,18 @@
 
 package org.blockchain_innovation.factom.client.impl.json.gson;
 
-import com.google.gson.*;
+import com.google.gson.FieldNamingPolicy;
+import com.google.gson.FieldNamingStrategy;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
 import com.google.gson.reflect.TypeToken;
 import org.blockchain_innovation.factom.client.api.json.JsonConverter;
 import org.blockchain_innovation.factom.client.api.rpc.RpcErrorResponse;
@@ -28,48 +39,32 @@ import java.io.Writer;
 import java.lang.reflect.Type;
 import java.util.Properties;
 
-public class GsonConverter implements JsonConverter {
+public class JsonConverterGSON implements JsonConverter {
     private Gson gson;
-    private Reader reader;
-    private Writer writer;
 
     static {
-        Registry.register(GsonConverter.class);
+        Registry.register(JsonConverterGSON.class);
     }
 
-    //// TODO: 06/08/2018 Implement readers/writers
-
     @Override
-    public GsonConverter configure(Properties properties) {
-        this.gson = new GsonBuilder().setPrettyPrinting().setFieldNamingStrategy(fieldNamingStrategy()).create();
+    public JsonConverterGSON configure(Properties properties) {
+        GsonBuilder builder = builder();
+
+        // Init new properties so we get default values
+        if (properties == null) {
+            properties = new Properties();
+        }
+        boolean lenient = Boolean.parseBoolean(properties.getProperty("json.lenient", "true"));
+        if (lenient) {
+            builder.setLenient();
+        }
+        boolean prettyprint = Boolean.parseBoolean(properties.getProperty("json.prettyprint", "true"));
+        if (prettyprint) {
+            builder.setPrettyPrinting();
+        }
+
+        this.gson = builder.create();
         return this;
-    }
-
-    @Override
-    public JsonConverter setJsonReader(Reader reader) {
-        this.reader = reader;
-        return this;
-    }
-
-    @Override
-    public Reader getJsonReader() {
-        return reader;
-    }
-
-    @Override
-    public JsonConverter setJsonWriter(Writer writer) {
-        this.writer = writer;
-        return this;
-    }
-
-    @Override
-    public Writer getJsonWriter() {
-        return writer;
-    }
-
-    @Override
-    public RpcErrorResponse errorFromJson(Reader reader) {
-        return gson().fromJson(reader, RpcErrorResponse.class);
     }
 
     @Override
@@ -79,18 +74,14 @@ public class GsonConverter implements JsonConverter {
 
 
     @Override
-    public <T> RpcResponse<T> fromJson(Reader reader, Class<T> resultClass) {
-        return gson().fromJson(reader, TypeToken.getParameterized(RpcResponse.class, resultClass).getType());
-    }
-
-    @Override
     public <T> RpcResponse<T> fromJson(String json, Class<T> resultClass) {
         return gson().fromJson(json, TypeToken.getParameterized(RpcResponse.class, resultClass).getType());
     }
 
     @Override
     public String prettyPrint(String json) {
-        return toJson(new JsonParser().parse(json));
+        // New builder since we will always pretty print. The parser is necesary to force pretty printing the sting input
+        return builder().setLenient().setPrettyPrinting().create().toJson(new JsonParser().parse(json));
     }
 
     @Override
@@ -98,29 +89,28 @@ public class GsonConverter implements JsonConverter {
         return gson().toJson(input);
     }
 
-    @Override
-    public GsonConverter toJson(Object source, Writer writer) {
-        gson().toJson(source, writer);
-        return this;
-    }
 
     /**
      * add naming strategy to handle response with reserved keywords and dashes.
      * Examples are: TmpTransaction#Transaction tx-name and WalletBackupResponse wallet-seed
-     * @see org.blockchain_innovation.factom.client.api.model.response.walletd.AddressResponse#_public public member of AddressResponse
      *
      * @return custom FieldNamingStrategy
+     * @see org.blockchain_innovation.factom.client.api.model.response.walletd.AddressResponse#_public public member of AddressResponse
      */
     private FieldNamingStrategy fieldNamingStrategy() {
         return f -> FieldNamingPolicy.LOWER_CASE_WITH_DASHES.translateName(f).replace("_", "");
     }
 
+    private GsonBuilder builder() {
+        return new GsonBuilder().setFieldNamingStrategy(fieldNamingStrategy()).
+//                    registerTypeAdapter(RpcMethod.class, new RpcMethodDeserializer()).
+        registerTypeAdapter(RpcMethod.class, new RpcMethodSerializer());
+    }
+
     private Gson gson() {
         if (gson == null) {
-            this.gson = new GsonBuilder().setFieldNamingStrategy(fieldNamingStrategy()).
-                    registerTypeAdapter(RpcMethod.class, new RpcMethodDeserializer()).
-                    registerTypeAdapter(RpcMethod.class, new RpcMethodSerializer()).
-                    setPrettyPrinting().setLenient().create();
+            configure(null);
+
         }
         return gson;
     }
@@ -132,10 +122,10 @@ public class GsonConverter implements JsonConverter {
         }
     }
 
-    private class RpcMethodDeserializer implements JsonDeserializer<RpcMethod> {
+    /*private class RpcMethodDeserializer implements JsonDeserializer<RpcMethod> {
         public RpcMethod deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
                 throws JsonParseException {
             return RpcMethod.fromJsonValue(json.getAsJsonPrimitive().getAsString());
         }
-    }
+    }*/
 }

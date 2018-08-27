@@ -21,12 +21,31 @@ public class RpcResponse<Result> {
     private String jsonrpc;
     private Result result;
 
+    public RpcResponse() {
+    }
+
+    public RpcResponse(Result result) {
+        this.result = result;
+    }
+
     public int getId() {
         return id;
     }
 
+    protected void setId(int id) {
+        this.id = id;
+    }
+
     public String getJsonrpc() {
         return jsonrpc;
+    }
+
+    protected void setJsonrpc(String jsonrpc) {
+        this.jsonrpc = jsonrpc;
+    }
+
+    protected void setResult(Result result) {
+        this.result = result;
     }
 
     public Result getResult() {
