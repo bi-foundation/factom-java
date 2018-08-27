@@ -169,7 +169,6 @@ public class ChainEntryIT extends AbstractClientTest {
 
 
     private boolean waitOnConfirmation(EntryTransactionResponse.Status desiredStatus, int maxSeconds) throws InterruptedException, FactomException.ClientException {
-
         int seconds = 0;
         while (seconds < maxSeconds) {
             System.out.println("At verification second: " + seconds);
