@@ -24,4 +24,12 @@ public class CommitAndRevealChainResponse {
         this.revealResponse = revealResponse;
         return this;
     }
+
+    @Override
+    public String toString() {
+        return "CommitAndRevealChainResponse{" +
+                "commitChainResponse=" + commitChainResponse +
+                ", revealResponse=" + revealResponse +
+                '}';
+    }
 }

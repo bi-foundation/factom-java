@@ -18,6 +18,8 @@ package org.blockchain_innovation.factom.client;
 
 import org.blockchain_innovation.factom.client.api.FactomResponse;
 import org.blockchain_innovation.factom.client.api.settings.RpcSettings;
+import org.blockchain_innovation.factom.client.impl.EntryClient;
+import org.blockchain_innovation.factom.client.impl.EntryOfflineSigningClientApi;
 import org.blockchain_innovation.factom.client.impl.FactomdClient;
 import org.blockchain_innovation.factom.client.impl.WalletdClient;
 import org.blockchain_innovation.factom.client.impl.json.gson.GsonConverter;
@@ -39,6 +41,9 @@ class AbstractClientTest {
     protected final FactomdClient factomdClient = new FactomdClient();
     protected final WalletdClient walletdClient = new WalletdClient();
 
+    protected final EntryClient entryClient = new EntryClient();
+    protected final EntryOfflineSigningClientApi entryOfflineSigningClient = new EntryOfflineSigningClientApi();
+
     @Before
     public void setup() throws IOException {
 
@@ -47,6 +52,10 @@ class AbstractClientTest {
 
         factomdClient.setSettings(new RpcSettingsImpl(RpcSettings.SubSystem.FACTOMD, getProperties()));
         walletdClient.setSettings(new RpcSettingsImpl(RpcSettings.SubSystem.WALLETD, getProperties()));
+
+        entryClient.setFactomdClient(factomdClient);
+        entryClient.setWalletdClient(walletdClient);
+        entryOfflineSigningClient.setFactomdClient(factomdClient);
     }
 
     protected Properties getProperties() throws IOException {

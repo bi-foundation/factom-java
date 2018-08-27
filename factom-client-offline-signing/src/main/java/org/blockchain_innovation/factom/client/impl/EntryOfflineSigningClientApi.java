@@ -14,15 +14,18 @@ import org.blockchain_innovation.factom.client.api.model.Entry;
 import org.blockchain_innovation.factom.client.api.model.response.CommitAndRevealChainResponse;
 import org.blockchain_innovation.factom.client.api.model.response.CommitAndRevealEntryResponse;
 import org.blockchain_innovation.factom.client.api.model.response.factomd.CommitChainResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.CommitEntryResponse;
 import org.blockchain_innovation.factom.client.api.model.response.factomd.RevealResponse;
 import org.blockchain_innovation.factom.client.impl.ops.ByteOperations;
 import org.blockchain_innovation.factom.client.impl.ops.EntryOperations;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.security.InvalidKeyException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.security.Signature;
 import java.security.SignatureException;
 import java.util.Arrays;
@@ -30,38 +33,39 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
-public class EntryOfflineSigningClientApi extends AbstractClient {
+public class EntryOfflineSigningClientApi {
 
+    private final Logger logger = LoggerFactory.getLogger(EntryClient.class);
     public static final int ENTRY_REVEAL_WAIT = 2000;
 
     private EntryOperations entryOperations = new EntryOperations();
     private ByteOperations byteOperations = new ByteOperations();
 
-    private WalletdClient walletdClient;
     private FactomdClient factomdClient;
 
-    private CompletableFuture<Void> waitFuture = CompletableFuture.runAsync(() -> {
-        try {
-            TimeUnit.SECONDS.sleep(ENTRY_REVEAL_WAIT);
-        } catch (InterruptedException e) {
-            throw new IllegalStateException(e);
-        }
-    });
-
-    private WalletdClient getWalletdClient() throws FactomException.ClientException {
-        if (walletdClient == null) {
-            walletdClient = new WalletdClient();
-            walletdClient.setSettings(getSettings());
-        }
-        return walletdClient;
+    private CompletableFuture<Void> waitFuture() {
+        return  CompletableFuture.runAsync(() -> {
+            try {
+                for (int i = 0; i < 5; i++) {
+                    logger.info("WAIT: " + i);
+                    TimeUnit.MILLISECONDS.sleep(ENTRY_REVEAL_WAIT);
+                }
+            } catch (InterruptedException e) {
+                throw new IllegalStateException(e);
+            }
+        });
     }
 
     private FactomdClient getFactomdClient() throws FactomException.ClientException {
         if (factomdClient == null) {
-            factomdClient = new FactomdClient();
-            factomdClient.setSettings(getSettings());
+            throw new FactomException.ClientException("factomd client not provided");
         }
         return factomdClient;
+    }
+
+    public EntryOfflineSigningClientApi setFactomdClient(FactomdClient factomdClient) {
+        this.factomdClient = factomdClient;
+        return this;
     }
 
     /**
@@ -76,19 +80,16 @@ public class EntryOfflineSigningClientApi extends AbstractClient {
         String commitChainMessage = composeChainCommit(chain, entryCreditAddress, secret);
         String revealChainEntry = composeChainReveal(chain);
 
-        CompletableFuture<FactomResponse<CommitChainResponse>> commitChainResponse = getFactomdClient().commitChain(commitChainMessage);
-        CompletableFuture<FactomResponse<RevealResponse>> revealChainResponse = getFactomdClient().revealChain(revealChainEntry);
-
-        CompletableFuture<CommitAndRevealChainResponse> commitChainFuture = commitChainResponse
-                .thenCombine(waitFuture, (_commitChainResponse, _void) -> {
-                    CommitAndRevealChainResponse response = new CommitAndRevealChainResponse();
-                    response.setCommitChainResponse(_commitChainResponse.getResult());
-                    return response;
-                }).thenCombine(revealChainResponse, (_response, _revealChainResponse) -> {
-                    _response.setRevealResponse(_revealChainResponse.getResult());
-                    return _response;
-                });
-        return commitChainFuture;
+        CompletableFuture<CommitAndRevealChainResponse> commitAndRevealChainFuture =
+                getFactomdClient().commitChain(commitChainMessage).thenCompose(_commitChainResponse ->
+                        waitFuture().thenCompose(_void ->
+                                getFactomdClient().revealChain(revealChainEntry).thenApply(_revealChainResponse -> {
+                                    CommitAndRevealChainResponse response = new CommitAndRevealChainResponse();
+                                    response.setCommitChainResponse(_commitChainResponse.getResult());
+                                    response.setRevealResponse(_revealChainResponse.getResult());
+                                    return response;
+                                })));
+        return commitAndRevealChainFuture;
     }
 
     /**
@@ -103,19 +104,16 @@ public class EntryOfflineSigningClientApi extends AbstractClient {
         String commitEntryMessage = composeEntryCommit(entry, entryCreditAddress, secret);
         String revealCommitMessage = composeEntryReveal(entry);
 
-        CompletableFuture<FactomResponse<CommitEntryResponse>> commitEntryResponse = getFactomdClient().commitEntry(commitEntryMessage);
-        CompletableFuture<FactomResponse<RevealResponse>> revealEntryResponse = getFactomdClient().revealChain(revealCommitMessage);
-
-        CompletableFuture<CommitAndRevealEntryResponse> commitEntryFuture = commitEntryResponse
-                .thenCombine(waitFuture, (_commitEntryResponse, _void) -> {
-                    CommitAndRevealEntryResponse response = new CommitAndRevealEntryResponse();
-                    response.setCommitEntryResponse(_commitEntryResponse.getResult());
-                    return response;
-                }).thenCombine(revealEntryResponse, (_response, _revealEntryResponse) -> {
-                    _response.setRevealResponse(_revealEntryResponse.getResult());
-                    return _response;
-                });
-        return commitEntryFuture;
+        CompletableFuture<CommitAndRevealEntryResponse> commitAndRevealEntryFuture =
+                getFactomdClient().commitEntry(commitEntryMessage).thenCompose(_commitEntryResponse ->
+                        waitFuture().thenCompose(_void ->
+                                getFactomdClient().revealChain(revealCommitMessage).thenApply(_revealEntryResponse -> {
+                                    CommitAndRevealEntryResponse response = new CommitAndRevealEntryResponse();
+                                    response.setCommitEntryResponse(_commitEntryResponse.getResult());
+                                    response.setRevealResponse(_revealEntryResponse.getResult());
+                                    return response;
+                                })));
+        return commitAndRevealEntryFuture;
     }
 
     /**
@@ -253,7 +251,7 @@ public class EntryOfflineSigningClientApi extends AbstractClient {
         EdDSAPrivateKey keyIn = new EdDSAPrivateKey(privateKeySpec);
 
         try {
-            Signature instance = new EdDSAEngine();
+            Signature instance = new EdDSAEngine(MessageDigest.getInstance("SHA-512"));
             instance.initSign(keyIn);
             instance.update(message);
 
@@ -261,7 +259,7 @@ public class EntryOfflineSigningClientApi extends AbstractClient {
             return signed;
         } catch (InvalidKeyException e) {
             throw new FactomException.ClientException(String.format("invalid key: ", e.getMessage()), e);
-        } catch (SignatureException e) {
+        } catch (SignatureException | NoSuchAlgorithmException e) {
             throw new FactomException.ClientException("failed to sign message", e);
         }
     }
