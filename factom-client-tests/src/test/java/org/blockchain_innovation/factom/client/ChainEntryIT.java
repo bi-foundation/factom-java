@@ -64,7 +64,7 @@ public class ChainEntryIT extends AbstractClientTest {
         chain.setFirstEntry(firstEntry);
 
 
-        composeResponse = walletdClient.composeChain(chain, EC_PUBLIC_KEY).join();
+        composeResponse = walletdClient.composeChain(chain, EC_PUBLIC_ADDRESS).join();
         assertValidResponse(composeResponse);
 
         Assert.assertNotNull(composeResponse.getResult().getCommit());
@@ -125,7 +125,7 @@ public class ChainEntryIT extends AbstractClientTest {
         entry.setContent("abcdef");
         entry.setExternalIds(externalIds);
 
-        FactomResponse<ComposeResponse> composeResponse = walletdClient.composeEntry(entry, EC_PUBLIC_KEY).join();
+        FactomResponse<ComposeResponse> composeResponse = walletdClient.composeEntry(entry, EC_PUBLIC_ADDRESS).join();
         assertValidResponse(composeResponse);
 
         ComposeResponse composeEntry = composeResponse.getResult();

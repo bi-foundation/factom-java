@@ -22,7 +22,7 @@ public class SigningTest extends AbstractClientTest {
     @Test
     public void testChain() {
         Chain chain = chain();
-        CommitAndRevealChainResponse commitAndRevealChain = entryClient.commitAndRevealChain(chain, EC_PUBLIC_KEY, EC_SECRET_KEY).join();
+        CommitAndRevealChainResponse commitAndRevealChain = entryClient.commitAndRevealChain(chain, EC_PUBLIC_ADDRESS, EC_SECRET_ADDRESS).join();
 
         Assert.assertEquals("Entry Commit Success",commitAndRevealChain.getCommitChainResponse().getMessage());
         Assert.assertEquals("Entry Reveal Success",commitAndRevealChain.getRevealResponse().getMessage());
@@ -33,7 +33,7 @@ public class SigningTest extends AbstractClientTest {
     public void testComposeChain() {
         Chain chain = chain();
 
-        String composeChainCommit = entryClient.composeChainCommit(chain, EC_PUBLIC_KEY, EC_SECRET_KEY);
+        String composeChainCommit = entryClient.composeChainCommit(chain, EC_PUBLIC_ADDRESS, EC_SECRET_ADDRESS);
         System.out.println("composeChainCommit = " + composeChainCommit);
         FactomResponse<CommitChainResponse> commitChainResponse = factomdClient.commitChain(composeChainCommit).join();
         assertValidResponse(commitChainResponse);
@@ -58,7 +58,7 @@ public class SigningTest extends AbstractClientTest {
     @Test
     public void testEntry() {
         Entry entry = entry();
-        CommitAndRevealEntryResponse commitAndRevealChain = entryClient.commitAndRevealEntry(entry, EC_PUBLIC_KEY, EC_SECRET_KEY).join();
+        CommitAndRevealEntryResponse commitAndRevealChain = entryClient.commitAndRevealEntry(entry, EC_PUBLIC_ADDRESS, EC_SECRET_ADDRESS).join();
 
         Assert.assertEquals("Entry Commit Success",commitAndRevealChain.getCommitEntryResponse().getMessage());
         Assert.assertEquals("Entry Reveal Success",commitAndRevealChain.getRevealResponse().getMessage());
@@ -69,7 +69,7 @@ public class SigningTest extends AbstractClientTest {
     public void testComposeEntry() {
         Entry entry = entry();
 
-        String composeEntryCommit = entryClient.composeEntryCommit(entry, EC_PUBLIC_KEY, EC_SECRET_KEY);
+        String composeEntryCommit = entryClient.composeEntryCommit(entry, EC_PUBLIC_ADDRESS, EC_SECRET_ADDRESS);
         FactomResponse<CommitEntryResponse> commitEntryResponse = factomdClient.commitEntry(composeEntryCommit).join();
         assertValidResponse(commitEntryResponse);
 

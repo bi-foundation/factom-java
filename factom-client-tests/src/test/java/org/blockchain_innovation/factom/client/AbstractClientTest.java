@@ -31,9 +31,10 @@ import java.util.Properties;
 
 class AbstractClientTest {
 
-    protected final static String EC_PUBLIC_KEY = System.getProperty("FACTOM_CLIENT_TEST_EC_PUBLIC_KEY", "EC3cqLZPq5ypwRB5CLfXnud5vkWAV2sd235CFf9KcWcE3FH9GRxv");
-    protected final static String EC_SECRET_KEY = System.getProperty("FACTOM_CLIENT_TEST_EC_SECRET_KEY", "Es3Y6U6H1Pfg4wYag8VMtRZEGuEJnfkJ2ZuSyCVcQKweB6y4WvGH");
-    protected final static String FACTOID_PUBLIC_KEY = System.getProperty("FACTOM_CLIENT_TEST_FACTOID_PUBLIC_KEY", "FA2ZrcG8xkwWWNfdMRw5pGNjMPEkLaxRGqacvzfLS6TGHEHZqAA4");
+    protected final static String EC_PUBLIC_ADDRESS = System.getProperty("FACTOM_CLIENT_TEST_EC_PUBLIC_ADDRESS", "EC3cqLZPq5ypwRB5CLfXnud5vkWAV2sd235CFf9KcWcE3FH9GRxv");
+    protected final static String EC_SECRET_ADDRESS = System.getProperty("FACTOM_CLIENT_TEST_EC_SECRET_ADDRESS", "Es3Y6U6H1Pfg4wYag8VMtRZEGuEJnfkJ2ZuSyCVcQKweB6y4WvGH");
+    protected final static String FCT_PUBLIC_ADDRESS = System.getProperty("FACTOM_CLIENT_TEST_FACTOID_PUBLIC_ADDRESS", "FA2ZrcG8xkwWWNfdMRw5pGNjMPEkLaxRGqacvzfLS6TGHEHZqAA4");
+    protected static final String FCT_SECRET_ADDRESS = System.getProperty("FACTOM_CLIENT_TEST_FACTOID_SECRET_ADDRESS","Fs1jQGc9GJjyWNroLPq7x6LbYQHveyjWNPXSqAvCEKpETNoTU5dP");
 
     protected final FactomdClient factomdClient = new FactomdClient();
     protected final WalletdClient walletdClient = new WalletdClient();
