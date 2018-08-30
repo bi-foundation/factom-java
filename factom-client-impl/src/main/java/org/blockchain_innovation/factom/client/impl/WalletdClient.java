@@ -22,7 +22,18 @@ import org.blockchain_innovation.factom.client.api.model.Address;
 import org.blockchain_innovation.factom.client.api.model.Chain;
 import org.blockchain_innovation.factom.client.api.model.Entry;
 import org.blockchain_innovation.factom.client.api.model.Range;
-import org.blockchain_innovation.factom.client.api.model.response.walletd.*;
+import org.blockchain_innovation.factom.client.api.model.response.walletd.AddressResponse;
+import org.blockchain_innovation.factom.client.api.model.response.walletd.AddressesResponse;
+import org.blockchain_innovation.factom.client.api.model.response.walletd.BlockHeightTransactionsResponse;
+import org.blockchain_innovation.factom.client.api.model.response.walletd.ComposeResponse;
+import org.blockchain_innovation.factom.client.api.model.response.walletd.ComposeTransactionResponse;
+import org.blockchain_innovation.factom.client.api.model.response.walletd.DeleteTransactionResponse;
+import org.blockchain_innovation.factom.client.api.model.response.walletd.ExecutedTransactionResponse;
+import org.blockchain_innovation.factom.client.api.model.response.walletd.GetHeightResponse;
+import org.blockchain_innovation.factom.client.api.model.response.walletd.PropertiesResponse;
+import org.blockchain_innovation.factom.client.api.model.response.walletd.TransactionResponse;
+import org.blockchain_innovation.factom.client.api.model.response.walletd.TransactionsResponse;
+import org.blockchain_innovation.factom.client.api.model.response.walletd.WalletBackupResponse;
 import org.blockchain_innovation.factom.client.api.rpc.RpcMethod;
 
 import java.util.List;
@@ -55,11 +66,13 @@ public class WalletdClient extends AbstractClient {
     }
 
     public CompletableFuture<FactomResponse<ComposeResponse>> composeChain(Chain chain, String entryCreditPublicKey) throws FactomException.ClientException {
-        return exchange(RpcMethod.COMPOSE_CHAIN.toRequestBuilder().param("chain", chain).param("ecpub", entryCreditPublicKey), ComposeResponse.class);
+        Chain encodedChain = encodeOperations.encodeHex(chain);
+        return exchange(RpcMethod.COMPOSE_CHAIN.toRequestBuilder().param("chain", encodedChain).param("ecpub", entryCreditPublicKey), ComposeResponse.class);
     }
 
     public CompletableFuture<FactomResponse<ComposeResponse>> composeEntry(Entry entry, String entryCreditPublicKey) throws FactomException.ClientException {
-        return exchange(RpcMethod.COMPOSE_ENTRY.toRequestBuilder().param("entry", entry).param("ecpub", entryCreditPublicKey), ComposeResponse.class);
+        Entry encodedEntry = encodeOperations.encodeHex(entry);
+        return exchange(RpcMethod.COMPOSE_ENTRY.toRequestBuilder().param("entry", encodedEntry).param("ecpub", entryCreditPublicKey), ComposeResponse.class);
     }
 
     public CompletableFuture<FactomResponse<ComposeTransactionResponse>> composeTransaction(String txName) throws FactomException.ClientException {

@@ -20,6 +20,7 @@ import org.blockchain_innovation.factom.client.api.FactomException;
 import org.blockchain_innovation.factom.client.api.FactomResponse;
 import org.blockchain_innovation.factom.client.api.rpc.RpcRequest;
 import org.blockchain_innovation.factom.client.api.settings.RpcSettings;
+import org.blockchain_innovation.factom.client.impl.ops.EncodeOperations;
 
 import java.net.URL;
 import java.util.concurrent.*;
@@ -29,6 +30,7 @@ abstract class AbstractClient {
     private URL url;
     private ThreadPoolExecutor executorService;
     private RpcSettings settings;
+    protected EncodeOperations encodeOperations = new EncodeOperations();
 
     public RpcSettings getSettings() {
         if (settings == null) {

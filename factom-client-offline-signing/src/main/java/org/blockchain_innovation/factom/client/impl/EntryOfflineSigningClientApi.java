@@ -36,7 +36,7 @@ import java.util.concurrent.TimeUnit;
 public class EntryOfflineSigningClientApi {
 
     private final Logger logger = LoggerFactory.getLogger(EntryClient.class);
-    public static final int ENTRY_REVEAL_WAIT = 2000;
+    public static final int ENTRY_REVEAL_WAIT = 1000;
 
     private EntryOperations entryOperations = new EntryOperations();
     private ByteOperations byteOperations = new ByteOperations();
@@ -46,10 +46,7 @@ public class EntryOfflineSigningClientApi {
     private CompletableFuture<Void> waitFuture() {
         return  CompletableFuture.runAsync(() -> {
             try {
-                for (int i = 0; i < 5; i++) {
-                    logger.info("WAIT: " + i);
-                    TimeUnit.MILLISECONDS.sleep(ENTRY_REVEAL_WAIT);
-                }
+                TimeUnit.MILLISECONDS.sleep(ENTRY_REVEAL_WAIT);
             } catch (InterruptedException e) {
                 throw new IllegalStateException(e);
             }
@@ -323,7 +320,7 @@ public class EntryOfflineSigningClientApi {
     /**
      * @return 6 byte current milli timestamp
      */
-    private byte[] currentTimeMillis() {
+    protected byte[] currentTimeMillis() {
         long now = System.currentTimeMillis();
         ByteBuffer buffer = ByteBuffer.allocate(8);
         buffer.putLong(now);

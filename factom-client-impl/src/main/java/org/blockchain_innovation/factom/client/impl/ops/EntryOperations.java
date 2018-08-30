@@ -72,7 +72,7 @@ public class EntryOperations {
         bytes = byteOps.concat(bytes, chainIdBytes);
         bytes = byteOps.concat(bytes, externalIdsToBytes(externalIds));
         if (StringUtils.isNotEmpty(content)) {
-            bytes = byteOps.concat(bytes, Encoding.HEX.decode(content));
+            bytes = byteOps.concat(bytes, Encoding.UTF_8.decode(content));
         }
         return bytes;
 
@@ -90,7 +90,7 @@ public class EntryOperations {
             if (externalId == null) {
                 throw new FactomRuntimeException.AssertionException("External Id needs a value or not be in the list at all");
             }
-            byte[] extIdAsBytes = Encoding.HEX.decode(externalId);
+            byte[] extIdAsBytes = Encoding.UTF_8.decode(externalId);
             int length = extIdAsBytes.length;
             bytes = byteOps.concat(bytes, byteOps.toShortBytes(length));
             bytes = byteOps.concat(bytes, extIdAsBytes);

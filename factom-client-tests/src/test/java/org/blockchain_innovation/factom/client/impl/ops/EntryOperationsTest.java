@@ -40,7 +40,6 @@ public class EntryOperationsTest {
 
     static final List<String> EXTERNAL_IDS = Arrays.asList(CHAIN_FIRST_EXTERNAL_ID, CHAIN_SECOND_EXTERNAL_ID);
 
-
     @Test
     public void testFirstChainIds() {
         Assert.assertEquals(CHAIN_ID, Encoding.HEX.encode(OPS.calculateChainId(EXTERNAL_IDS)));

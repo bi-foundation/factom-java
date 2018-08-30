@@ -26,16 +26,15 @@ public class EntryClient {
     private FactomdClient factomdClient;
     private WalletdClient walletdClient;
 
-    private CompletableFuture<Void> waitFuture = CompletableFuture.runAsync(() -> {
-        try {
-            for (int i = 0; i < 5; i++) {
-                logger.info("WAIT: " + i);
+    private CompletableFuture<Void> waitFuture() {
+        return CompletableFuture.runAsync(() -> {
+            try {
                 TimeUnit.MILLISECONDS.sleep(ENTRY_REVEAL_WAIT);
+            } catch (InterruptedException e) {
+                throw new IllegalStateException(e);
             }
-        } catch (InterruptedException e) {
-            throw new IllegalStateException(e);
-        }
-    });
+        });
+    }
     int maxSeconds = 22333;
 
     private CompletableFuture<Void> transactionConfirmation(EntryTransactionResponse.Status desiredStatus,  String entryHash, String chainId) {
@@ -103,7 +102,7 @@ public class EntryClient {
                         // commit chain
                         commitChainFuture(_composeChainResponse).thenCompose(_commitChainResponse ->
                                 // wait to transaction is known
-                                waitFuture.thenCompose(_void ->
+                                waitFuture().thenCompose(_void ->
                                         // reveal chain
                                         revealChainFuture(_composeChainResponse).thenApply(_revealChainResponse -> {
                                             // create response
@@ -130,7 +129,7 @@ public class EntryClient {
                         // commit chain
                         commitEntryFuture(_composeEntryResponse).thenCompose(_commitEntryResponse ->
                                 // wait to transaction is known
-                                waitFuture.thenCompose(_void ->
+                                waitFuture().thenCompose(_void ->
                                         // reveal chain
                                         revealEntryFuture(_composeEntryResponse).thenApply(_revealEntryResponse -> {
                                             // create response

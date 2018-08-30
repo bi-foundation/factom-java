@@ -16,7 +16,12 @@
 
 package org.blockchain_innovation.factom.client.api.model;
 
+import org.blockchain_innovation.factom.client.api.Encoding;
+import org.blockchain_innovation.factom.client.api.FactomException;
+
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Chain {
 
@@ -51,6 +56,58 @@ public class Chain {
         public Entry setContent(String content) {
             this.content = content;
             return this;
+        }
+    }
+
+    public static class Builder {
+
+        private List<String> externalIds;
+        private String content;
+
+        public Builder() {
+            this.externalIds = new ArrayList<>();
+        }
+
+        public Builder(List<String> externalIds) {
+            this.externalIds = externalIds;
+        }
+
+        public Builder(List<String> externalIds, String content) {
+            this.externalIds = externalIds;
+            this.content = content;
+        }
+
+        public Builder addExternalIds(String externalId) {
+            externalIds.add(externalId);
+            return this;
+        }
+
+        public Builder setExternalIds(List<String> externalIds) {
+            this.externalIds = externalIds;
+            return this;
+        }
+
+        public Builder setContent(String content) {
+            this.content = content;
+            return this;
+        }
+
+        public Chain build() {
+            if (externalIds != null && externalIds.isEmpty()) {
+                throw new FactomException.ClientException("external ids are required for first entry in chain");
+            }
+
+            // List<String> encodedExternalIds = externalIds.stream().map(extId -> Encoding.HEX.encode(Encoding.UTF_8.decode(extId))).collect(Collectors.toList());
+            // String encodedContent = Encoding.HEX.encode(Encoding.UTF_8.decode(content));
+
+            Entry firstEntry = new Entry();
+            firstEntry.setExternalIds(externalIds);
+            firstEntry.setContent(content);
+
+            Chain chain = new Chain();
+            chain.setFirstEntry(firstEntry);
+
+            return chain;
         }
     }
 }

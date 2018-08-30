@@ -31,8 +31,8 @@ import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
-import java.util.Random;
 import java.util.concurrent.ExecutionException;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
@@ -42,27 +42,9 @@ public class ChainEntryIT extends AbstractClientTest {
     private static String entryHash;
     private static FactomResponse<ComposeResponse> composeResponse;
 
-
-
-
-
     @Test
     public void _01_composeChain() throws FactomException.ClientException, ExecutionException, InterruptedException {
-        // random 8 digit number to create new chain
-        int value = 10000000 + new Random().nextInt(90000000);
-
-        List<String> externalIds = Arrays.asList(
-                String.valueOf(value),
-                "61626364",
-                "31323334");
-
-        Chain.Entry firstEntry = new Chain.Entry();
-        firstEntry.setExternalIds(externalIds);
-        firstEntry.setContent("3132333461626364");
-
-        Chain chain = new Chain();
-        chain.setFirstEntry(firstEntry);
-
+        Chain chain = chain();
 
         composeResponse = walletdClient.composeChain(chain, EC_PUBLIC_KEY).join();
         assertValidResponse(composeResponse);
@@ -70,8 +52,6 @@ public class ChainEntryIT extends AbstractClientTest {
         Assert.assertNotNull(composeResponse.getResult().getCommit());
         Assert.assertNotNull(composeResponse.getResult().getCommit().getId());
         Assert.assertNotNull(composeResponse.getResult().getCommit().getParams());
-
-
     }
 
     @Test
@@ -115,15 +95,9 @@ public class ChainEntryIT extends AbstractClientTest {
         Thread.sleep(1000);
     }
 
-
     @Test
     public void _03_commitEntry() throws FactomException.ClientException {
-        List<String> externalIds = Arrays.asList("cd90", "90cd");
-
-        Entry entry = new Entry();
-        entry.setChainId(chainId);
-        entry.setContent("abcdef");
-        entry.setExternalIds(externalIds);
+        Entry entry = entry(chainId);
 
         FactomResponse<ComposeResponse> composeResponse = walletdClient.composeEntry(entry, EC_PUBLIC_KEY).join();
         assertValidResponse(composeResponse);
@@ -189,4 +163,29 @@ public class ChainEntryIT extends AbstractClientTest {
         return false;
     }
 
+    private Chain chain() {
+        String randomness = new Date().toString();
+        List<String> externalIds = Arrays.asList(
+                "ChainEntryIT",
+                randomness
+        );
+
+        Chain.Entry firstEntry = new Chain.Entry();
+        firstEntry.setExternalIds(externalIds);
+        firstEntry.setContent("ChainEntry integration test content");
+
+        Chain chain = new Chain();
+        chain.setFirstEntry(firstEntry);
+        return chain;
+    }
+
+    private Entry entry(String chainId) {
+        List<String> externalIds = Arrays.asList("Entry ExtID 1", "Entry ExtID 2");
+
+        Entry entry = new Entry();
+        entry.setChainId(chainId);
+        entry.setContent("Entry content");
+        entry.setExternalIds(externalIds);
+        return entry;
+    }
 }

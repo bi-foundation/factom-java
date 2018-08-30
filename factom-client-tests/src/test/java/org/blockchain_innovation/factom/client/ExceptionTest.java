@@ -67,7 +67,7 @@ public class ExceptionTest extends AbstractClientTest {
         ).join();
     }
 
-    @Test(expected = CompletionException.class)
+    @Test(expected = FactomException.ClientException.class)
     public void testCommitNullChain() {
         walletdClient.composeChain(null, "").join();
     }
