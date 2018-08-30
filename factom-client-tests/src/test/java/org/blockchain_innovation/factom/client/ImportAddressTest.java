@@ -4,7 +4,7 @@ import org.blockchain_innovation.factom.client.api.AddressType;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class AddressTest extends AbstractClientTest {
+public class ImportAddressTest extends AbstractClientTest {
 
     @Test
     public void testPublicECAddress() {

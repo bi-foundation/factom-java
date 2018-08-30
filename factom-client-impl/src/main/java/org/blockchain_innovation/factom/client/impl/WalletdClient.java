@@ -19,7 +19,7 @@ package org.blockchain_innovation.factom.client.impl;
 import org.blockchain_innovation.factom.client.api.AddressType;
 import org.blockchain_innovation.factom.client.api.FactomException;
 import org.blockchain_innovation.factom.client.api.FactomResponse;
-import org.blockchain_innovation.factom.client.api.model.Address;
+import org.blockchain_innovation.factom.client.api.model.AddressImport;
 import org.blockchain_innovation.factom.client.api.model.Chain;
 import org.blockchain_innovation.factom.client.api.model.Entry;
 import org.blockchain_innovation.factom.client.api.model.Range;
@@ -103,10 +103,10 @@ public class WalletdClient extends AbstractClient {
         return exchange(RpcMethod.GET_HEIGHT.toRequestBuilder(), GetHeightResponse.class);
     }
 
-    public CompletableFuture<FactomResponse<AddressesResponse>> importAddresses(List<Address> addresses) throws FactomException.ClientException {
-        addresses.forEach(a -> AddressType.assertValidAddress(a.getValue()));
-        for (Address address : addresses) {
-            AddressType.assertValidAddress(address.getValue());
+    public CompletableFuture<FactomResponse<AddressesResponse>> importAddresses(List<AddressImport> addresses) throws FactomException.ClientException {
+        addresses.forEach(a -> AddressType.assertValidAddress(a.getSecret()));
+        for (AddressImport address : addresses) {
+            AddressType.assertValidAddress(address.getSecret());
         }
         return exchange(RpcMethod.IMPORT_ADDRESSES.toRequestBuilder().param("addresses", addresses), AddressesResponse.class);
     }

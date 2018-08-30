@@ -19,7 +19,6 @@ package org.blockchain_innovation.factom.client.impl;
 import org.blockchain_innovation.factom.client.api.AddressType;
 import org.blockchain_innovation.factom.client.api.FactomException;
 import org.blockchain_innovation.factom.client.api.FactomResponse;
-import org.blockchain_innovation.factom.client.api.model.Address;
 import org.blockchain_innovation.factom.client.api.model.response.factomd.AdminBlockResponse;
 import org.blockchain_innovation.factom.client.api.model.response.factomd.ChainHeadResponse;
 import org.blockchain_innovation.factom.client.api.model.response.factomd.CommitChainResponse;

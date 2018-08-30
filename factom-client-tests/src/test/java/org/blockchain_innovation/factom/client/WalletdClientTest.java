@@ -17,7 +17,7 @@
 package org.blockchain_innovation.factom.client;
 
 import org.blockchain_innovation.factom.client.api.FactomResponse;
-import org.blockchain_innovation.factom.client.api.model.Address;
+import org.blockchain_innovation.factom.client.api.model.AddressImport;
 import org.blockchain_innovation.factom.client.api.model.Chain;
 import org.blockchain_innovation.factom.client.api.model.Entry;
 import org.blockchain_innovation.factom.client.api.model.Range;
@@ -93,9 +93,9 @@ public class WalletdClientTest extends AbstractClientTest {
     public void _11_importAddresses() throws FactomException.ClientException {
         String secret = FCT_SECRET_ADDRESS;
 
-        Address address = new Address();
-        address.setValue(secret);
-        List<Address> addresses = Collections.singletonList(address);
+        AddressImport address = new AddressImport();
+        address.setSecret(secret);
+        List<AddressImport> addresses = Collections.singletonList(address);
 
         FactomResponse<AddressesResponse> response = walletdClient.importAddresses(addresses).join();
         assertValidResponse(response);
