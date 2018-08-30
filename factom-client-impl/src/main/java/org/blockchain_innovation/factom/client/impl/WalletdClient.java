@@ -16,6 +16,7 @@
 
 package org.blockchain_innovation.factom.client.impl;
 
+import org.blockchain_innovation.factom.client.api.AddressType;
 import org.blockchain_innovation.factom.client.api.FactomException;
 import org.blockchain_innovation.factom.client.api.FactomResponse;
 import org.blockchain_innovation.factom.client.api.model.Address;
@@ -42,22 +43,27 @@ import java.util.concurrent.CompletableFuture;
 public class WalletdClient extends AbstractClient {
 
     public CompletableFuture<FactomResponse<TransactionResponse>> addEntryCreditOutput(String txName, String address, long amount) throws FactomException.ClientException {
+        AddressType.ENTRY_CREDIT_PUBLIC.assertValid(address);
         return exchange(RpcMethod.ADD_ENTRY_CREDIT_OUTPUT.toRequestBuilder().param("tx-name", txName).param("address", address).param("amount", amount), TransactionResponse.class);
     }
 
     public CompletableFuture<FactomResponse<ExecutedTransactionResponse>> addFee(String txName, String address) throws FactomException.ClientException {
+        AddressType.FACTOID_PUBLIC.assertValid(address);
         return exchange(RpcMethod.ADD_FEE.toRequestBuilder().param("tx-name", txName).param("address", address), ExecutedTransactionResponse.class);
     }
 
     public CompletableFuture<FactomResponse<ExecutedTransactionResponse>> addInput(String txName, String address, long amount) throws FactomException.ClientException {
+        AddressType.FACTOID_PUBLIC.assertValid(address);
         return exchange(RpcMethod.ADD_INPUT.toRequestBuilder().param("tx-name", txName).param("address", address).param("amount", amount), ExecutedTransactionResponse.class);
     }
 
     public CompletableFuture<FactomResponse<ExecutedTransactionResponse>> addOutput(String txName, String address, long amount) throws FactomException.ClientException {
+        AddressType.FACTOID_PUBLIC.assertValid(address);
         return exchange(RpcMethod.ADD_OUTPUT.toRequestBuilder().param("tx-name", txName).param("address", address).param("amount", amount), ExecutedTransactionResponse.class);
     }
 
     public CompletableFuture<FactomResponse<AddressResponse>> address(String address) throws FactomException.ClientException {
+        AddressType.assertValidAddress(address);
         return exchange(RpcMethod.ADDRESS.toRequestBuilder().param("address", address), AddressResponse.class);
     }
 
@@ -65,14 +71,16 @@ public class WalletdClient extends AbstractClient {
         return exchange(RpcMethod.ALL_ADDRESSES.toRequestBuilder(), AddressesResponse.class);
     }
 
-    public CompletableFuture<FactomResponse<ComposeResponse>> composeChain(Chain chain, String entryCreditPublicKey) throws FactomException.ClientException {
+    public CompletableFuture<FactomResponse<ComposeResponse>> composeChain(Chain chain, String entryCreditAddress) throws FactomException.ClientException {
+        AddressType.ENTRY_CREDIT_PUBLIC.assertValid(entryCreditAddress);
         Chain encodedChain = encodeOperations.encodeHex(chain);
-        return exchange(RpcMethod.COMPOSE_CHAIN.toRequestBuilder().param("chain", encodedChain).param("ecpub", entryCreditPublicKey), ComposeResponse.class);
+        return exchange(RpcMethod.COMPOSE_CHAIN.toRequestBuilder().param("chain", encodedChain).param("ecpub", entryCreditAddress), ComposeResponse.class);
     }
 
-    public CompletableFuture<FactomResponse<ComposeResponse>> composeEntry(Entry entry, String entryCreditPublicKey) throws FactomException.ClientException {
+    public CompletableFuture<FactomResponse<ComposeResponse>> composeEntry(Entry entry, String entryCreditAddress) throws FactomException.ClientException {
+        AddressType.ENTRY_CREDIT_PUBLIC.assertValid(entryCreditAddress);
         Entry encodedEntry = encodeOperations.encodeHex(entry);
-        return exchange(RpcMethod.COMPOSE_ENTRY.toRequestBuilder().param("entry", encodedEntry).param("ecpub", entryCreditPublicKey), ComposeResponse.class);
+        return exchange(RpcMethod.COMPOSE_ENTRY.toRequestBuilder().param("entry", encodedEntry).param("ecpub", entryCreditAddress), ComposeResponse.class);
     }
 
     public CompletableFuture<FactomResponse<ComposeTransactionResponse>> composeTransaction(String txName) throws FactomException.ClientException {
@@ -96,6 +104,10 @@ public class WalletdClient extends AbstractClient {
     }
 
     public CompletableFuture<FactomResponse<AddressesResponse>> importAddresses(List<Address> addresses) throws FactomException.ClientException {
+        addresses.forEach(a -> AddressType.assertValidAddress(a.getValue()));
+        for (Address address : addresses) {
+            AddressType.assertValidAddress(address.getValue());
+        }
         return exchange(RpcMethod.IMPORT_ADDRESSES.toRequestBuilder().param("addresses", addresses), AddressesResponse.class);
     }
 
@@ -116,6 +128,7 @@ public class WalletdClient extends AbstractClient {
     }
 
     public CompletableFuture<FactomResponse<ExecutedTransactionResponse>> subFee(String txName, String address) throws FactomException.ClientException {
+        AddressType.FACTOID_PUBLIC.assertValid(address);
         return exchange(RpcMethod.SUB_FEE.toRequestBuilder().param("tx-name", txName).param("address", address), ExecutedTransactionResponse.class);
     }
 
@@ -132,6 +145,7 @@ public class WalletdClient extends AbstractClient {
     }
 
     public CompletableFuture<FactomResponse<BlockHeightTransactionsResponse>> transactionsByAddress(String address) throws FactomException.ClientException {
+        AddressType.assertValidAddress(address);
         return exchange(RpcMethod.TRANSACTIONS.toRequestBuilder().param("address", address), BlockHeightTransactionsResponse.class);
     }
 

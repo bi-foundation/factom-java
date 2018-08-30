@@ -78,7 +78,7 @@ public class ChainEntrySigningIT extends AbstractClientTest {
                 randomness
         );
 
-        Chain.Entry firstEntry = new Chain.Entry();
+        Entry firstEntry = new Entry();
         firstEntry.setExternalIds(externalIds);
         firstEntry.setContent("ChainEntry self signing integration test content");
 

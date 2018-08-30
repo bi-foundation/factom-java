@@ -20,7 +20,7 @@ import org.blockchain_innovation.factom.client.api.AddressType;
 
 public class Address {
 
-    private String value;
+    private String secret;
 
     public Address() {
     }
@@ -29,12 +29,12 @@ public class Address {
     }
 
     public String getValue() {
-        return value;
+        return secret;
     }
 
     public Address setValue(String value) {
         AddressType.assertValidAddress(value);
-        this.value = value;
+        this.secret = value;
         return this;
     }
 

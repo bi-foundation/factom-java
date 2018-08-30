@@ -36,29 +36,6 @@ public class Chain {
         return this;
     }
 
-    public static class Entry {
-        private List<String> extids;
-        private String content;
-
-        public List<String> getExternalIds() {
-            return extids;
-        }
-
-        public Entry setExternalIds(List<String> externalIds) {
-            this.extids = externalIds;
-            return this;
-        }
-
-        public String getContent() {
-            return content;
-        }
-
-        public Entry setContent(String content) {
-            this.content = content;
-            return this;
-        }
-    }
-
     public static class Builder {
 
         private List<String> externalIds;
@@ -93,13 +70,6 @@ public class Chain {
         }
 
         public Chain build() {
-            if (externalIds != null && externalIds.isEmpty()) {
-                throw new FactomException.ClientException("external ids are required for first entry in chain");
-            }
-
-            // List<String> encodedExternalIds = externalIds.stream().map(extId -> Encoding.HEX.encode(Encoding.UTF_8.decode(extId))).collect(Collectors.toList());
-            // String encodedContent = Encoding.HEX.encode(Encoding.UTF_8.decode(content));
-
             Entry firstEntry = new Entry();
             firstEntry.setExternalIds(externalIds);
             firstEntry.setContent(content);

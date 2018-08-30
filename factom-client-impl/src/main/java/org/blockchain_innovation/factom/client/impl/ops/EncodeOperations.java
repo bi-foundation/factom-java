@@ -2,6 +2,7 @@ package org.blockchain_innovation.factom.client.impl.ops;
 
 import org.blockchain_innovation.factom.client.api.Encoding;
 import org.blockchain_innovation.factom.client.api.FactomException;
+import org.blockchain_innovation.factom.client.api.FactomRuntimeException;
 import org.blockchain_innovation.factom.client.api.StringUtils;
 import org.blockchain_innovation.factom.client.api.model.Chain;
 import org.blockchain_innovation.factom.client.api.model.Entry;
@@ -13,11 +14,11 @@ public class EncodeOperations {
 
     public Chain encodeHex(Chain chain) {
         if (chain == null || chain.getFirstEntry() == null) {
-            throw new FactomException.ClientException("chain with first entry should given");
+            throw new FactomRuntimeException.AssertionException(String.format("Invalid chain. First entry is required in chain '%s'", chain));
         }
 
         Chain encodedChain = new Chain();
-        Chain.Entry firstEntry = new Chain.Entry();
+        Entry firstEntry = new Entry();
         firstEntry.setContent(encodeHex(chain.getFirstEntry().getContent()));
         firstEntry.setExternalIds(encodeHex(chain.getFirstEntry().getExternalIds()));
         encodedChain.setFirstEntry(firstEntry);
@@ -26,7 +27,7 @@ public class EncodeOperations {
 
     public Entry encodeHex(Entry entry) {
         if (entry == null || StringUtils.isEmpty(entry.getChainId())) {
-            throw new FactomException.ClientException("entry with chain id should be given");
+            throw new FactomRuntimeException.AssertionException(String.format("Invalid entry. Chain id is required in entry '%s'", entry));
         }
 
         Entry encodedEntry = new Entry();

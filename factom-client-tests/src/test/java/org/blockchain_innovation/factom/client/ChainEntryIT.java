@@ -170,7 +170,7 @@ public class ChainEntryIT extends AbstractClientTest {
                 randomness
         );
 
-        Chain.Entry firstEntry = new Chain.Entry();
+        Entry firstEntry = new Entry();
         firstEntry.setExternalIds(externalIds);
         firstEntry.setContent("ChainEntry integration test content");
 

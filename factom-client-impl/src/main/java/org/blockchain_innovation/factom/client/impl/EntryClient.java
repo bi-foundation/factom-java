@@ -21,7 +21,8 @@ import java.util.concurrent.TimeUnit;
 public class EntryClient {
 
     private final Logger logger = LoggerFactory.getLogger(EntryClient.class);
-    public static final int ENTRY_REVEAL_WAIT = 2000;
+    private static final int ENTRY_REVEAL_WAIT = 2000;
+    private int transactionConfirmationTimeout = 10000;
 
     private FactomdClient factomdClient;
     private WalletdClient walletdClient;
@@ -35,11 +36,12 @@ public class EntryClient {
             }
         });
     }
-    int maxSeconds = 22333;
 
     private CompletableFuture<Void> transactionConfirmation(EntryTransactionResponse.Status desiredStatus,  String entryHash, String chainId) {
         return CompletableFuture.runAsync(() -> {
             try {
+                int timeout = 1000;
+                int maxSeconds = transactionConfirmationTimeout / timeout;
                 int seconds = 0;
                 while (seconds < maxSeconds) {
                     logger.debug("Transaction verification of chain id={}, entry hash={} at {}", chainId, entryHash, seconds);
@@ -55,7 +57,7 @@ public class EntryClient {
                         }
                     }
                     seconds++;
-                    Thread.sleep(1000);
+                    Thread.sleep(timeout);
                 }
             } catch (InterruptedException e) {
                 throw new FactomException.ClientException("interrupted while waiting on confirmation", e);
@@ -87,6 +89,15 @@ public class EntryClient {
         return this;
     }
 
+    public int getTransactionConfirmationTimeout() {
+        return transactionConfirmationTimeout;
+    }
+
+    public EntryClient setTransactionConfirmationTimeout(int transactionConfirmationTimeout) {
+        this.transactionConfirmationTimeout = transactionConfirmationTimeout;
+        return this;
+    }
+
     /**
      * Compose, reveal and commit a chain
      *
@@ -95,7 +106,6 @@ public class EntryClient {
      * @throws FactomException.ClientException
      */
     public CompletableFuture<CommitAndRevealChainResponse> commitAndRevealChain(Chain chain, String entryCreditAddress) throws FactomException.ClientException {
-
         CompletableFuture<CommitAndRevealChainResponse> commitAndRevealChainFuture =
                 // after compose chain combine commit and reveal chain
                 composeChainFuture(chain, entryCreditAddress).thenCompose(_composeChainResponse ->

@@ -286,7 +286,7 @@ public class WalletdClientTest extends AbstractClientTest {
         List<String> externalIds = Arrays.asList(
                 "61626364",
                 "31323334");
-        Chain.Entry firstEntry = new Chain.Entry();
+        Entry firstEntry = new Entry();
         firstEntry.setExternalIds(externalIds);
         firstEntry.setContent("3132333461626364");
         Chain chain = new Chain();

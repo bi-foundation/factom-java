@@ -40,6 +40,13 @@ public enum AddressType {
         return isValidAddress(address) && address.startsWith(getPrefix());
     }
 
+    public void assertValid(String address) {
+        assertValidAddress(address);
+        if (!address.startsWith(getPrefix())) {
+            throw new FactomRuntimeException.AssertionException(String.format("Type of address '%s' is not a valid", address));
+        }
+    }
+
     public static boolean isValidAddress(String address) {
         try {
             assertValidAddress(address);

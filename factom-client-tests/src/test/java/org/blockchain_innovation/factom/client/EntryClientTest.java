@@ -52,7 +52,7 @@ public class EntryClientTest extends AbstractClientTest {
                 "80731950",
                 "61626364");
 
-        Chain.Entry firstEntry = new Chain.Entry();
+        Entry firstEntry = new Entry();
         firstEntry.setExternalIds(externalIds);
         firstEntry.setContent("3132333461626364");
 

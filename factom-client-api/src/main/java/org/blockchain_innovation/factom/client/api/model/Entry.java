@@ -16,6 +16,7 @@
 
 package org.blockchain_innovation.factom.client.api.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Entry {
@@ -49,5 +50,63 @@ public class Entry {
     public Entry setContent(String content) {
         this.content = content;
         return this;
+    }
+
+    public static class Builder {
+
+        private List<String> externalIds;
+        private String content;
+        private String chainId;
+
+        public Builder() {
+            this.externalIds = new ArrayList<>();
+        }
+
+        public Builder(List<String> externalIds) {
+            this.externalIds = externalIds;
+        }
+
+        public Builder(List<String> externalIds, String content) {
+            this.externalIds = externalIds;
+            this.content = content;
+        }
+
+        public Builder(List<String> externalIds, String content, String chainId) {
+            this.externalIds = externalIds;
+            this.content = content;
+            this.chainId = chainId;
+        }
+
+        public String getChainId() {
+            return chainId;
+        }
+
+        public Builder setChainId(String chainId) {
+            this.chainId = chainId;
+            return this;
+        }
+
+        public Builder addExternalIds(String externalId) {
+            externalIds.add(externalId);
+            return this;
+        }
+
+        public Builder setExternalIds(List<String> externalIds) {
+            this.externalIds = externalIds;
+            return this;
+        }
+
+        public Builder setContent(String content) {
+            this.content = content;
+            return this;
+        }
+
+        public Entry build() {
+            Entry entry = new Entry();
+            entry.setChainId(chainId);
+            entry.setContent(content);
+            entry.setExternalIds(externalIds);
+            return entry;
+        }
     }
 }

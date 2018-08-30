@@ -123,7 +123,7 @@ public class EntryOfflineSigningClientApi {
      * @throws FactomException.ClientException
      */
     public String composeChainCommit(Chain chain, String entryCreditPublicKey, String secret) throws FactomException.ClientException {
-        Chain.Entry firstEntry = chain.getFirstEntry();
+        Entry firstEntry = chain.getFirstEntry();
         byte[] chainId = entryOperations.calculateChainId(firstEntry.getExternalIds());
         String chainIdHex = Encoding.HEX.encode(chainId);
 
@@ -175,7 +175,7 @@ public class EntryOfflineSigningClientApi {
      * @return
      */
     public String composeChainReveal(Chain chain) {
-        Chain.Entry firstEntry = chain.getFirstEntry();
+        Entry firstEntry = chain.getFirstEntry();
         byte[] revealParam = entryOperations.entryToBytes(firstEntry.getExternalIds(), firstEntry.getContent());
         return Encoding.HEX.encode(revealParam);
     }
