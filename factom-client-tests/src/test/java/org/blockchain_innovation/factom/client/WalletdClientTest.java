@@ -91,10 +91,10 @@ public class WalletdClientTest extends AbstractClientTest {
 
     @Test
     public void _11_importAddresses() throws FactomException.ClientException {
-        String secret = "Fs1jQGc9GJjyWNroLPq7x6LbYQHveyjWNPXSqAvCEKpETNoTU5dP";
+        String secret = FCT_SECRET_ADDRESS;
 
         Address address = new Address();
-        address.setSecret(secret);
+        address.setValue(secret);
         List<Address> addresses = Collections.singletonList(address);
 
         FactomResponse<AddressesResponse> response = walletdClient.importAddresses(addresses).join();
@@ -160,7 +160,7 @@ public class WalletdClientTest extends AbstractClientTest {
 
     @Test
     public void _15_transactionsByAddress() throws FactomException.ClientException {
-        FactomResponse<BlockHeightTransactionsResponse> response = walletdClient.transactionsByAddress(FACTOID_PUBLIC_KEY).join();
+        FactomResponse<BlockHeightTransactionsResponse> response = walletdClient.transactionsByAddress(FCT_PUBLIC_ADDRESS).join();
         assertValidResponse(response);
 
         BlockHeightTransactionsResponse transactions = response.getResult();
@@ -199,7 +199,7 @@ public class WalletdClientTest extends AbstractClientTest {
     @Test
     public void _22_addInput() throws FactomException.ClientException {
         int amount = 10;
-        FactomResponse<ExecutedTransactionResponse> response = walletdClient.addInput(transactionName, FACTOID_PUBLIC_KEY, amount).join();
+        FactomResponse<ExecutedTransactionResponse> response = walletdClient.addInput(transactionName, FCT_PUBLIC_ADDRESS, amount).join();
         assertValidResponse(response);
 
         TransactionResponse transaction = response.getResult();
@@ -208,13 +208,13 @@ public class WalletdClientTest extends AbstractClientTest {
         Assert.assertEquals(10, transaction.getTotalInputs());
         Assert.assertFalse(transaction.getInputs().isEmpty());
         Assert.assertEquals(10, transaction.getInputs().get(0).getAmount());
-        Assert.assertEquals(FACTOID_PUBLIC_KEY, transaction.getInputs().get(0).getAddress());
+        Assert.assertEquals(FCT_PUBLIC_ADDRESS, transaction.getInputs().get(0).getAddress());
     }
 
     @Test
     public void _22_addOutput() throws FactomException.ClientException {
         int amount = 2;
-        FactomResponse<ExecutedTransactionResponse> response = walletdClient.addOutput(transactionName, FACTOID_PUBLIC_KEY, amount).join();
+        FactomResponse<ExecutedTransactionResponse> response = walletdClient.addOutput(transactionName, FCT_PUBLIC_ADDRESS, amount).join();
         assertValidResponse(response);
 
         TransactionResponse transaction = response.getResult();
@@ -223,12 +223,12 @@ public class WalletdClientTest extends AbstractClientTest {
         Assert.assertEquals(2, transaction.getTotalOutputs());
         Assert.assertFalse(transaction.getInputs().isEmpty());
         Assert.assertEquals(2, transaction.getOutputs().get(0).getAmount());
-        Assert.assertEquals(FACTOID_PUBLIC_KEY, transaction.getOutputs().get(0).getAddress());
+        Assert.assertEquals(FCT_PUBLIC_ADDRESS, transaction.getOutputs().get(0).getAddress());
     }
 
     @Test
     public void _23_addFee() throws FactomException.ClientException {
-        addFeeResponse = walletdClient.addFee(transactionName, FACTOID_PUBLIC_KEY).join();
+        addFeeResponse = walletdClient.addFee(transactionName, FCT_PUBLIC_ADDRESS).join();
         assertValidResponse(addFeeResponse);
 
         TransactionResponse transaction = addFeeResponse.getResult();
@@ -239,10 +239,10 @@ public class WalletdClientTest extends AbstractClientTest {
     public void _24_subFee() throws FactomException.ClientException {
         // make output + ec equal to input after the fee is subtracted
         long amount = addFeeResponse.getResult().getTotalInputs() + addFeeResponse.getResult().getFeesRequired() - addFeeResponse.getResult().getTotalEntryCreditOutputs();
-        FactomResponse<ExecutedTransactionResponse> addOutputResponse = walletdClient.addOutput(transactionName, FACTOID_PUBLIC_KEY, amount).join();
+        FactomResponse<ExecutedTransactionResponse> addOutputResponse = walletdClient.addOutput(transactionName, FCT_PUBLIC_ADDRESS, amount).join();
         assertValidResponse(addOutputResponse);
 
-        FactomResponse<ExecutedTransactionResponse> response = walletdClient.subFee(transactionName, FACTOID_PUBLIC_KEY).join();
+        FactomResponse<ExecutedTransactionResponse> response = walletdClient.subFee(transactionName, FCT_PUBLIC_ADDRESS).join();
         assertValidResponse(response);
 
         TransactionResponse transaction = response.getResult();
@@ -292,7 +292,7 @@ public class WalletdClientTest extends AbstractClientTest {
         Chain chain = new Chain();
         chain.setFirstEntry(firstEntry);
 
-        FactomResponse<ComposeResponse> response = walletdClient.composeChain(chain, EC_PUBLIC_KEY).join();
+        FactomResponse<ComposeResponse> response = walletdClient.composeChain(chain, EC_PUBLIC_ADDRESS).join();
         assertValidResponse(response);
 
         ComposeResponse composeResponse = response.getResult();
@@ -314,7 +314,7 @@ public class WalletdClientTest extends AbstractClientTest {
         entry.setContent("abcdef");
         entry.setExternalIds(externalIds);
 
-        FactomResponse<ComposeResponse> response = walletdClient.composeEntry(entry, EC_PUBLIC_KEY).join();
+        FactomResponse<ComposeResponse> response = walletdClient.composeEntry(entry, EC_PUBLIC_ADDRESS).join();
         assertValidResponse(response);
 
         ComposeResponse composeResponse = response.getResult();

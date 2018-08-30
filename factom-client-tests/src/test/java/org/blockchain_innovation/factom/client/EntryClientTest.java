@@ -24,7 +24,7 @@ public class EntryClientTest extends AbstractClientTest {
     @Test
     public void testChain() {
         Chain chain = chain();
-        CommitAndRevealChainResponse commitAndRevealChain = entryClient.commitAndRevealChain(chain, EC_PUBLIC_KEY).join();
+        CommitAndRevealChainResponse commitAndRevealChain = entryClient.commitAndRevealChain(chain, EC_PUBLIC_ADDRESS).join();
 
         Assert.assertEquals("Chain Commit Success",commitAndRevealChain.getCommitChainResponse().getMessage());
         Assert.assertEquals("Entry Reveal Success",commitAndRevealChain.getRevealResponse().getMessage());
@@ -36,7 +36,7 @@ public class EntryClientTest extends AbstractClientTest {
     @Test
     public void testEntry() {
         Entry entry = entry();
-        CompletableFuture<CommitAndRevealEntryResponse> commitFuture = entryClient.commitAndRevealEntry(entry, EC_PUBLIC_KEY);
+        CompletableFuture<CommitAndRevealEntryResponse> commitFuture = entryClient.commitAndRevealEntry(entry, EC_PUBLIC_ADDRESS);
         CommitAndRevealEntryResponse commitAndRevealChain = commitFuture.join();
 
         Assert.assertEquals("Entry Commit Success",commitAndRevealChain.getCommitEntryResponse().getMessage());

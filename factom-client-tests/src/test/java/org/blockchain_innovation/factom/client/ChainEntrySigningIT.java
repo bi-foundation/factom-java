@@ -37,7 +37,7 @@ public class ChainEntrySigningIT extends AbstractClientTest {
     @Test
     public void _01_commitChain() {
         Chain chain = chain();
-        CommitAndRevealChainResponse response = entryOfflineSigningClient.commitAndRevealChain(chain(), EC_PUBLIC_KEY, EC_SECRET_KEY).join();
+        CommitAndRevealChainResponse response = entryOfflineSigningClient.commitAndRevealChain(chain(), EC_PUBLIC_ADDRESS, EC_SECRET_ADDRESS).join();
 
         Assert.assertNotNull(response);
         Assert.assertNotNull(response.getCommitChainResponse());
@@ -58,7 +58,7 @@ public class ChainEntrySigningIT extends AbstractClientTest {
         Assert.assertNotNull(chainId);
 
         Entry entry = entry(chainId);
-        CommitAndRevealEntryResponse response = entryOfflineSigningClient.commitAndRevealEntry(entry, EC_PUBLIC_KEY, EC_SECRET_KEY).join();
+        CommitAndRevealEntryResponse response = entryOfflineSigningClient.commitAndRevealEntry(entry, EC_PUBLIC_ADDRESS, EC_SECRET_ADDRESS).join();
 
         Assert.assertNotNull(response);
         Assert.assertNotNull(response.getCommitEntryResponse());

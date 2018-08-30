@@ -281,12 +281,12 @@ public class FactomdClientTest extends AbstractClientTest {
 
     @Test
     public void testEntryCreditBalance() throws FactomException.ClientException {
-        FactomResponse<EntryCreditBalanceResponse> response = factomdClient.entryCreditBalance(EC_PUBLIC_KEY).join();
+        FactomResponse<EntryCreditBalanceResponse> response = factomdClient.entryCreditBalance(EC_PUBLIC_ADDRESS).join();
         assertValidResponse(response);
         EntryCreditBalanceResponse entryCreditBalance = response.getResult();
         Assert.assertNotNull(entryCreditBalance);
         if (entryCreditBalance.getBalance() < 30) {
-            fail(String.format("EC balance (%d) of %s is too low for other tests to run properly. Please go to %s to top up the balance", entryCreditBalance.getBalance(), EC_PUBLIC_KEY, "https://faucet.factoid.org/"));
+            fail(String.format("EC balance (%d) of %s is too low for other tests to run properly. Please go to %s to top up the balance", entryCreditBalance.getBalance(), EC_PUBLIC_ADDRESS, "https://faucet.factoid.org/"));
         }
     }
 
@@ -328,13 +328,13 @@ public class FactomdClientTest extends AbstractClientTest {
 
     @Test
     public void testFactoidBalance() throws FactomException.ClientException {
-        FactomResponse<FactoidBalanceResponse> response = factomdClient.factoidBalance(FACTOID_PUBLIC_KEY).join();
+        FactomResponse<FactoidBalanceResponse> response = factomdClient.factoidBalance(FCT_PUBLIC_ADDRESS).join();
         assertValidResponse(response);
 
         FactoidBalanceResponse factoidBalance = response.getResult();
         Assert.assertNotNull(factoidBalance);
         if (factoidBalance.getBalance() < 30) {
-            fail(String.format("Factoid balance (%d) of %s is too low for other tests to run properly. Please go to %s to top up the balance", factoidBalance.getBalance(), FACTOID_PUBLIC_KEY, "https://faucet.factoid.org/"));
+            fail(String.format("Factoid balance (%d) of %s is too low for other tests to run properly. Please go to %s to top up the balance", factoidBalance.getBalance(), FCT_PUBLIC_ADDRESS, "https://faucet.factoid.org/"));
         }
     }
 
