@@ -18,11 +18,12 @@ import org.blockchain_innovation.factom.client.impl.listeners.SimpleEntryCommitA
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 public class EntryClient {
 
@@ -92,10 +93,21 @@ public class EntryClient {
      *
      * @param chain
      * @param entryCreditAddress
+     * @throws FactomException.ClientException
+     */
+    public CompletableFuture<CommitAndRevealChainResponse> commitAndRevealChain(Chain chain, String entryCreditAddress, final ChainCommitAndRevealListener listener) throws FactomException.ClientException {
+        return commitAndRevealChain(chain, entryCreditAddress, listener, false);
+    }
+
+    /**
+     * Compose, reveal and commit a chain
+     *
+     * @param chain
+     * @param entryCreditAddress
      * @param listener
      * @return
      */
-    public CompletableFuture<CommitAndRevealChainResponse> commitAndRevealChain(Chain chain, String entryCreditAddress, final ChainCommitAndRevealListener listener) {
+    public CompletableFuture<CommitAndRevealChainResponse> commitAndRevealChain(Chain chain, String entryCreditAddress, final ChainCommitAndRevealListener listener, boolean confirmCommit) {
         // after compose chain combine commit and reveal chain
         CompletableFuture<CommitAndRevealChainResponse> commitAndRevealChainFuture = composeChainFuture(chain, entryCreditAddress)
                 .thenApply(_composeChainResponse -> handleResponse(listener, listener::onCompose, _composeChainResponse))
@@ -110,7 +122,7 @@ public class EntryClient {
                                         // wait for transaction acknowledgement
                                         .thenCompose(_revealChainResponse -> transactionAcknowledgeConfirmation(_revealChainResponse)
                                                 .thenApply(_transactionAcknowledgeResponse -> handleResponse(listener, listener::onTransactionAcknowledged, _transactionAcknowledgeResponse))
-                                                .thenCompose(_transactionAcknowledgeResponse -> transactionCommitConfirmation(_revealChainResponse)
+                                                .thenCompose(_transactionAcknowledgeResponse -> transactionCommitConfirmation(confirmCommit, _revealChainResponse)
                                                         .thenApply(_commitConfirmedResponse -> {
                                                             handleResponse(listener, listener::onCommitConfirmed, _commitConfirmedResponse);
                                                             // create response
@@ -134,7 +146,11 @@ public class EntryClient {
         return commitAndRevealEntry(entry, entryCreditAddress, listener);
     }
 
-    public CompletableFuture<CommitAndRevealEntryResponse> commitAndRevealEntry(Entry entry, String entryCreditAddress, EntryCommitAndRevealListener listener) throws FactomException.ClientException {
+    public CompletableFuture<CommitAndRevealEntryResponse> commitAndRevealEntry(Entry entry, String entryCreditAddress, final EntryCommitAndRevealListener listener) throws FactomException.ClientException {
+        return commitAndRevealEntry(entry, entryCreditAddress, listener, false);
+    }
+
+    public CompletableFuture<CommitAndRevealEntryResponse> commitAndRevealEntry(Entry entry, String entryCreditAddress, final EntryCommitAndRevealListener listener, boolean confirmCommit) throws FactomException.ClientException {
         // after compose entry combine commit and reveal entry
         CompletableFuture<CommitAndRevealEntryResponse> commitAndRevealEntryFuture = composeEntryFuture(entry, entryCreditAddress)
                 .thenApply(_composeEntryResponse -> handleResponse(listener, listener::onCompose, _composeEntryResponse))
@@ -150,7 +166,7 @@ public class EntryClient {
                                         .thenCompose(_revealEntryResponse -> transactionAcknowledgeConfirmation(_revealEntryResponse)
                                                 .thenApply(_transactionAcknowledgeResponse -> handleResponse(listener, listener::onTransactionAcknowledged, _transactionAcknowledgeResponse))
                                                 // wait for block confirmed
-                                                .thenCompose(_transactionAcknowledgeResponse -> transactionCommitConfirmation(_revealEntryResponse)
+                                                .thenCompose(_transactionAcknowledgeResponse -> transactionCommitConfirmation(confirmCommit, _revealEntryResponse)
                                                         .thenApply(_commitConfirmedResponse -> {
                                                             handleResponse(listener, listener::onCommitConfirmed, _commitConfirmedResponse);
                                                             // create response
@@ -194,16 +210,20 @@ public class EntryClient {
     private CompletionStage<FactomResponse<EntryTransactionResponse>> transactionAcknowledgeConfirmation(FactomResponse<RevealResponse> revealChainResponse) {
         String entryHash = revealChainResponse.getResult().getEntryHash();
         String chainId = revealChainResponse.getResult().getChainId();
-        return transactionConfirmation(entryHash, chainId, EntryTransactionResponse.Status.TransactionACK, transactionAcknowledgeTimeout, 1000);
+        return transactionConfirmation(entryHash, chainId, Arrays.asList(EntryTransactionResponse.Status.TransactionACK, EntryTransactionResponse.Status.DBlockConfirmed), transactionAcknowledgeTimeout, 1000);
     }
 
-    private CompletableFuture<FactomResponse<EntryTransactionResponse>> transactionCommitConfirmation(FactomResponse<RevealResponse> revealChainResponse) {
+    private CompletableFuture<FactomResponse<EntryTransactionResponse>> transactionCommitConfirmation(boolean waitForConfirmation, FactomResponse<RevealResponse> revealChainResponse) {
         String entryHash = revealChainResponse.getResult().getEntryHash();
         String chainId = revealChainResponse.getResult().getChainId();
-        return transactionConfirmation(entryHash, chainId, EntryTransactionResponse.Status.DBlockConfirmed, commitConfirmedTimeout, 60000);
+        if (waitForConfirmation) {
+            return transactionConfirmation(entryHash, chainId, Arrays.asList(EntryTransactionResponse.Status.DBlockConfirmed), commitConfirmedTimeout, 60000);
+        } else {
+            return getFactomdClient().ackTransactions(entryHash, chainId, EntryTransactionResponse.class);
+        }
     }
 
-    private CompletableFuture<FactomResponse<EntryTransactionResponse>> transactionConfirmation(String entryHash, String chainId, EntryTransactionResponse.Status desiredStatus, int timeout, int sleepTime) {
+    private CompletableFuture<FactomResponse<EntryTransactionResponse>> transactionConfirmation(String entryHash, String chainId, List<EntryTransactionResponse.Status> desiredStatus, int timeout, int sleepTime) {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 FactomResponse<EntryTransactionResponse> transactionsResponse = null;
@@ -211,14 +231,13 @@ public class EntryClient {
                 int maxSeconds = timeout / sleepTime;
                 int seconds = 0;
                 while (!confirmed && seconds < maxSeconds) {
-                    Thread.sleep(sleepTime);
-
                     logger.debug("Transaction verification of chain id={}, entry hash={} at {}", chainId, entryHash, seconds);
                     transactionsResponse = getFactomdClient().ackTransactions(entryHash, chainId, EntryTransactionResponse.class).join();
 
                     if (!transactionsResponse.hasErrors()) {
-                        confirmed = desiredStatus == transactionsResponse.getResult().getCommitData().getStatus();
+                        confirmed = desiredStatus.contains(transactionsResponse.getResult().getCommitData().getStatus());
                     }
+                    Thread.sleep(sleepTime);
                     seconds++;
                 }
 

@@ -28,6 +28,9 @@ public class EntryClientTest extends AbstractClientTest {
     @Test
     public void testChain() {
         Chain chain = chain();
+        AtomicReference<CommitEntryResponse> commitChainResponse = new AtomicReference<>();
+        AtomicReference<RevealResponse> revealChainResponse = new AtomicReference<>();
+        AtomicReference<EntryTransactionResponse> transactionAcknowledgedResponse = new AtomicReference<>();
 
         ChainCommitAndRevealListener listener = new ChainCommitAndRevealListener() {
 
@@ -39,16 +42,19 @@ public class EntryClientTest extends AbstractClientTest {
             @Override
             public void onCommit(CommitChainResponse commitResponse) {
                 System.out.println("> Commit = " + commitResponse);
+                commitChainResponse.set(commitResponse);
             }
 
             @Override
             public void onReveal(RevealResponse revealResponse) {
                 System.out.println("> Reveal = " + revealResponse);
+                revealChainResponse.set(revealResponse);
             }
 
             @Override
             public void onTransactionAcknowledged(EntryTransactionResponse transactionResponse) {
                 System.out.println("> TransactionAcknowledged = " + transactionResponse);
+                transactionAcknowledgedResponse.set(transactionResponse);
             }
 
             @Override
@@ -68,16 +74,22 @@ public class EntryClientTest extends AbstractClientTest {
         Assert.assertEquals("Chain Commit Success", commitAndRevealChain.getCommitChainResponse().getMessage());
         Assert.assertEquals("Entry Reveal Success", commitAndRevealChain.getRevealResponse().getMessage());
         Assert.assertEquals(commitAndRevealChain.getCommitChainResponse().getEntryHash(), commitAndRevealChain.getRevealResponse().getEntryHash());
-        System.out.println("commitAndRevealChain = " + commitAndRevealChain);
+
+        Assert.assertEquals("Chain Commit Success", commitChainResponse.get().getMessage());
+        Assert.assertEquals("Entry Reveal Success", revealChainResponse.get().getMessage());
+        Assert.assertEquals(commitChainResponse.get().getEntryHash(), revealChainResponse.get().getEntryHash());
+
+        Assert.assertNotNull(transactionAcknowledgedResponse.get());
+        Assert.assertNotNull(commitAndRevealChain.getCommitChainResponse().getEntryHash(), transactionAcknowledgedResponse.get().getEntryHash());
     }
 
 
     @Test
     public void testEntry() throws InterruptedException {
         Entry entry = entry();
-        AtomicBoolean transactionAcknowledge = new AtomicBoolean(false);
         AtomicReference<CommitEntryResponse> commitEntryResponse = new AtomicReference<>();
         AtomicReference<RevealResponse> revealEntryResponse = new AtomicReference<>();
+        AtomicReference<EntryTransactionResponse> transactionAcknowledgedResponse = new AtomicReference<>();
 
         final EntryCommitAndRevealListener listener = new EntryCommitAndRevealListener() {
 
@@ -101,7 +113,7 @@ public class EntryClientTest extends AbstractClientTest {
             @Override
             public void onTransactionAcknowledged(EntryTransactionResponse transactionResponse) {
                 System.out.println("> TransactionAcknowledged = " + transactionResponse);
-                transactionAcknowledge.set(true);
+                transactionAcknowledgedResponse.set(transactionResponse);
             }
 
             @Override
@@ -117,19 +129,20 @@ public class EntryClientTest extends AbstractClientTest {
         };
 
         CompletableFuture<CommitAndRevealEntryResponse> commitFuture = entryClient.commitAndRevealEntry(entry, EC_PUBLIC_ADDRESS, listener);
-        CommitAndRevealEntryResponse commitAndRevealChain = commitFuture.join();
+        CommitAndRevealEntryResponse commitAndRevealEntry = commitFuture.join();
 
-        int count = 0;
-        while (!transactionAcknowledge.get() && count < 12000) {
-            Thread.sleep(1000);
-            count++;
-        }
+        Assert.assertEquals("Entry Commit Success", commitAndRevealEntry.getCommitEntryResponse().getMessage());
+        Assert.assertEquals("Entry Reveal Success", commitAndRevealEntry.getRevealResponse().getMessage());
+        Assert.assertEquals(commitAndRevealEntry.getCommitEntryResponse().getEntryHash(), commitAndRevealEntry.getRevealResponse().getEntryHash());
 
         Assert.assertEquals("Entry Commit Success", commitEntryResponse.get().getMessage());
         Assert.assertEquals("Entry Reveal Success", revealEntryResponse.get().getMessage());
-        Assert.assertEquals(commitEntryResponse.get().getEntryHash(), revealEntryResponse.get().getEntryHash());
-    }
+        Assert.assertEquals(commitAndRevealEntry.getCommitEntryResponse().getEntryHash(), commitEntryResponse.get().getEntryHash());
+        Assert.assertEquals(commitAndRevealEntry.getRevealResponse().getEntryHash(), revealEntryResponse.get().getEntryHash());
 
+        Assert.assertNotNull(transactionAcknowledgedResponse.get());
+        Assert.assertNotNull(commitAndRevealEntry.getCommitEntryResponse().getEntryHash(), transactionAcknowledgedResponse.get().getEntryHash());
+    }
 
     private Chain chain() {
         int randomness = 10000000 + new Random().nextInt(90000000);
