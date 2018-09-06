@@ -31,7 +31,7 @@ public class AdminBlockResponse {
         return rawdata;
     }
 
-    public class AdminBlock {
+    public static class AdminBlock {
         private Header header;
         private List<Entry> abentries;
 
@@ -54,7 +54,7 @@ public class AdminBlockResponse {
             return lookuphash;
         }
 
-        public class Header {
+        public static  class Header {
 
             private String prevbackrefhash;
             private long dbheight;
@@ -98,7 +98,7 @@ public class AdminBlockResponse {
             }
         }
 
-        public class Entry {
+        public static class Entry {
             private String identityadminchainid;
             private DirectoryBlockSignature prevdbsig;
             private String minutenumber;
@@ -115,7 +115,7 @@ public class AdminBlockResponse {
                 return minutenumber;
             }
 
-            public class DirectoryBlockSignature {
+            public static class DirectoryBlockSignature {
                 private String pub;
                 private String sig;
 

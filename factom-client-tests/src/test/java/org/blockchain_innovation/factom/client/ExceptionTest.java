@@ -39,7 +39,7 @@ public class ExceptionTest extends AbstractClientTest {
 
         factomdClient.commitChain("incorrect-message").exceptionally(throwable -> {
                     FactomException.RpcErrorException e = (FactomException.RpcErrorException) throwable.getCause();
-                    FactomResponse response = e.getFactomResponse();
+                    FactomResponse<?> response = e.getFactomResponse();
                     Assert.assertEquals(400, response.getHTTPResponseCode());
                     Assert.assertEquals("Bad Request", response.getHTTPResponseMessage());
                     Assert.assertNotNull(response.getRpcErrorResponse());
@@ -48,7 +48,7 @@ public class ExceptionTest extends AbstractClientTest {
                     Assert.assertEquals("Invalid params", response.getRpcErrorResponse().getError().getMessage());
                     Assert.assertEquals("Invalid Commit Chain", response.getRpcErrorResponse().getError().getData());
                     Assert.assertNull(response.getResult());
-                    return response;
+                    return null;
                 }
         ).join();
 
@@ -59,7 +59,7 @@ public class ExceptionTest extends AbstractClientTest {
 
         walletdClient.composeTransaction("incorrect-tx-name").exceptionally(throwable -> {
                     FactomException.RpcErrorException e = (FactomException.RpcErrorException) throwable.getCause();
-                    FactomResponse response = e.getFactomResponse();
+                    FactomResponse<?> response = e.getFactomResponse();
                     Assert.assertEquals(400, response.getHTTPResponseCode());
                     Assert.assertEquals("Bad Request", response.getHTTPResponseMessage());
                     Assert.assertNotNull(response.getRpcErrorResponse());
@@ -67,7 +67,7 @@ public class ExceptionTest extends AbstractClientTest {
                     Assert.assertEquals(-32603, response.getRpcErrorResponse().getError().getCode());
                     Assert.assertEquals("Internal error", response.getRpcErrorResponse().getError().getMessage());
                     Assert.assertEquals("wallet: Transaction name was not found", response.getRpcErrorResponse().getError().getData());
-                    return response;
+                    return null;
                 }
         ).join();
     }

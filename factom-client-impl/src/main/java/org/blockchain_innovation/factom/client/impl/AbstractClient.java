@@ -23,12 +23,11 @@ import org.blockchain_innovation.factom.client.api.settings.RpcSettings;
 import org.blockchain_innovation.factom.client.impl.ops.EncodeOperations;
 
 import java.net.URL;
-import java.util.concurrent.*;
+import java.util.concurrent.CompletableFuture;
 
 abstract class AbstractClient {
 
     private URL url;
-    private ThreadPoolExecutor executorService;
     private RpcSettings settings;
     protected EncodeOperations encodeOperations = new EncodeOperations();
 
@@ -44,28 +43,12 @@ abstract class AbstractClient {
         setUrl(settings.getServer().getURL());
     }
 
-    public static ThreadFactory threadFactory(final String name, final boolean daemon) {
-        return runnable -> {
-            Thread result = new Thread(runnable, name);
-            result.setDaemon(daemon);
-            return result;
-        };
-    }
-
     public URL getUrl() {
         return url;
     }
 
     public void setUrl(URL url) {
         this.url = url;
-    }
-
-    protected synchronized ExecutorService getExecutorService() {
-        if (executorService == null) {
-            executorService = new ThreadPoolExecutor(2, 10, 5, TimeUnit.MINUTES,
-                    new SynchronousQueue<>(), threadFactory("FactomApi Dispatcher", false));
-        }
-        return executorService;
     }
 
     public <RpcResult> CompletableFuture<FactomResponse<RpcResult>> exchange(FactomRequestImpl factomRequest, Class<RpcResult> rpcResultClass) {

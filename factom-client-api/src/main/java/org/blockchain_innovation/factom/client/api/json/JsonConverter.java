@@ -20,38 +20,19 @@ import org.blockchain_innovation.factom.client.api.FactomRuntimeException;
 import org.blockchain_innovation.factom.client.api.rpc.RpcErrorResponse;
 import org.blockchain_innovation.factom.client.api.rpc.RpcResponse;
 
-import java.io.Reader;
-import java.io.Writer;
 import java.util.Properties;
 
 public interface JsonConverter {
 
     JsonConverter configure(Properties properties);
 
-    JsonConverter setJsonReader(Reader reader);
-
-    Reader getJsonReader();
-
-    JsonConverter setJsonWriter(Writer writer);
-
-    Writer getJsonWriter();
-
-
-    RpcErrorResponse errorFromJson(Reader reader);
-
     RpcErrorResponse errorFromJson(String json);
-
-    <Result> RpcResponse<Result> fromJson(Reader reader, Class<Result> resultClass);
 
     <Result> RpcResponse<Result> fromJson(String json, Class<Result> resultClass);
 
     String prettyPrint(String json);
 
     String toJson(Object source);
-
-
-
-    JsonConverter toJson(Object source, Writer writer);
 
     class Registry {
 
@@ -62,7 +43,7 @@ public interface JsonConverter {
             if (Registry.converterClass == null || Registry.converterClass.equals(converterClass)) {
                 Registry.converterClass = converterClass;
             } else {
-                throw new FactomRuntimeException(String.format("Only one Factom Json converter class is allowed on the classpath. Please make sure you configured it correctly"));
+                throw new FactomRuntimeException("Only one Factom Json converter class is allowed on the classpath. Please make sure you configured it correctly");
             }
         }
 

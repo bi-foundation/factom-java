@@ -26,7 +26,7 @@ public class ReceiptResponse {
         return receipt;
     }
 
-    public class Receipt {
+    public static class Receipt {
         private Entry entry;
         private List<MerkleBranch> merklebranch;
         private String entryblockkeymr;
@@ -58,7 +58,7 @@ public class ReceiptResponse {
             return bitcoinblockhash;
         }
 
-        public class Entry {
+        public static class Entry {
             private String entryhash;
 
             public String getEntryHash() {
@@ -66,7 +66,7 @@ public class ReceiptResponse {
             }
         }
 
-        public class MerkleBranch {
+        public static class MerkleBranch {
             private String left;
             private String right;
             private String top;

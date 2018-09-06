@@ -14,36 +14,27 @@
  * limitations under the License.
  */
 
-package org.blockchain_innovation.factom.client.api.model.response.walletd;
 
-public class ComposeTransactionResponse {
+plugins {
+    id "java"
+    id "com.athaydes.osgi-run" version "1.6.0"
+    id "org.dm.bundle" version "0.8.4"
+}
+runOsgi {
+    bundles += project
+}
 
-    private String jsonrpc;
-    private int id;
-    private Params params;
-    private String method;
+repositories {
+    jcenter()
+}
 
-    public String getJsonRpc() {
-        return jsonrpc;
-    }
+group = 'blockchain-innovation'
+version = '0.2.1'
+group = 'org.blockchain_innovation.factom'
 
-    public int getId() {
-        return id;
-    }
-
-    public Params getParams() {
-        return params;
-    }
-
-    public String getMethod() {
-        return method;
-    }
-
-    public static class Params {
-        private String transaction;
-
-        public String getTransaction() {
-            return transaction;
-        }
-    }
+dependencies {
+    compile project(':factom-client-api')
+    compile project(':factom-client-impl')
+    compile project(':json-converter-gson')
+    compile 'org.slf4j:slf4j-simple:1.7.25'
 }

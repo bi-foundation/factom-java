@@ -31,7 +31,7 @@ public class FactoidBlockResponse {
         return rawdata;
     }
 
-    public class FactoidBlock {
+    public static class FactoidBlock {
         private String bodymr;
         private String prevkeymr;
         private String prevledgerkeymr;
@@ -78,7 +78,7 @@ public class FactoidBlockResponse {
             return ledgerkeymr;
         }
 
-        public class Transaction {
+        public static class Transaction {
             private String txid;
             private long blockheight;
             private long millitimestamp;
@@ -115,7 +115,7 @@ public class FactoidBlockResponse {
                 return sigblocks;
             }
 
-            public abstract class IO {
+            public static abstract class IO {
                 private long amount;
                 private String address;
                 private String useraddress;
@@ -133,16 +133,16 @@ public class FactoidBlockResponse {
                 }
             }
 
-            public class Input extends IO {
+            public static class Input extends IO {
             }
 
-            public class Output extends IO {
+            public static class Output extends IO {
             }
 
-            public class OutputEntryCredit extends IO {
+            public static class OutputEntryCredit extends IO {
             }
 
-            public class SigBlock {
+            public static class SigBlock {
                 private List<String> signatures;
 
                 public List<String> getSignatures() {
