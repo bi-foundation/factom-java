@@ -12,7 +12,7 @@ import org.blockchain_innovation.factom.client.api.model.Chain;
 import org.blockchain_innovation.factom.client.api.model.Entry;
 import org.blockchain_innovation.factom.client.api.model.response.CommitAndRevealChainResponse;
 import org.blockchain_innovation.factom.client.api.model.response.CommitAndRevealEntryResponse;
-import org.blockchain_innovation.factom.client.impl.ops.ByteOperations;
+import org.blockchain_innovation.factom.client.api.ByteOperations;
 import org.blockchain_innovation.factom.client.impl.ops.EntryOperations;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

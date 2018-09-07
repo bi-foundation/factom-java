@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.blockchain_innovation.factom.client.impl.ops;
+package org.blockchain_innovation.factom.client.api;
 
 
 

@@ -56,6 +56,14 @@ public enum AddressType {
         return true;
     }
 
+    public static void assertVisibility(String address, Visibility visibility) throws FactomRuntimeException.AssertionException {
+        assertValidAddress(address);
+        AddressType addressType = AddressType.getType(address);
+        if (addressType.getVisibility() != visibility) {
+            throw new FactomRuntimeException.AssertionException(String.format("Visibility of address '%s' is not the desired %s", address, visibility));
+        }
+    }
+
     public static void assertValidAddress(String address) throws FactomRuntimeException.AssertionException {
         if (StringUtils.isEmpty(address) || address.length() <= 2) {
             throw new FactomRuntimeException.AssertionException(String.format("Address '%s' is not a valid address", address));
@@ -70,6 +78,13 @@ public enum AddressType {
         byte[] checksum = Arrays.copyOf(sha256d, 4);
         if (!Arrays.equals(checksum, Arrays.copyOfRange(addressBytes, 34, 38))) {
             throw new FactomRuntimeException.AssertionException(String.format("Address '%s' checksum mismatch!", address));
+        }
+    }
+
+    public static void assertValidAddress(String address, AddressType type) throws FactomRuntimeException.AssertionException {
+        assertValidAddress(address);
+        if (AddressType.getType(address) != type) {
+            throw new FactomRuntimeException.AssertionException(String.format("Address %s is not of type %s", address, type.name()));
         }
     }
 

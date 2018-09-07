@@ -17,6 +17,7 @@
 package org.blockchain_innovation.factom.client.impl.ops;
 
 
+import org.blockchain_innovation.factom.client.api.ByteOperations;
 import org.blockchain_innovation.factom.client.api.FactomRuntimeException;
 import org.bouncycastle.util.Arrays;
 import org.junit.Assert;

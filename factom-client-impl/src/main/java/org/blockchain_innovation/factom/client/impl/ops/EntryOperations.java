@@ -16,6 +16,7 @@
 
 package org.blockchain_innovation.factom.client.impl.ops;
 
+import org.blockchain_innovation.factom.client.api.ByteOperations;
 import org.blockchain_innovation.factom.client.api.StringUtils;
 import org.blockchain_innovation.factom.client.api.Digests;
 import org.blockchain_innovation.factom.client.api.Encoding;

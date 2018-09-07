@@ -106,10 +106,7 @@ public class WalletdClient extends AbstractClient {
 
     public CompletableFuture<FactomResponse<AddressesResponse>> importAddresses(List<AddressImport> addresses) throws FactomException.ClientException {
         for (AddressImport address : addresses) {
-            AddressType addressType = AddressType.getType(address.getSecret());
-            if (!addressType.isPrivate()) {
-                throw new FactomRuntimeException.AssertionException(String.format("Type of address '%s' is not a valid", address));
-            }
+            AddressType.assertVisibility(address.getSecret(), AddressType.Visibility.PRIVATE);
         }
         return exchange(RpcMethod.IMPORT_ADDRESSES.toRequestBuilder().param("addresses", addresses), AddressesResponse.class);
     }
