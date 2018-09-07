@@ -7,14 +7,11 @@ import net.i2p.crypto.eddsa.spec.EdDSAPrivateKeySpec;
 import org.blockchain_innovation.factom.client.api.Digests;
 import org.blockchain_innovation.factom.client.api.Encoding;
 import org.blockchain_innovation.factom.client.api.FactomException;
-import org.blockchain_innovation.factom.client.api.FactomResponse;
 import org.blockchain_innovation.factom.client.api.StringUtils;
 import org.blockchain_innovation.factom.client.api.model.Chain;
 import org.blockchain_innovation.factom.client.api.model.Entry;
 import org.blockchain_innovation.factom.client.api.model.response.CommitAndRevealChainResponse;
 import org.blockchain_innovation.factom.client.api.model.response.CommitAndRevealEntryResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.CommitChainResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.RevealResponse;
 import org.blockchain_innovation.factom.client.impl.ops.ByteOperations;
 import org.blockchain_innovation.factom.client.impl.ops.EntryOperations;
 import org.slf4j.Logger;
@@ -33,9 +30,9 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
-public class EntryOfflineSigningClientApi {
+public class EntryApiOfflineSigningImpl {
 
-    private final Logger logger = LoggerFactory.getLogger(EntryClient.class);
+    private final Logger logger = LoggerFactory.getLogger(EntryApiImpl.class);
     public static final int ENTRY_REVEAL_WAIT = 1000;
 
     private EntryOperations entryOperations = new EntryOperations();
@@ -60,7 +57,7 @@ public class EntryOfflineSigningClientApi {
         return factomdClient;
     }
 
-    public EntryOfflineSigningClientApi setFactomdClient(FactomdClient factomdClient) {
+    public EntryApiOfflineSigningImpl setFactomdClient(FactomdClient factomdClient) {
         this.factomdClient = factomdClient;
         return this;
     }

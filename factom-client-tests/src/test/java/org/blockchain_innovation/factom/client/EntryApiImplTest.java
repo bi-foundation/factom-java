@@ -11,9 +11,9 @@ import org.blockchain_innovation.factom.client.api.model.response.factomd.EntryT
 import org.blockchain_innovation.factom.client.api.model.response.factomd.RevealResponse;
 import org.blockchain_innovation.factom.client.api.model.response.walletd.ComposeResponse;
 import org.blockchain_innovation.factom.client.api.rpc.RpcErrorResponse;
-import org.blockchain_innovation.factom.client.impl.listeners.ChainCommitAndRevealListener;
-import org.blockchain_innovation.factom.client.impl.listeners.EntryCommitAndRevealListener;
+import org.blockchain_innovation.factom.client.impl.listeners.CommitAndRevealListener;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -23,17 +23,23 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class EntryClientTest extends AbstractClientTest {
+@Ignore
+public class EntryApiImplTest extends AbstractClientTest {
 
     @Test
     public void testChain() {
         Chain chain = chain();
 
-        ChainCommitAndRevealListener listener = new ChainCommitAndRevealListener() {
+        CommitAndRevealListener listener = new CommitAndRevealListener() {
 
             @Override
             public void onCompose(ComposeResponse composeResponse) {
                 System.out.println("> Compose = " + composeResponse);
+            }
+
+            @Override
+            public void onCommit(CommitEntryResponse commitResponse) {
+                System.out.println("> Commit = " + commitResponse);
             }
 
             @Override
@@ -63,7 +69,9 @@ public class EntryClientTest extends AbstractClientTest {
             }
         };
 
-        CommitAndRevealChainResponse commitAndRevealChain = entryClient.commitAndRevealChain(chain, EC_PUBLIC_ADDRESS, listener).join();
+        entryClient.clearListeners().addListener(listener);
+
+        CommitAndRevealChainResponse commitAndRevealChain = entryClient.commitAndRevealChain(chain, EC_PUBLIC_ADDRESS).join();
 
         Assert.assertEquals("Chain Commit Success", commitAndRevealChain.getCommitChainResponse().getMessage());
         Assert.assertEquals("Entry Reveal Success", commitAndRevealChain.getRevealResponse().getMessage());
@@ -79,7 +87,7 @@ public class EntryClientTest extends AbstractClientTest {
         AtomicReference<CommitEntryResponse> commitEntryResponse = new AtomicReference<>();
         AtomicReference<RevealResponse> revealEntryResponse = new AtomicReference<>();
 
-        final EntryCommitAndRevealListener listener = new EntryCommitAndRevealListener() {
+        final CommitAndRevealListener listener = new CommitAndRevealListener() {
 
             @Override
             public void onCompose(ComposeResponse composeResponse) {
@@ -88,6 +96,12 @@ public class EntryClientTest extends AbstractClientTest {
 
             @Override
             public void onCommit(CommitEntryResponse commitResponse) {
+                System.out.println("> Commit = " + commitResponse);
+                commitEntryResponse.set(commitResponse);
+            }
+
+            @Override
+            public void onCommit(CommitChainResponse commitResponse) {
                 System.out.println("> Commit = " + commitResponse);
                 commitEntryResponse.set(commitResponse);
             }
@@ -116,7 +130,8 @@ public class EntryClientTest extends AbstractClientTest {
             }
         };
 
-        CompletableFuture<CommitAndRevealEntryResponse> commitFuture = entryClient.commitAndRevealEntry(entry, EC_PUBLIC_ADDRESS, listener);
+        entryClient.clearListeners().addListener(listener);
+        CompletableFuture<CommitAndRevealEntryResponse> commitFuture = entryClient.commitAndRevealEntry(entry, EC_PUBLIC_ADDRESS);
         CommitAndRevealEntryResponse commitAndRevealChain = commitFuture.join();
 
         int count = 0;

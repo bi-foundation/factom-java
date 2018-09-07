@@ -18,12 +18,11 @@ package org.blockchain_innovation.factom.client;
 
 import org.blockchain_innovation.factom.client.api.FactomResponse;
 import org.blockchain_innovation.factom.client.api.settings.RpcSettings;
-import org.blockchain_innovation.factom.client.impl.EntryClient;
-import org.blockchain_innovation.factom.client.impl.EntryOfflineSigningClientApi;
+import org.blockchain_innovation.factom.client.impl.EntryApiImpl;
+import org.blockchain_innovation.factom.client.impl.EntryApiOfflineSigningImpl;
 import org.blockchain_innovation.factom.client.impl.FactomdClient;
 import org.blockchain_innovation.factom.client.impl.WalletdClient;
 import org.blockchain_innovation.factom.client.impl.json.gson.JsonConverterGSON;
-import org.blockchain_innovation.factom.client.impl.json.jee.JsonConverterJEE;
 import org.blockchain_innovation.factom.client.impl.settings.RpcSettingsImpl;
 import org.junit.Assert;
 import org.junit.Before;
@@ -42,8 +41,8 @@ class AbstractClientTest {
     protected final FactomdClient factomdClient = new FactomdClient();
     protected final WalletdClient walletdClient = new WalletdClient();
 
-    protected final EntryClient entryClient = new EntryClient();
-    protected final EntryOfflineSigningClientApi entryOfflineSigningClient = new EntryOfflineSigningClientApi();
+    protected final EntryApiImpl entryClient = new EntryApiImpl();
+    protected final EntryApiOfflineSigningImpl entryOfflineSigningClient = new EntryApiOfflineSigningImpl();
 
     @Before
     public void setup() throws IOException {

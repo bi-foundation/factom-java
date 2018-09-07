@@ -11,28 +11,46 @@ import org.blockchain_innovation.factom.client.api.model.response.factomd.Commit
 import org.blockchain_innovation.factom.client.api.model.response.factomd.EntryTransactionResponse;
 import org.blockchain_innovation.factom.client.api.model.response.factomd.RevealResponse;
 import org.blockchain_innovation.factom.client.api.model.response.walletd.ComposeResponse;
-import org.blockchain_innovation.factom.client.impl.listeners.ChainCommitAndRevealListener;
-import org.blockchain_innovation.factom.client.impl.listeners.EntryCommitAndRevealListener;
-import org.blockchain_innovation.factom.client.impl.listeners.SimpleChainCommitAndRevealListener;
-import org.blockchain_innovation.factom.client.impl.listeners.SimpleEntryCommitAndRevealListener;
+import org.blockchain_innovation.factom.client.impl.listeners.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
-public class EntryClient {
+public class EntryApiImpl {
 
     private static final int ENTRY_REVEAL_WAIT = 2000;
-    private final Logger logger = LoggerFactory.getLogger(EntryClient.class);
+    private final Logger logger = LoggerFactory.getLogger(EntryApiImpl.class);
     private int transactionAcknowledgeTimeout = 10000; // 10 sec
     private int commitConfirmedTimeout = 15 * 60000; // 15 min
 
     private FactomdClient factomdClient;
     private WalletdClient walletdClient;
+
+    private List<CommitAndRevealListener> listeners = new ArrayList<>();
+
+
+    public EntryApiImpl addListener(CommitAndRevealListener listener) {
+        if (listener != null) {
+            listeners.add(listener);
+        }
+        return this;
+    }
+
+    public EntryApiImpl removeListener(CommitAndRevealListener listener) {
+        listeners.remove(listener);
+        return this;
+    }
+
+    public EntryApiImpl clearListeners() {
+        listeners.clear();
+        return this;
+    }
 
     private FactomdClient getFactomdClient() throws FactomException.ClientException {
         if (factomdClient == null) {
@@ -41,7 +59,7 @@ public class EntryClient {
         return factomdClient;
     }
 
-    public EntryClient setFactomdClient(FactomdClient factomdClient) {
+    public EntryApiImpl setFactomdClient(FactomdClient factomdClient) {
         this.factomdClient = factomdClient;
         return this;
     }
@@ -53,7 +71,7 @@ public class EntryClient {
         return walletdClient;
     }
 
-    public EntryClient setWalletdClient(WalletdClient walletdClient) {
+    public EntryApiImpl setWalletdClient(WalletdClient walletdClient) {
         this.walletdClient = walletdClient;
         return this;
     }
@@ -62,7 +80,7 @@ public class EntryClient {
         return transactionAcknowledgeTimeout;
     }
 
-    public EntryClient setTransactionAcknowledgeTimeout(int transactionAcknowledgeTimeout) {
+    public EntryApiImpl setTransactionAcknowledgeTimeout(int transactionAcknowledgeTimeout) {
         this.transactionAcknowledgeTimeout = transactionAcknowledgeTimeout;
         return this;
     }
@@ -71,48 +89,37 @@ public class EntryClient {
         return commitConfirmedTimeout;
     }
 
-    public EntryClient setCommitConfirmedTimeout(int commitConfirmedTimeout) {
+    public EntryApiImpl setCommitConfirmedTimeout(int commitConfirmedTimeout) {
         this.commitConfirmedTimeout = commitConfirmedTimeout;
         return this;
     }
 
-    /**
-     * Compose, reveal and commit a chain
-     *
-     * @param chain
-     * @param entryCreditAddress
-     * @throws FactomException.ClientException
-     */
-    public CompletableFuture<CommitAndRevealChainResponse> commitAndRevealChain(Chain chain, String entryCreditAddress) throws FactomException.ClientException {
-        return commitAndRevealChain(chain, entryCreditAddress, new SimpleChainCommitAndRevealListener());
-    }
 
     /**
      * Compose, reveal and commit a chain
      *
      * @param chain
      * @param entryCreditAddress
-     * @param listener
      * @return
      */
-    public CompletableFuture<CommitAndRevealChainResponse> commitAndRevealChain(Chain chain, String entryCreditAddress, final ChainCommitAndRevealListener listener) {
+    public CompletableFuture<CommitAndRevealChainResponse> commitAndRevealChain(Chain chain, String entryCreditAddress) {
         // after compose chain combine commit and reveal chain
         CompletableFuture<CommitAndRevealChainResponse> commitAndRevealChainFuture = composeChainFuture(chain, entryCreditAddress)
-                .thenApply(_composeChainResponse -> handleResponse(listener, listener::onCompose, _composeChainResponse))
+                .thenApply(_composeChainResponse -> notifyCompose(_composeChainResponse))
                 // commit chain
                 .thenCompose(_composeChainResponse -> commitChainFuture(_composeChainResponse)
-                        .thenApply(_commitChainResponse -> handleResponse(listener, listener::onCommit, _commitChainResponse))
+                        .thenApply(_commitChainResponse -> notifyChainCommit(_commitChainResponse))
                         // wait to transaction is known
                         .thenCompose(_commitChainResponse -> waitFuture()
                                 // reveal chain
                                 .thenCompose(_void -> revealChainFuture(_composeChainResponse)
-                                        .thenApply(_revealChainResponse -> handleResponse(listener, listener::onReveal, _revealChainResponse))
+                                        .thenApply(_revealChainResponse -> notifyReveal(_revealChainResponse))
                                         // wait for transaction acknowledgement
                                         .thenCompose(_revealChainResponse -> transactionAcknowledgeConfirmation(_revealChainResponse)
-                                                .thenApply(_transactionAcknowledgeResponse -> handleResponse(listener, listener::onTransactionAcknowledged, _transactionAcknowledgeResponse))
+                                                .thenApply(_transactionAcknowledgeResponse -> notifyEntryTransaction(_transactionAcknowledgeResponse))
                                                 .thenCompose(_transactionAcknowledgeResponse -> transactionCommitConfirmation(_revealChainResponse)
                                                         .thenApply(_commitConfirmedResponse -> {
-                                                            handleResponse(listener, listener::onCommitConfirmed, _commitConfirmedResponse);
+                                                            notifyCommitConfirmed(_commitConfirmedResponse);
                                                             // create response
                                                             CommitAndRevealChainResponse response = new CommitAndRevealChainResponse();
                                                             response.setCommitChainResponse(_commitChainResponse.getResult());
@@ -130,29 +137,24 @@ public class EntryClient {
      * @throws FactomException.ClientException
      */
     public CompletableFuture<CommitAndRevealEntryResponse> commitAndRevealEntry(Entry entry, String entryCreditAddress) throws FactomException.ClientException {
-        SimpleEntryCommitAndRevealListener listener = new SimpleEntryCommitAndRevealListener();
-        return commitAndRevealEntry(entry, entryCreditAddress, listener);
-    }
-
-    public CompletableFuture<CommitAndRevealEntryResponse> commitAndRevealEntry(Entry entry, String entryCreditAddress, EntryCommitAndRevealListener listener) throws FactomException.ClientException {
         // after compose entry combine commit and reveal entry
         CompletableFuture<CommitAndRevealEntryResponse> commitAndRevealEntryFuture = composeEntryFuture(entry, entryCreditAddress)
-                .thenApply(_composeEntryResponse -> handleResponse(listener, listener::onCompose, _composeEntryResponse))
+                .thenApply(_composeEntryResponse -> notifyCompose(_composeEntryResponse))
                 // commit chain
                 .thenCompose(_composeEntryResponse -> commitEntryFuture(_composeEntryResponse)
-                        .thenApply(_commitEntryResponse -> handleResponse(listener, listener::onCommit, _commitEntryResponse))
+                        .thenApply(_commitEntryResponse -> notifyEntryCommit(_commitEntryResponse))
                         // wait to transaction is known
                         .thenCompose(_commitEntryResponse -> waitFuture()
                                 // reveal chain
                                 .thenCompose(_void -> revealEntryFuture(_composeEntryResponse)
-                                        .thenApply(_revealEntryResponse -> handleResponse(listener, listener::onReveal, _revealEntryResponse))
+                                        .thenApply(_revealEntryResponse -> notifyReveal(_revealEntryResponse))
                                         // wait for transaction acknowledgement
                                         .thenCompose(_revealEntryResponse -> transactionAcknowledgeConfirmation(_revealEntryResponse)
-                                                .thenApply(_transactionAcknowledgeResponse -> handleResponse(listener, listener::onTransactionAcknowledged, _transactionAcknowledgeResponse))
+                                                .thenApply(_transactionAcknowledgeResponse -> notifyEntryTransaction(_transactionAcknowledgeResponse))
                                                 // wait for block confirmed
                                                 .thenCompose(_transactionAcknowledgeResponse -> transactionCommitConfirmation(_revealEntryResponse)
                                                         .thenApply(_commitConfirmedResponse -> {
-                                                            handleResponse(listener, listener::onCommitConfirmed, _commitConfirmedResponse);
+                                                            notifyCommitConfirmed(_commitConfirmedResponse);
                                                             // create response
                                                             CommitAndRevealEntryResponse response = new CommitAndRevealEntryResponse();
                                                             response.setCommitEntryResponse(_commitEntryResponse.getResult());
@@ -163,7 +165,7 @@ public class EntryClient {
         return commitAndRevealEntryFuture;
     }
 
-    private <T> FactomResponse<T> handleResponse(ChainCommitAndRevealListener listener, Consumer<T> listenerCall, FactomResponse<T> response) {
+    private <T> FactomResponse<T> handleResponse(CommitAndRevealListener listener, Consumer<T> listenerCall, FactomResponse<T> response) {
         if (response.hasErrors()) {
             listener.onError(response.getRpcErrorResponse());
         } else {
@@ -172,14 +174,36 @@ public class EntryClient {
         return response;
     }
 
-    private <T> FactomResponse<T> handleResponse(EntryCommitAndRevealListener listener, Consumer<T> listenerCall, FactomResponse<T> response) {
-        if (response.hasErrors()) {
-            listener.onError(response.getRpcErrorResponse());
-        } else {
-            listenerCall.accept(response.getResult());
-        }
+    private FactomResponse<ComposeResponse> notifyCompose(FactomResponse<ComposeResponse> response) {
+        listeners.forEach(listener -> handleResponse(listener, listener::onCompose, response));
         return response;
     }
+
+    private FactomResponse<CommitEntryResponse> notifyEntryCommit(FactomResponse<CommitEntryResponse> response) {
+        listeners.forEach(listener -> handleResponse(listener, listener::onCommit, response));
+        return response;
+    }
+
+    private FactomResponse<CommitChainResponse> notifyChainCommit(FactomResponse<CommitChainResponse> response) {
+        listeners.forEach(listener -> handleResponse(listener, listener::onCommit, response));
+        return response;
+    }
+
+    private FactomResponse<RevealResponse> notifyReveal(FactomResponse<RevealResponse> response) {
+        listeners.forEach(listener -> handleResponse(listener, listener::onReveal, response));
+        return response;
+    }
+
+    private FactomResponse<EntryTransactionResponse> notifyEntryTransaction(FactomResponse<EntryTransactionResponse> response) {
+        listeners.forEach(listener -> handleResponse(listener, listener::onTransactionAcknowledged, response));
+        return response;
+    }
+
+    private FactomResponse<EntryTransactionResponse> notifyCommitConfirmed(FactomResponse<EntryTransactionResponse> response) {
+        listeners.forEach(listener -> handleResponse(listener, listener::onCommitConfirmed, response));
+        return response;
+    }
+
 
     private CompletableFuture<Void> waitFuture() {
         return CompletableFuture.runAsync(() -> {
