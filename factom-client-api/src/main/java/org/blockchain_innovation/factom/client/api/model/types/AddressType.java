@@ -1,6 +1,6 @@
 package org.blockchain_innovation.factom.client.api.model.types;
 
-import org.blockchain_innovation.factom.client.api.FactomRuntimeException;
+import org.blockchain_innovation.factom.client.api.errors.FactomRuntimeException;
 import org.blockchain_innovation.factom.client.api.ops.Digests;
 import org.blockchain_innovation.factom.client.api.ops.Encoding;
 import org.blockchain_innovation.factom.client.api.ops.StringUtils;

@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package org.blockchain_innovation.factom.client.api;
+package org.blockchain_innovation.factom.client.api.errors;
 
+import org.blockchain_innovation.factom.client.api.FactomResponse;
 import org.blockchain_innovation.factom.client.api.rpc.RpcErrorResponse;
 
 public class FactomException extends Exception {

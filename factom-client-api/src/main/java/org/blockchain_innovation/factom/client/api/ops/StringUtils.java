@@ -16,6 +16,11 @@
 
 package org.blockchain_innovation.factom.client.api.ops;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+@Named
+@Singleton
 public class StringUtils {
     public static boolean isEmpty(String input) {
         return input == null || "".equals(input);

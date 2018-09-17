@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.blockchain_innovation.factom.client.api;
+package org.blockchain_innovation.factom.client.api.errors;
 
 public class FactomRuntimeException extends RuntimeException {
     public FactomRuntimeException(String message) {

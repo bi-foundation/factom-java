@@ -1,10 +1,15 @@
 package org.blockchain_innovation.factom.client.api.ops;
 
-import org.blockchain_innovation.factom.client.api.FactomRuntimeException;
+import org.blockchain_innovation.factom.client.api.errors.FactomRuntimeException;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 /**
  * code used from vrotaru/Base58.java
  */
+@Named
+@Singleton
 public class Base58 {
 
     private static final char[] ALPHABET = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz".toCharArray();

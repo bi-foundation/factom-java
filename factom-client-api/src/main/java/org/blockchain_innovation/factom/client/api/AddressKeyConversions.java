@@ -1,5 +1,6 @@
 package org.blockchain_innovation.factom.client.api;
 
+import org.blockchain_innovation.factom.client.api.errors.FactomRuntimeException;
 import org.blockchain_innovation.factom.client.api.model.types.AddressType;
 import org.blockchain_innovation.factom.client.api.model.types.RCDType;
 import org.blockchain_innovation.factom.client.api.ops.ByteOperations;

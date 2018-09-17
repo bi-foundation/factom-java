@@ -16,7 +16,7 @@
 
 package org.blockchain_innovation.factom.client.api.rpc;
 
-import org.blockchain_innovation.factom.client.api.FactomRuntimeException;
+import org.blockchain_innovation.factom.client.api.errors.FactomRuntimeException;
 import org.blockchain_innovation.factom.client.api.model.Address;
 import org.blockchain_innovation.factom.client.api.model.Chain;
 import org.blockchain_innovation.factom.client.api.model.Entry;

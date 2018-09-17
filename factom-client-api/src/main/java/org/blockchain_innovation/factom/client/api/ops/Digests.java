@@ -17,16 +17,16 @@
 package org.blockchain_innovation.factom.client.api.ops;
 
 
-import org.blockchain_innovation.factom.client.api.FactomRuntimeException;
+import org.blockchain_innovation.factom.client.api.errors.FactomRuntimeException;
 
+import javax.inject.Named;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 public enum Digests {
 
     SHA_256("SHA-256"),
-    SHA_512("SHA-512"),
-    ;
+    SHA_512("SHA-512"),;
 
     private final String algorithm;
 

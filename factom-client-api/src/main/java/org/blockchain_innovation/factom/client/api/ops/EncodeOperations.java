@@ -1,12 +1,16 @@
 package org.blockchain_innovation.factom.client.api.ops;
 
-import org.blockchain_innovation.factom.client.api.FactomRuntimeException;
+import org.blockchain_innovation.factom.client.api.errors.FactomRuntimeException;
 import org.blockchain_innovation.factom.client.api.model.Chain;
 import org.blockchain_innovation.factom.client.api.model.Entry;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Named
+@Singleton
 public class EncodeOperations {
 
     public Chain encodeHex(Chain chain) {

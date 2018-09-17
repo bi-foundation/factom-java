@@ -18,14 +18,17 @@ package org.blockchain_innovation.factom.client.impl.json.gson;
 
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
+import javafx.beans.NamedArg;
 import org.blockchain_innovation.factom.client.api.json.JsonConverter;
 import org.blockchain_innovation.factom.client.api.rpc.RpcErrorResponse;
 import org.blockchain_innovation.factom.client.api.rpc.RpcMethod;
 import org.blockchain_innovation.factom.client.api.rpc.RpcResponse;
 
+import javax.inject.Named;
 import java.lang.reflect.Type;
 import java.util.Properties;
 
+@Named
 public class JsonConverterGSON implements JsonConverter {
     private Gson gson;
 

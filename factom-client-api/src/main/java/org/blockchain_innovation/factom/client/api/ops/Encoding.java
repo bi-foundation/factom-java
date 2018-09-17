@@ -16,8 +16,9 @@
 
 package org.blockchain_innovation.factom.client.api.ops;
 
-import org.blockchain_innovation.factom.client.api.FactomRuntimeException;
+import org.blockchain_innovation.factom.client.api.errors.FactomRuntimeException;
 
+import javax.inject.Named;
 import javax.xml.bind.DatatypeConverter;
 import java.nio.charset.StandardCharsets;
 

@@ -16,7 +16,7 @@
 
 package org.blockchain_innovation.factom.client.api.rpc;
 
-import org.blockchain_innovation.factom.client.api.FactomRuntimeException;
+import org.blockchain_innovation.factom.client.api.errors.FactomRuntimeException;
 
 import java.util.Collection;
 

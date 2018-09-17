@@ -16,11 +16,15 @@
 
 package org.blockchain_innovation.factom.client.api.ops;
 
-import org.blockchain_innovation.factom.client.api.FactomRuntimeException;
+import org.blockchain_innovation.factom.client.api.errors.FactomRuntimeException;
 import org.blockchain_innovation.factom.client.api.model.response.factomd.EntryResponse;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
 import java.util.List;
 
+@Named
+@Singleton
 public class EntryOperations {
     private final ByteOperations byteOps = new ByteOperations();
 

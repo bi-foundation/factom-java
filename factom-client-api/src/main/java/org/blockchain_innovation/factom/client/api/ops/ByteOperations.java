@@ -17,12 +17,16 @@
 package org.blockchain_innovation.factom.client.api.ops;
 
 
-import org.blockchain_innovation.factom.client.api.FactomRuntimeException;
+import org.blockchain_innovation.factom.client.api.errors.FactomRuntimeException;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
 import java.lang.reflect.Array;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
+@Named
+@Singleton
 public class ByteOperations {
 
     /**
