@@ -185,4 +185,72 @@ public class EntryApiImplTest extends AbstractClientTest {
 
         return entry;
     }
+
+
+    @Test
+    public void testChainAsync() throws InterruptedException {
+        Chain chain = chain();
+        AtomicReference<CommitEntryResponse> commitChainResponse = new AtomicReference<>();
+        AtomicReference<RevealResponse> revealChainResponse = new AtomicReference<>();
+        AtomicReference<EntryTransactionResponse> transactionAcknowledgedResponse = new AtomicReference<>();
+
+        CommitAndRevealListener listener = new CommitAndRevealListener() {
+
+            @Override
+            public void onCompose(ComposeResponse composeResponse) {
+                System.out.println("> Compose = " + composeResponse);
+            }
+
+            @Override
+            public void onCommit(CommitEntryResponse commitResponse) {
+                System.out.println("> Commit = " + commitResponse);
+            }
+
+            @Override
+            public void onCommit(CommitChainResponse commitResponse) {
+                System.out.println("> Commit = " + commitResponse);
+                commitChainResponse.set(commitResponse);
+            }
+
+            @Override
+            public void onReveal(RevealResponse revealResponse) {
+                System.out.println("> Reveal = " + revealResponse);
+                revealChainResponse.set(revealResponse);
+            }
+
+            @Override
+            public void onTransactionAcknowledged(EntryTransactionResponse transactionResponse) {
+                System.out.println("> TransactionAcknowledged = " + transactionResponse);
+                transactionAcknowledgedResponse.set(transactionResponse);
+            }
+
+            @Override
+            public void onCommitConfirmed(EntryTransactionResponse transactionResponse) {
+                System.out.println("> ChainCommitConfirmed = " + transactionResponse);
+            }
+
+            @Override
+            public void onError(RpcErrorResponse e) {
+                System.out.println("e = " + e);
+                Assert.fail(e.getJsonrpc());
+            }
+        };
+
+        entryClient.clearListeners().addListener(listener);
+        CompletableFuture<CommitAndRevealChainResponse> future = entryClient.commitAndRevealChain(chain, EC_PUBLIC_ADDRESS, true);
+
+        int count = 0;
+        while(transactionAcknowledgedResponse.get() == null && count < 100) {
+            count++;
+            Thread.sleep(1000);
+        }
+        future.cancel(true);
+
+        Assert.assertEquals("Chain Commit Success", commitChainResponse.get().getMessage());
+        Assert.assertEquals("Entry Reveal Success", revealChainResponse.get().getMessage());
+        Assert.assertEquals(commitChainResponse.get().getEntryHash(), revealChainResponse.get().getEntryHash());
+
+        Assert.assertNotNull(transactionAcknowledgedResponse.get());
+        Assert.assertNotNull(commitChainResponse.get().getEntryHash(), transactionAcknowledgedResponse.get().getEntryHash());
+    }
 }
