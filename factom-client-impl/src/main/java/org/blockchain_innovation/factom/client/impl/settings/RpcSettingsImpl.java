@@ -18,7 +18,7 @@ package org.blockchain_innovation.factom.client.impl.settings;
 
 
 import org.blockchain_innovation.factom.client.api.FactomRuntimeException;
-import org.blockchain_innovation.factom.client.api.StringUtils;
+import org.blockchain_innovation.factom.client.api.ops.StringUtils;
 import org.blockchain_innovation.factom.client.api.settings.RpcSettings;
 
 import java.net.MalformedURLException;

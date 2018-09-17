@@ -16,6 +16,6 @@
 /*
 // To declare projects as part of a multi-project build use the 'include' method
 */
-include ':factom-client-api', ':factom-client-impl', ':factom-client-offline-signing', ':json-converter-gson', ':factom-client-tests', ':docs'
+include ':factom-client-api', ':factom-client-impl', ':factom-client-offline-signing', ':json-converter-gson', ':json-converter-jee', ':factom-client-tests', ':docs'
 rootProject.name = 'factom-java'
 

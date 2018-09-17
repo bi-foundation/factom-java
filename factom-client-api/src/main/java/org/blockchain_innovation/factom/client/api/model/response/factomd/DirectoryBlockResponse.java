@@ -31,7 +31,22 @@ public class DirectoryBlockResponse {
         return entryblocklist;
     }
 
-    public class Header {
+    public static class Entry {
+
+        private String chainid;
+        private String keymr;
+
+        public String getChainId() {
+            return chainid;
+        }
+
+        public String getKeyMR() {
+            return keymr;
+        }
+    }
+
+    public static class Header {
+
         private String prevblockkeymr;
         private long sequencenumber;
         private long timestamp;
@@ -49,16 +64,4 @@ public class DirectoryBlockResponse {
         }
     }
 
-    public class Entry {
-        private String chainid;
-        private String keymr;
-
-        public String getChainId() {
-            return chainid;
-        }
-
-        public String getKeyMR() {
-            return keymr;
-        }
-    }
 }

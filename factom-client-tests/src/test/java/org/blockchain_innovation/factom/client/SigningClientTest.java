@@ -1,10 +1,10 @@
 package org.blockchain_innovation.factom.client;
 
-import org.blockchain_innovation.factom.client.api.Encoding;
 import org.blockchain_innovation.factom.client.api.model.Chain;
 import org.blockchain_innovation.factom.client.api.model.Entry;
-import org.blockchain_innovation.factom.client.impl.EntryOfflineSigningClientApi;
-import org.blockchain_innovation.factom.client.impl.ops.EntryOperations;
+import org.blockchain_innovation.factom.client.api.ops.Encoding;
+import org.blockchain_innovation.factom.client.api.ops.EntryOperations;
+import org.blockchain_innovation.factom.client.impl.EntryApiOfflineSigningImpl;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -15,7 +15,7 @@ import java.util.List;
 
 public class SigningClientTest extends AbstractClientTest {
 
-    private SigningTestClient signingClient = new SigningTestClient();
+    private SigningTestClientOfflineSigningImpl signingClient = new SigningTestClientOfflineSigningImpl();
 
     @Test
     public void entryOperations() {
@@ -87,7 +87,7 @@ public class SigningClientTest extends AbstractClientTest {
         return entry;
     }
 
-    class SigningTestClient extends EntryOfflineSigningClientApi {
+    class SigningTestClientOfflineSigningImpl extends EntryApiOfflineSigningImpl {
         protected byte[] currentTimeMillis() {
             Instant timeInstant = Instant.parse("2018-01-10T02:01:40.222Z");
             long now = timeInstant.toEpochMilli();

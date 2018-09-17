@@ -31,7 +31,7 @@ public class DirectoryBlockHeightResponse {
         return rawdata;
     }
 
-    public class DirectoryBlock {
+    public static class DirectoryBlock {
         private Header header;
         private List<Entry> dbentries;
 
@@ -54,7 +54,7 @@ public class DirectoryBlockHeightResponse {
             return keymr;
         }
 
-        public class Header {
+        public static class Header {
             private int version;
             private long networkid;
             private String bodymr;
@@ -102,7 +102,7 @@ public class DirectoryBlockHeightResponse {
             }
         }
 
-        public class Entry {
+        public static class Entry {
             private String chainid;
             private String keymr;
 

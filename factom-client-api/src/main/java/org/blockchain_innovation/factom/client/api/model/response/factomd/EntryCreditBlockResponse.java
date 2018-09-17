@@ -31,7 +31,7 @@ public class EntryCreditBlockResponse {
         return rawdata;
     }
 
-    public class EntryCreditBlock {
+    public static class EntryCreditBlock {
         private Header header;
         private Body body;
 
@@ -43,7 +43,7 @@ public class EntryCreditBlockResponse {
             return body;
         }
 
-        public class Header {
+        public static class Header {
             private String bodyhash;
             private String prevheaderhash;
             private String prevfullhash;
@@ -86,14 +86,14 @@ public class EntryCreditBlockResponse {
             }
         }
 
-        public class Body {
+        public static class Body {
             private List<Entry> entries;
 
             public List<Entry> getEntries() {
                 return entries;
             }
 
-            public class Entry {
+            public static class Entry {
                 private long serverindexnumber;
                 private long number;
                 private int version;

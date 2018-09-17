@@ -17,21 +17,23 @@
 package org.blockchain_innovation.factom.client.impl;
 
 import org.blockchain_innovation.factom.client.api.FactomException;
+import org.blockchain_innovation.factom.client.api.FactomRequest;
 import org.blockchain_innovation.factom.client.api.FactomResponse;
+import org.blockchain_innovation.factom.client.api.LowLevelClient;
+import org.blockchain_innovation.factom.client.api.ops.EncodeOperations;
 import org.blockchain_innovation.factom.client.api.rpc.RpcRequest;
 import org.blockchain_innovation.factom.client.api.settings.RpcSettings;
-import org.blockchain_innovation.factom.client.impl.ops.EncodeOperations;
 
 import java.net.URL;
-import java.util.concurrent.*;
+import java.util.concurrent.CompletableFuture;
 
-abstract class AbstractClient {
+abstract class AbstractClient implements LowLevelClient {
 
     private URL url;
-    private ThreadPoolExecutor executorService;
     private RpcSettings settings;
     protected EncodeOperations encodeOperations = new EncodeOperations();
 
+    @Override
     public RpcSettings getSettings() {
         if (settings == null) {
             throw new FactomException.ClientException("settings not provided");
@@ -39,43 +41,33 @@ abstract class AbstractClient {
         return settings;
     }
 
+    @Override
     public void setSettings(RpcSettings settings) {
         this.settings = settings;
         setUrl(settings.getServer().getURL());
     }
 
-    public static ThreadFactory threadFactory(final String name, final boolean daemon) {
-        return runnable -> {
-            Thread result = new Thread(runnable, name);
-            result.setDaemon(daemon);
-            return result;
-        };
-    }
-
+    @Override
     public URL getUrl() {
         return url;
     }
 
+    @Override
     public void setUrl(URL url) {
         this.url = url;
     }
 
-    protected synchronized ExecutorService getExecutorService() {
-        if (executorService == null) {
-            executorService = new ThreadPoolExecutor(2, 10, 5, TimeUnit.MINUTES,
-                    new SynchronousQueue<>(), threadFactory("FactomApi Dispatcher", false));
-        }
-        return executorService;
-    }
-
-    public <RpcResult> CompletableFuture<FactomResponse<RpcResult>> exchange(FactomRequestImpl factomRequest, Class<RpcResult> rpcResultClass) {
+    @Override
+    public <RpcResult> CompletableFuture<FactomResponse<RpcResult>> exchange(FactomRequest factomRequest, Class<RpcResult> rpcResultClass) {
         return exchange(factomRequest.getRpcRequest(), rpcResultClass);
     }
 
+    @Override
     public <RpcResult> CompletableFuture<FactomResponse<RpcResult>> exchange(RpcRequest.Builder rpcRequestBuilder, Class<RpcResult> rpcResultClass) {
         return exchange(rpcRequestBuilder.build(), rpcResultClass);
     }
 
+    @Override
     public <RpcResult> CompletableFuture<FactomResponse<RpcResult>> exchange(RpcRequest rpcRequest, Class<RpcResult> rpcResultClass) {
         Exchange<RpcResult> exchange = new Exchange<>(getSettings(), rpcRequest, rpcResultClass);
         return exchange.execute();

@@ -31,7 +31,7 @@ public class EntryBlockResponse {
         return entrylist;
     }
 
-    public class Header {
+    public static class Header {
         private long blocksequencenumber;
         private String chainid;
         private String prevkeymr;
@@ -54,7 +54,7 @@ public class EntryBlockResponse {
         }
     }
 
-    public class Entry {
+    public static class Entry {
         private String entryhash;
         private long timestamp;
 
