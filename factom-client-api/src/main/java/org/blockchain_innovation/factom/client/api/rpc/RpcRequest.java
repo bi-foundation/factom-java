@@ -17,11 +17,11 @@
 package org.blockchain_innovation.factom.client.api.rpc;
 
 import org.blockchain_innovation.factom.client.api.FactomRuntimeException;
-import org.blockchain_innovation.factom.client.api.StringUtils;
-import org.blockchain_innovation.factom.client.api.model.AddressImport;
+import org.blockchain_innovation.factom.client.api.model.Address;
 import org.blockchain_innovation.factom.client.api.model.Chain;
 import org.blockchain_innovation.factom.client.api.model.Entry;
 import org.blockchain_innovation.factom.client.api.model.Range;
+import org.blockchain_innovation.factom.client.api.ops.StringUtils;
 
 import java.util.*;
 
@@ -79,7 +79,7 @@ public class RpcRequest {
     }
 
 
-    public Map<String,Object> getParams() {
+    public Map<String, Object> getParams() {
         return params;
     }
 
@@ -190,8 +190,8 @@ public class RpcRequest {
         }
     }
 
-    public static class AddressesParam extends Param<List<AddressImport>> {
-        public AddressesParam(String key, List<AddressImport> value) {
+    public static class AddressesParam extends Param<List<Address>> {
+        public AddressesParam(String key, List<Address> value) {
             super(key, value);
         }
     }
@@ -243,7 +243,7 @@ public class RpcRequest {
             return this;
         }
 
-        public Builder param(String paramKey, List<AddressImport> paramValue) {
+        public Builder param(String paramKey, List<Address> paramValue) {
             param(new RpcRequest.AddressesParam(paramKey, paramValue));
             return this;
         }

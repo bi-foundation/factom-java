@@ -1,10 +1,10 @@
 package org.blockchain_innovation.factom.client;
 
-import org.blockchain_innovation.factom.client.api.Encoding;
 import org.blockchain_innovation.factom.client.api.model.Chain;
 import org.blockchain_innovation.factom.client.api.model.Entry;
+import org.blockchain_innovation.factom.client.api.ops.Encoding;
+import org.blockchain_innovation.factom.client.api.ops.EntryOperations;
 import org.blockchain_innovation.factom.client.impl.EntryApiOfflineSigningImpl;
-import org.blockchain_innovation.factom.client.impl.ops.EntryOperations;
 import org.junit.Assert;
 import org.junit.Test;
 

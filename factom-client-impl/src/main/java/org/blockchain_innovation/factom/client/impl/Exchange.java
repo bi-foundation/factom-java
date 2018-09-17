@@ -167,7 +167,6 @@ public class Exchange<Result> {
     }
 
 
-
     public static ThreadFactory threadFactory(final String name, final boolean daemon) {
         return runnable -> {
             Thread result = new Thread(runnable, name);

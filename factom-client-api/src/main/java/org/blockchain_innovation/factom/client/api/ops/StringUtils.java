@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.blockchain_innovation.factom.client.api;
+package org.blockchain_innovation.factom.client.api.ops;
 
 public class StringUtils {
     public static boolean isEmpty(String input) {

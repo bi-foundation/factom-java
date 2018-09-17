@@ -19,10 +19,10 @@ package org.blockchain_innovation.factom.client;
 import org.blockchain_innovation.factom.client.api.FactomException;
 import org.blockchain_innovation.factom.client.api.FactomResponse;
 import org.blockchain_innovation.factom.client.api.FactomRuntimeException;
-import org.blockchain_innovation.factom.client.api.model.AddressImport;
+import org.blockchain_innovation.factom.client.api.model.Address;
 import org.blockchain_innovation.factom.client.api.model.Entry;
 import org.blockchain_innovation.factom.client.api.settings.RpcSettings;
-import org.blockchain_innovation.factom.client.impl.FactomdClient;
+import org.blockchain_innovation.factom.client.impl.FactomdClientImpl;
 import org.blockchain_innovation.factom.client.impl.settings.RpcSettingsImpl;
 import org.junit.Assert;
 import org.junit.Test;
@@ -79,7 +79,7 @@ public class ExceptionTest extends AbstractClientTest {
 
     @Test(expected = FactomException.ClientException.class)
     public void testNoSettings() throws FactomException.ClientException {
-        FactomdClient factomdClient = new FactomdClient();
+        FactomdClientImpl factomdClient = new FactomdClientImpl();
         factomdClient.properties();
     }
 
@@ -87,7 +87,7 @@ public class ExceptionTest extends AbstractClientTest {
     public void testInvalidURLSettings() throws FactomException.ClientException {
         Properties properties = new Properties();
         RpcSettings settings = new RpcSettingsImpl(RpcSettings.SubSystem.WALLETD, properties);
-        FactomdClient factomdClient = new FactomdClient();
+        FactomdClientImpl factomdClient = new FactomdClientImpl();
         factomdClient.setSettings(settings);
         factomdClient.properties().join();
     }
@@ -95,10 +95,10 @@ public class ExceptionTest extends AbstractClientTest {
 
     @Test(expected = FactomRuntimeException.AssertionException.class)
     public void testWrongAddressType() {
-        AddressImport correctAddress = new AddressImport().setSecret(EC_SECRET_ADDRESS);
-        AddressImport invalidAddress1 = new AddressImport().setSecret("Es3Y6U6H1Pfg4wYag8VMtRZEGuEJnfkJ2ZuSyCVcQKweB6y4WvVH");
-        AddressImport invalidAddress2 = new AddressImport().setSecret("Es3Y6U6H1Pfg4wYag8VMtRZEGuEJnfkJ2ZuSyCVcQKweB6y4WvGD");
-        List<AddressImport> addresses = Arrays.asList(correctAddress, invalidAddress1, invalidAddress2);
+        Address correctAddress = new Address(EC_SECRET_ADDRESS);
+        Address invalidAddress1 = new Address("Es3Y6U6H1Pfg4wYag8VMtRZEGuEJnfkJ2ZuSyCVcQKweB6y4WvVH");
+        Address invalidAddress2 = new Address("Es3Y6U6H1Pfg4wYag8VMtRZEGuEJnfkJ2ZuSyCVcQKweB6y4WvGD");
+        List<Address> addresses = Arrays.asList(correctAddress, invalidAddress1, invalidAddress2);
         walletdClient.importAddresses(addresses);
     }
 

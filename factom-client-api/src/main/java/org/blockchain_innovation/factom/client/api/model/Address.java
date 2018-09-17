@@ -16,16 +16,27 @@
 
 package org.blockchain_innovation.factom.client.api.model;
 
-public class AddressImport {
+import org.blockchain_innovation.factom.client.api.model.types.AddressType;
+
+public class Address {
 
     private String secret;
 
-    public String getSecret() {
+    public Address(String hexAddress) {
+        setValue(hexAddress);
+    }
+
+    public String getValue() {
         return secret;
     }
 
-    public AddressImport setSecret(String secret) {
-        this.secret = secret;
+    protected Address setValue(String value) {
+        AddressType.assertValidAddress(value);
+        this.secret = value;
         return this;
+    }
+
+    public AddressType getType() {
+        return AddressType.getType(getValue());
     }
 }

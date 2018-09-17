@@ -19,7 +19,7 @@ package org.blockchain_innovation.factom.client;
 import org.blockchain_innovation.factom.client.api.FactomResponse;
 import org.blockchain_innovation.factom.client.api.model.response.factomd.AdminBlockResponse;
 import org.blockchain_innovation.factom.client.api.settings.RpcSettings;
-import org.blockchain_innovation.factom.client.impl.FactomdClient;
+import org.blockchain_innovation.factom.client.impl.FactomdClientImpl;
 import org.blockchain_innovation.factom.client.impl.json.gson.JsonConverterGSON;
 import org.blockchain_innovation.factom.client.impl.settings.RpcSettingsImpl;
 import org.junit.Before;
@@ -31,7 +31,7 @@ import java.util.concurrent.ExecutionException;
 
 public class FactomdClientAsyncTest extends AbstractClientTest {
 
-    private final FactomdClient client = new FactomdClient();
+    private final FactomdClientImpl client = new FactomdClientImpl();
 
     @Before
     public void setup() throws IOException {

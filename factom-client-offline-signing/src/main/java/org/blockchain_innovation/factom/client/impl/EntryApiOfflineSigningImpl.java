@@ -4,27 +4,19 @@ import net.i2p.crypto.eddsa.EdDSAEngine;
 import net.i2p.crypto.eddsa.EdDSAPrivateKey;
 import net.i2p.crypto.eddsa.spec.EdDSANamedCurveTable;
 import net.i2p.crypto.eddsa.spec.EdDSAPrivateKeySpec;
-import org.blockchain_innovation.factom.client.api.Digests;
-import org.blockchain_innovation.factom.client.api.Encoding;
 import org.blockchain_innovation.factom.client.api.FactomException;
-import org.blockchain_innovation.factom.client.api.StringUtils;
 import org.blockchain_innovation.factom.client.api.model.Chain;
 import org.blockchain_innovation.factom.client.api.model.Entry;
 import org.blockchain_innovation.factom.client.api.model.response.CommitAndRevealChainResponse;
 import org.blockchain_innovation.factom.client.api.model.response.CommitAndRevealEntryResponse;
-import org.blockchain_innovation.factom.client.api.ByteOperations;
-import org.blockchain_innovation.factom.client.impl.ops.EntryOperations;
+import org.blockchain_innovation.factom.client.api.ops.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.security.InvalidKeyException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.Signature;
-import java.security.SignatureException;
+import java.security.*;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -38,7 +30,7 @@ public class EntryApiOfflineSigningImpl {
     private EntryOperations entryOperations = new EntryOperations();
     private ByteOperations byteOperations = new ByteOperations();
 
-    private FactomdClient factomdClient;
+    private FactomdClientImpl factomdClient;
 
     private CompletableFuture<Void> waitFuture() {
         return  CompletableFuture.runAsync(() -> {
@@ -50,14 +42,14 @@ public class EntryApiOfflineSigningImpl {
         });
     }
 
-    private FactomdClient getFactomdClient() throws FactomException.ClientException {
+    private FactomdClientImpl getFactomdClient() throws FactomException.ClientException {
         if (factomdClient == null) {
             throw new FactomException.ClientException("factomd client not provided");
         }
         return factomdClient;
     }
 
-    public EntryApiOfflineSigningImpl setFactomdClient(FactomdClient factomdClient) {
+    public EntryApiOfflineSigningImpl setFactomdClient(FactomdClientImpl factomdClient) {
         this.factomdClient = factomdClient;
         return this;
     }

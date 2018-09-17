@@ -16,13 +16,13 @@
 
 package org.blockchain_innovation.factom.client;
 
+import org.blockchain_innovation.factom.client.api.FactomException;
 import org.blockchain_innovation.factom.client.api.FactomResponse;
-import org.blockchain_innovation.factom.client.api.model.AddressImport;
+import org.blockchain_innovation.factom.client.api.model.Address;
 import org.blockchain_innovation.factom.client.api.model.Chain;
 import org.blockchain_innovation.factom.client.api.model.Entry;
 import org.blockchain_innovation.factom.client.api.model.Range;
 import org.blockchain_innovation.factom.client.api.model.response.walletd.*;
-import org.blockchain_innovation.factom.client.api.FactomException;
 import org.junit.Assert;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -33,7 +33,7 @@ import java.util.Collections;
 import java.util.List;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class WalletdClientTest extends AbstractClientTest {
+public class WalletdClientImplTest extends AbstractClientTest {
 
     private static String transactionName = "TransactionName";
     private static String entryCreditAddress /*= "EC3cqLZPq5ypwRB5CLfXnud5vkWAV2sd235CFf9KcWcE3FH9GRxv"*/;
@@ -91,11 +91,8 @@ public class WalletdClientTest extends AbstractClientTest {
 
     @Test
     public void _11_importAddresses() throws FactomException.ClientException {
-        String secret = FCT_SECRET_ADDRESS;
-
-        AddressImport address = new AddressImport();
-        address.setSecret(secret);
-        List<AddressImport> addresses = Collections.singletonList(address);
+        Address address = new Address(FCT_SECRET_ADDRESS);
+        List<Address> addresses = Collections.singletonList(address);
 
         FactomResponse<AddressesResponse> response = walletdClient.importAddresses(addresses).join();
         assertValidResponse(response);
@@ -105,7 +102,7 @@ public class WalletdClientTest extends AbstractClientTest {
         Assert.assertNotNull(addressesResponse.getAddresses());
         Assert.assertNotNull(addressesResponse.getAddresses().get(0));
         Assert.assertNotNull(addressesResponse.getAddresses().get(0).getPublicAddress());
-        Assert.assertNotNull(secret, addressesResponse.getAddresses().get(0).getSecret());
+        Assert.assertNotNull(FCT_SECRET_ADDRESS, addressesResponse.getAddresses().get(0).getSecret());
     }
 
     @Test

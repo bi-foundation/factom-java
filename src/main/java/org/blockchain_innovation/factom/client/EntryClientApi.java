@@ -8,12 +8,6 @@ import org.blockchain_innovation.factom.client.data.model.response.factomd.Commi
 import org.blockchain_innovation.factom.client.data.model.response.factomd.EntryTransactionResponse;
 import org.blockchain_innovation.factom.client.data.model.response.factomd.RevealResponse;
 import org.blockchain_innovation.factom.client.data.model.response.walletd.ComposeResponse;
-import org.blockchain_innovation.factom.client.settings.RpcSettings;
-import org.blockchain_innovation.factom.client.settings.RpcSettingsImpl;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
 
 public class EntryClientApi extends AbstractClient {
 

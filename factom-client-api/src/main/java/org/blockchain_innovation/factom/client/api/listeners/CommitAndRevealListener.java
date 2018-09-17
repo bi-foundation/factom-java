@@ -1,4 +1,4 @@
-package org.blockchain_innovation.factom.client.impl.listeners;
+package org.blockchain_innovation.factom.client.api.listeners;
 
 import org.blockchain_innovation.factom.client.api.model.response.factomd.CommitChainResponse;
 import org.blockchain_innovation.factom.client.api.model.response.factomd.CommitEntryResponse;
@@ -12,6 +12,7 @@ public interface CommitAndRevealListener {
     void onCompose(ComposeResponse composeResponse);
 
     void onCommit(CommitEntryResponse commitResponse);
+
     void onCommit(CommitChainResponse commitResponse);
 
     void onReveal(RevealResponse revealResponse);

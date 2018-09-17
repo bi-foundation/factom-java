@@ -54,7 +54,7 @@ public class AdminBlockResponse {
             return lookuphash;
         }
 
-        public static  class Header {
+        public static class Header {
 
             private String prevbackrefhash;
             private long dbheight;

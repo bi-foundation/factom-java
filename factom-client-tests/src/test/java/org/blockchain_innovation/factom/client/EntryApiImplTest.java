@@ -1,6 +1,6 @@
 package org.blockchain_innovation.factom.client;
 
-import org.blockchain_innovation.factom.client.api.Encoding;
+import org.blockchain_innovation.factom.client.api.listeners.CommitAndRevealListener;
 import org.blockchain_innovation.factom.client.api.model.Chain;
 import org.blockchain_innovation.factom.client.api.model.Entry;
 import org.blockchain_innovation.factom.client.api.model.response.CommitAndRevealChainResponse;
@@ -10,8 +10,8 @@ import org.blockchain_innovation.factom.client.api.model.response.factomd.Commit
 import org.blockchain_innovation.factom.client.api.model.response.factomd.EntryTransactionResponse;
 import org.blockchain_innovation.factom.client.api.model.response.factomd.RevealResponse;
 import org.blockchain_innovation.factom.client.api.model.response.walletd.ComposeResponse;
+import org.blockchain_innovation.factom.client.api.ops.Encoding;
 import org.blockchain_innovation.factom.client.api.rpc.RpcErrorResponse;
-import org.blockchain_innovation.factom.client.impl.listeners.CommitAndRevealListener;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;

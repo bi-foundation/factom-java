@@ -67,7 +67,7 @@ public abstract class AbstractTransactionResponse {
         return ecoutputs;
     }
 
-    public  static abstract class IO {
+    public static abstract class IO {
         private String address;
         private long amount;
 

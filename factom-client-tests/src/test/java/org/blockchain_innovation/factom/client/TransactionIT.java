@@ -16,6 +16,7 @@
 
 package org.blockchain_innovation.factom.client;
 
+import org.blockchain_innovation.factom.client.api.FactomException;
 import org.blockchain_innovation.factom.client.api.FactomResponse;
 import org.blockchain_innovation.factom.client.api.model.response.factomd.EntryCreditRateResponse;
 import org.blockchain_innovation.factom.client.api.model.response.factomd.FactoidSubmitResponse;
@@ -23,7 +24,6 @@ import org.blockchain_innovation.factom.client.api.model.response.walletd.Addres
 import org.blockchain_innovation.factom.client.api.model.response.walletd.ComposeTransactionResponse;
 import org.blockchain_innovation.factom.client.api.model.response.walletd.ExecutedTransactionResponse;
 import org.blockchain_innovation.factom.client.api.model.response.walletd.TransactionResponse;
-import org.blockchain_innovation.factom.client.api.FactomException;
 import org.junit.Assert;
 import org.junit.FixMethodOrder;
 import org.junit.Test;

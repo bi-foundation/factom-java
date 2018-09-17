@@ -20,8 +20,8 @@ import org.blockchain_innovation.factom.client.api.FactomResponse;
 import org.blockchain_innovation.factom.client.api.settings.RpcSettings;
 import org.blockchain_innovation.factom.client.impl.EntryApiImpl;
 import org.blockchain_innovation.factom.client.impl.EntryApiOfflineSigningImpl;
-import org.blockchain_innovation.factom.client.impl.FactomdClient;
-import org.blockchain_innovation.factom.client.impl.WalletdClient;
+import org.blockchain_innovation.factom.client.impl.FactomdClientImpl;
+import org.blockchain_innovation.factom.client.impl.WalletdClientImpl;
 import org.blockchain_innovation.factom.client.impl.json.gson.JsonConverterGSON;
 import org.blockchain_innovation.factom.client.impl.settings.RpcSettingsImpl;
 import org.junit.Assert;
@@ -38,8 +38,8 @@ class AbstractClientTest {
     protected final static String FCT_PUBLIC_ADDRESS = System.getProperty("FACTOM_CLIENT_TEST_FACTOID_PUBLIC_ADDRESS", "FA2ZrcG8xkwWWNfdMRw5pGNjMPEkLaxRGqacvzfLS6TGHEHZqAA4");
     protected static final String FCT_SECRET_ADDRESS = System.getProperty("FACTOM_CLIENT_TEST_FACTOID_SECRET_ADDRESS","Fs1jQGc9GJjyWNroLPq7x6LbYQHveyjWNPXSqAvCEKpETNoTU5dP");
 
-    protected final FactomdClient factomdClient = new FactomdClient();
-    protected final WalletdClient walletdClient = new WalletdClient();
+    protected final FactomdClientImpl factomdClient = new FactomdClientImpl();
+    protected final WalletdClientImpl walletdClient = new WalletdClientImpl();
 
     protected final EntryApiImpl entryClient = new EntryApiImpl();
     protected final EntryApiOfflineSigningImpl entryOfflineSigningClient = new EntryApiOfflineSigningImpl();

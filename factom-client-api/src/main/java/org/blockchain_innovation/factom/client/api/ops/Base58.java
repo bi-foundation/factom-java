@@ -1,4 +1,6 @@
-package org.blockchain_innovation.factom.client.api;
+package org.blockchain_innovation.factom.client.api.ops;
+
+import org.blockchain_innovation.factom.client.api.FactomRuntimeException;
 
 /**
  * code used from vrotaru/Base58.java

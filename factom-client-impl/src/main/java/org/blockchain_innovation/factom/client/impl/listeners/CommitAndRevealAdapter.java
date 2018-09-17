@@ -1,5 +1,6 @@
 package org.blockchain_innovation.factom.client.impl.listeners;
 
+import org.blockchain_innovation.factom.client.api.listeners.CommitAndRevealListener;
 import org.blockchain_innovation.factom.client.api.model.response.factomd.CommitChainResponse;
 import org.blockchain_innovation.factom.client.api.model.response.factomd.CommitEntryResponse;
 import org.blockchain_innovation.factom.client.api.model.response.factomd.EntryTransactionResponse;
@@ -7,7 +8,7 @@ import org.blockchain_innovation.factom.client.api.model.response.factomd.Reveal
 import org.blockchain_innovation.factom.client.api.model.response.walletd.ComposeResponse;
 import org.blockchain_innovation.factom.client.api.rpc.RpcErrorResponse;
 
-public class SimpleCommitAndRevealListener implements CommitAndRevealListener {
+public abstract class CommitAndRevealAdapter implements CommitAndRevealListener {
 
     @Override
     public void onCompose(ComposeResponse composeResponse) {

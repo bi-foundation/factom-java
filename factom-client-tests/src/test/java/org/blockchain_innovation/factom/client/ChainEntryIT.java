@@ -164,7 +164,7 @@ public class ChainEntryIT extends AbstractClientTest {
     }
 
     private Chain chain() {
-        String randomness = new Date().toString();
+        String randomness = /*"1234859584933";*/new Date().toString();
         List<String> externalIds = Arrays.asList(
                 "ChainEntryIT",
                 randomness

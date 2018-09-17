@@ -17,7 +17,7 @@
 package org.blockchain_innovation.factom.client.api.model.response.walletd;
 
 public class PropertiesResponse {
-    
+
     private String walletversion;
     private String walletapiversion;
 

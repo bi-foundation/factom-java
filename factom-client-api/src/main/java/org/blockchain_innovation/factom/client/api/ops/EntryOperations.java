@@ -14,14 +14,10 @@
  * limitations under the License.
  */
 
-package org.blockchain_innovation.factom.client.impl.ops;
+package org.blockchain_innovation.factom.client.api.ops;
 
-import org.blockchain_innovation.factom.client.api.ByteOperations;
-import org.blockchain_innovation.factom.client.api.StringUtils;
-import org.blockchain_innovation.factom.client.api.Digests;
-import org.blockchain_innovation.factom.client.api.Encoding;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.EntryResponse;
 import org.blockchain_innovation.factom.client.api.FactomRuntimeException;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.EntryResponse;
 
 import java.util.List;
 

@@ -16,12 +16,8 @@
 
 package org.blockchain_innovation.factom.client.api.model;
 
-import org.blockchain_innovation.factom.client.api.Encoding;
-import org.blockchain_innovation.factom.client.api.FactomException;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class Chain {
 

@@ -52,8 +52,7 @@ public enum RpcMethod {
     SUB_FEE("sub-fee"),
     TMP_TRANSACTIONS("tmp-transactions"),
     TRANSACTIONS("transactions"),
-    WALLET_BACKUP("wallet-backup")
-    ;
+    WALLET_BACKUP("wallet-backup");
 
     private final String method;
 

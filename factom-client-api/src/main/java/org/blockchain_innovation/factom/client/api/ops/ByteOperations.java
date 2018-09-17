@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-package org.blockchain_innovation.factom.client.api;
-
+package org.blockchain_innovation.factom.client.api.ops;
 
 
 import org.blockchain_innovation.factom.client.api.FactomRuntimeException;

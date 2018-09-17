@@ -1,4 +1,6 @@
-package org.blockchain_innovation.factom.client.api;
+package org.blockchain_innovation.factom.client.api.model.types;
+
+import org.blockchain_innovation.factom.client.api.ops.Encoding;
 
 public enum RCDType {
 
