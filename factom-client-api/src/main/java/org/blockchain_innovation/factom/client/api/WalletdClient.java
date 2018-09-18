@@ -22,7 +22,7 @@ public interface WalletdClient {
      * @return
      * @throws FactomException.ClientException
      */
-    CompletableFuture<FactomResponse<TransactionResponse>> addEntryCreditOutput(String txName, String address, long amount) throws FactomException.ClientException;
+    CompletableFuture<FactomResponse<TransactionResponse>> addEntryCreditOutput(String txName, Address address, long amount) throws FactomException.ClientException;
 
     /**
      * Addfee is a shortcut and safeguard for adding the required additional factoshis to covert the fee. The fee is displayed in the returned transaction after each step, but addfee should be used instead of manually adding the additional input. This will help to prevent overpaying.
@@ -36,7 +36,7 @@ public interface WalletdClient {
      * @return
      * @throws FactomException.ClientException
      */
-    CompletableFuture<FactomResponse<ExecutedTransactionResponse>> addFee(String txName, String address) throws FactomException.ClientException;
+    CompletableFuture<FactomResponse<ExecutedTransactionResponse>> addFee(String txName, Address address) throws FactomException.ClientException;
 
     /**
      * Adds an input to the transaction from the given address. The public address is given, and the wallet must have the private key associated with the address to successfully sign the transaction.
@@ -48,7 +48,7 @@ public interface WalletdClient {
      * @return
      * @throws FactomException.ClientException
      */
-    CompletableFuture<FactomResponse<ExecutedTransactionResponse>> addInput(String txName, String address, long amount) throws FactomException.ClientException;
+    CompletableFuture<FactomResponse<ExecutedTransactionResponse>> addInput(String txName, Address address, long amount) throws FactomException.ClientException;
 
     /**
      * Adds a factoid address output to the transaction. Keep in mind the output is done in factoshis. 1 factoid is 1,000,000,000 factoshis.
@@ -60,7 +60,7 @@ public interface WalletdClient {
      * @return
      * @throws FactomException.ClientException
      */
-    CompletableFuture<FactomResponse<ExecutedTransactionResponse>> addOutput(String txName, String address, long amount) throws FactomException.ClientException;
+    CompletableFuture<FactomResponse<ExecutedTransactionResponse>> addOutput(String txName, Address address, long amount) throws FactomException.ClientException;
 
     /**
      * Retrieve the public and private parts of a Factoid or Entry Credit address stored in the wallet.
@@ -69,7 +69,7 @@ public interface WalletdClient {
      * @return
      * @throws FactomException.ClientException
      */
-    CompletableFuture<FactomResponse<AddressResponse>> address(String address) throws FactomException.ClientException;
+    CompletableFuture<FactomResponse<AddressResponse>> address(Address address) throws FactomException.ClientException;
 
     /**
      * Retrieve all of the Factoid and Entry Credit addresses stored in the wallet.
@@ -89,7 +89,7 @@ public interface WalletdClient {
      * @return
      * @throws FactomException.ClientException
      */
-    CompletableFuture<FactomResponse<ComposeResponse>> composeChain(Chain chain, String entryCreditAddress) throws FactomException.ClientException;
+    CompletableFuture<FactomResponse<ComposeResponse>> composeChain(Chain chain, Address entryCreditAddress) throws FactomException.ClientException;
 
     /**
      * This method, compose-entry, will return the appropriate API calls to create an entry in factom. You must first call the commit-entry, then the reveal-entry API calls. To be safe, wait a few seconds after calling commit.
@@ -101,7 +101,7 @@ public interface WalletdClient {
      * @return
      * @throws FactomException.ClientException
      */
-    CompletableFuture<FactomResponse<ComposeResponse>> composeEntry(Entry entry, String entryCreditAddress) throws FactomException.ClientException;
+    CompletableFuture<FactomResponse<ComposeResponse>> composeEntry(Entry entry, Address entryCreditAddress) throws FactomException.ClientException;
 
     /**
      * Compose transaction marshals the transaction into a hex encoded string. The string can be inputted into the factomd API factoid-submit to be sent to the network.
@@ -199,7 +199,7 @@ public interface WalletdClient {
      * @return
      * @throws FactomException.ClientException
      */
-    CompletableFuture<FactomResponse<ExecutedTransactionResponse>> subFee(String txName, String address) throws FactomException.ClientException;
+    CompletableFuture<FactomResponse<ExecutedTransactionResponse>> subFee(String txName, Address address) throws FactomException.ClientException;
 
     /**
      * Lists all the current working transactions in the wallet. These are transactions that are not yet sent.
@@ -235,7 +235,7 @@ public interface WalletdClient {
      * @return
      * @throws FactomException.ClientException
      */
-    CompletableFuture<FactomResponse<BlockHeightTransactionsResponse>> transactionsByAddress(String address) throws FactomException.ClientException;
+    CompletableFuture<FactomResponse<BlockHeightTransactionsResponse>> transactionsByAddress(Address address) throws FactomException.ClientException;
 
     /**
      * Return the wallet seed and all addresses in the wallet for backup and offline storage.

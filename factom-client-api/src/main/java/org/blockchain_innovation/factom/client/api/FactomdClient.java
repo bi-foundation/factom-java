@@ -1,5 +1,6 @@
 package org.blockchain_innovation.factom.client.api;
 
+import org.blockchain_innovation.factom.client.api.model.Address;
 import org.blockchain_innovation.factom.client.api.model.response.factomd.*;
 
 import java.util.concurrent.CompletableFuture;
@@ -203,7 +204,7 @@ public interface FactomdClient {
      * @return
      * @throws FactomException.ClientException
      */
-    CompletableFuture<FactomResponse<EntryCreditBalanceResponse>> entryCreditBalance(String entryCreditAddress) throws FactomException.ClientException;
+    CompletableFuture<FactomResponse<EntryCreditBalanceResponse>> entryCreditBalance(Address entryCreditAddress) throws FactomException.ClientException;
 
     /**
      * Retrieve a specified entrycredit block given its merkle root key. The numbers are minute markers.
@@ -229,7 +230,7 @@ public interface FactomdClient {
      * @return
      * @throws FactomException.ClientException
      */
-    CompletableFuture<FactomResponse<FactoidBalanceResponse>> factoidBalance(String factoidAddress) throws FactomException.ClientException;
+    CompletableFuture<FactomResponse<FactoidBalanceResponse>> factoidBalance(Address factoidAddress) throws FactomException.ClientException;
 
     /**
      * Retrieve a specified factoid block given its merkle root key.

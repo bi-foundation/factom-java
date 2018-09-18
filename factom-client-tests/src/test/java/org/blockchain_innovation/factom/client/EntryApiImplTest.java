@@ -1,6 +1,7 @@
 package org.blockchain_innovation.factom.client;
 
 import org.blockchain_innovation.factom.client.api.listeners.CommitAndRevealListener;
+import org.blockchain_innovation.factom.client.api.model.Address;
 import org.blockchain_innovation.factom.client.api.model.Chain;
 import org.blockchain_innovation.factom.client.api.model.Entry;
 import org.blockchain_innovation.factom.client.api.model.response.CommitAndRevealChainResponse;
@@ -74,8 +75,9 @@ public class EntryApiImplTest extends AbstractClientTest {
         };
 
         entryClient.clearListeners().addListener(listener);
+        Address address = new Address(EC_PUBLIC_ADDRESS);
 
-        CommitAndRevealChainResponse commitAndRevealChain = entryClient.commitAndRevealChain(chain, EC_PUBLIC_ADDRESS).join();
+        CommitAndRevealChainResponse commitAndRevealChain = entryClient.commitAndRevealChain(chain, address).join();
 
         Assert.assertEquals("Chain Commit Success", commitAndRevealChain.getCommitChainResponse().getMessage());
         Assert.assertEquals("Entry Reveal Success", commitAndRevealChain.getRevealResponse().getMessage());
@@ -143,7 +145,8 @@ public class EntryApiImplTest extends AbstractClientTest {
         };
 
         entryClient.clearListeners().addListener(listener);
-        CompletableFuture<CommitAndRevealEntryResponse> commitFuture = entryClient.commitAndRevealEntry(entry, EC_PUBLIC_ADDRESS);
+        Address address = new Address(EC_PUBLIC_ADDRESS);
+        CompletableFuture<CommitAndRevealEntryResponse> commitFuture = entryClient.commitAndRevealEntry(entry, address);
         CommitAndRevealEntryResponse commitAndRevealEntry = commitFuture.join();
 
         Assert.assertEquals("Entry Commit Success", commitAndRevealEntry.getCommitEntryResponse().getMessage());
@@ -237,7 +240,8 @@ public class EntryApiImplTest extends AbstractClientTest {
         };
 
         entryClient.clearListeners().addListener(listener);
-        CompletableFuture<CommitAndRevealChainResponse> future = entryClient.commitAndRevealChain(chain, EC_PUBLIC_ADDRESS, true);
+        Address address = new Address(EC_PUBLIC_ADDRESS);
+        CompletableFuture<CommitAndRevealChainResponse> future = entryClient.commitAndRevealChain(chain, address, true);
 
         int count = 0;
         while(transactionAcknowledgedResponse.get() == null && count < 100) {

@@ -1,10 +1,35 @@
 package org.blockchain_innovation.factom.client;
 
+import net.i2p.crypto.eddsa.EdDSAPrivateKey;
+import net.i2p.crypto.eddsa.math.GroupElement;
+import net.i2p.crypto.eddsa.spec.EdDSANamedCurveTable;
+import net.i2p.crypto.eddsa.spec.EdDSAPrivateKeySpec;
 import org.blockchain_innovation.factom.client.api.AddressKeyConversions;
 import org.blockchain_innovation.factom.client.api.model.types.AddressType;
+import org.blockchain_innovation.factom.client.api.ops.Base58;
+import org.blockchain_innovation.factom.client.api.ops.Digests;
 import org.blockchain_innovation.factom.client.api.ops.Encoding;
+import org.blockchain_innovation.factom.client.impl.OfflineAddressKeyConversions;
+import org.bouncycastle.asn1.sec.SECNamedCurves;
+import org.bouncycastle.asn1.x9.X9ECParameters;
+import org.bouncycastle.jce.ECNamedCurveTable;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.jce.spec.ECNamedCurveParameterSpec;
+import org.bouncycastle.jce.spec.ECPublicKeySpec;
+import org.bouncycastle.math.ec.ECPoint;
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.math.BigInteger;
+
+import java.security.KeyFactory;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.PublicKey;
+import java.security.spec.InvalidKeySpecException;
+import java.util.Arrays;
+import java.util.stream.Stream;
 
 public class AddressTest extends AbstractClientTest {
     private static AddressKeyConversions conversions = new AddressKeyConversions();
@@ -81,9 +106,6 @@ public class AddressTest extends AbstractClientTest {
         Assert.assertEquals("Fs3GFV6GNV6ar4b8eGcQWpGFbFtkNWKfEPdbywmha8ez5p7XMJyk", conversions.keyToAddress(Encoding.HEX.decode("ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"), AddressType.FACTOID_SECRET));
         Assert.assertEquals("Es2Rf7iM6PdsqfYCo3D1tnAR65SkLENyWJG1deUzpRMQmbh9F3eG", conversions.keyToAddress(Encoding.HEX.decode("0000000000000000000000000000000000000000000000000000000000000000"), AddressType.ENTRY_CREDIT_SECRET));
         Assert.assertEquals("Es4NQHwo8F4Z4oMnVwndtjV1rzZN3t5pP5u5jtdgiR1RA6FH4Tmc", conversions.keyToAddress(Encoding.HEX.decode("ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"), AddressType.ENTRY_CREDIT_SECRET));
-
-
-
     }
 
     @Test
@@ -92,5 +114,14 @@ public class AddressTest extends AbstractClientTest {
         Assert.assertArrayEquals(Encoding.HEX.decode("98fb8ffa591adc5f20ee4887affe06c18ca3b97cbda1a74a12944c1c26fdf864"), conversions.addressToKey("EC2vXWYkAPduo3oo2tPuzA44Tm7W6Cj7SeBr3fBnzswbG5rrkSTD"));
         Assert.assertArrayEquals(Encoding.HEX.decode("776b5cf08edea510711e2bc4a73f2b5118008906c5afd2e5786cf817fa279b80"), conversions.addressToKey("Es3LFXNj5vHBw8c9kM98HKR69CJjUTyTPv4BdxoRbMQJ8zifxkgV"));
         Assert.assertArrayEquals(Encoding.HEX.decode("d48189215e445ea7e8dbf707c48922ab25a23552d8eae40cc5e9cd6b1a36963c"), conversions.addressToKey("Fs2w6VL6cwBqt6SpUyPLvdo9TK834gCr52Y225z8C5aHPAFav36X"));
+    }
+
+    @Test
+    public void testAddressToPublic() {
+        OfflineAddressKeyConversions conversions = new OfflineAddressKeyConversions();
+        String publicAddress= conversions.addressToPublicAddress(EC_SECRET_ADDRESS);
+
+        AddressType.ENTRY_CREDIT_PUBLIC.assertValid(publicAddress);
+        Assert.assertEquals(EC_PUBLIC_ADDRESS, publicAddress);
     }
 }

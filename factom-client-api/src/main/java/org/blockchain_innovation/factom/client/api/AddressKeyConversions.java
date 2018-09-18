@@ -1,5 +1,6 @@
 package org.blockchain_innovation.factom.client.api;
 
+import org.blockchain_innovation.factom.client.api.model.Address;
 import org.blockchain_innovation.factom.client.api.model.types.AddressType;
 import org.blockchain_innovation.factom.client.api.model.types.RCDType;
 import org.blockchain_innovation.factom.client.api.ops.ByteOperations;
@@ -57,14 +58,7 @@ public class AddressKeyConversions {
         return Encoding.BASE58.encode(new ByteOperations().concat(address, checksum));
     }
 
-    public String addressToPublicAddress(String address) {
-        AddressType addressType = AddressType.getType(address);
-        if (addressType.isPublic()) {
-            return address;
-        }
-        byte[] pk = addressToKey(address);
-        return keyToAddress(pk, AddressType.getType(address));
+    public byte[] addressToKey(Address address) {
+        return addressToKey(address.getValue());
     }
-
-
 }

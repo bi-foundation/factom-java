@@ -18,6 +18,7 @@ package org.blockchain_innovation.factom.client;
 
 import org.blockchain_innovation.factom.client.api.FactomException;
 import org.blockchain_innovation.factom.client.api.FactomResponse;
+import org.blockchain_innovation.factom.client.api.model.Address;
 import org.blockchain_innovation.factom.client.api.model.Chain;
 import org.blockchain_innovation.factom.client.api.model.Entry;
 import org.blockchain_innovation.factom.client.api.model.response.factomd.CommitChainResponse;
@@ -38,26 +39,27 @@ import java.util.concurrent.ExecutionException;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class ChainEntryIT extends AbstractClientTest {
 
-    private static String chainId /*= "23fc40b5d301f8c40513cb1363439bc23e6c21856073abefdb1a2a2e49baba3b"*/;
-    private static String entryHash;
-    private static FactomResponse<ComposeResponse> composeResponse;
+    protected static String chainId /*= "23fc40b5d301f8c40513cb1363439bc23e6c21856073abefdb1a2a2e49baba3b"*/;
+    protected static String entryHash;
+    protected static ComposeResponse composeChain;
+    protected static ComposeResponse composeEntry;
 
     @Test
     public void _01_composeChain() throws FactomException.ClientException, ExecutionException, InterruptedException {
         Chain chain = chain();
 
-        composeResponse = walletdClient.composeChain(chain, EC_PUBLIC_ADDRESS).join();
+        Address address = new Address(EC_PUBLIC_ADDRESS);
+        FactomResponse<ComposeResponse> composeResponse = walletdClient.composeChain(chain, address).join();
         assertValidResponse(composeResponse);
 
-        Assert.assertNotNull(composeResponse.getResult().getCommit());
-        Assert.assertNotNull(composeResponse.getResult().getCommit().getId());
-        Assert.assertNotNull(composeResponse.getResult().getCommit().getParams());
+        composeChain = composeResponse.getResult();
+        Assert.assertNotNull(composeChain.getCommit());
+        Assert.assertNotNull(composeChain.getCommit().getId());
+        Assert.assertNotNull(composeChain.getCommit().getParams());
     }
 
     @Test
     public void _02_commitChain() throws FactomException.ClientException {
-        ComposeResponse composeChain = composeResponse.getResult();
-
         String commitChainMessage = composeChain.getCommit().getParams().getMessage();
         Assert.assertNotNull(commitChainMessage);
         Assert.assertNotNull(composeChain.getReveal());
@@ -89,20 +91,21 @@ public class ChainEntryIT extends AbstractClientTest {
     }
 
     @Test
-    public void _02_verifyCommitChain() throws FactomException.ClientException, InterruptedException {
+    public void _03_verifyCommitChain() throws FactomException.ClientException, InterruptedException {
         boolean confirmed = waitOnConfirmation(EntryTransactionResponse.Status.TransactionACK, 15);
         Assert.assertTrue(confirmed);
         Thread.sleep(1000);
     }
 
     @Test
-    public void _03_commitEntry() throws FactomException.ClientException {
+    public void _04_composeEntry() throws FactomException.ClientException {
         Entry entry = entry(chainId);
+        Address address = new Address(EC_PUBLIC_ADDRESS);
 
-        FactomResponse<ComposeResponse> composeResponse = walletdClient.composeEntry(entry, EC_PUBLIC_ADDRESS).join();
+        FactomResponse<ComposeResponse> composeResponse = walletdClient.composeEntry(entry, address).join();
         assertValidResponse(composeResponse);
 
-        ComposeResponse composeEntry = composeResponse.getResult();
+        composeEntry = composeResponse.getResult();
         Assert.assertNotNull(composeEntry.getCommit());
         Assert.assertNotNull(composeEntry.getCommit().getId());
         Assert.assertNotNull(composeEntry.getCommit().getParams());
@@ -115,6 +118,13 @@ public class ChainEntryIT extends AbstractClientTest {
 
         String revealCommitMessage = composeEntry.getReveal().getParams().getEntry();
         Assert.assertNotNull(revealCommitMessage);
+
+    }
+
+    @Test
+    public void _05_commitEntry() throws FactomException.ClientException {
+        String commitEntryMessage = composeEntry.getCommit().getParams().getMessage();
+        String revealCommitMessage = composeEntry.getReveal().getParams().getEntry();
 
         FactomResponse<CommitEntryResponse> commitEntryResponse = factomdClient.commitEntry(commitEntryMessage).join();
         assertValidResponse(commitEntryResponse);
@@ -136,11 +146,10 @@ public class ChainEntryIT extends AbstractClientTest {
     }
 
     @Test
-    public void _04_verifyCommitEntry() throws FactomException.ClientException, InterruptedException {
+    public void _06_verifyCommitEntry() throws FactomException.ClientException, InterruptedException {
         boolean confirmed = waitOnConfirmation(EntryTransactionResponse.Status.TransactionACK, 10);
         Assert.assertTrue(confirmed);
     }
-
 
     private boolean waitOnConfirmation(EntryTransactionResponse.Status desiredStatus, int maxSeconds) throws InterruptedException, FactomException.ClientException {
         int seconds = 0;
@@ -163,7 +172,7 @@ public class ChainEntryIT extends AbstractClientTest {
         return false;
     }
 
-    private Chain chain() {
+    protected Chain chain() {
         String randomness = /*"1234859584933";*/new Date().toString();
         List<String> externalIds = Arrays.asList(
                 "ChainEntryIT",
@@ -179,7 +188,7 @@ public class ChainEntryIT extends AbstractClientTest {
         return chain;
     }
 
-    private Entry entry(String chainId) {
+    protected Entry entry(String chainId) {
         List<String> externalIds = Arrays.asList("Entry ExtID 1", "Entry ExtID 2");
 
         Entry entry = new Entry();

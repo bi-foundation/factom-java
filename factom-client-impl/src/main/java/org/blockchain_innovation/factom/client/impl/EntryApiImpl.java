@@ -4,6 +4,7 @@ import org.blockchain_innovation.factom.client.api.FactomException;
 import org.blockchain_innovation.factom.client.api.FactomResponse;
 import org.blockchain_innovation.factom.client.api.FactomdClient;
 import org.blockchain_innovation.factom.client.api.listeners.CommitAndRevealListener;
+import org.blockchain_innovation.factom.client.api.model.Address;
 import org.blockchain_innovation.factom.client.api.model.Chain;
 import org.blockchain_innovation.factom.client.api.model.Entry;
 import org.blockchain_innovation.factom.client.api.model.response.CommitAndRevealChainResponse;
@@ -100,23 +101,23 @@ public class EntryApiImpl {
      * Compose, reveal and commit a chain
      *
      * @param chain
-     * @param entryCreditAddress
+     * @param address
      * @throws FactomException.ClientException
      */
-    public CompletableFuture<CommitAndRevealChainResponse> commitAndRevealChain(Chain chain, String entryCreditAddress) throws FactomException.ClientException {
-        return commitAndRevealChain(chain, entryCreditAddress, false);
+    public CompletableFuture<CommitAndRevealChainResponse> commitAndRevealChain(Chain chain, Address address) throws FactomException.ClientException {
+        return commitAndRevealChain(chain, address, false);
     }
 
     /**
      * Compose, reveal and commit a chain
      *
      * @param chain
-     * @param entryCreditAddress
+     * @param address
      * @return
      */
-    public CompletableFuture<CommitAndRevealChainResponse> commitAndRevealChain(Chain chain, String entryCreditAddress, boolean confirmCommit) {
+    public CompletableFuture<CommitAndRevealChainResponse> commitAndRevealChain(Chain chain, Address address, boolean confirmCommit) {
         // after compose chain combine commit and reveal chain
-        CompletableFuture<CommitAndRevealChainResponse> commitAndRevealChainFuture = composeChainFuture(chain, entryCreditAddress)
+        CompletableFuture<CommitAndRevealChainResponse> commitAndRevealChainFuture = composeChainFuture(chain, address)
                 .thenApply(_composeChainResponse -> notifyCompose(_composeChainResponse))
                 // commit chain
                 .thenCompose(_composeChainResponse -> commitChainFuture(_composeChainResponse)
@@ -145,23 +146,23 @@ public class EntryApiImpl {
      * Compose, reveal and commit an entry
      *
      * @param entry
-     * @param entryCreditAddress
+     * @param address
      * @throws FactomException.ClientException
      */
-    public CompletableFuture<CommitAndRevealEntryResponse> commitAndRevealEntry(Entry entry, String entryCreditAddress) throws FactomException.ClientException {
-        return commitAndRevealEntry(entry, entryCreditAddress, false);
+    public CompletableFuture<CommitAndRevealEntryResponse> commitAndRevealEntry(Entry entry, Address address) throws FactomException.ClientException {
+        return commitAndRevealEntry(entry, address, false);
     }
 
     /**
      * Compose, reveal and commit an entry
      *
      * @param entry
-     * @param entryCreditAddress
+     * @param address
      * @throws FactomException.ClientException
      */
-    public CompletableFuture<CommitAndRevealEntryResponse> commitAndRevealEntry(Entry entry, String entryCreditAddress, boolean confirmCommit) throws FactomException.ClientException {
+    public CompletableFuture<CommitAndRevealEntryResponse> commitAndRevealEntry(Entry entry, Address address, boolean confirmCommit) throws FactomException.ClientException {
         // after compose entry combine commit and reveal entry
-        CompletableFuture<CommitAndRevealEntryResponse> commitAndRevealEntryFuture = composeEntryFuture(entry, entryCreditAddress)
+        CompletableFuture<CommitAndRevealEntryResponse> commitAndRevealEntryFuture = composeEntryFuture(entry, address)
                 .thenApply(_composeEntryResponse -> notifyCompose(_composeEntryResponse))
                 // commit chain
                 .thenCompose(_composeEntryResponse -> commitEntryFuture(_composeEntryResponse)
@@ -286,8 +287,8 @@ public class EntryApiImpl {
         });
     }
 
-    private CompletableFuture<FactomResponse<ComposeResponse>> composeChainFuture(Chain chain, String entryCreditAddress) {
-        return getWalletdClient().composeChain(chain, entryCreditAddress);
+    private CompletableFuture<FactomResponse<ComposeResponse>> composeChainFuture(Chain chain, Address address) {
+        return getWalletdClient().composeChain(chain, address);
     }
 
     private CompletableFuture<FactomResponse<CommitChainResponse>> commitChainFuture(FactomResponse<ComposeResponse> composeChain) {
@@ -298,9 +299,9 @@ public class EntryApiImpl {
         return getFactomdClient().revealChain(composeChain.getResult().getReveal().getParams().getEntry());
     }
 
-    private CompletableFuture<FactomResponse<ComposeResponse>> composeEntryFuture(Entry entry, String entryCreditAddress) {
+    private CompletableFuture<FactomResponse<ComposeResponse>> composeEntryFuture(Entry entry, Address address) {
         logger.info("commitEntryFuture");
-        return getWalletdClient().composeEntry(entry, entryCreditAddress);
+        return getWalletdClient().composeEntry(entry, address);
     }
 
     private CompletableFuture<FactomResponse<CommitEntryResponse>> commitEntryFuture(FactomResponse<ComposeResponse> composeEntry) {

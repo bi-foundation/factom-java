@@ -5,113 +5,94 @@ import net.i2p.crypto.eddsa.EdDSAPrivateKey;
 import net.i2p.crypto.eddsa.spec.EdDSANamedCurveTable;
 import net.i2p.crypto.eddsa.spec.EdDSAPrivateKeySpec;
 import org.blockchain_innovation.factom.client.api.FactomException;
+import org.blockchain_innovation.factom.client.api.FactomResponse;
+import org.blockchain_innovation.factom.client.api.model.Address;
 import org.blockchain_innovation.factom.client.api.model.Chain;
 import org.blockchain_innovation.factom.client.api.model.Entry;
-import org.blockchain_innovation.factom.client.api.model.response.CommitAndRevealChainResponse;
-import org.blockchain_innovation.factom.client.api.model.response.CommitAndRevealEntryResponse;
-import org.blockchain_innovation.factom.client.api.ops.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.blockchain_innovation.factom.client.api.model.response.walletd.ComposeResponse;
+import org.blockchain_innovation.factom.client.api.model.types.AddressType;
+import org.blockchain_innovation.factom.client.api.ops.ByteOperations;
+import org.blockchain_innovation.factom.client.api.ops.Digests;
+import org.blockchain_innovation.factom.client.api.ops.Encoding;
+import org.blockchain_innovation.factom.client.api.ops.EntryOperations;
+import org.blockchain_innovation.factom.client.api.rpc.RpcResponse;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.security.*;
-import java.util.Arrays;
+import java.security.InvalidKeyException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.Signature;
+import java.security.SignatureException;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
-public class EntryApiOfflineSigningImpl {
+public class OfflineWalletdClientImpl extends WalletdClientImpl {
 
-    private final Logger logger = LoggerFactory.getLogger(EntryApiImpl.class);
-    public static final int ENTRY_REVEAL_WAIT = 1000;
-
+    private OfflineAddressKeyConversions addressKeyConversions = new OfflineAddressKeyConversions();
     private EntryOperations entryOperations = new EntryOperations();
     private ByteOperations byteOperations = new ByteOperations();
 
-    private FactomdClientImpl factomdClient;
+    @Override
+    public CompletableFuture<FactomResponse<ComposeResponse>> composeChain(Chain chain, Address address) throws FactomException.ClientException {
+        Supplier<FactomResponse<ComposeResponse>> supplier = () -> {
+            AddressType.ENTRY_CREDIT_SECRET.assertValid(address);
 
-    private CompletableFuture<Void> waitFuture() {
-        return  CompletableFuture.runAsync(() -> {
-            try {
-                TimeUnit.MILLISECONDS.sleep(ENTRY_REVEAL_WAIT);
-            } catch (InterruptedException e) {
-                throw new IllegalStateException(e);
-            }
-        });
+            String message = composeChainCommit(chain, address);
+            String entryReveal = composeChainReveal(chain);
+            FactomResponse<ComposeResponse> response = composeResponse("compose-chain", message, "reveal-chain", entryReveal);
+            return response;
+        };
+
+        return CompletableFuture.supplyAsync(supplier);
     }
 
-    private FactomdClientImpl getFactomdClient() throws FactomException.ClientException {
-        if (factomdClient == null) {
-            throw new FactomException.ClientException("factomd client not provided");
-        }
-        return factomdClient;
+    @Override
+    public CompletableFuture<FactomResponse<ComposeResponse>> composeEntry(Entry entry, Address address) throws FactomException.ClientException {
+        Supplier<FactomResponse<ComposeResponse>> supplier = () -> {
+            AddressType.ENTRY_CREDIT_SECRET.assertValid(address);
+
+            String message = composeEntryCommit(entry, address);
+            String entryReveal = composeEntryReveal(entry);
+            FactomResponse<ComposeResponse> response = composeResponse("compose-entry", message, "reveal-entry", entryReveal);
+            return response;
+        };
+
+        return CompletableFuture.supplyAsync(supplier);
     }
 
-    public EntryApiOfflineSigningImpl setFactomdClient(FactomdClientImpl factomdClient) {
-        this.factomdClient = factomdClient;
-        return this;
+    private FactomResponse<ComposeResponse> composeResponse(String commitMethod, String commitMessage, String revealMethod, String revealEntry) {
+        ComposeResponse.Commit.Params commitParams = new ComposeResponse.Commit.Params();
+        commitParams.setMessage(commitMessage);
+
+        ComposeResponse.Commit commit = new ComposeResponse.Commit();
+        commit.setId(0);
+        commit.setJsonrpc("2.0");
+        commit.setMethod(commitMethod);
+        commit.setParams(commitParams);
+
+        ComposeResponse.Reveal.Params revealParams = new ComposeResponse.Reveal.Params();
+        revealParams.setEntry(revealEntry);
+
+        ComposeResponse.Reveal reveal = new ComposeResponse.Reveal();
+        reveal.setId(0);
+        reveal.setJsonrpc("2.0");
+        reveal.setMethod(revealMethod);
+        reveal.setParams(revealParams);
+
+        ComposeResponse composeResponse = new ComposeResponse();
+        composeResponse.setCommit(commit);
+        composeResponse.setReveal(reveal);
+
+        RpcResponse<ComposeResponse> rpcResponse = new RpcResponse<>(composeResponse);
+        // rpcResponse.setId(0);
+        // rpcResponse.setJsonrpc("2.0");
+        return new OfflineFactomResponseImpl<ComposeResponse>(rpcResponse);
     }
 
-    /**
-     * Compose, reveal and commit a chain
-     *
-     * @param chain
-     * @param entryCreditAddress
-     * @param secret
-     * @throws FactomException.ClientException
-     */
-    public CompletableFuture<CommitAndRevealChainResponse> commitAndRevealChain(Chain chain, String entryCreditAddress, String secret) throws FactomException.ClientException {
-        String commitChainMessage = composeChainCommit(chain, entryCreditAddress, secret);
-        String revealChainEntry = composeChainReveal(chain);
-
-        CompletableFuture<CommitAndRevealChainResponse> commitAndRevealChainFuture =
-                getFactomdClient().commitChain(commitChainMessage).thenCompose(_commitChainResponse ->
-                        waitFuture().thenCompose(_void ->
-                                getFactomdClient().revealChain(revealChainEntry).thenApply(_revealChainResponse -> {
-                                    CommitAndRevealChainResponse response = new CommitAndRevealChainResponse();
-                                    response.setCommitChainResponse(_commitChainResponse.getResult());
-                                    response.setRevealResponse(_revealChainResponse.getResult());
-                                    return response;
-                                })));
-        return commitAndRevealChainFuture;
-    }
-
-    /**
-     * Compose, reveal and commit an entry
-     *
-     * @param entry
-     * @param entryCreditAddress
-     * @param secret
-     * @throws FactomException.ClientException
-     */
-    public CompletableFuture<CommitAndRevealEntryResponse> commitAndRevealEntry(Entry entry, String entryCreditAddress, String secret) throws FactomException.ClientException {
-        String commitEntryMessage = composeEntryCommit(entry, entryCreditAddress, secret);
-        String revealCommitMessage = composeEntryReveal(entry);
-
-        CompletableFuture<CommitAndRevealEntryResponse> commitAndRevealEntryFuture =
-                getFactomdClient().commitEntry(commitEntryMessage).thenCompose(_commitEntryResponse ->
-                        waitFuture().thenCompose(_void ->
-                                getFactomdClient().revealChain(revealCommitMessage).thenApply(_revealEntryResponse -> {
-                                    CommitAndRevealEntryResponse response = new CommitAndRevealEntryResponse();
-                                    response.setCommitEntryResponse(_commitEntryResponse.getResult());
-                                    response.setRevealResponse(_revealEntryResponse.getResult());
-                                    return response;
-                                })));
-        return commitAndRevealEntryFuture;
-    }
-
-    /**
-     * Compose a chain commit message that is needed to commit the chain
-     *
-     * @param chain
-     * @param entryCreditPublicKey
-     * @param secret
-     * @return
-     * @throws FactomException.ClientException
-     */
-    public String composeChainCommit(Chain chain, String entryCreditPublicKey, String secret) throws FactomException.ClientException {
+    protected String composeChainCommit(Chain chain, Address entryCreditAddress) throws FactomException.ClientException {
         Entry firstEntry = chain.getFirstEntry();
         byte[] chainId = entryOperations.calculateChainId(firstEntry.getExternalIds());
         String chainIdHex = Encoding.HEX.encode(chainId);
@@ -144,8 +125,8 @@ public class EntryApiOfflineSigningImpl {
 
             // 32 byte Entry Credit Address Public Key + 64 byte Signature
             byte[] message = outputStream.toByteArray();
-            byte[] signature = sign(message, secret);
-            byte[] entryCreditKey = getKeyFromAddress(entryCreditPublicKey);
+            byte[] signature = sign(message, entryCreditAddress);
+            byte[] entryCreditKey = addressKeyConversions.addressToKey(addressKeyConversions.addressToPublicAddress(entryCreditAddress));
 
             outputStream.write(entryCreditKey);
             outputStream.write(signature);
@@ -158,27 +139,14 @@ public class EntryApiOfflineSigningImpl {
     }
 
     /**
-     * Compose chain reveal message that is needed to reveal the chain
-     *
-     * @param chain
-     * @return
-     */
-    public String composeChainReveal(Chain chain) {
-        Entry firstEntry = chain.getFirstEntry();
-        byte[] revealParam = entryOperations.entryToBytes(firstEntry.getExternalIds(), firstEntry.getContent());
-        return Encoding.HEX.encode(revealParam);
-    }
-
-    /**
      * Compose an entry commit message that is needed to commit the entry
      *
      * @param entry
-     * @param entryCreditPublicKey
-     * @param secret
+     * @param address
      * @return
      * @throws FactomException.ClientException
      */
-    public String composeEntryCommit(Entry entry, String entryCreditPublicKey, String secret) throws FactomException.ClientException {
+    protected String composeEntryCommit(Entry entry, Address address) throws FactomException.ClientException {
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
             // 1 byte version
             byte[] version = {0};
@@ -198,8 +166,8 @@ public class EntryApiOfflineSigningImpl {
 
             // 32 byte Entry Credit Address Public Key + 64 byte Signature
             byte[] message = outputStream.toByteArray();
-            byte[] signature = sign(message, secret);
-            byte[] entryCreditKey = getKeyFromAddress(entryCreditPublicKey);
+            byte[] signature = sign(message, address);
+            byte[] entryCreditKey = addressKeyConversions.addressToKey(addressKeyConversions.addressToPublicAddress(address));
 
             outputStream.write(entryCreditKey);
             outputStream.write(signature);
@@ -212,12 +180,24 @@ public class EntryApiOfflineSigningImpl {
     }
 
     /**
+     * Compose chain reveal message that is needed to reveal the chain
+     *
+     * @param chain
+     * @return
+     */
+    protected String composeChainReveal(Chain chain) {
+        Entry firstEntry = chain.getFirstEntry();
+        byte[] revealParam = entryOperations.entryToBytes(firstEntry.getExternalIds(), firstEntry.getContent());
+        return Encoding.HEX.encode(revealParam);
+    }
+
+    /**
      * Compose entry reveal message that is needed to reveal the chain
      *
      * @param entry
      * @return
      */
-    public String composeEntryReveal(Entry entry) {
+    protected String composeEntryReveal(Entry entry) {
         byte[] revealParam = entryOperations.entryToBytes(entry.getExternalIds(), entry.getContent(), entry.getChainId());
         return Encoding.HEX.encode(revealParam);
     }
@@ -226,12 +206,12 @@ public class EntryApiOfflineSigningImpl {
      * sign message
      *
      * @param message
-     * @param secret
+     * @param address
      * @return
      * @throws FactomException.ClientException
      */
-    private byte[] sign(byte[] message, String secret) throws FactomException.ClientException {
-        byte[] privateKey = getKeyFromAddress(secret);
+    private byte[] sign(byte[] message, Address address) throws FactomException.ClientException {
+        byte[] privateKey = addressKeyConversions.addressToKey(address);
 
         EdDSAPrivateKeySpec privateKeySpec = new EdDSAPrivateKeySpec(privateKey, EdDSANamedCurveTable.ED_25519_CURVE_SPEC);
         EdDSAPrivateKey keyIn = new EdDSAPrivateKey(privateKeySpec);
@@ -248,20 +228,6 @@ public class EntryApiOfflineSigningImpl {
         } catch (SignatureException | NoSuchAlgorithmException e) {
             throw new FactomException.ClientException("failed to sign message", e);
         }
-    }
-
-    /**
-     * extract key from Factoid or Entry Credit address. They have an identifiable prefix and a checksum to prevent typos
-     *
-     * @param address
-     * @return
-     */
-    private byte[] getKeyFromAddress(String address) throws FactomException.ClientException {
-        if (StringUtils.isEmpty(address) || address.length() != 52) {
-            throw new FactomException.ClientException(String.format("invalid address: '%s'", address));
-        }
-        byte[] decodeKey = Encoding.BASE58.decode(address);
-        return Arrays.copyOfRange(decodeKey, 2, 34);
     }
 
     /**

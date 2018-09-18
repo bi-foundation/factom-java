@@ -74,7 +74,7 @@ public class ExceptionTest extends AbstractClientTest {
 
     @Test(expected = FactomRuntimeException.AssertionException.class)
     public void testCommitNullChain() {
-        walletdClient.composeChain(null, "").join();
+        walletdClient.composeChain(null, new Address(null)).join();
     }
 
     @Test(expected = FactomException.ClientException.class)
@@ -104,22 +104,26 @@ public class ExceptionTest extends AbstractClientTest {
 
     @Test(expected = FactomRuntimeException.AssertionException.class)
     public void testWrongAddressTypeCompose() {
-        walletdClient.composeEntry(new Entry(), FCT_PUBLIC_ADDRESS);
+        Address address = new Address(FCT_PUBLIC_ADDRESS.substring(0, FCT_PUBLIC_ADDRESS.length() - 1));
+        walletdClient.composeEntry(new Entry(), address);
     }
 
     @Test(expected = FactomRuntimeException.AssertionException.class)
     public void testWrongAddressTransaction() {
-        walletdClient.transactionsByAddress(FCT_PUBLIC_ADDRESS.substring(0, FCT_PUBLIC_ADDRESS.length() -1)).join();
+        Address address = new Address(FCT_PUBLIC_ADDRESS.substring(0, FCT_PUBLIC_ADDRESS.length() - 1));
+        walletdClient.transactionsByAddress(address).join();
     }
 
     @Test(expected = FactomRuntimeException.AssertionException.class)
     public void testWrongAddressFactoidBalance() {
-        factomdClient.factoidBalance(EC_PUBLIC_ADDRESS);
+        Address address = new Address(EC_PUBLIC_ADDRESS);
+        factomdClient.factoidBalance(address);
     }
 
     @Test(expected = FactomRuntimeException.AssertionException.class)
     public void testWrongAddressCreditBalance() {
-        factomdClient.entryCreditBalance(EC_SECRET_ADDRESS);
+        Address address = new Address(EC_SECRET_ADDRESS);
+        factomdClient.entryCreditBalance(address);
     }
 
 }

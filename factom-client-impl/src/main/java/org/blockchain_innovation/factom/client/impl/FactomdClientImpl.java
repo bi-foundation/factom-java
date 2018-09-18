@@ -19,7 +19,33 @@ package org.blockchain_innovation.factom.client.impl;
 import org.blockchain_innovation.factom.client.api.FactomException;
 import org.blockchain_innovation.factom.client.api.FactomResponse;
 import org.blockchain_innovation.factom.client.api.FactomdClient;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.*;
+import org.blockchain_innovation.factom.client.api.model.Address;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.AdminBlockResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.ChainHeadResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.CommitChainResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.CommitEntryResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.DirectoryBlockHeadResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.DirectoryBlockHeightResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.DirectoryBlockResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.EntryBlockResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.EntryCreditBalanceResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.EntryCreditBlockResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.EntryCreditRateResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.EntryResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.EntryTransactionResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.FactoidBalanceResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.FactoidBlockResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.FactoidSubmitResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.FactoidTransactionsResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.HeightsResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.PendingEntriesResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.PendingTransactionsResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.PropertiesResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.RawDataResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.ReceiptResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.RevealResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.SendRawMessageResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.TransactionResponse;
 import org.blockchain_innovation.factom.client.api.model.types.AddressType;
 import org.blockchain_innovation.factom.client.api.rpc.RpcMethod;
 
@@ -104,9 +130,9 @@ public class FactomdClientImpl extends AbstractClient implements FactomdClient {
     }
 
     @Override
-    public CompletableFuture<FactomResponse<EntryCreditBalanceResponse>> entryCreditBalance(String entryCreditAddress) throws FactomException.ClientException {
+    public CompletableFuture<FactomResponse<EntryCreditBalanceResponse>> entryCreditBalance(Address entryCreditAddress) throws FactomException.ClientException {
         AddressType.ENTRY_CREDIT_PUBLIC.assertValid(entryCreditAddress);
-        return exchange(RpcMethod.ENTRY_CREDIT_BALANCE.toRequestBuilder().param("address", entryCreditAddress), EntryCreditBalanceResponse.class);
+        return exchange(RpcMethod.ENTRY_CREDIT_BALANCE.toRequestBuilder().param("address", entryCreditAddress.getValue()), EntryCreditBalanceResponse.class);
     }
 
     @Override
@@ -120,9 +146,9 @@ public class FactomdClientImpl extends AbstractClient implements FactomdClient {
     }
 
     @Override
-    public CompletableFuture<FactomResponse<FactoidBalanceResponse>> factoidBalance(String factoidAddress) throws FactomException.ClientException {
+    public CompletableFuture<FactomResponse<FactoidBalanceResponse>> factoidBalance(Address factoidAddress) throws FactomException.ClientException {
         AddressType.FACTOID_PUBLIC.assertValid(factoidAddress);
-        return exchange(RpcMethod.FACTOID_BALANCE.toRequestBuilder().param("address", factoidAddress), FactoidBalanceResponse.class);
+        return exchange(RpcMethod.FACTOID_BALANCE.toRequestBuilder().param("address", factoidAddress.getValue()), FactoidBalanceResponse.class);
     }
 
     @Override
