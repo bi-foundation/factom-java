@@ -24,6 +24,7 @@ import org.blockchain_innovation.factom.client.api.model.response.factomd.AdminB
 import org.blockchain_innovation.factom.client.api.model.response.factomd.ChainHeadResponse;
 import org.blockchain_innovation.factom.client.api.model.response.factomd.CommitChainResponse;
 import org.blockchain_innovation.factom.client.api.model.response.factomd.CommitEntryResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.CurrentMinuteResponse;
 import org.blockchain_innovation.factom.client.api.model.response.factomd.DirectoryBlockHeadResponse;
 import org.blockchain_innovation.factom.client.api.model.response.factomd.DirectoryBlockHeightResponse;
 import org.blockchain_innovation.factom.client.api.model.response.factomd.DirectoryBlockResponse;
@@ -97,6 +98,11 @@ public class FactomdClientImpl extends AbstractClient implements FactomdClient {
     @Override
     public CompletableFuture<FactomResponse<CommitEntryResponse>> commitEntry(String message) throws FactomException.ClientException {
         return exchange(RpcMethod.COMMIT_ENTRY.toRequestBuilder().param("message", message), CommitEntryResponse.class);
+    }
+
+    @Override
+    public CompletableFuture<FactomResponse<CurrentMinuteResponse>> currentMinute() throws FactomException.ClientException {
+        return exchange(RpcMethod.CURRENT_MINUTE.toRequest(), CurrentMinuteResponse.class);
     }
 
     @Override

@@ -1,7 +1,33 @@
 package org.blockchain_innovation.factom.client.api;
 
 import org.blockchain_innovation.factom.client.api.model.Address;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.*;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.AdminBlockResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.ChainHeadResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.CommitChainResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.CommitEntryResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.CurrentMinuteResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.DirectoryBlockHeadResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.DirectoryBlockHeightResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.DirectoryBlockResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.EntryBlockResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.EntryCreditBalanceResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.EntryCreditBlockResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.EntryCreditRateResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.EntryResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.EntryTransactionResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.FactoidBalanceResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.FactoidBlockResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.FactoidSubmitResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.FactoidTransactionsResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.HeightsResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.PendingEntriesResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.PendingTransactionsResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.PropertiesResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.RawDataResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.ReceiptResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.RevealResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.SendRawMessageResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.TransactionResponse;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -141,6 +167,25 @@ public interface FactomdClient {
      * @throws FactomException.ClientException
      */
     CompletableFuture<FactomResponse<CommitEntryResponse>> commitEntry(String message) throws FactomException.ClientException;
+
+
+    /**
+     * The current-minute API call returns:
+     * - leaderheight returns the current block height.
+     * - directoryblockheight returns the last saved height.
+     * - minute returns the current minute number for the open entry block.
+     * - currentblockstarttime returns the start time for the current block.
+     * - currentminutestarttime returns the start time for the current minute.
+     * - currenttime returns the current nodes understanding of current time.
+     * - directoryblockinseconds returns the number of seconds per block.
+     * - stalldetected returns if factomd thinks it has stalled.
+     * - faulttimeout returns the number of seconds before leader node is faulted for failing to provide a necessary message.
+     * - roundtimeout returns the number of seconds between rounds of an election during a fault.
+     *
+     * @return
+     * @throws FactomException.ClientException
+     */
+    CompletableFuture<FactomResponse<CurrentMinuteResponse>> currentMinute() throws FactomException.ClientException;
 
     /**
      * Retrieve a directory block given only its height.

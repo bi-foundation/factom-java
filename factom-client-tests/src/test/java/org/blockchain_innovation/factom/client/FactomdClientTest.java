@@ -26,6 +26,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 import static org.junit.Assert.fail;
 
@@ -165,6 +166,22 @@ public class FactomdClientTest extends AbstractClientTest {
 
     @Test
     public void testCommitEntry() {
+    }
+
+    @Test
+    public void testCurrentMinute() {
+        FactomResponse<CurrentMinuteResponse> response = factomdClient.currentMinute().join();
+        assertValidResponse(response);
+
+        CurrentMinuteResponse currentMinute = response.getResult();
+        Assert.assertTrue(currentMinute.getCurrentTime() > 0);
+        Assert.assertTrue(currentMinute.getCurrentBlockStartTime() > 0);
+        Assert.assertTrue(currentMinute.getCurrentMinuteStartTime() > 0);
+        Assert.assertTrue(currentMinute.getDirectoryBlockHeight() > 0);
+        Assert.assertTrue(currentMinute.getDirectoryBlockInSeconds() > 0);
+        Assert.assertTrue(currentMinute.getLeaderHeight() > 0);
+        Assert.assertTrue(currentMinute.getMinute() > 0);
+        Assert.assertFalse("Something is wrong with factom test network. Stall detected", currentMinute.isStallDetected());
     }
 
     @Test

@@ -54,7 +54,7 @@ public class OfflineChainEntryIT extends ChainEntryIT {
 
     @Test
     public void _02_commitChain() throws FactomException.ClientException {
-        // override the methods to keep the same order
+        // override the methods to keep the same test with different composeResponse
         super._02_commitChain();
     }
 

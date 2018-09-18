@@ -23,7 +23,7 @@ import java.util.Collection;
 public enum RpcMethod {
     // factomd api
     HEIGHTS("heights"), ADMIN_BLOCK_BY_HEIGHT("ablock-by-height"), ADMIN_BLOCK_BY_KEYMR("admin-block"), ACK_TRANSACTION("ack"), CHAIN_HEAD("chain-head"), COMMIT_CHAIN("commit-chain"), COMMIT_ENTRY("commit-entry"),
-    DIRECTORY_BLOCK_BY_HEIGHT("dblock-by-height"), DIRECTORY_BLOCK_BY_KEYMR("directory-block"), DIRECTORY_BLOCK_HEAD("directory-block-head"),
+    CURRENT_MINUTE("current-minute"), DIRECTORY_BLOCK_BY_HEIGHT("dblock-by-height"), DIRECTORY_BLOCK_BY_KEYMR("directory-block"), DIRECTORY_BLOCK_HEAD("directory-block-head"),
     ENTRY("entry"), ENTRY_BLOCK_BY_KEYMR("entry-block"), ENTRY_CREDIT_BLOCK_BY_HEIGH("ecblock-by-height"), ENTRY_CREDIT_BALANCE("entry-credit-balance"), ENTRY_CREDIT_BLOCK("entrycredit-block"),
     ENTRY_CREDIT_RATE("entry-credit-rate"), FACTOID_BALANCE("factoid-balance"), FACTOID_BLOCK("factoid-block"), FACTOID_SUBMIT("factoid-submit"), FACTOID_BLOCK_BY_HEIGHT("fblock-by-height"),
     PENDING_ENTRIES("pending-entries"), PENDING_TRANSACTONS("pending-transactions"), PROPERTIES("properties"), RAW_DATA("raw-data"), RECEIPT("receipt"),
