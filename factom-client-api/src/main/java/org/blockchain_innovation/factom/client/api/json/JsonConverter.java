@@ -24,14 +24,46 @@ import java.util.Properties;
 
 public interface JsonConverter {
 
+    /**
+     * Allows you to configure a JSON converter implementation. This is converter specific
+     *
+     * @param properties Properties the converter accepts
+     * @return
+     */
     JsonConverter configure(Properties properties);
 
+    /**
+     * Deserializes and RPC error string in json format from a factomd or walletd RPC server
+     *
+     * @param json The error json as String
+     * @return
+     */
     RpcErrorResponse errorFromJson(String json);
 
+    /**
+     * Deserialized a response from factomd or walletd into a proper RCP Response object with an appropriate result object as POJO
+     *
+     * @param json        The json response as String from factomd or walletd
+     * @param resultClass The target result class for the response
+     * @param <Result>    The target result type
+     * @return The RpcResponse
+     */
     <Result> RpcResponse<Result> fromJson(String json, Class<Result> resultClass);
 
+    /**
+     * Pretty prints the input JSON string if the Json Converter implementation supports it.
+     *
+     * @param json The json string to prettyprint
+     * @return The prettyprinted json string
+     */
     String prettyPrint(String json);
 
+    /**
+     * Serializes the input object to a json string
+     *
+     * @param source The source object
+     * @return A json string result
+     */
     String toJson(Object source);
 
     class Registry {

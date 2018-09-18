@@ -41,10 +41,10 @@ public class ByteOperationsTest {
 
     @Test
     public void appendTest() {
-        Assert.assertArrayEquals(EXAMPLE, OPS.concat(EXAMPLE, (String) null));
-        Assert.assertArrayEquals(EXAMPLE, OPS.concat(EXAMPLE, (byte[]) null));
+        Assert.assertArrayEquals(EXAMPLE, OPS.concat(EXAMPLE, null, Encoding.UTF_8));
+        Assert.assertArrayEquals(EXAMPLE, OPS.concat(EXAMPLE, null));
         Assert.assertArrayEquals(EXAMPLE, OPS.concat(EXAMPLE, new byte[]{}));
         Assert.assertArrayEquals(Arrays.concatenate(EXAMPLE, EXAMPLE), OPS.concat(EXAMPLE, EXAMPLE));
-        Assert.assertArrayEquals(Arrays.concatenate(EXAMPLE, EXAMPLE), OPS.concat(EXAMPLE, new String(EXAMPLE, StandardCharsets.UTF_8)));
+        Assert.assertArrayEquals(Arrays.concatenate(EXAMPLE, EXAMPLE), OPS.concat(EXAMPLE, new String(EXAMPLE, StandardCharsets.UTF_8), Encoding.UTF_8));
     }
 }

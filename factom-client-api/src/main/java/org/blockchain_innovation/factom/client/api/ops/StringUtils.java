@@ -21,11 +21,26 @@ import javax.inject.Singleton;
 
 @Named
 @Singleton
+/**
+ * String Util class for common string functions to make sure we do not have to rely on outside libs like commons-stringutils
+ */
 public class StringUtils {
+    /**
+     * Returns true whenever the input string is null or equals an empty string
+     *
+     * @param input
+     * @return
+     */
     public static boolean isEmpty(String input) {
         return input == null || "".equals(input);
     }
 
+    /**
+     * Returns true whenever the input string is not null and does not equal an empty string
+     *
+     * @param input
+     * @return
+     */
     public static boolean isNotEmpty(String input) {
         return !isEmpty(input);
     }

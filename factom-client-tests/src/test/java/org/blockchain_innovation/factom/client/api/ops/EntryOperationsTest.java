@@ -69,7 +69,7 @@ public class EntryOperationsTest {
         } catch (FactomRuntimeException.AssertionException e) {
         }
         try {
-            OPS.entryToBytes(Arrays.asList(CHAIN_FIRST_EXTERNAL_ID, CHAIN_SECOND_EXTERNAL_ID, null), CHAIN_ID);
+            OPS.firstEntryToBytes(Arrays.asList(CHAIN_FIRST_EXTERNAL_ID, CHAIN_SECOND_EXTERNAL_ID, null), CHAIN_ID);
             Assert.fail("Assertion exception should be thrown when a null external id is passed in the list");
         } catch (FactomRuntimeException.AssertionException e) {
         }

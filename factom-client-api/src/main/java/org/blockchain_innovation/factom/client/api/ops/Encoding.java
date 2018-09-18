@@ -18,10 +18,13 @@ package org.blockchain_innovation.factom.client.api.ops;
 
 import org.blockchain_innovation.factom.client.api.errors.FactomRuntimeException;
 
-import javax.inject.Named;
 import javax.xml.bind.DatatypeConverter;
 import java.nio.charset.StandardCharsets;
 
+/**
+ * Create a common entry point for all ancoding and decoding operations needed. Supports hex, base58, base64, utf-8
+ * by selecting the correct enum value
+ */
 public enum Encoding {
 
 
@@ -86,16 +89,38 @@ public enum Encoding {
         }
     };
 
+    /**
+     * Encodes the input bytes to string using the appropriate encoding type as selected by the enum value
+     *
+     * @param toEncode The input to encode
+     * @return The encoded string
+     */
     public abstract String encode(byte[] toEncode);
 
+    /**
+     * Decodes the input string to bytes using the appropriate encoding type as selected by the enum value
+     *
+     * @param toDecode The input string to decode
+     * @return The decoded bytes
+     */
     public abstract byte[] decode(String toDecode);
 
+    /**
+     * Assert the input string is not null
+     *
+     * @param input
+     */
     protected void assertNotNull(String input) {
         if (StringUtils.isEmpty(input)) {
             throw new FactomRuntimeException.AssertionException(String.format("Input value needs to be not null/empty for %s en- or decoding", name()));
         }
     }
 
+    /**
+     * Assert the input bytes are not null
+     *
+     * @param input
+     */
     protected void assertNotNull(byte[] input) {
         if (input == null) {
             throw new FactomRuntimeException.AssertionException(String.format("Input value needs to be not null/empty for %s en- or decoding", name()));

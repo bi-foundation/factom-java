@@ -27,6 +27,12 @@ public class Base58 {
         }
     }
 
+    /**
+     * Encode a byte input to bitcoin compatible Base58 String
+     *
+     * @param input
+     * @return
+     */
     public static String encode(byte[] input) {
         if (input.length == 0) {
             // paying with the same coin
@@ -70,6 +76,12 @@ public class Base58 {
         return new String(output);
     }
 
+    /**
+     * Decode a base58 input into bytes
+     *
+     * @param input
+     * @return
+     */
     public static byte[] decode(String input) {
         if (input.length() == 0) {
             // paying with the same coin

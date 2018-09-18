@@ -69,9 +69,9 @@ public class EntryApiTest extends AbstractClientTest {
             }
 
             @Override
-            public void onError(RpcErrorResponse e) {
-                System.out.println("e = " + e);
-                Assert.fail(e.getJsonrpc());
+            public void onError(RpcErrorResponse errorResponse) {
+                System.out.println("e = " + errorResponse);
+                Assert.fail(errorResponse.getJsonrpc());
             }
         };
 
@@ -139,9 +139,9 @@ public class EntryApiTest extends AbstractClientTest {
             }
 
             @Override
-            public void onError(RpcErrorResponse e) {
-                System.out.println("e = " + e);
-                Assert.fail(e.getJsonrpc());
+            public void onError(RpcErrorResponse errorResponse) {
+                System.out.println("e = " + errorResponse);
+                Assert.fail(errorResponse.getJsonrpc());
             }
         };
 
@@ -234,9 +234,9 @@ public class EntryApiTest extends AbstractClientTest {
             }
 
             @Override
-            public void onError(RpcErrorResponse e) {
-                System.out.println("e = " + e);
-                Assert.fail(e.getJsonrpc());
+            public void onError(RpcErrorResponse errorResponse) {
+                System.out.println("e = " + errorResponse);
+                Assert.fail(errorResponse.getJsonrpc());
             }
         };
 

@@ -41,7 +41,7 @@ public abstract class CommitAndRevealAdapter implements CommitAndRevealListener 
     }
 
     @Override
-    public void onError(RpcErrorResponse e) {
+    public void onError(RpcErrorResponse errorResponse) {
 
     }
 }

@@ -64,7 +64,7 @@ public class CommitAndRevealEvents implements CommitAndRevealListener, Serializa
     }
 
     @Override
-    public void onError(RpcErrorResponse e) {
-        errorResponseEvent.fire(e);
+    public void onError(RpcErrorResponse errorResponse) {
+        errorResponseEvent.fire(errorResponse);
     }
 }

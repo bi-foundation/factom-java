@@ -28,10 +28,22 @@ import java.util.List;
 public class EntryOperations {
     private final ByteOperations byteOps = new ByteOperations();
 
+    /**
+     * Calculates the chain Id from an entry response object
+     *
+     * @param entryResponse Entry response
+     * @return
+     */
     public byte[] calculateChainId(EntryResponse entryResponse) {
         return calculateChainId(entryResponse.getExtIds());
     }
 
+    /**
+     * Calculates the chain Id from a list of external Ids
+     *
+     * @param externalIds The external ids
+     * @return
+     */
     public byte[] calculateChainId(List<String> externalIds) {
         byte[] bytes = new byte[0];
         if (externalIds != null) {
@@ -44,10 +56,27 @@ public class EntryOperations {
         return chainId;
     }
 
+    /**
+     * Calculates the entryHash of the first entry in a chain.
+     * This is only applicable to the first entry, hence you do not have to provide the chain Id
+     *
+     * @param externalIds The external Ids
+     * @param content     The content
+     * @return The entryHash
+     */
     public byte[] calculateFirstEntryHash(List<String> externalIds, String content) {
         return calculateEntryHash(externalIds, content, null);
     }
 
+
+    /**
+     * Calculates the entryHash of an entry in a chain.
+     *
+     * @param externalIds The external Ids
+     * @param content     The content
+     * @return The entryHash
+     * @Param chainId The chain Id
+     */
     public byte[] calculateEntryHash(List<String> externalIds, String content, String chainId) {
         byte[] entryBytes = entryToBytes(externalIds, content, chainId);
         byte[] bytes = byteOps.concat(Digests.SHA_512.digest(entryBytes), entryBytes);
@@ -55,10 +84,25 @@ public class EntryOperations {
 
     }
 
-    public byte[] entryToBytes(List<String> externalIds, String content) {
+    /**
+     * Converts the first entry of a chain to a byte array. This is needed in some lower level messages
+     *
+     * @param externalIds The external Ids
+     * @param content     The content
+     * @return
+     */
+    public byte[] firstEntryToBytes(List<String> externalIds, String content) {
         return entryToBytes(externalIds, content, null);
     }
 
+    /**
+     * Converts an entry of a chain to a byte array. This is needed in some lower level messages
+     *
+     * @param externalIds The external Ids
+     * @param content     The content
+     * @return
+     * @Param chainId The chain Id
+     */
     public byte[] entryToBytes(List<String> externalIds, String content, String chainId) {
         byte[] chainIdBytes;
         byte[] bytes = new byte[0];
@@ -80,6 +124,12 @@ public class EntryOperations {
     }
 
 
+    /**
+     * Converts the external Ids to a byte-array. Part of the entry to byte conversion
+     *
+     * @param externalIds
+     * @return
+     */
     protected byte[] externalIdsToBytes(List<String> externalIds) {
         if (externalIds == null || externalIds.isEmpty()) {
             return new byte[]{(byte) 0};

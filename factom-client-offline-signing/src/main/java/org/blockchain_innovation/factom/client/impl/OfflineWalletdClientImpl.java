@@ -187,7 +187,7 @@ public class OfflineWalletdClientImpl extends WalletdClientImpl {
      */
     protected String composeChainReveal(Chain chain) {
         Entry firstEntry = chain.getFirstEntry();
-        byte[] revealParam = entryOperations.entryToBytes(firstEntry.getExternalIds(), firstEntry.getContent());
+        byte[] revealParam = entryOperations.firstEntryToBytes(firstEntry.getExternalIds(), firstEntry.getContent());
         return Encoding.HEX.encode(revealParam);
     }
 

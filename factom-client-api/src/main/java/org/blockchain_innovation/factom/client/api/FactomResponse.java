@@ -19,6 +19,9 @@ package org.blockchain_innovation.factom.client.api;
 import org.blockchain_innovation.factom.client.api.rpc.RpcErrorResponse;
 import org.blockchain_innovation.factom.client.api.rpc.RpcResponse;
 
+/**
+ * A composition class around the RpcResponse to get access to different values from a server response, like http codes, errors, results
+ */
 public interface FactomResponse<Result> {
     /**
      * Get the RPC response object that represents the result of a API call.
@@ -28,16 +31,23 @@ public interface FactomResponse<Result> {
     RpcResponse getRpcResponse();
 
     /**
+     * The result object deserialized
+     *
      * @return The result in the RpcResponse
      */
     Result getResult();
 
+    /**
+     * The deserialized error response
+     *
+     * @return The error response
+     */
     RpcErrorResponse getRpcErrorResponse();
 
     /**
      * Gets the status code from an HTTP response message.
      *
-     * @return the HTTP Response Status-Code, or -1
+     * @return the HTTP Response Status-Code, or -1 of the response is not from a HTTP request (rare)
      */
     int getHTTPResponseCode();
 

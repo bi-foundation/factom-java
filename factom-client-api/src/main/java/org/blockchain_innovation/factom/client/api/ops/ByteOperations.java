@@ -30,7 +30,7 @@ import java.util.Arrays;
 public class ByteOperations {
 
     /**
-     * Concatenate two byte arrays
+     * Concatenates two byte arrays
      *
      * @param first
      * @param append
@@ -47,7 +47,7 @@ public class ByteOperations {
 
 
     /**
-     * Concatenate a byte array with a single byte
+     * Concatenates a byte array with a single byte
      *
      * @param first
      * @param append
@@ -59,11 +59,17 @@ public class ByteOperations {
         return result;
     }
 
-    public byte[] concat(byte[] first, String append) {
+    /**
+     * Concatenates a byte array with a string
+     * @param first
+     * @param append
+     * @return
+     */
+    public byte[] concat(byte[] first, String append, Encoding appendDecoding) {
         if (append == null) {
             return first;
         }
-        return concat(first, append.getBytes());
+        return concat(first, appendDecoding.decode(append));
     }
 
     /**
