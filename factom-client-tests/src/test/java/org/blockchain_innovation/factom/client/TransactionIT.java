@@ -18,6 +18,7 @@ package org.blockchain_innovation.factom.client;
 
 import org.blockchain_innovation.factom.client.api.errors.FactomException;
 import org.blockchain_innovation.factom.client.api.FactomResponse;
+import org.blockchain_innovation.factom.client.api.model.Address;
 import org.blockchain_innovation.factom.client.api.model.response.factomd.EntryCreditRateResponse;
 import org.blockchain_innovation.factom.client.api.model.response.factomd.FactoidSubmitResponse;
 import org.blockchain_innovation.factom.client.api.model.response.walletd.AddressResponse;
@@ -75,7 +76,8 @@ public class TransactionIT extends AbstractClientTest {
     public void _04_addInput() throws FactomException.ClientException {
         long fctCost = calculateCost();
 
-        FactomResponse<ExecutedTransactionResponse> response = walletdClient.addInput(TRANSACTION_NAME, FCT_PUBLIC_ADDRESS, fctCost).join();
+        Address address = new Address(FCT_PUBLIC_ADDRESS);
+        FactomResponse<ExecutedTransactionResponse> response = walletdClient.addInput(TRANSACTION_NAME, address, fctCost).join();
         assertValidResponse(response);
 
         Assert.assertFalse(response.getResult().getInputs().isEmpty());
@@ -86,9 +88,10 @@ public class TransactionIT extends AbstractClientTest {
     @Test
     public void _05_addEntryCreditOutput() throws FactomException.ClientException {
         String toAddress = toAddressResponse.getResult().getPublicAddress();
+        Address address = new Address(toAddress);
         long fctCost = calculateCost();
 
-        FactomResponse<TransactionResponse> response = walletdClient.addEntryCreditOutput(TRANSACTION_NAME, toAddress, fctCost).join();
+        FactomResponse<TransactionResponse> response = walletdClient.addEntryCreditOutput(TRANSACTION_NAME, address, fctCost).join();
         assertValidResponse(response);
 
         Assert.assertFalse(response.getResult().getEntryCreditOutputs().isEmpty());
@@ -98,7 +101,8 @@ public class TransactionIT extends AbstractClientTest {
 
     @Test
     public void _06_addFee() throws FactomException.ClientException {
-        FactomResponse<ExecutedTransactionResponse> response = walletdClient.addFee(TRANSACTION_NAME, FCT_PUBLIC_ADDRESS).join();
+        Address address = new Address(FCT_PUBLIC_ADDRESS);
+        FactomResponse<ExecutedTransactionResponse> response = walletdClient.addFee(TRANSACTION_NAME, address).join();
         assertValidResponse(response);
 
         Assert.assertNotNull(response.getResult().getInputs().isEmpty());

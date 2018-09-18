@@ -1,10 +1,12 @@
 package org.blockchain_innovation.factom.client.api;
 
 import org.blockchain_innovation.factom.client.api.errors.FactomException;
+import org.blockchain_innovation.factom.client.api.model.Address;
 import org.blockchain_innovation.factom.client.api.model.response.factomd.AdminBlockResponse;
 import org.blockchain_innovation.factom.client.api.model.response.factomd.ChainHeadResponse;
 import org.blockchain_innovation.factom.client.api.model.response.factomd.CommitChainResponse;
 import org.blockchain_innovation.factom.client.api.model.response.factomd.CommitEntryResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.CurrentMinuteResponse;
 import org.blockchain_innovation.factom.client.api.model.response.factomd.DirectoryBlockHeadResponse;
 import org.blockchain_innovation.factom.client.api.model.response.factomd.DirectoryBlockHeightResponse;
 import org.blockchain_innovation.factom.client.api.model.response.factomd.DirectoryBlockResponse;
@@ -167,6 +169,25 @@ public interface FactomdClient {
      */
     CompletableFuture<FactomResponse<CommitEntryResponse>> commitEntry(String message) throws FactomException.ClientException;
 
+
+    /**
+     * The current-minute API call returns:
+     * - leaderheight returns the current block height.
+     * - directoryblockheight returns the last saved height.
+     * - minute returns the current minute number for the open entry block.
+     * - currentblockstarttime returns the start time for the current block.
+     * - currentminutestarttime returns the start time for the current minute.
+     * - currenttime returns the current nodes understanding of current time.
+     * - directoryblockinseconds returns the number of seconds per block.
+     * - stalldetected returns if factomd thinks it has stalled.
+     * - faulttimeout returns the number of seconds before leader node is faulted for failing to provide a necessary message.
+     * - roundtimeout returns the number of seconds between rounds of an election during a fault.
+     *
+     * @return
+     * @throws FactomException.ClientException
+     */
+    CompletableFuture<FactomResponse<CurrentMinuteResponse>> currentMinute() throws FactomException.ClientException;
+
     /**
      * Retrieve a directory block given only its height.
      * The header of the directory block will contain information regarding the previous directory block’s keyMR, directory block height, and the timestamp.
@@ -229,7 +250,7 @@ public interface FactomdClient {
      * @return
      * @throws FactomException.ClientException
      */
-    CompletableFuture<FactomResponse<EntryCreditBalanceResponse>> entryCreditBalance(String entryCreditAddress) throws FactomException.ClientException;
+    CompletableFuture<FactomResponse<EntryCreditBalanceResponse>> entryCreditBalance(Address entryCreditAddress) throws FactomException.ClientException;
 
     /**
      * Retrieve a specified entrycredit block given its merkle root key. The numbers are minute markers.
@@ -255,7 +276,7 @@ public interface FactomdClient {
      * @return
      * @throws FactomException.ClientException
      */
-    CompletableFuture<FactomResponse<FactoidBalanceResponse>> factoidBalance(String factoidAddress) throws FactomException.ClientException;
+    CompletableFuture<FactomResponse<FactoidBalanceResponse>> factoidBalance(Address factoidAddress) throws FactomException.ClientException;
 
     /**
      * Retrieve a specified factoid block given its merkle root key.

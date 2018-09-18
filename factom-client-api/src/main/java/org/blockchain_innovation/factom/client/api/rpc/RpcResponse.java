@@ -16,6 +16,12 @@
 
 package org.blockchain_innovation.factom.client.api.rpc;
 
+/**
+ * The Factom APIs use JSON-RPC, which is a remote procedure call protocol encoded in JSON.
+ * This RPC response object represents the result of a API call.
+ *
+ * @param <Result> The type result of the API call
+ */
 public class RpcResponse<Result> {
     private int id;
     private String jsonrpc;
@@ -44,12 +50,12 @@ public class RpcResponse<Result> {
         this.jsonrpc = jsonrpc;
     }
 
-    protected void setResult(Result result) {
-        this.result = result;
-    }
-
     public Result getResult() {
         return result;
+    }
+
+    protected void setResult(Result result) {
+        this.result = result;
     }
 
 }

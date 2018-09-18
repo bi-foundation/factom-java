@@ -18,6 +18,7 @@ package org.blockchain_innovation.factom.client;
 
 import org.blockchain_innovation.factom.client.api.errors.FactomException;
 import org.blockchain_innovation.factom.client.api.FactomResponse;
+import org.blockchain_innovation.factom.client.api.model.Address;
 import org.blockchain_innovation.factom.client.api.model.response.factomd.*;
 import org.blockchain_innovation.factom.client.api.rpc.RpcMethod;
 import org.blockchain_innovation.factom.client.impl.FactomRequestImpl;
@@ -25,6 +26,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 import static org.junit.Assert.fail;
 
@@ -167,6 +169,22 @@ public class FactomdClientTest extends AbstractClientTest {
     }
 
     @Test
+    public void testCurrentMinute() {
+        FactomResponse<CurrentMinuteResponse> response = factomdClient.currentMinute().join();
+        assertValidResponse(response);
+
+        CurrentMinuteResponse currentMinute = response.getResult();
+        Assert.assertTrue(currentMinute.getCurrentTime() > 0);
+        Assert.assertTrue(currentMinute.getCurrentBlockStartTime() > 0);
+        Assert.assertTrue(currentMinute.getCurrentMinuteStartTime() > 0);
+        Assert.assertTrue(currentMinute.getDirectoryBlockHeight() > 0);
+        Assert.assertTrue(currentMinute.getDirectoryBlockInSeconds() > 0);
+        Assert.assertTrue(currentMinute.getLeaderHeight() > 0);
+        Assert.assertTrue(currentMinute.getMinute() > 0);
+        Assert.assertFalse("Something is wrong with factom test network. Stall detected", currentMinute.isStallDetected());
+    }
+
+    @Test
     public void testDirectoryBlockByHeight() throws FactomException.ClientException {
         FactomResponse<DirectoryBlockHeightResponse> response = factomdClient.directoryBlockByHeight(39251).join();
         assertValidResponse(response);
@@ -281,12 +299,12 @@ public class FactomdClientTest extends AbstractClientTest {
 
     @Test
     public void testEntryCreditBalance() throws FactomException.ClientException {
-        FactomResponse<EntryCreditBalanceResponse> response = factomdClient.entryCreditBalance(EC_PUBLIC_ADDRESS).join();
+        FactomResponse<EntryCreditBalanceResponse> response = factomdClient.entryCreditBalance(new Address(EC_PUBLIC_ADDRESS)).join();
         assertValidResponse(response);
         EntryCreditBalanceResponse entryCreditBalance = response.getResult();
         Assert.assertNotNull(entryCreditBalance);
         if (entryCreditBalance.getBalance() < 30) {
-            fail(String.format("EC balance (%d) of %s is too low for other tests to run properly. Please go to %s to top up the balance", entryCreditBalance.getBalance(), EC_PUBLIC_ADDRESS, "https://faucet.factoid.org/"));
+            fail(String.format("EC balance (%d) of %s is too low for other tests to run properly. Please go to %s to top up the balance", entryCreditBalance.getBalance(), new Address(EC_PUBLIC_ADDRESS), "https://faucet.factoid.org/"));
         }
     }
 
@@ -328,13 +346,13 @@ public class FactomdClientTest extends AbstractClientTest {
 
     @Test
     public void testFactoidBalance() throws FactomException.ClientException {
-        FactomResponse<FactoidBalanceResponse> response = factomdClient.factoidBalance(FCT_PUBLIC_ADDRESS).join();
+        FactomResponse<FactoidBalanceResponse> response = factomdClient.factoidBalance(new Address(FCT_PUBLIC_ADDRESS)).join();
         assertValidResponse(response);
 
         FactoidBalanceResponse factoidBalance = response.getResult();
         Assert.assertNotNull(factoidBalance);
         if (factoidBalance.getBalance() < 30) {
-            fail(String.format("Factoid balance (%d) of %s is too low for other tests to run properly. Please go to %s to top up the balance", factoidBalance.getBalance(), FCT_PUBLIC_ADDRESS, "https://faucet.factoid.org/"));
+            fail(String.format("Factoid balance (%d) of %s is too low for other tests to run properly. Please go to %s to top up the balance", factoidBalance.getBalance(), new Address(FCT_PUBLIC_ADDRESS), "https://faucet.factoid.org/"));
         }
     }
 

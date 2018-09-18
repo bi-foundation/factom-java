@@ -19,8 +19,8 @@ package org.blockchain_innovation.factom.client;
 import org.blockchain_innovation.factom.client.api.FactomResponse;
 import org.blockchain_innovation.factom.client.api.settings.RpcSettings;
 import org.blockchain_innovation.factom.client.impl.EntryApiImpl;
-import org.blockchain_innovation.factom.client.impl.EntryApiOfflineSigningImpl;
 import org.blockchain_innovation.factom.client.impl.FactomdClientImpl;
+import org.blockchain_innovation.factom.client.impl.OfflineWalletdClientImpl;
 import org.blockchain_innovation.factom.client.impl.WalletdClientImpl;
 import org.blockchain_innovation.factom.client.impl.json.gson.JsonConverterGSON;
 import org.blockchain_innovation.factom.client.impl.settings.RpcSettingsImpl;
@@ -31,7 +31,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-class AbstractClientTest {
+public class AbstractClientTest {
 
     protected final static String EC_PUBLIC_ADDRESS = System.getProperty("FACTOM_CLIENT_TEST_EC_PUBLIC_ADDRESS", "EC3cqLZPq5ypwRB5CLfXnud5vkWAV2sd235CFf9KcWcE3FH9GRxv");
     protected final static String EC_SECRET_ADDRESS = System.getProperty("FACTOM_CLIENT_TEST_EC_SECRET_ADDRESS", "Es3Y6U6H1Pfg4wYag8VMtRZEGuEJnfkJ2ZuSyCVcQKweB6y4WvGH");
@@ -42,11 +42,11 @@ class AbstractClientTest {
     protected final WalletdClientImpl walletdClient = new WalletdClientImpl();
 
     protected final EntryApiImpl entryClient = new EntryApiImpl();
-    protected final EntryApiOfflineSigningImpl entryOfflineSigningClient = new EntryApiOfflineSigningImpl();
+    protected final EntryApiImpl offlineEntryClient = new EntryApiImpl();
+    protected final OfflineWalletdClientImpl offlineWalletdClient = new OfflineWalletdClientImpl();
 
     @Before
     public void setup() throws IOException {
-
         //// FIXME: 06/08/2018 Only needed now to init the converter
         JsonConverterGSON conv = new JsonConverterGSON();
 //        JsonConverterJEE conv = new JsonConverterJEE();
@@ -56,7 +56,9 @@ class AbstractClientTest {
 
         entryClient.setFactomdClient(factomdClient);
         entryClient.setWalletdClient(walletdClient);
-        entryOfflineSigningClient.setFactomdClient(factomdClient);
+
+        offlineEntryClient.setFactomdClient(factomdClient);
+        offlineEntryClient.setWalletdClient(offlineWalletdClient);
     }
 
     protected Properties getProperties() throws IOException {

@@ -1,5 +1,6 @@
 package org.blockchain_innovation.factom.client.api;
 
+import org.blockchain_innovation.factom.client.api.model.Address;
 import org.blockchain_innovation.factom.client.api.errors.FactomRuntimeException;
 import org.blockchain_innovation.factom.client.api.model.types.AddressType;
 import org.blockchain_innovation.factom.client.api.model.types.RCDType;
@@ -15,12 +16,25 @@ import java.util.Arrays;
 @Singleton
 public class AddressKeyConversions {
 
-
+    /**
+     * Get the key from the address. This strips an identifiable prefix and a checksum from the address.
+     * The result will be encoded in a given encoding.
+     *
+     * @param address
+     * @param encoding of the address
+     * @return the key of the address encoded by the given encoding
+     */
     public String addressToKey(String address, Encoding encoding) {
         return encoding.encode(addressToKey(address));
 
     }
 
+    /**
+     * Get the key from the address. This strips an identifiable prefix and a checksum from the address.
+     *
+     * @param address
+     * @return the key of the address
+     */
     public byte[] addressToKey(String address) {
         AddressType.assertValidAddress(address);
         byte[] addressBytes = Encoding.BASE58.decode(address);
@@ -29,6 +43,16 @@ public class AddressKeyConversions {
         }
         return Arrays.copyOfRange(addressBytes, 2, 34);
 
+    }
+
+    /**
+     * Get the key from the address. This strips an identifiable prefix and a checksum from the address.
+     *
+     * @param address
+     * @return the key of the address
+     */
+    public byte[] addressToKey(Address address) {
+        return addressToKey(address.getValue());
     }
 
     public String fctAddressToRcdHash(String address, Encoding encoding) {
@@ -41,10 +65,25 @@ public class AddressKeyConversions {
         return addressToKey(address);
     }
 
+    /**
+     * Creates an address from a key. The address has an identifiable prefix and a checksum to prevent typos.
+     *
+     * @param key               of the address
+     * @param targetAddressType type of address
+     * @param keyEncoding
+     * @return the address in a a given encoding
+     */
     public String keyToAddress(String key, AddressType targetAddressType, Encoding keyEncoding) {
         return keyToAddress(keyEncoding.decode(key), targetAddressType);
     }
 
+    /**
+     * Creates an address from a key. The address has an identifiable prefix and a checksum to prevent typos.
+     *
+     * @param key               of the address
+     * @param targetAddressType type of address
+     * @return the address
+     */
     public String keyToAddress(byte[] key, AddressType targetAddressType) {
         String hexKey = Encoding.HEX.encode(key);
         if (hexKey.length() != 64) {
@@ -61,15 +100,4 @@ public class AddressKeyConversions {
         byte[] checksum = Arrays.copyOf(Digests.SHA_256.doubleDigest(address), 4);
         return Encoding.BASE58.encode(new ByteOperations().concat(address, checksum));
     }
-
-    public String addressToPublicAddress(String address) {
-        AddressType addressType = AddressType.getType(address);
-        if (addressType.isPublic()) {
-            return address;
-        }
-        byte[] pk = addressToKey(address);
-        return keyToAddress(pk, AddressType.getType(address));
-    }
-
-
 }

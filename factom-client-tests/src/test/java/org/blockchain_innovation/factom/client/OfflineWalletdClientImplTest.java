@@ -16,13 +16,25 @@
 
 package org.blockchain_innovation.factom.client;
 
-import org.blockchain_innovation.factom.client.api.errors.FactomException;
+import org.blockchain_innovation.factom.client.api.FactomException;
 import org.blockchain_innovation.factom.client.api.FactomResponse;
 import org.blockchain_innovation.factom.client.api.model.Address;
 import org.blockchain_innovation.factom.client.api.model.Chain;
 import org.blockchain_innovation.factom.client.api.model.Entry;
 import org.blockchain_innovation.factom.client.api.model.Range;
-import org.blockchain_innovation.factom.client.api.model.response.walletd.*;
+import org.blockchain_innovation.factom.client.api.model.response.walletd.AddressResponse;
+import org.blockchain_innovation.factom.client.api.model.response.walletd.AddressesResponse;
+import org.blockchain_innovation.factom.client.api.model.response.walletd.BlockHeightTransactionResponse;
+import org.blockchain_innovation.factom.client.api.model.response.walletd.BlockHeightTransactionsResponse;
+import org.blockchain_innovation.factom.client.api.model.response.walletd.ComposeResponse;
+import org.blockchain_innovation.factom.client.api.model.response.walletd.ComposeTransactionResponse;
+import org.blockchain_innovation.factom.client.api.model.response.walletd.DeleteTransactionResponse;
+import org.blockchain_innovation.factom.client.api.model.response.walletd.ExecutedTransactionResponse;
+import org.blockchain_innovation.factom.client.api.model.response.walletd.GetHeightResponse;
+import org.blockchain_innovation.factom.client.api.model.response.walletd.PropertiesResponse;
+import org.blockchain_innovation.factom.client.api.model.response.walletd.TransactionResponse;
+import org.blockchain_innovation.factom.client.api.model.response.walletd.TransactionsResponse;
+import org.blockchain_innovation.factom.client.api.model.response.walletd.WalletBackupResponse;
 import org.junit.Assert;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -33,7 +45,7 @@ import java.util.Collections;
 import java.util.List;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class WalletdClientImplTest extends AbstractClientTest {
+public class OfflineWalletdClientImplTest extends AbstractClientTest {
 
     private static String transactionName = "TransactionName";
     private static Address entryCreditAddress /*= "EC3cqLZPq5ypwRB5CLfXnud5vkWAV2sd235CFf9KcWcE3FH9GRxv"*/;

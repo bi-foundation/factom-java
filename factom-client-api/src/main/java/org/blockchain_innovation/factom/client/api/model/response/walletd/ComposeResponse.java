@@ -31,6 +31,16 @@ public class ComposeResponse implements Serializable {
         return reveal;
     }
 
+    public ComposeResponse setCommit(Commit commit) {
+        this.commit = commit;
+        return this;
+    }
+
+    public ComposeResponse setReveal(Reveal reveal) {
+        this.reveal = reveal;
+        return this;
+    }
+
     public static class Commit {
         private String jsonrpc;
         private int id;
@@ -53,11 +63,36 @@ public class ComposeResponse implements Serializable {
             return method;
         }
 
+        public Commit setJsonrpc(String jsonrpc) {
+            this.jsonrpc = jsonrpc;
+            return this;
+        }
+
+        public Commit setId(int id) {
+            this.id = id;
+            return this;
+        }
+
+        public Commit setParams(Params params) {
+            this.params = params;
+            return this;
+        }
+
+        public Commit setMethod(String method) {
+            this.method = method;
+            return this;
+        }
+
         public static class Params {
             private String message;
 
             public String getMessage() {
                 return message;
+            }
+
+            public Params setMessage(String message) {
+                this.message = message;
+                return this;
             }
         }
     }
@@ -84,11 +119,36 @@ public class ComposeResponse implements Serializable {
             return method;
         }
 
+        public Reveal setJsonrpc(String jsonrpc) {
+            this.jsonrpc = jsonrpc;
+            return this;
+        }
+
+        public Reveal setId(int id) {
+            this.id = id;
+            return this;
+        }
+
+        public Reveal setParams(Params params) {
+            this.params = params;
+            return this;
+        }
+
+        public Reveal setMethod(String method) {
+            this.method = method;
+            return this;
+        }
+
         public static class Params {
             private String entry;
 
             public String getEntry() {
                 return entry;
+            }
+
+            public Params setEntry(String entry) {
+                this.entry = entry;
+                return this;
             }
         }
     }

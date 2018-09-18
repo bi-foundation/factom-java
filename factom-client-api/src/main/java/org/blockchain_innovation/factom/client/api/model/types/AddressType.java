@@ -1,5 +1,6 @@
 package org.blockchain_innovation.factom.client.api.model.types;
 
+import org.blockchain_innovation.factom.client.api.model.Address;
 import org.blockchain_innovation.factom.client.api.errors.FactomRuntimeException;
 import org.blockchain_innovation.factom.client.api.ops.Digests;
 import org.blockchain_innovation.factom.client.api.ops.Encoding;
@@ -49,6 +50,12 @@ public enum AddressType {
 
     public boolean isValid(String address) {
         return isValidAddress(address) && address.startsWith(getHumanReadablePrefix());
+    }
+
+    public void assertValid(Address address) {
+        if (this != address.getType()) {
+            throw new FactomRuntimeException.AssertionException(String.format("Type of address '%s' is not a valid", address));
+        }
     }
 
     public void assertValid(String address) {

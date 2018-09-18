@@ -16,6 +16,7 @@
 
 package org.blockchain_innovation.factom.client;
 
+import org.blockchain_innovation.factom.client.api.model.Address;
 import org.blockchain_innovation.factom.client.api.model.Chain;
 import org.blockchain_innovation.factom.client.api.model.Entry;
 import org.blockchain_innovation.factom.client.api.model.response.CommitAndRevealChainResponse;
@@ -37,7 +38,9 @@ public class ChainEntrySigningIT extends AbstractClientTest {
     @Test
     public void _01_commitChain() {
         Chain chain = chain();
-        CommitAndRevealChainResponse response = entryOfflineSigningClient.commitAndRevealChain(chain(), EC_PUBLIC_ADDRESS, EC_SECRET_ADDRESS).join();
+        Address secretAddress = new Address(EC_SECRET_ADDRESS);
+
+        CommitAndRevealChainResponse response = offlineEntryClient.commitAndRevealChain(chain(), secretAddress).join();
 
         Assert.assertNotNull(response);
         Assert.assertNotNull(response.getCommitChainResponse());
@@ -56,9 +59,10 @@ public class ChainEntrySigningIT extends AbstractClientTest {
     @Test
     public void _02_commitEntry() {
         Assert.assertNotNull(chainId);
+        Address secretAddress = new Address(EC_SECRET_ADDRESS);
 
         Entry entry = entry(chainId);
-        CommitAndRevealEntryResponse response = entryOfflineSigningClient.commitAndRevealEntry(entry, EC_PUBLIC_ADDRESS, EC_SECRET_ADDRESS).join();
+        CommitAndRevealEntryResponse response = offlineEntryClient.commitAndRevealEntry(entry, secretAddress).join();
 
         Assert.assertNotNull(response);
         Assert.assertNotNull(response.getCommitEntryResponse());
