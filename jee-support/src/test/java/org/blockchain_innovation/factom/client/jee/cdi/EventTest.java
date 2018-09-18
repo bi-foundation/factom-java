@@ -37,7 +37,7 @@ public class EventTest extends AbstractCDITest {
 
 
     @Test
-    public void testCdi() {
+    public void commitAndRevealEventTest() {
         Assert.assertNotNull(entryApiProvider.get());
 
         Chain chain = chain();
@@ -61,21 +61,25 @@ public class EventTest extends AbstractCDITest {
     }
 
     public void testEvent(@Observes ComposeResponse composeResponse) {
-        System.err.println(composeResponse);
+        System.err.println("COMPOSE RESONSE: "+ composeResponse);
     }
 
     public void commitChainResponse(@Observes CommitChainResponse commitChainResponse) {
+        System.err.println("COMMIT CHAIN RESPONSE: "+ commitChainResponse);
         commitChainResponseRef.set(commitChainResponse);
     }
     public void revealChainResponse(@Observes RevealResponse revealResponse) {
+        System.err.println("REVEAL RESPONSE: "+ revealResponse);
         revealChainResponseRef.set(revealResponse);
     }
 
     public void transactionAcknowledged(@Observes EntryTransactionResponse transactionResponse) {
+        System.err.println("TRANSACTION RESPONSE: "+ transactionResponse);
         transactionAcknowledgedResponseRef.set(transactionResponse);
     }
 
     public void onError(@Observes RpcErrorResponse errorResponse) {
+        System.err.println("ERROR RESPONSE: "+ errorResponse);
         Assert.fail(errorResponse.getError().getMessage());
     }
 

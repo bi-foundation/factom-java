@@ -2,6 +2,7 @@ package org.blockchain_innovation.factom.client.impl;
 
 import org.blockchain_innovation.factom.client.api.FactomResponse;
 import org.blockchain_innovation.factom.client.api.FactomdClient;
+import org.blockchain_innovation.factom.client.api.LowLevelClient;
 import org.blockchain_innovation.factom.client.api.WalletdClient;
 import org.blockchain_innovation.factom.client.api.errors.FactomException;
 import org.blockchain_innovation.factom.client.api.listeners.CommitAndRevealListener;
@@ -22,6 +23,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
@@ -118,27 +120,27 @@ public class EntryApiImpl {
     public CompletableFuture<CommitAndRevealChainResponse> commitAndRevealChain(Chain chain, String entryCreditAddress, boolean confirmCommit) {
         // after compose chain combine commit and reveal chain
         CompletableFuture<CommitAndRevealChainResponse> commitAndRevealChainFuture = composeChainFuture(chain, entryCreditAddress)
-                .thenApply(_composeChainResponse -> notifyCompose(_composeChainResponse))
+                .thenApplyAsync(_composeChainResponse -> notifyCompose(_composeChainResponse), executorService())
                 // commit chain
-                .thenCompose(_composeChainResponse -> commitChainFuture(_composeChainResponse)
-                        .thenApply(_commitChainResponse -> notifyChainCommit(_commitChainResponse))
+                .thenComposeAsync(_composeChainResponse -> commitChainFuture(_composeChainResponse)
+                        .thenApplyAsync(_commitChainResponse -> notifyChainCommit(_commitChainResponse), executorService())
                         // wait to transaction is known
-                        .thenCompose(_commitChainResponse -> waitFuture()
+                        .thenComposeAsync(_commitChainResponse -> waitFuture()
                                 // reveal chain
-                                .thenCompose(_void -> revealChainFuture(_composeChainResponse)
-                                        .thenApply(_revealChainResponse -> notifyReveal(_revealChainResponse))
+                                .thenComposeAsync(_void -> revealChainFuture(_composeChainResponse)
+                                        .thenApplyAsync(_revealChainResponse -> notifyReveal(_revealChainResponse), executorService())
                                         // wait for transaction acknowledgement
-                                        .thenCompose(_revealChainResponse -> transactionAcknowledgeConfirmation(_revealChainResponse)
-                                                .thenApply(_transactionAcknowledgeResponse -> notifyEntryTransaction(_transactionAcknowledgeResponse))
-                                                .thenCompose(_transactionAcknowledgeResponse -> transactionCommitConfirmation(confirmCommit, _revealChainResponse)
-                                                        .thenApply(_commitConfirmedResponse -> {
+                                        .thenComposeAsync(_revealChainResponse -> transactionAcknowledgeConfirmation(_revealChainResponse)
+                                                .thenApplyAsync(_transactionAcknowledgeResponse -> notifyEntryTransaction(_transactionAcknowledgeResponse), executorService())
+                                                .thenComposeAsync(_transactionAcknowledgeResponse -> transactionCommitConfirmation(confirmCommit, _revealChainResponse)
+                                                        .thenApplyAsync(_commitConfirmedResponse -> {
                                                             notifyCommitConfirmed(_commitConfirmedResponse);
                                                             // create response
                                                             CommitAndRevealChainResponse response = new CommitAndRevealChainResponse();
                                                             response.setCommitChainResponse(_commitChainResponse.getResult());
                                                             response.setRevealResponse(_revealChainResponse.getResult());
                                                             return response;
-                                                        }))))));
+                                                        }, executorService()), executorService()), executorService()), executorService()), executorService()), executorService());
         return commitAndRevealChainFuture;
     }
 
@@ -163,28 +165,28 @@ public class EntryApiImpl {
     public CompletableFuture<CommitAndRevealEntryResponse> commitAndRevealEntry(Entry entry, String entryCreditAddress, boolean confirmCommit) throws FactomException.ClientException {
         // after compose entry combine commit and reveal entry
         CompletableFuture<CommitAndRevealEntryResponse> commitAndRevealEntryFuture = composeEntryFuture(entry, entryCreditAddress)
-                .thenApply(_composeEntryResponse -> notifyCompose(_composeEntryResponse))
+                .thenApplyAsync(_composeEntryResponse -> notifyCompose(_composeEntryResponse), executorService())
                 // commit chain
-                .thenCompose(_composeEntryResponse -> commitEntryFuture(_composeEntryResponse)
-                        .thenApply(_commitEntryResponse -> notifyEntryCommit(_commitEntryResponse))
+                .thenComposeAsync(_composeEntryResponse -> commitEntryFuture(_composeEntryResponse)
+                        .thenApplyAsync(_commitEntryResponse -> notifyEntryCommit(_commitEntryResponse),executorService())
                         // wait to transaction is known
-                        .thenCompose(_commitEntryResponse -> waitFuture()
+                        .thenComposeAsync(_commitEntryResponse -> waitFuture()
                                 // reveal chain
-                                .thenCompose(_void -> revealEntryFuture(_composeEntryResponse)
-                                        .thenApply(_revealEntryResponse -> notifyReveal(_revealEntryResponse))
+                                .thenComposeAsync(_void -> revealEntryFuture(_composeEntryResponse)
+                                        .thenApplyAsync(_revealEntryResponse -> notifyReveal(_revealEntryResponse), executorService())
                                         // wait for transaction acknowledgement
-                                        .thenCompose(_revealEntryResponse -> transactionAcknowledgeConfirmation(_revealEntryResponse)
-                                                .thenApply(_transactionAcknowledgeResponse -> notifyEntryTransaction(_transactionAcknowledgeResponse))
+                                        .thenComposeAsync(_revealEntryResponse -> transactionAcknowledgeConfirmation(_revealEntryResponse)
+                                                .thenApplyAsync(_transactionAcknowledgeResponse -> notifyEntryTransaction(_transactionAcknowledgeResponse), executorService())
                                                 // wait for block confirmed
-                                                .thenCompose(_transactionAcknowledgeResponse -> transactionCommitConfirmation(confirmCommit, _revealEntryResponse)
-                                                        .thenApply(_commitConfirmedResponse -> {
+                                                .thenComposeAsync(_transactionAcknowledgeResponse -> transactionCommitConfirmation(confirmCommit, _revealEntryResponse)
+                                                        .thenApplyAsync(_commitConfirmedResponse -> {
                                                             notifyCommitConfirmed(_commitConfirmedResponse);
                                                             // create response
                                                             CommitAndRevealEntryResponse response = new CommitAndRevealEntryResponse();
                                                             response.setCommitEntryResponse(_commitEntryResponse.getResult());
                                                             response.setRevealResponse(_revealEntryResponse.getResult());
                                                             return response;
-                                                        }))))));
+                                                        }, executorService()), executorService()), executorService()), executorService()), executorService()), executorService());
 
         return commitAndRevealEntryFuture;
     }
@@ -233,11 +235,18 @@ public class EntryApiImpl {
             try {
                 TimeUnit.MILLISECONDS.sleep(ENTRY_REVEAL_WAIT);
             } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
                 throw new FactomException.ClientException("interrupted while waiting on confirmation", e);
             }
-        });
+        }, executorService());
     }
 
+    private ExecutorService executorService() {
+        return client().getExecutorService();
+    }
+    private LowLevelClient client() {
+        return (LowLevelClient) factomdClient;
+    }
     private CompletionStage<FactomResponse<EntryTransactionResponse>> transactionAcknowledgeConfirmation(FactomResponse<RevealResponse> revealChainResponse) {
         String entryHash = revealChainResponse.getResult().getEntryHash();
         String chainId = revealChainResponse.getResult().getChainId();
@@ -282,9 +291,10 @@ public class EntryApiImpl {
                 }
                 return transactionsResponse;
             } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
                 throw new FactomException.ClientException("interrupted while waiting on confirmation", e);
             }
-        });
+        }, executorService());
     }
 
     private CompletableFuture<FactomResponse<ComposeResponse>> composeChainFuture(Chain chain, String entryCreditAddress) {

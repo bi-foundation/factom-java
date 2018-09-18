@@ -19,10 +19,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class EntryApiImplTest extends AbstractClientTest {
+public class EntryApiTest extends AbstractClientTest {
 
     @Test
     public void testChain() {
@@ -188,7 +189,7 @@ public class EntryApiImplTest extends AbstractClientTest {
 
 
     @Test
-    public void testChainAsync() throws InterruptedException {
+    public void testChainAsync() throws InterruptedException, ExecutionException {
         Chain chain = chain();
         AtomicReference<CommitEntryResponse> commitChainResponse = new AtomicReference<>();
         AtomicReference<RevealResponse> revealChainResponse = new AtomicReference<>();
@@ -243,6 +244,9 @@ public class EntryApiImplTest extends AbstractClientTest {
         while(transactionAcknowledgedResponse.get() == null && count < 100) {
             count++;
             Thread.sleep(1000);
+            if (future.isCompletedExceptionally()) {
+                Assert.fail(future.get().toString());
+            }
         }
         future.cancel(true);
 

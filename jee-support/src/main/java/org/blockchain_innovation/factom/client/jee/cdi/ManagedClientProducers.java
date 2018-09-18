@@ -1,7 +1,6 @@
 package org.blockchain_innovation.factom.client.jee.cdi;
 
 import org.blockchain_innovation.factom.client.api.FactomdClient;
-import org.blockchain_innovation.factom.client.api.LowLevelClient;
 import org.blockchain_innovation.factom.client.api.WalletdClient;
 import org.blockchain_innovation.factom.client.api.json.JsonConverter;
 import org.blockchain_innovation.factom.client.api.settings.RpcSettings;
@@ -9,15 +8,20 @@ import org.blockchain_innovation.factom.client.impl.EntryApiImpl;
 import org.blockchain_innovation.factom.client.impl.FactomdClientImpl;
 import org.blockchain_innovation.factom.client.impl.WalletdClientImpl;
 
-import javax.enterprise.context.SessionScoped;
+import javax.annotation.Resource;
+import javax.enterprise.concurrent.ManagedExecutorService;
+import javax.enterprise.context.RequestScoped;
 import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-@SessionScoped
+@RequestScoped
 public class ManagedClientProducers implements Serializable {
+
+    @Resource
+    ManagedExecutorService managedExecutorService;
 
     @Inject
     private CommitAndRevealEvents commitAndRevealEvents;
@@ -25,8 +29,8 @@ public class ManagedClientProducers implements Serializable {
     @Inject
     private JsonConverter jsonConverter;
 
-    private FactomdClient factomdClient;
-    private WalletdClient walletdClient;
+    private FactomdClientImpl factomdClient;
+    private WalletdClientImpl walletdClient;
     private Map<RpcSettings.SubSystem, RpcSettings> settings = new HashMap<>();
     private EntryApiImpl entryApi;
 
@@ -50,26 +54,31 @@ public class ManagedClientProducers implements Serializable {
     }
 
 
-    @Produces @ManagedClient
+    @Produces
+    @ManagedClient
     public FactomdClient getFactomdClient() {
         if (factomdClient == null) {
             this.factomdClient = new FactomdClientImpl();
-            ((LowLevelClient) factomdClient).setSettings(getSettings(RpcSettings.SubSystem.FACTOMD));
+            factomdClient.setSettings(getSettings(RpcSettings.SubSystem.FACTOMD));
+            factomdClient.setExecutorService(managedExecutorService);
         }
         return factomdClient;
     }
 
-    @Produces @ManagedClient
+    @Produces
+    @ManagedClient
     public WalletdClient getWalletdClient() {
         if (walletdClient == null) {
             this.walletdClient = new WalletdClientImpl();
-            ((LowLevelClient) walletdClient).setSettings(getSettings(RpcSettings.SubSystem.WALLETD));
+            walletdClient.setSettings(getSettings(RpcSettings.SubSystem.WALLETD));
+            walletdClient.setExecutorService(managedExecutorService);
         }
         return walletdClient;
     }
 
 
-    @Produces @ManagedClient
+    @Produces
+    @ManagedClient
     public EntryApiImpl getEntryAPI() {
         if (entryApi == null) {
             this.entryApi = new EntryApiImpl();

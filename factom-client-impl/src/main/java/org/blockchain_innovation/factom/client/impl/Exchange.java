@@ -16,6 +16,7 @@
 
 package org.blockchain_innovation.factom.client.impl;
 
+import org.blockchain_innovation.factom.client.api.LowLevelClient;
 import org.blockchain_innovation.factom.client.api.errors.FactomException;
 import org.blockchain_innovation.factom.client.api.FactomRequest;
 import org.blockchain_innovation.factom.client.api.FactomResponse;
@@ -46,11 +47,12 @@ public class Exchange<Result> {
     private final Class<Result> rpcResultClass;
 
     private final Logger logger = LoggerFactory.getLogger(Exchange.class);
-    private ExecutorService executorService;
+    private final ExecutorService executorService;
 
 
-    protected Exchange(RpcSettings settings, RpcRequest rpcRequest, Class<Result> rpcResultClass) {
-        this.settings = settings;
+    protected Exchange(LowLevelClient client, RpcRequest rpcRequest, Class<Result> rpcResultClass) {
+        this.executorService = client.getExecutorService();
+        this.settings = client.getSettings();
         this.url = settings.getServer().getURL();
         this.factomRequest = new FactomRequestImpl(rpcRequest);
         this.rpcResultClass = rpcResultClass;
@@ -166,21 +168,7 @@ public class Exchange<Result> {
 
     }
 
-
-    public static ThreadFactory threadFactory(final String name, final boolean daemon) {
-        return runnable -> {
-            Thread result = new Thread(runnable, name);
-            result.setDaemon(daemon);
-            return result;
-        };
-    }
-
-
-    protected synchronized ExecutorService getExecutorService() {
-        if (executorService == null) {
-            executorService = new ThreadPoolExecutor(2, 10, 5, TimeUnit.MINUTES,
-                    new SynchronousQueue<>(), threadFactory("FactomApi Dispatcher", false));
-        }
+    protected ExecutorService getExecutorService() {
         return executorService;
     }
 
