@@ -7,8 +7,12 @@ import org.blockchain_innovation.factom.client.api.ops.ByteOperations;
 import org.blockchain_innovation.factom.client.api.ops.Digests;
 import org.blockchain_innovation.factom.client.api.ops.Encoding;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
 import java.util.Arrays;
 
+@Named
+@Singleton
 public class AddressKeyConversions {
 
 

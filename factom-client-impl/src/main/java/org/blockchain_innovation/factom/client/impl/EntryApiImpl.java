@@ -1,8 +1,9 @@
 package org.blockchain_innovation.factom.client.impl;
 
-import org.blockchain_innovation.factom.client.api.errors.FactomException;
 import org.blockchain_innovation.factom.client.api.FactomResponse;
 import org.blockchain_innovation.factom.client.api.FactomdClient;
+import org.blockchain_innovation.factom.client.api.WalletdClient;
+import org.blockchain_innovation.factom.client.api.errors.FactomException;
 import org.blockchain_innovation.factom.client.api.listeners.CommitAndRevealListener;
 import org.blockchain_innovation.factom.client.api.model.Chain;
 import org.blockchain_innovation.factom.client.api.model.Entry;
@@ -32,7 +33,7 @@ public class EntryApiImpl {
     private int commitConfirmedTimeout = 15 * 60000; // 15 min
 
     private FactomdClient factomdClient;
-    private WalletdClientImpl walletdClient;
+    private WalletdClient walletdClient;
 
     private List<CommitAndRevealListener> listeners = new ArrayList<>();
 
@@ -66,14 +67,14 @@ public class EntryApiImpl {
         return this;
     }
 
-    private WalletdClientImpl getWalletdClient() throws FactomException.ClientException {
+    private WalletdClient getWalletdClient() throws FactomException.ClientException {
         if (walletdClient == null) {
             throw new FactomException.ClientException("walletd client not provided");
         }
         return walletdClient;
     }
 
-    public EntryApiImpl setWalletdClient(WalletdClientImpl walletdClient) {
+    public EntryApiImpl setWalletdClient(WalletdClient walletdClient) {
         this.walletdClient = walletdClient;
         return this;
     }

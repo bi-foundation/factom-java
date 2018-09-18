@@ -25,11 +25,12 @@ import org.blockchain_innovation.factom.client.api.rpc.RpcMethod;
 import org.blockchain_innovation.factom.client.api.rpc.RpcResponse;
 
 import javax.inject.Named;
+import java.io.Serializable;
 import java.lang.reflect.Type;
 import java.util.Properties;
 
 @Named
-public class JsonConverterGSON implements JsonConverter {
+public class JsonConverterGSON implements JsonConverter, Serializable {
     private Gson gson;
 
     static {

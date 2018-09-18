@@ -92,6 +92,7 @@ project(':json-converter-jee') {
         compile project(':factom-client-api')
         compile 'javax.json:javax.json-api:1.1.2'
         compile 'javax.json.bind:javax.json.bind-api:1.0.0-RC2'
+        compileOnly 'javax.enterprise:cdi-api:2.0.SP1'
         testCompile 'org.glassfish:javax.json:1.1.2'
         testCompile 'org.eclipse:yasson:1.0.1'
         testCompile 'junit:junit:4.12'
@@ -104,13 +105,18 @@ project(':jee-support') {
 
     dependencies {
         compile project(':factom-client-impl')
-        compile project(':json-converter-jee')
+//        compile project(':json-converter-jee')
+        compile project(':json-converter-gson') //fixme
         compileOnly 'javax.enterprise:cdi-api:2.0.SP1'
         testCompile 'javax.enterprise:cdi-api:2.0.SP1'
         testCompile 'org.jboss.weld:weld-core-impl:3.0.5.Final'
         testCompile 'org.jboss.weld.se:weld-se-core:3.0.5.Final'
         testCompile 'org.jboss.weld:weld-junit4:1.3.0.Final'
         testCompile 'org.jboss.arquillian.container:arquillian-weld-embedded:2.0.0.Final'
+        testCompile 'org.jboss.arquillian.junit:arquillian-junit-container:1.4.0.Final'
+        testCompile 'org.glassfish:javax.json:1.1.2'
+        testCompile 'org.eclipse:yasson:1.0.1'
+        compile 'com.google.code.gson:gson:2.8.5' //fixme
         testCompile 'junit:junit:4.12'
     }
 }

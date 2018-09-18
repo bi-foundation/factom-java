@@ -21,6 +21,8 @@ import org.blockchain_innovation.factom.client.api.rpc.RpcErrorResponse;
 import org.blockchain_innovation.factom.client.api.rpc.RpcMethod;
 import org.blockchain_innovation.factom.client.api.rpc.RpcResponse;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
 import javax.json.bind.JsonbConfig;
@@ -29,13 +31,15 @@ import javax.json.bind.config.PropertyVisibilityStrategy;
 import javax.json.bind.serializer.JsonbSerializer;
 import javax.json.bind.serializer.SerializationContext;
 import javax.json.stream.JsonGenerator;
+import java.io.Serializable;
 import java.lang.reflect.*;
 import java.util.Objects;
 import java.util.Properties;
 
 import static javax.json.bind.config.PropertyOrderStrategy.LEXICOGRAPHICAL;
 
-public class JsonConverterJEE implements JsonConverter {
+@Named
+public class JsonConverterJEE implements JsonConverter, Serializable {
     protected static final String RPC_METHOD = "method";
     private Jsonb jsonb;
 

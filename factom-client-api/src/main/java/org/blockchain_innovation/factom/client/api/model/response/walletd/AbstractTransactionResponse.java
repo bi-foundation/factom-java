@@ -16,9 +16,10 @@
 
 package org.blockchain_innovation.factom.client.api.model.response.walletd;
 
+import java.io.Serializable;
 import java.util.List;
 
-public abstract class AbstractTransactionResponse {
+public abstract class AbstractTransactionResponse implements Serializable {
 
     private boolean signed;
     private String name;

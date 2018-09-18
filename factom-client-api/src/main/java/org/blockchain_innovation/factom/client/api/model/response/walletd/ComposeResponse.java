@@ -16,7 +16,9 @@
 
 package org.blockchain_innovation.factom.client.api.model.response.walletd;
 
-public class ComposeResponse {
+import java.io.Serializable;
+
+public class ComposeResponse implements Serializable {
 
     private Commit commit;
     private Reveal reveal;
