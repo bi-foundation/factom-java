@@ -10,11 +10,28 @@ import org.blockchain_innovation.factom.client.api.ops.Digests;
 import java.util.Arrays;
 
 public class OfflineAddressKeyConversions extends AddressKeyConversions {
-
+    /**
+     * Create a public address. If the address is public it will return itself. Otherwise it will extract the key
+     * from the address. Calculates the public key from the private key. This will be returned as an address.
+     * If a Factoid Address is given, an Factoid Private Key will be returned.
+     * If a Entry Credit Address is given, an Entry Credit Private Key is returned
+     *
+     * @param address
+     * @return an address
+     */
     public Address addressToPublicAddress(Address address) {
         return new Address(addressToPublicAddress(address.getValue()));
     }
 
+    /**
+     * Create a public address. If the address is public it will return itself. Otherwise it will extract the key
+     * from the address. Calculates the public key from the private key. This will be returned as an address.
+     * If a Factoid Address is given, an Factoid Private Key will be returned.
+     * If a Entry Credit Address is given, an Entry Credit Private Key is returned
+     *
+     * @param address
+     * @return an address
+     */
     public String addressToPublicAddress(String address) {
         AddressType addressType = AddressType.getType(address);
         if (addressType.isPublic()) {
