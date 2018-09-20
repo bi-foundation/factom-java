@@ -16,7 +16,9 @@
 
 package org.blockchain_innovation.factom.client.api.model.response.walletd;
 
-public class GetHeightResponse {
+import java.io.Serializable;
+
+public class GetHeightResponse implements Serializable {
 
     private int height;
 

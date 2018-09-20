@@ -16,9 +16,10 @@
 
 package org.blockchain_innovation.factom.client.api.model.response.factomd;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class TransactionResponse {
+public class TransactionResponse implements Serializable {
 
     private Transaction factoidtransaction;
     private String includedintransactionblock;
@@ -41,7 +42,7 @@ public class TransactionResponse {
         return includedindirectoryblockheight;
     }
 
-    public static class Transaction {
+    public static class Transaction implements Serializable {
 
         private long millitimestamp;
         private List<Input> inputs;
@@ -79,7 +80,7 @@ public class TransactionResponse {
             return blockheight;
         }
 
-        public static abstract class IO {
+        public abstract static class IO implements Serializable {
             private long amount;
             private String address;
             private String useraddress;
@@ -106,7 +107,7 @@ public class TransactionResponse {
         public static class OutputEntryCredit extends IO {
         }
 
-        public static class SigBlock {
+        public static class SigBlock implements Serializable {
             private List<String> signatures;
         }
     }

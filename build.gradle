@@ -48,7 +48,7 @@ subprojects {
     }
 
     tasks.withType(Pmd){
-        ignoreFailures = true
+        ignoreFailures = false
         consoleOutput = true
         reports{
             xml.enabled=true

@@ -22,11 +22,12 @@ import org.bouncycastle.util.Arrays;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 public class ByteOperationsTest {
     private static final ByteOperations OPS = new ByteOperations();
-    private static final byte[] EXAMPLE = "This is an example".getBytes();
+    private static final byte[] EXAMPLE = "This is an example".getBytes(Charset.defaultCharset());
 
     @Test(expected = FactomRuntimeException.AssertionException.class)
     public void testNullInt() {

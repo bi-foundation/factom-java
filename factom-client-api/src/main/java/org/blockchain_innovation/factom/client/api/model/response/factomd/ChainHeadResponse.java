@@ -16,7 +16,9 @@
 
 package org.blockchain_innovation.factom.client.api.model.response.factomd;
 
-public class ChainHeadResponse {
+import java.io.Serializable;
+
+public class ChainHeadResponse implements Serializable {
     private String chainhead;
     private boolean chaininprocesslist;
 

@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 public class EncodeOperations {
 
     /**
-     * Encode a Chain. The content and external ids from the first entry will be encoded from UFT-8 to HEX
+     * Encode a Chain. The content and external ids from the first entry will be encoded from UFT-8 to HEX.
      *
      * @param chain
      * @return
@@ -33,7 +33,7 @@ public class EncodeOperations {
     }
 
     /**
-     * Encode an Entry to HEX. The content and external ids are encoded from UTF-8 to HEX
+     * Encode an Entry to HEX. The content and external ids are encoded from UTF-8 to HEX.
      *
      * @param entry
      * @return
@@ -51,7 +51,7 @@ public class EncodeOperations {
     }
 
     /**
-     * Encode each UTF-8 value in a list to HEX
+     * Encode each UTF-8 value in a list to HEX.
      *
      * @param list
      * @return
@@ -61,7 +61,7 @@ public class EncodeOperations {
     }
 
     /**
-     * Encode a UFT-8 value to HEX
+     * Encode a UFT-8 value to HEX.
      *
      * @param value
      * @return

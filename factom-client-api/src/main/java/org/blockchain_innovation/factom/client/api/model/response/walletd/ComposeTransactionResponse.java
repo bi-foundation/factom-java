@@ -16,7 +16,9 @@
 
 package org.blockchain_innovation.factom.client.api.model.response.walletd;
 
-public class ComposeTransactionResponse {
+import java.io.Serializable;
+
+public class ComposeTransactionResponse implements Serializable {
 
     private String jsonrpc;
     private int id;
@@ -39,7 +41,7 @@ public class ComposeTransactionResponse {
         return method;
     }
 
-    public static class Params {
+    public static class Params implements Serializable {
         private String transaction;
 
         public String getTransaction() {

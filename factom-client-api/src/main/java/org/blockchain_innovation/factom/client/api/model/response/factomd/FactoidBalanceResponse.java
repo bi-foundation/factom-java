@@ -16,7 +16,9 @@
 
 package org.blockchain_innovation.factom.client.api.model.response.factomd;
 
-public class FactoidBalanceResponse {
+import java.io.Serializable;
+
+public class FactoidBalanceResponse implements Serializable {
 
     private long balance;
 

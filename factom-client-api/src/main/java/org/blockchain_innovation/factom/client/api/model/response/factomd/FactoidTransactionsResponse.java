@@ -16,7 +16,9 @@
 
 package org.blockchain_innovation.factom.client.api.model.response.factomd;
 
-public class FactoidTransactionsResponse {
+import java.io.Serializable;
+
+public class FactoidTransactionsResponse implements Serializable {
 
     private String txid;
     private long transactiondate;

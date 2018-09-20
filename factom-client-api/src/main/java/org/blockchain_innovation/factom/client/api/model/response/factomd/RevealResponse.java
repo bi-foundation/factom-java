@@ -16,7 +16,9 @@
 
 package org.blockchain_innovation.factom.client.api.model.response.factomd;
 
-public class RevealResponse {
+import java.io.Serializable;
+
+public class RevealResponse implements Serializable {
 
     private String message;
     private String entryhash;

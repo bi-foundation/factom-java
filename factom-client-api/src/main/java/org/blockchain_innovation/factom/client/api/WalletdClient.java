@@ -5,14 +5,26 @@ import org.blockchain_innovation.factom.client.api.model.Address;
 import org.blockchain_innovation.factom.client.api.model.Chain;
 import org.blockchain_innovation.factom.client.api.model.Entry;
 import org.blockchain_innovation.factom.client.api.model.Range;
-import org.blockchain_innovation.factom.client.api.model.response.walletd.*;
+import org.blockchain_innovation.factom.client.api.model.response.walletd.AddressResponse;
+import org.blockchain_innovation.factom.client.api.model.response.walletd.AddressesResponse;
+import org.blockchain_innovation.factom.client.api.model.response.walletd.BlockHeightTransactionsResponse;
+import org.blockchain_innovation.factom.client.api.model.response.walletd.ComposeResponse;
+import org.blockchain_innovation.factom.client.api.model.response.walletd.ComposeTransactionResponse;
+import org.blockchain_innovation.factom.client.api.model.response.walletd.DeleteTransactionResponse;
+import org.blockchain_innovation.factom.client.api.model.response.walletd.ExecutedTransactionResponse;
+import org.blockchain_innovation.factom.client.api.model.response.walletd.GetHeightResponse;
+import org.blockchain_innovation.factom.client.api.model.response.walletd.PropertiesResponse;
+import org.blockchain_innovation.factom.client.api.model.response.walletd.TransactionResponse;
+import org.blockchain_innovation.factom.client.api.model.response.walletd.TransactionsResponse;
+import org.blockchain_innovation.factom.client.api.model.response.walletd.WalletBackupResponse;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public interface WalletdClient {
     /**
-     * When adding entry credit outputs, the amount given is in factoshis, not entry credits. This means math is required to determine the correct amount of factoshis to pay to get X EC.
+     * When adding entry credit outputs, the amount given is in factoshis, not entry credits. This means math is required to determine the correct amount of factoshis to pay to get
+     * X EC.
      * (ECRate * ECTotalOutput)
      * In our case, the rate is 1000, meaning 1000 entry credits per factoid. We added 10 entry credits, so we need 1,000 * 10 = 10,000 factoshis
      * To get the ECRate search in the search bar above for "entry-credit-rate"
@@ -26,10 +38,18 @@ public interface WalletdClient {
     CompletableFuture<FactomResponse<TransactionResponse>> addEntryCreditOutput(String txName, Address address, long amount) throws FactomException.ClientException;
 
     /**
-     * Addfee is a shortcut and safeguard for adding the required additional factoshis to covert the fee. The fee is displayed in the returned transaction after each step, but addfee should be used instead of manually adding the additional input. This will help to prevent overpaying.
-     * Addfee will complain if your inputs and outputs do not match up. For example, in the steps above we added the inputs first. This was done intentionally to show a case of overpaying. Obviously, no one wants to overpay for a transaction, so addfee has returned an error and the message: ‘Inputs and outputs don’t add up’. This is because we have 2,000,000,000 factoshis as input and only 1,000,000,000 + 10,000 as output. Let’s correct the input by doing 'add-input’, and putting 1000010000 as the amount for the address. It will overwrite the previous input.
+     * Addfee is a shortcut and safeguard for adding the required additional factoshis to covert the fee. The fee is displayed in the returned transaction after each step, but
+     * addfee should be used instead of manually adding the additional input. This will help to prevent overpaying.
+     * Addfee will complain if your inputs and outputs do not match up. For example, in the steps above we added the inputs first. This was done intentionally to show a case of
+     * overpaying. Obviously, no one wants to overpay for a transaction, so addfee has returned an error and the message: ‘Inputs and outputs don’t add up’. This is because we have
+     * 2,000,000,000 factoshis as input and only 1,000,000,000 + 10,000 as output. Let’s correct the input by doing 'add-input’, and putting 1000010000 as the amount for the
+     * address. It will overwrite the previous input.
      * Curl to do that:
-     * <pre>curl -X POST --data-binary '{"jsonrpc":"2.0","id":0,"method":"add-input","params": {"tx-name":"TX_NAME","address":"FA2jK2HcLnRdS94dEcU27rF3meoJfpUcZPSinpb7AwQvPRY6RL1Q","amount":1000010000}}' \ -H 'content-type:text/plain;' http://localhost:8089/v2</pre>
+     * <pre>
+     *     curl -X POST \
+     *     --data-binary '{"jsonrpc":"2.0","id":0,"method":"add-input","params": {"tx-name":"TX_NAME","address":"FA2jK2HcLnRdS94dEcU27rF3meoJfpUcZPSinpb7AwQvPRY6RL1Q","amount":1000010000}}'
+     * \ -H 'content-type:text/plain;' http://localhost:8089/v2
+     * </pre>
      * Run the addfee again, and the feepaid and feerequired will match up
      *
      * @param txName
@@ -40,7 +60,8 @@ public interface WalletdClient {
     CompletableFuture<FactomResponse<ExecutedTransactionResponse>> addFee(String txName, Address address) throws FactomException.ClientException;
 
     /**
-     * Adds an input to the transaction from the given address. The public address is given, and the wallet must have the private key associated with the address to successfully sign the transaction.
+     * Adds an input to the transaction from the given address. The public address is given, and the wallet must have the private key associated with the address to successfully
+     * sign the transaction.
      * The input is measured in factoshis, so to send ten factoids, you must input 1,000,000,000 factoshis (without commas in JSON)
      *
      * @param txName
@@ -81,7 +102,8 @@ public interface WalletdClient {
     CompletableFuture<FactomResponse<AddressesResponse>> allAddresses() throws FactomException.ClientException;
 
     /**
-     * This method, compose-chain, will return the appropriate API calls to create a chain in factom. You must first call the commit-chain, then the reveal-chain API calls. To be safe, wait a few seconds after calling commit.
+     * This method, compose-chain, will return the appropriate API calls to create a chain in factom. You must first call the commit-chain, then the reveal-chain API calls. To be
+     * safe, wait a few seconds after calling commit.
      * Notes:
      * Ensure that all data given in the firstentry fields are encoded in hex. This includes the content section.
      *
@@ -93,7 +115,8 @@ public interface WalletdClient {
     CompletableFuture<FactomResponse<ComposeResponse>> composeChain(Chain chain, Address entryCreditAddress) throws FactomException.ClientException;
 
     /**
-     * This method, compose-entry, will return the appropriate API calls to create an entry in factom. You must first call the commit-entry, then the reveal-entry API calls. To be safe, wait a few seconds after calling commit.
+     * This method, compose-entry, will return the appropriate API calls to create an entry in factom. You must first call the commit-entry, then the reveal-entry API calls. To be
+     * safe, wait a few seconds after calling commit.
      * Notes:
      * Ensure all data given in the entry fields are encoded in hex. This includes the content section.
      *
@@ -192,7 +215,8 @@ public interface WalletdClient {
     CompletableFuture<FactomResponse<ExecutedTransactionResponse>> signTransaction(String txName) throws FactomException.ClientException;
 
     /**
-     * When paying from a transaction, you can also make the receiving transaction pay for it. Using sub fee, you can use the receiving address in the parameters, and the fee will be deducted from their output amount.
+     * When paying from a transaction, you can also make the receiving transaction pay for it. Using sub fee, you can use the receiving address in the parameters, and the fee will
+     * be deducted from their output amount.
      * This allows a wallet to send all it’s factoids, by making the input and output the remaining balance, then using sub fee on the output address.
      *
      * @param txName
@@ -220,7 +244,8 @@ public interface WalletdClient {
     CompletableFuture<FactomResponse<BlockHeightTransactionsResponse>> transactionsByRange(Range range) throws FactomException.ClientException;
 
     /**
-     * This will retrieve a transaction by the given TxID. This call is the fastest way to retrieve a transaction, but it will not display the height of the transaction. If a height is in the response, it will be 0. To retrieve the height of a transaction, use the 'By Address’ method
+     * This will retrieve a transaction by the given TxID. This call is the fastest way to retrieve a transaction, but it will not display the height of the transaction. If a
+     * height is in the response, it will be 0. To retrieve the height of a transaction, use the 'By Address’ method
      * This call in the backend actually pushes the request to factomd. For a more informative response, it is advised to use the factomd transaction method
      *
      * @param txid

@@ -23,7 +23,7 @@ import java.nio.charset.StandardCharsets;
 
 /**
  * Create a common entry point for all ancoding and decoding operations needed. Supports hex, base58, base64, utf-8
- * by selecting the correct enum value
+ * by selecting the correct enum value.
  */
 public enum Encoding {
 
@@ -90,7 +90,7 @@ public enum Encoding {
     };
 
     /**
-     * Encodes the input bytes to string using the appropriate encoding type as selected by the enum value
+     * Encodes the input bytes to string using the appropriate encoding type as selected by the enum value.
      *
      * @param toEncode The input to encode
      * @return The encoded string
@@ -98,7 +98,7 @@ public enum Encoding {
     public abstract String encode(byte[] toEncode);
 
     /**
-     * Decodes the input string to bytes using the appropriate encoding type as selected by the enum value
+     * Decodes the input string to bytes using the appropriate encoding type as selected by the enum value.
      *
      * @param toDecode The input string to decode
      * @return The decoded bytes
@@ -106,7 +106,7 @@ public enum Encoding {
     public abstract byte[] decode(String toDecode);
 
     /**
-     * Assert the input string is not null
+     * Assert the input string is not null.
      *
      * @param input
      */
@@ -117,7 +117,7 @@ public enum Encoding {
     }
 
     /**
-     * Assert the input bytes are not null
+     * Assert the input bytes are not null.
      *
      * @param input
      */

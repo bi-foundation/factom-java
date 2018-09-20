@@ -25,14 +25,27 @@ import org.blockchain_innovation.factom.client.api.rpc.RpcRequest;
 import org.blockchain_innovation.factom.client.api.settings.RpcSettings;
 
 import java.net.URL;
-import java.util.concurrent.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 abstract class AbstractClient implements LowLevelClient {
 
+    protected EncodeOperations encodeOperations = new EncodeOperations();
     private URL url;
     private RpcSettings settings;
-    protected EncodeOperations encodeOperations = new EncodeOperations();
     private ExecutorService executorService;
+
+    protected static ThreadFactory threadFactory(final String name, final boolean daemon) {
+        return runnable -> {
+            Thread result = new Thread(runnable, name);
+            result.setDaemon(daemon);
+            return result;
+        };
+    }
 
     @Override
     public RpcSettings getSettings() {
@@ -87,20 +100,10 @@ abstract class AbstractClient implements LowLevelClient {
     public ExecutorService getExecutorService() {
         if (executorService == null) {
             synchronized (this) {
-                if (executorService == null) {
-                    this.executorService = new ThreadPoolExecutor(2, 10, 5, TimeUnit.MINUTES,
-                            new SynchronousQueue<>(), threadFactory("FactomApi Dispatcher", false));
-                }
+                this.executorService = new ThreadPoolExecutor(2, 10, 5, TimeUnit.MINUTES,
+                        new SynchronousQueue<>(), threadFactory("FactomApi Dispatcher", false));
             }
         }
         return executorService;
-    }
-
-    protected static ThreadFactory threadFactory(final String name, final boolean daemon) {
-        return runnable -> {
-            Thread result = new Thread(runnable, name);
-            result.setDaemon(daemon);
-            return result;
-        };
     }
 }

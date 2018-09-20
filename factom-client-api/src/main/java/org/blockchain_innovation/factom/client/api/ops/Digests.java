@@ -25,8 +25,7 @@ import java.security.NoSuchAlgorithmException;
 public enum Digests {
 
     SHA_256("SHA-256"),
-    SHA_512("SHA-512")
-    ;
+    SHA_512("SHA-512");
 
     private final String algorithm;
 
@@ -36,7 +35,7 @@ public enum Digests {
 
 
     /**
-     * Digest/hash an input string using the algorithm chosen by selecting the correct enum
+     * Digest/hash an input string using the algorithm chosen by selecting the correct enum.
      *
      * @param message The message to hash/digest
      * @return The digested/hashed value
@@ -47,7 +46,7 @@ public enum Digests {
 
 
     /**
-     * Digest/hash input bytes using the algorithm chosen by selecting the correct enum
+     * Digest/hash input bytes using the algorithm chosen by selecting the correct enum.
      *
      * @param message The message to hash/digest
      * @return The digested/hashed value
@@ -59,7 +58,7 @@ public enum Digests {
 
 
     /**
-     * Digest/hash an input string twice using the algorithm chosen by selecting the correct enum
+     * Digest/hash an input string twice using the algorithm chosen by selecting the correct enum.
      *
      * @param message The message to hash/digest twice
      * @return The digested/hashed value
@@ -69,7 +68,7 @@ public enum Digests {
     }
 
     /**
-     * Digest/hash input bytes twice using the algorithm chosen by selecting the correct enum
+     * Digest/hash input bytes twice using the algorithm chosen by selecting the correct enum.
      *
      * @param message The message to hash/digest twice
      * @return The digested/hashed value
@@ -80,7 +79,7 @@ public enum Digests {
 
 
     /**
-     * Assert the input message is valid
+     * Assert the input message is valid.
      *
      * @param message
      */
@@ -91,7 +90,7 @@ public enum Digests {
     }
 
     /**
-     * Get the correct message digest object based on the algorithm connected with current enum value
+     * Get the correct message digest object based on the algorithm connected with current enum value.
      *
      * @return
      */

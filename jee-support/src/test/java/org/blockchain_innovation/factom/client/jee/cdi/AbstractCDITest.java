@@ -15,12 +15,10 @@ import java.io.InputStream;
 import java.util.Properties;
 
 public abstract class AbstractCDITest {
-    protected final static Address EC_PUBLIC_ADDRESS = new Address(System.getProperty("FACTOM_CLIENT_TEST_EC_PUBLIC_ADDRESS", "EC3cqLZPq5ypwRB5CLfXnud5vkWAV2sd235CFf9KcWcE3FH9GRxv"));
-
+    protected static final Address EC_PUBLIC_ADDRESS = new Address(System.getProperty("FACTOM_CLIENT_TEST_EC_PUBLIC_ADDRESS","EC3cqLZPq5ypwRB5CLfXnud5vkWAV2sd235CFf9KcWcE3FH9GRxv"));
 
     @Inject
     protected ManagedClientProducers managedClientProducers;
-
 
     @Before
     public void setup() throws IOException {

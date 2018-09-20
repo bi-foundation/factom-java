@@ -2,11 +2,13 @@ package org.blockchain_innovation.factom.client.api.model;
 
 import org.blockchain_innovation.factom.client.api.ops.Encoding;
 
-public class Key {
+import java.io.Serializable;
+
+public class Key implements Serializable {
     private final byte[] value;
 
     public Key(byte[] keyValue) {
-        this.value = keyValue;
+        this.value = keyValue.clone();
     }
 
     public Key(String hexKey) {

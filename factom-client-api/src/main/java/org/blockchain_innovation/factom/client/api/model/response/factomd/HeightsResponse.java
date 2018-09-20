@@ -16,7 +16,9 @@
 
 package org.blockchain_innovation.factom.client.api.model.response.factomd;
 
-public class HeightsResponse {
+import java.io.Serializable;
+
+public class HeightsResponse implements Serializable {
 
     private long directoryblockheight;
     private long leaderheight;

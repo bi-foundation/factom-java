@@ -16,7 +16,9 @@
 
 package org.blockchain_innovation.factom.client.api.model.response.factomd;
 
-public class RawDataResponse {
+import java.io.Serializable;
+
+public class RawDataResponse implements Serializable {
 
     private String data;
 

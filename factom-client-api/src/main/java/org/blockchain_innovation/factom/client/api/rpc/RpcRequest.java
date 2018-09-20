@@ -23,7 +23,12 @@ import org.blockchain_innovation.factom.client.api.model.Entry;
 import org.blockchain_innovation.factom.client.api.model.Range;
 import org.blockchain_innovation.factom.client.api.ops.StringUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class RpcRequest {
     private static final String VERSION = "2.0";

@@ -10,9 +10,8 @@ import org.blockchain_innovation.factom.client.api.rpc.RpcErrorResponse;
 
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
-import java.io.Serializable;
 
-public class CommitAndRevealEvents implements CommitAndRevealListener, Serializable {
+public class CommitAndRevealEvents implements CommitAndRevealListener {
 
     @Inject
     private Event<ComposeResponse> composeResponseEvent;

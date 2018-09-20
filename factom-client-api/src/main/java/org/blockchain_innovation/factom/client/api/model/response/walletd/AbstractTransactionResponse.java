@@ -68,7 +68,7 @@ public abstract class AbstractTransactionResponse implements Serializable {
         return ecoutputs;
     }
 
-    public static abstract class IO {
+    public abstract static class IO implements Serializable {
         private String address;
         private long amount;
 

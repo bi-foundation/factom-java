@@ -139,7 +139,7 @@ public class OfflineWalletdClientImpl extends WalletdClientImpl {
     }
 
     /**
-     * Compose an entry commit message that is needed to commit the entry
+     * Compose an entry commit message that is needed to commit the entry.
      *
      * @param entry
      * @param address
@@ -180,7 +180,7 @@ public class OfflineWalletdClientImpl extends WalletdClientImpl {
     }
 
     /**
-     * Compose chain reveal message that is needed to reveal the chain
+     * Compose chain reveal message that is needed to reveal the chain.
      *
      * @param chain
      * @return
@@ -192,7 +192,7 @@ public class OfflineWalletdClientImpl extends WalletdClientImpl {
     }
 
     /**
-     * Compose entry reveal message that is needed to reveal the chain
+     * Compose entry reveal message that is needed to reveal the chain.
      *
      * @param entry
      * @return
@@ -203,7 +203,7 @@ public class OfflineWalletdClientImpl extends WalletdClientImpl {
     }
 
     /**
-     * sign message
+     * sign message.
      *
      * @param message
      * @param address
@@ -224,14 +224,14 @@ public class OfflineWalletdClientImpl extends WalletdClientImpl {
             byte[] signed = instance.sign();
             return signed;
         } catch (InvalidKeyException e) {
-            throw new FactomException.ClientException(String.format("invalid key: ", e.getMessage()), e);
+            throw new FactomException.ClientException(String.format("invalid key: %s", e.getMessage()), e);
         } catch (SignatureException | NoSuchAlgorithmException e) {
             throw new FactomException.ClientException("failed to sign message", e);
         }
     }
 
     /**
-     * chain cost 10 + the first entry cost
+     * chain cost 10 + the first entry cost.
      *
      * @param externalIds
      * @param content
@@ -264,7 +264,7 @@ public class OfflineWalletdClientImpl extends WalletdClientImpl {
         }
 
         // cost is the capacity of the entry payment in KB
-        int cost = (int) Math.ceil(length / 1024);
+        int cost = (int) Math.ceil(1.0 * length / 1024);
         if (cost < 1) {
             cost = 1;
         }

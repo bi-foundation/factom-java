@@ -22,13 +22,36 @@ import java.util.Collection;
 
 public enum RpcMethod {
     // factomd api
-    HEIGHTS("heights"), ADMIN_BLOCK_BY_HEIGHT("ablock-by-height"), ADMIN_BLOCK_BY_KEYMR("admin-block"), ACK_TRANSACTION("ack"), CHAIN_HEAD("chain-head"), COMMIT_CHAIN("commit-chain"), COMMIT_ENTRY("commit-entry"),
-    CURRENT_MINUTE("current-minute"), DIRECTORY_BLOCK_BY_HEIGHT("dblock-by-height"), DIRECTORY_BLOCK_BY_KEYMR("directory-block"), DIRECTORY_BLOCK_HEAD("directory-block-head"),
-    ENTRY("entry"), ENTRY_BLOCK_BY_KEYMR("entry-block"), ENTRY_CREDIT_BLOCK_BY_HEIGH("ecblock-by-height"), ENTRY_CREDIT_BALANCE("entry-credit-balance"), ENTRY_CREDIT_BLOCK("entrycredit-block"),
-    ENTRY_CREDIT_RATE("entry-credit-rate"), FACTOID_BALANCE("factoid-balance"), FACTOID_BLOCK("factoid-block"), FACTOID_SUBMIT("factoid-submit"), FACTOID_BLOCK_BY_HEIGHT("fblock-by-height"),
-    PENDING_ENTRIES("pending-entries"), PENDING_TRANSACTONS("pending-transactions"), PROPERTIES("properties"), RAW_DATA("raw-data"), RECEIPT("receipt"),
-    REVEAL_CHAIN("reveal-chain"), REVEAL_ENTRY("reveal-entry"), SEND_RAW_MESSAGE("send-raw-message"), TRANSACTION("transaction"),
-
+    HEIGHTS("heights"),
+    ADMIN_BLOCK_BY_HEIGHT("ablock-by-height"),
+    ADMIN_BLOCK_BY_KEYMR("admin-block"),
+    ACK_TRANSACTION("ack"),
+    CHAIN_HEAD("chain-head"),
+    COMMIT_CHAIN("commit-chain"),
+    COMMIT_ENTRY("commit-entry"),
+    CURRENT_MINUTE("current-minute"),
+    DIRECTORY_BLOCK_BY_HEIGHT("dblock-by-height"),
+    DIRECTORY_BLOCK_BY_KEYMR("directory-block"),
+    DIRECTORY_BLOCK_HEAD("directory-block-head"),
+    ENTRY("entry"),
+    ENTRY_BLOCK_BY_KEYMR("entry-block"),
+    ENTRY_CREDIT_BLOCK_BY_HEIGH("ecblock-by-height"),
+    ENTRY_CREDIT_BALANCE("entry-credit-balance"),
+    ENTRY_CREDIT_BLOCK("entrycredit-block"),
+    ENTRY_CREDIT_RATE("entry-credit-rate"),
+    FACTOID_BALANCE("factoid-balance"),
+    FACTOID_BLOCK("factoid-block"),
+    FACTOID_SUBMIT("factoid-submit"),
+    FACTOID_BLOCK_BY_HEIGHT("fblock-by-height"),
+    PENDING_ENTRIES("pending-entries"),
+    PENDING_TRANSACTONS("pending-transactions"),
+    PROPERTIES("properties"),
+    RAW_DATA("raw-data"),
+    RECEIPT("receipt"),
+    REVEAL_CHAIN("reveal-chain"),
+    REVEAL_ENTRY("reveal-entry"),
+    SEND_RAW_MESSAGE("send-raw-message"),
+    TRANSACTION("transaction"),
 
     // wallet api
     ADD_ENTRY_CREDIT_OUTPUT("add-ec-output"),
@@ -60,6 +83,19 @@ public enum RpcMethod {
         this.method = method;
     }
 
+    public static RpcMethod fromJsonValue(String value) {
+        if (value == null || "".equals(value)) {
+            throw new FactomRuntimeException("Cannot have a null rpc method");
+        }
+        for (RpcMethod method : RpcMethod.values()) {
+            if (method.toJsonValue().equalsIgnoreCase(value)) {
+                return method;
+            }
+        }
+
+        return valueOf(value.toUpperCase());
+    }
+
     public RpcRequest toRequest() {
         return new RpcRequest(this);
     }
@@ -80,23 +116,8 @@ public enum RpcMethod {
         return new RpcRequest(this, params);
     }
 
-
     public String toJsonValue() {
         return method;
-    }
-
-
-    public static RpcMethod fromJsonValue(String value) {
-        if (value == null || "".equals(value)) {
-            throw new FactomRuntimeException("Cannot have a null rpc method");
-        }
-        for (RpcMethod method : RpcMethod.values()) {
-            if (method.toJsonValue().equalsIgnoreCase(value)) {
-                return method;
-            }
-        }
-
-        return valueOf(value.toUpperCase());
     }
 
 

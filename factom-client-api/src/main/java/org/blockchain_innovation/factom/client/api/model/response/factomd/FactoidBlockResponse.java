@@ -16,6 +16,7 @@
 
 package org.blockchain_innovation.factom.client.api.model.response.factomd;
 
+import java.io.Serializable;
 import java.util.List;
 
 public class FactoidBlockResponse {
@@ -31,7 +32,7 @@ public class FactoidBlockResponse {
         return rawdata;
     }
 
-    public static class FactoidBlock {
+    public static class FactoidBlock implements Serializable {
         private String bodymr;
         private String prevkeymr;
         private String prevledgerkeymr;
@@ -78,7 +79,7 @@ public class FactoidBlockResponse {
             return ledgerkeymr;
         }
 
-        public static class Transaction {
+        public static class Transaction implements Serializable {
             private String txid;
             private long blockheight;
             private long millitimestamp;
@@ -115,7 +116,7 @@ public class FactoidBlockResponse {
                 return sigblocks;
             }
 
-            public static abstract class IO {
+            public abstract static class IO implements Serializable {
                 private long amount;
                 private String address;
                 private String useraddress;
@@ -142,7 +143,7 @@ public class FactoidBlockResponse {
             public static class OutputEntryCredit extends IO {
             }
 
-            public static class SigBlock {
+            public static class SigBlock implements Serializable {
                 private List<String> signatures;
 
                 public List<String> getSignatures() {

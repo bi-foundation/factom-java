@@ -6,7 +6,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 /**
- * code used from vrotaru/Base58.java
+ * code used from vrotaru/Base58.java.
  */
 @Named
 @Singleton
@@ -28,7 +28,7 @@ public class Base58 {
     }
 
     /**
-     * Encode a byte input to bitcoin compatible Base58 String
+     * Encode a byte input to bitcoin compatible Base58 String.
      *
      * @param input
      * @return
@@ -73,11 +73,11 @@ public class Base58 {
         }
 
         byte[] output = copyOfRange(temp, j, temp.length);
-        return new String(output);
+        return Encoding.UTF_8.encode(output);
     }
 
     /**
-     * Decode a base58 input into bytes
+     * Decode a base58 input into bytes.
      *
      * @param input
      * @return

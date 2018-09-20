@@ -63,7 +63,8 @@ public interface FactomdClient {
     CompletableFuture<FactomResponse<AdminBlockResponse>> adminBlockByKeyMerkleRoot(String keyMR) throws FactomException.ClientException;
 
     /**
-     * This api call is used to find the status of a transaction, whether it be a factoid, reveal entry, or commit entry. When using this, you must specify the type of the transaction by giving the chainid field 1 of 3 values:
+     * This api call is used to find the status of a transaction, whether it be a factoid, reveal entry, or commit entry. When using this, you must specify the type of the
+     * transaction by giving the chainid field 1 of 3 values:
      * <p>
      * - f for factoid transactions
      * - c for entry credit transactions (commit entry/chain)
@@ -82,12 +83,17 @@ public interface FactomdClient {
      * <p>The hash field for a factoid transaction is equivalent to txid. To indicate the hash is a factoid transaction, put f in the chainid field and the txid in the hash field.
      * The response will look different than entry related ack calls.
      * Extra notes:
-     * Why f? It is short for 000000000000000000000000000000000000000000000000000000000000000f, which is the chainid for all factoid blocks. All factoid transactions are placed in the factoid (assuming they are valid)</p>
+     * Why f? It is short for 000000000000000000000000000000000000000000000000000000000000000f, which is the chainid for all factoid blocks. All factoid transactions are placed in
+     * the factoid (assuming they are valid)</p>
      * <p>
-     * Requesting an entry requires you to specify if the hash you provide is a commit or an entry hash. The chainid field is used to specify this. If you are searching for a commit, put c as the chainid field, otherwise, put the chainid that the entry belongs too.
-     * For commit/reveal acks, the response has 2 sections, one for the commit, one for the reveal. If you provide the entryhash and chainid, both will be filled (if found). If you only provide the commit txid and c as the chainid, then only the commitdata is guaranteed to come back with data. The committxid and entryhash fields correspond to the commitdata and entrydata objects.
+     * Requesting an entry requires you to specify if the hash you provide is a commit or an entry hash. The chainid field is used to specify this. If you are searching for a
+     * commit, put c as the chainid field, otherwise, put the chainid that the entry belongs too.
+     * For commit/reveal acks, the response has 2 sections, one for the commit, one for the reveal. If you provide the entryhash and chainid, both will be filled (if found). If you
+     * only provide the commit txid and c as the chainid, then only the commitdata is guaranteed to come back with data. The committxid and entryhash fields correspond to the
+     * commitdata and entrydata objects.
      * Extra notes:
-     * Why c? It is short for 000000000000000000000000000000000000000000000000000000000000000c, which is the chainid for all entry credit blocks. All commits are placed in the entry credit block (assuming they are valid and are properly paid for)
+     * Why c? It is short for 000000000000000000000000000000000000000000000000000000000000000c, which is the chainid for all entry credit blocks. All commits are placed in the
+     * entry credit block (assuming they are valid and are properly paid for)
      * </p>
      *
      * @param hash           txid for factoid trans, entryhash in other cases
@@ -119,10 +125,14 @@ public interface FactomdClient {
     CompletableFuture<FactomResponse<FactoidTransactionsResponse>> ackFactoidTransactions(String txId) throws FactomException.ClientException;
 
     /**
-     * Requesting an entry requires you to specify if the hash you provide is a commit or an entry hash. The chainid field is used to specify this. If you are searching for a commit, put c as the chainid field, otherwise, put the chainid that the entry belongs too.
-     * For commit/reveal acks, the response has 2 sections, one for the commit, one for the reveal. If you provide the entryhash and chainid, both will be filled (if found). If you only provide the commit txid and c as the chainid, then only the commitdata is guaranteed to come back with data. The committxid and entryhash fields correspond to the commitdata and entrydata objects.
+     * Requesting an entry requires you to specify if the hash you provide is a commit or an entry hash. The chainid field is used to specify this. If you are searching for a
+     * commit, put c as the chainid field, otherwise, put the chainid that the entry belongs too.
+     * For commit/reveal acks, the response has 2 sections, one for the commit, one for the reveal. If you provide the entryhash and chainid, both will be filled (if found). If you
+     * only provide the commit txid and c as the chainid, then only the commitdata is guaranteed to come back with data. The committxid and entryhash fields correspond to the
+     * commitdata and entrydata objects.
      * Extra notes:
-     * Why c? It is short for 000000000000000000000000000000000000000000000000000000000000000c, which is the chainid for all entry credit blocks. All commits are placed in the entry credit block (assuming they are valid and are properly paid for)
+     * Why c? It is short for 000000000000000000000000000000000000000000000000000000000000000c, which is the chainid for all entry credit blocks. All commits are placed in the
+     * entry credit block (assuming they are valid and are properly paid for)
      *
      * @param hash
      * @return
@@ -140,12 +150,16 @@ public interface FactomdClient {
     CompletableFuture<FactomResponse<ChainHeadResponse>> chainHead(String chainId) throws FactomException.ClientException;
 
     /**
-     * Send a Chain Commit Message to factomd to create a new Chain. The commit chain hex encoded string is documented here: <a href="https://github.com/FactomProject/FactomDocs/blob/master/factomDataStructureDetails.md#chain-commit">Github Documentation</a>
-     * The commit-chain API takes a specifically formated message encoded in hex that includes signatures. If you have a factom-walletd instance running, you can construct this commit-chain API call with compose-chain which takes easier to construct arguments.
-     * The compose-chain api call has two api calls in it’s response: commit-chain and reveal-chain. To successfully create a chain, the reveal-chain must be called after the commit-chain.
+     * Send a Chain Commit Message to factomd to create a new Chain. The commit chain hex encoded string is documented here: <a
+     * href="https://github.com/FactomProject/FactomDocs/blob/master/factomDataStructureDetails.md#chain-commit">Github Documentation</a>
+     * The commit-chain API takes a specifically formated message encoded in hex that includes signatures. If you have a factom-walletd instance running, you can construct this
+     * commit-chain API call with compose-chain which takes easier to construct arguments.
+     * The compose-chain api call has two api calls in it’s response: commit-chain and reveal-chain. To successfully create a chain, the reveal-chain must be called after the
+     * commit-chain.
      * <p>
      * Notes:
-     * It is possible to be unable to send a commit, if the commit already exists (if you try to send it twice). This is a mechanism to prevent you from double spending. If you encounter this error, just skip to the reveal-chain. The error format can be found here: repeated-commit
+     * It is possible to be unable to send a commit, if the commit already exists (if you try to send it twice). This is a mechanism to prevent you from double spending. If you
+     * encounter this error, just skip to the reveal-chain. The error format can be found here: repeated-commit
      * </p>
      *
      * @param message The Chain Commit Message
@@ -155,12 +169,16 @@ public interface FactomdClient {
     CompletableFuture<FactomResponse<CommitChainResponse>> commitChain(String message) throws FactomException.ClientException;
 
     /**
-     * Send an Entry Commit Message to factom to create a new Entry. The entry commit hex encoded string is documented here: <a href="https://github.com/FactomProject/FactomDocs/blob/master/factomDataStructureDetails.md#entry-commit">Github Documentation</a>
-     * The commit-entry API takes a specifically formated message encoded in hex that includes signatures. If you have a factom-walletd instance running, you can construct this commit-entry API call with compose-entry which takes easier to construct arguments.
-     * The compose-entry api call has two api calls in it’s response: commit-entry and reveal-entry. To successfully create an entry, the reveal-entry must be called after the commit-entry.
+     * Send an Entry Commit Message to factom to create a new Entry. The entry commit hex encoded string is documented here: <a
+     * href="https://github.com/FactomProject/FactomDocs/blob/master/factomDataStructureDetails.md#entry-commit">Github Documentation</a>
+     * The commit-entry API takes a specifically formated message encoded in hex that includes signatures. If you have a factom-walletd instance running, you can construct this
+     * commit-entry API call with compose-entry which takes easier to construct arguments.
+     * The compose-entry api call has two api calls in it’s response: commit-entry and reveal-entry. To successfully create an entry, the reveal-entry must be called after the
+     * commit-entry.
      * <p>
      * Notes:
-     * It is possible to be unable to send a commit, if the commit already exists (if you try to send it twice). This is a mechanism to prevent you from double spending. If you encounter this error, just skip to the reveal-entry. The error format can be found here: repeated-commit
+     * It is possible to be unable to send a commit, if the commit already exists (if you try to send it twice). This is a mechanism to prevent you from double spending. If you
+     * encounter this error, just skip to the reveal-entry. The error format can be found here: repeated-commit
      * </p>
      *
      * @param message The entry commit message
@@ -199,7 +217,8 @@ public interface FactomdClient {
     CompletableFuture<FactomResponse<DirectoryBlockHeightResponse>> directoryBlockByHeight(long height) throws FactomException.ClientException;
 
     /**
-     * Every directory block has a KeyMR (Key Merkle Root), which can be used to retrieve it. The response will contain information that can be used to navigate through all transactions (entry and factoid) within that block.
+     * Every directory block has a KeyMR (Key Merkle Root), which can be used to retrieve it. The response will contain information that can be used to navigate through all
+     * transactions (entry and factoid) within that block.
      * The header of the directory block will contain information regarding the previous directory block’s keyMR, directory block height, and the timestamp.
      *
      * @param keyMR Key Merkle Root
@@ -209,7 +228,8 @@ public interface FactomdClient {
     CompletableFuture<FactomResponse<DirectoryBlockResponse>> directoryBlockByKeyMerkleRoot(String keyMR) throws FactomException.ClientException;
 
     /**
-     * The directory block head is the last known directory block by factom, or in other words, the most recently recorded block. This can be used to grab the latest block and the information required to traverse the entire blockchain.
+     * The directory block head is the last known directory block by factom, or in other words, the most recently recorded block. This can be used to grab the latest block and the
+     * information required to traverse the entire blockchain.
      *
      * @return
      * @throws FactomException.ClientException
@@ -262,7 +282,8 @@ public interface FactomdClient {
     CompletableFuture<FactomResponse<EntryCreditBlockResponse>> entryCreditBlock(String keymr) throws FactomException.ClientException;
 
     /**
-     * Returns the number of Factoshis (Factoids *10^-8) that purchase a single Entry Credit. The minimum factoid fees are also determined by this rate, along with how complex the factoid transaction is.
+     * Returns the number of Factoshis (Factoids *10^-8) that purchase a single Entry Credit. The minimum factoid fees are also determined by this rate, along with how complex the
+     * factoid transaction is.
      *
      * @return
      * @throws FactomException.ClientException
@@ -308,12 +329,16 @@ public interface FactomdClient {
     CompletableFuture<FactomResponse<FactoidBlockResponse>> factoidBlockByHeight(int height) throws FactomException.ClientException;
 
     /**
-     * Returns various heights that allows you to view the state of the blockchain. The heights returned provide a lot of information regarding the state of factomd, but not all are needed by most applications. The heights also indicate the most recent block, which could not be complete, and still being built. The heights mean as follows:
+     * Returns various heights that allows you to view the state of the blockchain. The heights returned provide a lot of information regarding the state of factomd, but not all
+     * are needed by most applications. The heights also indicate the most recent block, which could not be complete, and still being built. The heights mean as follows:
      * <p>
      * directoryblockheight : The current directory block height of the local factomd node.
-     * leaderheight : The current block being worked on by the leaders in the network. This block is not yet complete, but all transactions submitted will go into this block (depending on network conditions, the transaction may be delayed into the next block)
-     * entryblockheight : The height at which the factomd node has all the entry blocks. Directory blocks are obtained first, entry blocks could be lagging behind the directory block when syncing.
-     * entryheight : The height at which the local factomd node has all the entries. If you added entries at a block height above this, they will not be able to be retrieved by the local factomd until it syncs further.
+     * leaderheight : The current block being worked on by the leaders in the network. This block is not yet complete, but all transactions submitted will go into this block
+     * (depending on network conditions, the transaction may be delayed into the next block)
+     * entryblockheight : The height at which the factomd node has all the entry blocks. Directory blocks are obtained first, entry blocks could be lagging behind the directory
+     * block when syncing.
+     * entryheight : The height at which the local factomd node has all the entries. If you added entries at a block height above this, they will not be able to be retrieved by the
+     * local factomd until it syncs further.
      * A fully synced node should show the same number for all, (except between minute 0 and 1, when leaderheight will be 1 block ahead.)
      * </p>
      *
@@ -358,7 +383,8 @@ public interface FactomdClient {
     CompletableFuture<FactomResponse<RawDataResponse>> rawData(String hash) throws FactomException.ClientException;
 
     /**
-     * Retrieve a receipt providing cryptographically verifiable proof that information was recorded in the factom blockchain and that this was subsequently anchored in the bitcoin blockchain.
+     * Retrieve a receipt providing cryptographically verifiable proof that information was recorded in the factom blockchain and that this was subsequently anchored in the bitcoin
+     * blockchain.
      *
      * @param hash
      * @return
@@ -368,8 +394,10 @@ public interface FactomdClient {
 
     /**
      * Reveal the First Entry in a Chain to factomd after the Commit to complete the Chain creation. The reveal-chain hex encoded string is documented here: Github Documentation
-     * The reveal-chain API takes a specifically formatted message encoded in hex that includes signatures. If you have a factom-walletd instance running, you can construct this reveal-chain API call with compose-chain which takes easier to construct arguments.
-     * The compose-chain api call has two api calls in its response: commit-chain and reveal-chain. To successfully create a chain, the reveal-chain must be called after the commit-chain.
+     * The reveal-chain API takes a specifically formatted message encoded in hex that includes signatures. If you have a factom-walletd instance running, you can construct this
+     * reveal-chain API call with compose-chain which takes easier to construct arguments.
+     * The compose-chain api call has two api calls in its response: commit-chain and reveal-chain. To successfully create a chain, the reveal-chain must be called after the
+     * commit-chain.
      *
      * @param entry
      * @return
@@ -379,8 +407,10 @@ public interface FactomdClient {
 
     /**
      * Reveal an Entry to factomd after the Commit to complete the Entry creation. The reveal-entry hex encoded string is documented here: Github Documentation
-     * The reveal-entry API takes a specifically formatted message encoded in hex that includes signatures. If you have a factom-walletd instance running, you can construct this reveal-entry API call with compose-entry which takes easier to construct arguments.
-     * The compose-entry api call has two api calls in it’s response: commit-entry and reveal-entry. To successfully create an entry, the reveal-entry must be called after the commit-entry.
+     * The reveal-entry API takes a specifically formatted message encoded in hex that includes signatures. If you have a factom-walletd instance running, you can construct this
+     * reveal-entry API call with compose-entry which takes easier to construct arguments.
+     * The compose-entry api call has two api calls in it’s response: commit-entry and reveal-entry. To successfully create an entry, the reveal-entry must be called after the
+     * commit-entry.
      *
      * @param entry
      * @return
@@ -430,7 +460,8 @@ public interface FactomdClient {
      * The "blockheight" parameter in the response will always be 0 when using this call, refer to "includedindirectoryblockheight" if you need the height.
      * </p>
      * <p>
-     * Note: This call will also accept an entry hash as input, in which case the returned data concerns the entry. The returned fields and their format are shown in the 2nd Example Response at right.
+     * Note: This call will also accept an entry hash as input, in which case the returned data concerns the entry. The returned fields and their format are shown in the 2nd
+     * Example Response at right.
      * Note: If the input hash is non-existent, the returned fields will be as follows:
      * </p>
      * "includedintransactionblock":""
