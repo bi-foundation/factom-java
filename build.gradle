@@ -22,6 +22,7 @@ plugins {
     id 'org.asciidoctor.convert' version '1.5.6' apply false
 }
 
+
 // In this section you declare where to find the dependencies of your project
 allprojects {
     repositories {
@@ -32,9 +33,66 @@ allprojects {
     group = 'org.blockchain_innovation.factom'
 }
 
+subprojects {
+    apply plugin: 'checkstyle'
+    apply plugin: 'findbugs'
+    apply plugin: 'pmd'
+
+    buildscript {
+        repositories {
+            jcenter()
+            maven {
+                url "https://plugins.gradle.org/m2/"
+            }
+        }
+    }
+
+    tasks.withType(Pmd){
+        ignoreFailures = true
+        consoleOutput = true
+        reports{
+            xml.enabled=true
+            html.enabled=true
+            html.destination file("${project.projectDir}/../quality/reports/${project.name}-pmd.html")
+        }
+    }
+    tasks.withType(FindBugs) {
+        ignoreFailures = true
+        reports {
+            xml.enabled = false
+            html.enabled = true
+            html.destination file("${project.projectDir}/../quality/reports/${project.name}-findbugs.html")
+        }
+    }
+    tasks.withType(Checkstyle) {
+        ignoreFailures = true
+        configFile = file("${project.projectDir}/../quality/config/checkstyle.xml")
+        reports {
+            xml.enabled false
+            html.enabled true
+            html.destination file("${project.projectDir}/../quality/reports/${project.name}-checkstyle.html")
+        }
+    }
+    task qualityCheck {
+        dependsOn tasks.withType(Pmd)
+        dependsOn tasks.withType(FindBugs)
+        dependsOn tasks.withType(Checkstyle)
+    }
+}
+
+task cleanReports(type: Delete) {
+    doLast {
+        FileTree tree = fileTree(dir: "${project.projectDir}/quality/reports");
+        tree.include "*.html"
+        tree.each { File file ->
+            delete(file)
+        }
+        println "clean reports: ${project.projectDir}/quality/reports"
+    }
+    // clean.dependsOn cleanReports
+}
+
 project(':factom-client-api') {
-
-
     apply plugin: 'java'
 
     dependencies {
@@ -43,8 +101,8 @@ project(':factom-client-api') {
     }
 }
 
-project(':factom-client-impl') {
 
+project(':factom-client-impl') {
     apply plugin: 'java'
     dependencies {
         compile project(':factom-client-api')
@@ -59,7 +117,6 @@ project(':factom-client-impl') {
 }
 
 project(':factom-client-offline-signing') {
-
     apply plugin: 'java'
     dependencies {
         compile project(':factom-client-api')
@@ -70,9 +127,9 @@ project(':factom-client-offline-signing') {
         testCompile 'org.mock-server:mockserver-netty:5.4.1'
         testCompile 'org.mock-server:mockserver-client-java:5.4.1'
         testCompile 'junit:junit:4.12'
-
     }
 }
+
 project(':json-converter-gson') {
     apply plugin: 'java'
 
@@ -141,9 +198,7 @@ project(':factom-client-tests') {
     }
 }
 
-
 project(':docs') {
-
 
     buildscript {
         repositories {

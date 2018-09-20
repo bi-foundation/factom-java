@@ -15,7 +15,7 @@ public interface WalletdClient {
      * When adding entry credit outputs, the amount given is in factoshis, not entry credits. This means math is required to determine the correct amount of factoshis to pay to get X EC.
      * (ECRate * ECTotalOutput)
      * In our case, the rate is 1000, meaning 1000 entry credits per factoid. We added 10 entry credits, so we need 1,000 * 10 = 10,000 factoshis
-     * To get the ECRate search in the search bar above for “entry-credit-rate”
+     * To get the ECRate search in the search bar above for "entry-credit-rate"
      *
      * @param txName
      * @param address
@@ -156,7 +156,7 @@ public interface WalletdClient {
     CompletableFuture<FactomResponse<AddressesResponse>> importAddresses(List<Address> addresses) throws FactomException.ClientException;
 
     /**
-     * Import a Koinify crowd sale address into the wallet. In our examples we used the word “yellow” twelve times, note that in your case the master passphrase will be different.
+     * Import a Koinify crowd sale address into the wallet. In our examples we used the word "yellow" twelve times, note that in your case the master passphrase will be different.
      *
      * @param words
      * @return

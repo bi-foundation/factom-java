@@ -107,3 +107,6 @@ gradle-app.setting
 hs_err_pid*
 
 !/gradle/wrapper/gradle-wrapper.jar
+
+# Quality output reports
+quality/reports/*

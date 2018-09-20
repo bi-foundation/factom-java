@@ -72,10 +72,10 @@ public interface FactomdClient {
      * </p>
      * <p>
      * The status types returned are as follows:
-     * “Unknown” : Not found anywhere
-     * “NotConfirmed” : Found on local node, but not in network (Holding Map)
-     * “TransactionACK” : Found in network, but not written to the blockchain yet (ProcessList)
-     * “DBlockConfirmed” : Found in Blockchain
+     * "Unknown" : Not found anywhere
+     * "NotConfirmed" : Found on local node, but not in network (Holding Map)
+     * "TransactionACK" : Found in network, but not written to the blockchain yet (ProcessList)
+     * "DBlockConfirmed" : Found in Blockchain
      * You may also provide the full marshaled transaction, instead of a hash, and it will be hashed for you.
      * </p>
      * The responses vary based on the type
@@ -104,10 +104,10 @@ public interface FactomdClient {
      * The response will look different than entry related ack calls.
      * <p>
      * The status types returned are as follows:
-     * “Unknown” : Not found anywhere
-     * “NotConfirmed” : Found on local node, but not in network (Holding Map)
-     * “TransactionACK” : Found in network, but not written to the blockchain yet (ProcessList)
-     * “DBlockConfirmed” : Found in Blockchain
+     * "Unknown" : Not found anywhere
+     * "NotConfirmed" : Found on local node, but not in network (Holding Map)
+     * "TransactionACK" : Found in network, but not written to the blockchain yet (ProcessList)
+     * "DBlockConfirmed" : Found in Blockchain
      * You may also provide the full marshaled transaction, instead of a hash, and it will be hashed for you.
      * </p>
      * The responses vary based on the type
@@ -427,15 +427,15 @@ public interface FactomdClient {
      * transaction block keymr
      * are also included.
      * <p>
-     * The "blockheight” parameter in the response will always be 0 when using this call, refer to “includedindirectoryblockheight” if you need the height.
+     * The "blockheight" parameter in the response will always be 0 when using this call, refer to "includedindirectoryblockheight" if you need the height.
      * </p>
      * <p>
      * Note: This call will also accept an entry hash as input, in which case the returned data concerns the entry. The returned fields and their format are shown in the 2nd Example Response at right.
      * Note: If the input hash is non-existent, the returned fields will be as follows:
      * </p>
-     * “includedintransactionblock”:“”
-     * “includedindirectoryblock”:“”
-     * “includedindirectoryblockheight”:-1
+     * "includedintransactionblock":""
+     * "includedindirectoryblock":""
+     * "includedindirectoryblockheight":-1
      *
      * @param hash
      * @return
