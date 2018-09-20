@@ -1,6 +1,5 @@
 package org.blockchain_innovation.factom.client.jee.cdi;
 
-import org.blockchain_innovation.factom.client.api.model.Address;
 import org.blockchain_innovation.factom.client.api.model.Chain;
 import org.blockchain_innovation.factom.client.api.model.Entry;
 import org.blockchain_innovation.factom.client.api.model.response.CommitAndRevealChainResponse;
@@ -28,14 +27,12 @@ import java.util.concurrent.atomic.AtomicReference;
 @RunWith(Arquillian.class)
 public class EventTest extends AbstractCDITest {
 
-    @Inject
-    @ManagedClient
-    private Provider<EntryApiImpl> entryApiProvider;
-
     static AtomicReference<CommitEntryResponse> commitChainResponseRef = new AtomicReference<>();
     static AtomicReference<RevealResponse> revealChainResponseRef = new AtomicReference<>();
     static AtomicReference<EntryTransactionResponse> transactionAcknowledgedResponseRef = new AtomicReference<>();
-
+    @Inject
+    @ManagedClient
+    private Provider<EntryApiImpl> entryApiProvider;
 
     @Test
     public void commitAndRevealEventTest() {
@@ -58,29 +55,29 @@ public class EventTest extends AbstractCDITest {
         Assert.assertNotNull(commitAndRevealChain.getCommitChainResponse().getEntryHash(), transactionAcknowledgedResponseRef.get().getEntryHash());
 
         System.out.println("commitAndRevealChain = " + commitAndRevealChain);
-
     }
 
     public void testEvent(@Observes ComposeResponse composeResponse) {
-        System.err.println("COMPOSE RESONSE: "+ composeResponse);
+        System.err.println("COMPOSE RESONSE: " + composeResponse);
     }
 
     public void commitChainResponse(@Observes CommitChainResponse commitChainResponse) {
-        System.err.println("COMMIT CHAIN RESPONSE: "+ commitChainResponse);
+        System.err.println("COMMIT CHAIN RESPONSE: " + commitChainResponse);
         commitChainResponseRef.set(commitChainResponse);
     }
+
     public void revealChainResponse(@Observes RevealResponse revealResponse) {
-        System.err.println("REVEAL RESPONSE: "+ revealResponse);
+        System.err.println("REVEAL RESPONSE: " + revealResponse);
         revealChainResponseRef.set(revealResponse);
     }
 
     public void transactionAcknowledged(@Observes EntryTransactionResponse transactionResponse) {
-        System.err.println("TRANSACTION RESPONSE: "+ transactionResponse);
+        System.err.println("TRANSACTION RESPONSE: " + transactionResponse);
         transactionAcknowledgedResponseRef.set(transactionResponse);
     }
 
     public void onError(@Observes RpcErrorResponse errorResponse) {
-        System.err.println("ERROR RESPONSE: "+ errorResponse);
+        System.err.println("ERROR RESPONSE: " + errorResponse);
         Assert.fail(errorResponse.getError().getMessage());
     }
 

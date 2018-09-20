@@ -16,7 +16,9 @@
 
 package org.blockchain_innovation.factom.client.api.model.response.factomd;
 
-public class DirectoryBlockHeadResponse {
+import java.io.Serializable;
+
+public class DirectoryBlockHeadResponse implements Serializable {
     private String keymr;
 
     public String getKeyMR() {

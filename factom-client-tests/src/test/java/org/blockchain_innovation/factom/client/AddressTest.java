@@ -1,35 +1,11 @@
 package org.blockchain_innovation.factom.client;
 
-import net.i2p.crypto.eddsa.EdDSAPrivateKey;
-import net.i2p.crypto.eddsa.math.GroupElement;
-import net.i2p.crypto.eddsa.spec.EdDSANamedCurveTable;
-import net.i2p.crypto.eddsa.spec.EdDSAPrivateKeySpec;
 import org.blockchain_innovation.factom.client.api.AddressKeyConversions;
 import org.blockchain_innovation.factom.client.api.model.types.AddressType;
-import org.blockchain_innovation.factom.client.api.ops.Base58;
-import org.blockchain_innovation.factom.client.api.ops.Digests;
 import org.blockchain_innovation.factom.client.api.ops.Encoding;
 import org.blockchain_innovation.factom.client.impl.OfflineAddressKeyConversions;
-import org.bouncycastle.asn1.sec.SECNamedCurves;
-import org.bouncycastle.asn1.x9.X9ECParameters;
-import org.bouncycastle.jce.ECNamedCurveTable;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.bouncycastle.jce.spec.ECNamedCurveParameterSpec;
-import org.bouncycastle.jce.spec.ECPublicKeySpec;
-import org.bouncycastle.math.ec.ECPoint;
 import org.junit.Assert;
 import org.junit.Test;
-
-import java.math.BigInteger;
-
-import java.security.KeyFactory;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.PublicKey;
-import java.security.spec.InvalidKeySpecException;
-import java.util.Arrays;
-import java.util.stream.Stream;
 
 public class AddressTest extends AbstractClientTest {
     private static AddressKeyConversions conversions = new AddressKeyConversions();
@@ -119,7 +95,7 @@ public class AddressTest extends AbstractClientTest {
     @Test
     public void testAddressToPublic() {
         OfflineAddressKeyConversions conversions = new OfflineAddressKeyConversions();
-        String publicAddress= conversions.addressToPublicAddress(EC_SECRET_ADDRESS);
+        String publicAddress = conversions.addressToPublicAddress(EC_SECRET_ADDRESS);
 
         AddressType.ENTRY_CREDIT_PUBLIC.assertValid(publicAddress);
         Assert.assertEquals(EC_PUBLIC_ADDRESS, publicAddress);

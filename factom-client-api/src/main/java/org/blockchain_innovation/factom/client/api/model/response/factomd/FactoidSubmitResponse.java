@@ -16,7 +16,9 @@
 
 package org.blockchain_innovation.factom.client.api.model.response.factomd;
 
-public class FactoidSubmitResponse {
+import java.io.Serializable;
+
+public class FactoidSubmitResponse implements Serializable {
 
     private String message;
     private String txid;

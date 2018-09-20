@@ -22,7 +22,6 @@ import org.blockchain_innovation.factom.client.api.rpc.RpcMethod;
 import org.blockchain_innovation.factom.client.api.rpc.RpcResponse;
 
 import javax.inject.Named;
-import javax.inject.Singleton;
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
 import javax.json.bind.JsonbConfig;
@@ -31,22 +30,25 @@ import javax.json.bind.config.PropertyVisibilityStrategy;
 import javax.json.bind.serializer.JsonbSerializer;
 import javax.json.bind.serializer.SerializationContext;
 import javax.json.stream.JsonGenerator;
-import java.io.Serializable;
-import java.lang.reflect.*;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.Objects;
 import java.util.Properties;
 
 import static javax.json.bind.config.PropertyOrderStrategy.LEXICOGRAPHICAL;
 
 @Named
-public class JsonConverterJEE implements JsonConverter, Serializable {
+public class JsonConverterJEE implements JsonConverter {
     protected static final String RPC_METHOD = "method";
-    private Jsonb jsonb;
 
     static {
         Registry.register(JsonConverterJEE.class);
     }
 
+    private Jsonb jsonb;
 
     @Override
     public JsonConverterJEE configure(Properties properties) {
@@ -68,8 +70,8 @@ public class JsonConverterJEE implements JsonConverter, Serializable {
                 withPropertyOrderStrategy(LEXICOGRAPHICAL).
                 withSerializers(new RpcMethodSerializer()).
 //                withDeserializers(new RpcMethodDeserializer()).
-                withPropertyVisibilityStrategy(propertyVisibilityStrategy()).
-                withPropertyNamingStrategy(propertyNamingStrategy());
+        withPropertyVisibilityStrategy(propertyVisibilityStrategy()).
+                        withPropertyNamingStrategy(propertyNamingStrategy());
         return config;
     }
 
@@ -147,7 +149,7 @@ public class JsonConverterJEE implements JsonConverter, Serializable {
     }
 
 
-    private class RpcMethodSerializer implements JsonbSerializer<RpcMethod> {
+    private static class RpcMethodSerializer implements JsonbSerializer<RpcMethod> {
         public void serialize(RpcMethod rpcMethod, JsonGenerator jsonGenerator, SerializationContext serializationContext) {
             if (rpcMethod != null) {
                 serializationContext.serialize(rpcMethod.toJsonValue(), jsonGenerator);

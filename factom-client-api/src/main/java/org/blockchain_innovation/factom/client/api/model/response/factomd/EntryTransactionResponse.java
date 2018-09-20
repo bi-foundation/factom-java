@@ -16,7 +16,9 @@
 
 package org.blockchain_innovation.factom.client.api.model.response.factomd;
 
-public class EntryTransactionResponse {
+import java.io.Serializable;
+
+public class EntryTransactionResponse implements Serializable {
 
     private String committxid;
     private String entryhash;
@@ -46,7 +48,7 @@ public class EntryTransactionResponse {
         DBlockConfirmed
     }
 
-    public static class CommitData {
+    public static class CommitData implements Serializable {
 
         private Status status;
 
@@ -55,7 +57,7 @@ public class EntryTransactionResponse {
         }
     }
 
-    public static class EntryData {
+    public static class EntryData implements Serializable {
         private String status;
 
         public String getStatus() {

@@ -16,26 +16,32 @@
 
 package org.blockchain_innovation.factom.client.impl.json.gson;
 
-import com.google.gson.*;
+import com.google.gson.FieldNamingPolicy;
+import com.google.gson.FieldNamingStrategy;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
 import com.google.gson.reflect.TypeToken;
-import javafx.beans.NamedArg;
 import org.blockchain_innovation.factom.client.api.json.JsonConverter;
 import org.blockchain_innovation.factom.client.api.rpc.RpcErrorResponse;
 import org.blockchain_innovation.factom.client.api.rpc.RpcMethod;
 import org.blockchain_innovation.factom.client.api.rpc.RpcResponse;
 
 import javax.inject.Named;
-import java.io.Serializable;
 import java.lang.reflect.Type;
 import java.util.Properties;
 
 @Named
-public class JsonConverterGSON implements JsonConverter, Serializable {
-    private Gson gson;
-
+public class JsonConverterGSON implements JsonConverter {
     static {
         Registry.register(JsonConverterGSON.class);
     }
+
+    private Gson gson;
 
     @Override
     public JsonConverterGSON configure(Properties properties) {
@@ -107,7 +113,7 @@ public class JsonConverterGSON implements JsonConverter, Serializable {
     }
 
 
-    private class RpcMethodSerializer implements JsonSerializer<RpcMethod> {
+    private static class RpcMethodSerializer implements JsonSerializer<RpcMethod> {
         public JsonElement serialize(RpcMethod rpcMethod, Type typeOfSrc, JsonSerializationContext context) {
             return new JsonPrimitive(rpcMethod.toJsonValue());
         }

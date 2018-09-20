@@ -16,7 +16,9 @@
 
 package org.blockchain_innovation.factom.client.api.model.response.factomd;
 
-public class SendRawMessageResponse {
+import java.io.Serializable;
+
+public class SendRawMessageResponse implements Serializable {
 
     private String message;
 

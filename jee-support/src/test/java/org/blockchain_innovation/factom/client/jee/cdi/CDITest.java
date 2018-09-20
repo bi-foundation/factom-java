@@ -3,7 +3,11 @@ package org.blockchain_innovation.factom.client.jee.cdi;
 import org.blockchain_innovation.factom.client.api.AddressKeyConversions;
 import org.blockchain_innovation.factom.client.api.FactomdClient;
 import org.blockchain_innovation.factom.client.api.WalletdClient;
-import org.blockchain_innovation.factom.client.api.ops.*;
+import org.blockchain_innovation.factom.client.api.ops.Base58;
+import org.blockchain_innovation.factom.client.api.ops.ByteOperations;
+import org.blockchain_innovation.factom.client.api.ops.EncodeOperations;
+import org.blockchain_innovation.factom.client.api.ops.EntryOperations;
+import org.blockchain_innovation.factom.client.api.ops.StringUtils;
 import org.jboss.arquillian.junit.Arquillian;
 import org.junit.Assert;
 import org.junit.Test;
@@ -33,10 +37,12 @@ public class CDITest extends AbstractCDITest {
     @Inject
     private AddressKeyConversions addressKeyConversions;
 
-    @Inject @ManagedClient
+    @Inject
+    @ManagedClient
     private Provider<FactomdClient> factomdClientProvider;
 
-    @Inject @ManagedClient
+    @Inject
+    @ManagedClient
     private Provider<WalletdClient> walletdClientProvider;
 
 
@@ -53,8 +59,6 @@ public class CDITest extends AbstractCDITest {
 
         Assert.assertNotNull(factomdClientProvider.get().heights().join().getRpcResponse().getResult());
     }
-
-
 
 
 }

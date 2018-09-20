@@ -33,14 +33,17 @@ import java.util.Properties;
 
 public class AbstractClientTest {
 
-    protected final static String EC_PUBLIC_ADDRESS = System.getProperty("FACTOM_CLIENT_TEST_EC_PUBLIC_ADDRESS", "EC3cqLZPq5ypwRB5CLfXnud5vkWAV2sd235CFf9KcWcE3FH9GRxv");
-    protected final static String EC_SECRET_ADDRESS = System.getProperty("FACTOM_CLIENT_TEST_EC_SECRET_ADDRESS", "Es3Y6U6H1Pfg4wYag8VMtRZEGuEJnfkJ2ZuSyCVcQKweB6y4WvGH");
-    protected final static String FCT_PUBLIC_ADDRESS = System.getProperty("FACTOM_CLIENT_TEST_FACTOID_PUBLIC_ADDRESS", "FA2ZrcG8xkwWWNfdMRw5pGNjMPEkLaxRGqacvzfLS6TGHEHZqAA4");
-    protected static final String FCT_SECRET_ADDRESS = System.getProperty("FACTOM_CLIENT_TEST_FACTOID_SECRET_ADDRESS","Fs1jQGc9GJjyWNroLPq7x6LbYQHveyjWNPXSqAvCEKpETNoTU5dP");
+    protected static final String EC_PUBLIC_ADDRESS = System.getProperty("FACTOM_CLIENT_TEST_EC_PUBLIC_ADDRESS", "EC3cqLZPq5ypwRB5CLfXnud5vkWAV2sd235CFf9KcWcE3FH9GRxv");
+    protected static final String EC_SECRET_ADDRESS = System.getProperty("FACTOM_CLIENT_TEST_EC_SECRET_ADDRESS", "Es3Y6U6H1Pfg4wYag8VMtRZEGuEJnfkJ2ZuSyCVcQKweB6y4WvGH");
+    protected static final String FCT_PUBLIC_ADDRESS = System.getProperty("FACTOM_CLIENT_TEST_FACTOID_PUBLIC_ADDRESS","FA2ZrcG8xkwWWNfdMRw5pGNjMPEkLaxRGqacvzfLS6TGHEHZqAA4");
+    protected static final String FCT_SECRET_ADDRESS = System.getProperty("FACTOM_CLIENT_TEST_FACTOID_SECRET_ADDRESS", "Fs1jQGc9GJjyWNroLPq7x6LbYQHveyjWNPXSqAvCEKpETNoTU5dP");
+
+    static {
+        System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "debug");
+    }
 
     protected final FactomdClientImpl factomdClient = new FactomdClientImpl();
     protected final WalletdClientImpl walletdClient = new WalletdClientImpl();
-
     protected final EntryApiImpl entryClient = new EntryApiImpl();
     protected final EntryApiImpl offlineEntryClient = new EntryApiImpl();
     protected final OfflineWalletdClientImpl offlineWalletdClient = new OfflineWalletdClientImpl();
@@ -67,10 +70,6 @@ public class AbstractClientTest {
         properties.load(is);
         is.close();
         return properties;
-    }
-
-    static {
-        System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "debug");
     }
 
     protected void assertValidResponse(FactomResponse<?> factomResponse) {

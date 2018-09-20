@@ -16,7 +16,9 @@
 
 package org.blockchain_innovation.factom.client.api.model.response.walletd;
 
-public class BlockHeightTransactionResponse extends ExecutedTransactionResponse {
+import java.io.Serializable;
+
+public class BlockHeightTransactionResponse extends ExecutedTransactionResponse implements Serializable {
 
     private int blockheight;
 

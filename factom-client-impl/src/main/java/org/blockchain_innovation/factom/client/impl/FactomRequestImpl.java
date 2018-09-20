@@ -22,7 +22,6 @@ import org.blockchain_innovation.factom.client.api.rpc.RpcRequest;
 public class FactomRequestImpl implements FactomRequest {
     private final RpcRequest rpcRequest;
 
-
     public FactomRequestImpl(RpcRequest rpcRequest) {
         this.rpcRequest = rpcRequest;
     }
@@ -32,11 +31,10 @@ public class FactomRequestImpl implements FactomRequest {
         return rpcRequest;
     }
 
-
     @Override
     public String toString() {
         if (rpcRequest == null) {
-            return null;
+            return "null";
         }
         return rpcRequest.toString();
     }

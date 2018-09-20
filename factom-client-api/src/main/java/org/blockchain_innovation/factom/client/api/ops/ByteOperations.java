@@ -30,7 +30,7 @@ import java.util.Arrays;
 public class ByteOperations {
 
     /**
-     * Concatenates two byte arrays
+     * Concatenates two byte arrays.
      *
      * @param first
      * @param append
@@ -47,7 +47,7 @@ public class ByteOperations {
 
 
     /**
-     * Concatenates a byte array with a single byte
+     * Concatenates a byte array with a single byte.
      *
      * @param first
      * @param append
@@ -60,7 +60,8 @@ public class ByteOperations {
     }
 
     /**
-     * Concatenates a byte array with a string
+     * Concatenates a byte array with a string.
+     *
      * @param first
      * @param append
      * @return
@@ -73,7 +74,7 @@ public class ByteOperations {
     }
 
     /**
-     * Convert a int value (within short range) to byte array
+     * Convert a int value (within short range) to byte array.
      *
      * @param value
      * @return
@@ -89,7 +90,7 @@ public class ByteOperations {
 
 
     /**
-     * Convert a short value to byte array
+     * Convert a short value to byte array.
      *
      * @param value
      * @return

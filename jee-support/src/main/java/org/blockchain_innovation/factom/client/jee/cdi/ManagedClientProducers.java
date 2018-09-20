@@ -13,12 +13,11 @@ import javax.enterprise.concurrent.ManagedExecutorService;
 import javax.enterprise.context.RequestScoped;
 import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
 @RequestScoped
-public class ManagedClientProducers implements Serializable {
+public class ManagedClientProducers {
 
     @Resource
     ManagedExecutorService managedExecutorService;

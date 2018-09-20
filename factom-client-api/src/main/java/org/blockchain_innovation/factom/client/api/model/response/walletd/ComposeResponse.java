@@ -41,7 +41,7 @@ public class ComposeResponse implements Serializable {
         return this;
     }
 
-    public static class Commit {
+    public static class Commit implements Serializable {
         private String jsonrpc;
         private int id;
         private Params params;
@@ -83,7 +83,7 @@ public class ComposeResponse implements Serializable {
             return this;
         }
 
-        public static class Params {
+        public static class Params implements Serializable {
             private String message;
 
             public String getMessage() {
@@ -97,7 +97,7 @@ public class ComposeResponse implements Serializable {
         }
     }
 
-    public static class Reveal {
+    public static class Reveal implements Serializable {
         private String jsonrpc;
         private int id;
         private Params params;
@@ -139,7 +139,7 @@ public class ComposeResponse implements Serializable {
             return this;
         }
 
-        public static class Params {
+        public static class Params implements Serializable {
             private String entry;
 
             public String getEntry() {

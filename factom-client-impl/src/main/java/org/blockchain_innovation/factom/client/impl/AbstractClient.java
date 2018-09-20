@@ -25,13 +25,18 @@ import org.blockchain_innovation.factom.client.api.rpc.RpcRequest;
 import org.blockchain_innovation.factom.client.api.settings.RpcSettings;
 
 import java.net.URL;
-import java.util.concurrent.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 abstract class AbstractClient implements LowLevelClient {
 
+    protected EncodeOperations encodeOperations = new EncodeOperations();
     private URL url;
     private RpcSettings settings;
-    protected EncodeOperations encodeOperations = new EncodeOperations();
     private ExecutorService executorService;
 
 
@@ -99,13 +104,5 @@ abstract class AbstractClient implements LowLevelClient {
             }
         }
         return executorService;
-    }
-
-    protected static ThreadFactory threadFactory(final String name, final boolean daemon) {
-        return runnable -> {
-            Thread result = new Thread(runnable, name);
-            result.setDaemon(daemon);
-            return result;
-        };
     }
 }

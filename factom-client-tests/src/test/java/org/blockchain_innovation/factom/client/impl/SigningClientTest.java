@@ -92,7 +92,7 @@ public class SigningClientTest extends AbstractClientTest {
         return entry;
     }
 
-    class TestOfflineWalletdClientImpl extends OfflineWalletdClientImpl {
+    static class TestOfflineWalletdClientImpl extends OfflineWalletdClientImpl {
         protected byte[] currentTimeMillis() {
             Instant timeInstant = Instant.parse("2018-01-10T02:01:40.222Z");
             long now = timeInstant.toEpochMilli();

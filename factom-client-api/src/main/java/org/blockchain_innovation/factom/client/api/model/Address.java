@@ -18,7 +18,9 @@ package org.blockchain_innovation.factom.client.api.model;
 
 import org.blockchain_innovation.factom.client.api.model.types.AddressType;
 
-public class Address {
+import java.io.Serializable;
+
+public class Address implements Serializable {
 
     private String secret;
 

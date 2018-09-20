@@ -16,7 +16,9 @@
 
 package org.blockchain_innovation.factom.client.api.model.response.factomd;
 
-public class PropertiesResponse {
+import java.io.Serializable;
+
+public class PropertiesResponse implements Serializable {
 
     private String factomdversion;
     private String factomdapiversion;

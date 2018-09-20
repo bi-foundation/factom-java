@@ -1,6 +1,8 @@
 package org.blockchain_innovation.factom.client.api.model.response.factomd;
 
-public class CurrentMinuteResponse {
+import java.io.Serializable;
+
+public class CurrentMinuteResponse implements Serializable {
     private long leaderheight;
     private long directoryblockheight;
     private int minute;

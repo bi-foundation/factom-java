@@ -20,7 +20,10 @@ import org.blockchain_innovation.factom.client.api.rpc.RpcErrorResponse;
 import org.blockchain_innovation.factom.client.api.rpc.RpcResponse;
 
 /**
- * A composition class around the RpcResponse to get access to different values from a server response, like http codes, errors, results
+ * A composition class around the RpcResponse to get access to different values from a server response,
+ * like http codes, errors, results.
+ *
+ * @param <Result> type of result in responses
  */
 public interface FactomResponse<Result> {
     /**
@@ -31,14 +34,14 @@ public interface FactomResponse<Result> {
     RpcResponse getRpcResponse();
 
     /**
-     * The result object deserialized
+     * The result object deserialized.
      *
      * @return The result in the RpcResponse
      */
     Result getResult();
 
     /**
-     * The deserialized error response
+     * The deserialized error response.
      *
      * @return The error response
      */
@@ -66,7 +69,7 @@ public interface FactomResponse<Result> {
     String getHTTPResponseMessage();
 
     /**
-     * Checks if the Rpc response contains errors
+     * Checks if the Rpc response contains errors.
      *
      * @return if the Response contains errors
      */

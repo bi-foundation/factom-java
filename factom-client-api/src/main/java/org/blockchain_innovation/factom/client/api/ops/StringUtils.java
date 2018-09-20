@@ -26,7 +26,7 @@ import javax.inject.Singleton;
  */
 public class StringUtils {
     /**
-     * Returns true whenever the input string is null or equals an empty string
+     * Returns true whenever the input string is null or equals an empty string.
      *
      * @param input
      * @return
@@ -36,7 +36,7 @@ public class StringUtils {
     }
 
     /**
-     * Returns true whenever the input string is not null and does not equal an empty string
+     * Returns true whenever the input string is not null and does not equal an empty string.
      *
      * @param input
      * @return

@@ -16,9 +16,10 @@
 
 package org.blockchain_innovation.factom.client.api.model.response.factomd;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class EntryResponse {
+public class EntryResponse implements Serializable {
     private String chainid;
     private String content;
     private List<String> extids;

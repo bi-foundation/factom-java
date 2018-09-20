@@ -16,9 +16,10 @@
 
 package org.blockchain_innovation.factom.client.api.model.response.factomd;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class PendingEntriesResponse extends ArrayList<PendingEntriesResponse.PendingEntry> {
+public class PendingEntriesResponse extends ArrayList<PendingEntriesResponse.PendingEntry> implements Serializable {
 
     public static class PendingEntry {
         private String entryhash;

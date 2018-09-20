@@ -16,7 +16,9 @@
 
 package org.blockchain_innovation.factom.client.api.model.response.walletd;
 
-public class TransactionResponse extends AbstractTransactionResponse {
+import java.io.Serializable;
+
+public class TransactionResponse extends AbstractTransactionResponse implements Serializable {
 
     private long feesrequired;
     private String txid;
