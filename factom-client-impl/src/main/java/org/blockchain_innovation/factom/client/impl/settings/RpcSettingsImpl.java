@@ -30,6 +30,11 @@ public class RpcSettingsImpl implements RpcSettings {
     private Server server;
 
 
+    public RpcSettingsImpl(SubSystem subSystem, Server server) {
+        this.subSystem = subSystem;
+        this.server = server;
+    }
+
     public RpcSettingsImpl(SubSystem subSystem, Properties properties) {
         setSubSystem(subSystem);
         setServer(new ServerImpl(subSystem, properties));

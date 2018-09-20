@@ -34,6 +34,11 @@ abstract class AbstractClient implements LowLevelClient {
     protected EncodeOperations encodeOperations = new EncodeOperations();
     private ExecutorService executorService;
 
+
+    public LowLevelClient lowLevelClient() {
+        return this;
+    }
+
     @Override
     public RpcSettings getSettings() {
         if (settings == null) {

@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public interface WalletdClient {
+    LowLevelClient lowLevelClient();
     /**
      * When adding entry credit outputs, the amount given is in factoshis, not entry credits. This means math is required to determine the correct amount of factoshis to pay to get X EC.
      * (ECRate * ECTotalOutput)

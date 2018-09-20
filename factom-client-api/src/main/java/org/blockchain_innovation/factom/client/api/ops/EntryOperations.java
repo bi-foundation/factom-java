@@ -74,8 +74,8 @@ public class EntryOperations {
      *
      * @param externalIds The external Ids
      * @param content     The content
+     * @param chainId     The chain Id
      * @return The entryHash
-     * @Param chainId The chain Id
      */
     public byte[] calculateEntryHash(List<String> externalIds, String content, String chainId) {
         byte[] entryBytes = entryToBytes(externalIds, content, chainId);
@@ -100,8 +100,8 @@ public class EntryOperations {
      *
      * @param externalIds The external Ids
      * @param content     The content
+     * @param chainId     The chain Id
      * @return
-     * @Param chainId The chain Id
      */
     public byte[] entryToBytes(List<String> externalIds, String content, String chainId) {
         byte[] chainIdBytes;
