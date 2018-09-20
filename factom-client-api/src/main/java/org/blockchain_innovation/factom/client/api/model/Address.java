@@ -41,4 +41,9 @@ public class Address implements Serializable {
     public AddressType getType() {
         return AddressType.getType(getValue());
     }
+
+    @Override
+    public String toString() {
+        return "Address{" + secret + '}';
+    }
 }

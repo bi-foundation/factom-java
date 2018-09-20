@@ -23,7 +23,6 @@ plugins {
     id 'org.springframework.boot' version '2.0.5.RELEASE' apply false
 }
 
-
 // In this section you declare where to find the dependencies of your project
 allprojects {
     repositories {
@@ -35,11 +34,6 @@ allprojects {
 
 }
 
-subprojects {
-    tasks.withType(JavaCompile) {
-        options.encoding = "UTF-8"
-    }
-}
 
 
 
@@ -47,6 +41,7 @@ subprojects {
     apply plugin: 'checkstyle'
     apply plugin: 'findbugs'
     apply plugin: 'pmd'
+
 
     buildscript {
         repositories {
@@ -57,12 +52,16 @@ subprojects {
         }
     }
 
-    tasks.withType(Pmd){
+    tasks.withType(JavaCompile) {
+        options.encoding = "UTF-8"
+    }
+
+    tasks.withType(Pmd) {
         ignoreFailures = false
         consoleOutput = true
-        reports{
-            xml.enabled=true
-            html.enabled=true
+        reports {
+            xml.enabled = true
+            html.enabled = true
             html.destination file("${project.projectDir}/../quality/reports/${project.name}-pmd.html")
         }
     }
@@ -205,7 +204,6 @@ project(':spring-support') {
         testCompile('org.springframework.boot:spring-boot-starter-test')
 
     }
-
 
 
 }
