@@ -21,12 +21,12 @@ import org.blockchain_innovation.factom.client.api.FactomResponse;
 import org.blockchain_innovation.factom.client.api.LowLevelClient;
 import org.blockchain_innovation.factom.client.api.errors.FactomException;
 import org.blockchain_innovation.factom.client.api.json.JsonConverter;
+import org.blockchain_innovation.factom.client.api.log.LogFactory;
+import org.blockchain_innovation.factom.client.api.log.Logger;
 import org.blockchain_innovation.factom.client.api.rpc.RpcErrorResponse;
 import org.blockchain_innovation.factom.client.api.rpc.RpcRequest;
 import org.blockchain_innovation.factom.client.api.rpc.RpcResponse;
 import org.blockchain_innovation.factom.client.api.settings.RpcSettings;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -49,7 +49,7 @@ public class Exchange<Result> {
     private final RpcSettings settings;
     private final FactomRequest factomRequest;
     private final Class<Result> rpcResultClass;
-    private final Logger logger = LoggerFactory.getLogger(Exchange.class);
+    private static Logger logger = LogFactory.getLogger(Exchange.class);
     private final ExecutorService executorService;
     private HttpURLConnection connection;
     private FactomResponse<Result> factomResponse;
@@ -102,7 +102,7 @@ public class Exchange<Result> {
         if (getFactomRequest().getRpcRequest() != null) {
             try (OutputStream outputStream = connection().getOutputStream(); OutputStreamWriter out = new OutputStreamWriter(outputStream, Charset.defaultCharset())) {
                 String json = JsonConverter.Provider.getInstance().toJson(getFactomRequest().getRpcRequest());
-                logger.debug("request({}): {} ", getFactomRequest().getRpcRequest().getId(), json);
+                logger.debug("request(%d): %s ", getFactomRequest().getRpcRequest().getId(), json);
                 out.write(json);
             } catch (IOException e) {
                 throw new FactomException.ClientException(String.format("Error while talking to %s: %s", url, e.getMessage()), e);
@@ -116,7 +116,7 @@ public class Exchange<Result> {
              InputStreamReader streamReader = new InputStreamReader(is, Charset.defaultCharset());
              BufferedReader reader = new BufferedReader(streamReader)) {
             String json = reader.lines().collect(Collectors.joining());
-            logger.debug("response({}): {}", getFactomRequest().getRpcRequest().getId(), JsonConverter.Provider.getInstance().prettyPrint(json));
+            logger.debug("response(%d): %s", getFactomRequest().getRpcRequest().getId(), JsonConverter.Provider.getInstance().prettyPrint(json));
             RpcResponse<Result> rpcResult = JsonConverter.Provider.getInstance().fromJson(json, rpcResultClass);
             this.factomResponse = new FactomResponseImpl<>(this, rpcResult, connection().getResponseCode(), connection().getResponseMessage());
             return factomResponse;
@@ -131,11 +131,11 @@ public class Exchange<Result> {
                 // No you never log yourself and rethrow an exception. We are however a library so are reliant on the implementor
                 // to do proper logging on exception. Hence we bind to debug level to not upset everybody ;)
                 if (logger.isDebugEnabled()) {
-                    logger.error("RPC Server returned an error response. HTTP code: {}, message: {}", getFactomResponse().getHTTPResponseCode(), getFactomResponse().getHTTPResponseMessage());
-                    logger.error("error response({}): {}", getFactomRequest().getRpcRequest().getId(), JsonConverter.Provider.getInstance().prettyPrint(error) + "\n");
+                    logger.error("RPC Server returned an error response. HTTP code: %s, message: %s", getFactomResponse().getHTTPResponseCode(), getFactomResponse().getHTTPResponseMessage());
+                    logger.error("error response(%d): %s", getFactomRequest().getRpcRequest().getId(), JsonConverter.Provider.getInstance().prettyPrint(error) + "\n");
                 }
             } catch (RuntimeException | IOException e2) {
-                logger.error("Error after handling an error response of the server: " + e2.getMessage() + ". Error body: " + error, e2);
+                logger.error("Error after handling an error response of the server: %s. Error body: %s", e2, e2.getMessage(), error);
                 // Fallback to client exception when we could not retrieve the error response
                 throw new FactomException.ClientException(e);
             }

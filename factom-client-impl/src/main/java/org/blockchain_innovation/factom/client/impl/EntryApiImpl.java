@@ -6,6 +6,8 @@ import org.blockchain_innovation.factom.client.api.LowLevelClient;
 import org.blockchain_innovation.factom.client.api.WalletdClient;
 import org.blockchain_innovation.factom.client.api.errors.FactomException;
 import org.blockchain_innovation.factom.client.api.listeners.CommitAndRevealListener;
+import org.blockchain_innovation.factom.client.api.log.LogFactory;
+import org.blockchain_innovation.factom.client.api.log.Logger;
 import org.blockchain_innovation.factom.client.api.model.Address;
 import org.blockchain_innovation.factom.client.api.model.Chain;
 import org.blockchain_innovation.factom.client.api.model.Entry;
@@ -16,8 +18,6 @@ import org.blockchain_innovation.factom.client.api.model.response.factomd.Commit
 import org.blockchain_innovation.factom.client.api.model.response.factomd.EntryTransactionResponse;
 import org.blockchain_innovation.factom.client.api.model.response.factomd.RevealResponse;
 import org.blockchain_innovation.factom.client.api.model.response.walletd.ComposeResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.inject.Named;
 import java.util.ArrayList;
@@ -34,7 +34,7 @@ import java.util.function.Consumer;
 public class EntryApiImpl {
 
     private static final int ENTRY_REVEAL_WAIT = 2000;
-    private final Logger logger = LoggerFactory.getLogger(EntryApiImpl.class);
+    private static Logger logger = LogFactory.getLogger(EntryApiImpl.class);
     private int transactionAcknowledgeTimeout = 10000; // 10 sec
     private int commitConfirmedTimeout = 15 * 60000; // 15 min
 
@@ -171,31 +171,31 @@ public class EntryApiImpl {
                 .thenApplyAsync(_composeEntryResponse -> notifyCompose(_composeEntryResponse), executorService())
                 // commit chain
                 .thenComposeAsync(_composeEntryResponse -> commitEntryFuture(_composeEntryResponse)
-                        .thenApplyAsync(_commitEntryResponse -> notifyEntryCommit(_commitEntryResponse), executorService())
-                        // wait to transaction is known
-                        .thenComposeAsync(_commitEntryResponse -> waitFuture()
-                                // reveal chain
-                                .thenComposeAsync(_void -> revealEntryFuture(_composeEntryResponse)
-                                        .thenApplyAsync(_revealEntryResponse -> notifyReveal(_revealEntryResponse), executorService())
-                                        // wait for transaction acknowledgement
-                                        .thenComposeAsync(_revealEntryResponse -> transactionAcknowledgeConfirmation(_revealEntryResponse)
-                                                .thenApplyAsync(_transactionAcknowledgeResponse ->
-                                                        notifyEntryTransaction(_transactionAcknowledgeResponse), executorService())
-                                                // wait for block confirmed
-                                                .thenComposeAsync(_transactionAcknowledgeResponse ->
-                                                        transactionCommitConfirmation(confirmCommit, _revealEntryResponse)
-                                                        .thenApplyAsync(_commitConfirmedResponse -> {
-                                                            notifyCommitConfirmed(_commitConfirmedResponse);
-                                                            // create response
-                                                            CommitAndRevealEntryResponse response = new CommitAndRevealEntryResponse();
-                                                            response.setCommitEntryResponse(_commitEntryResponse.getResult());
-                                                            response.setRevealResponse(_revealEntryResponse.getResult());
-                                                            return response;
-                                                        }, executorService()),
+                                .thenApplyAsync(_commitEntryResponse -> notifyEntryCommit(_commitEntryResponse), executorService())
+                                // wait to transaction is known
+                                .thenComposeAsync(_commitEntryResponse -> waitFuture()
+                                                // reveal chain
+                                                .thenComposeAsync(_void -> revealEntryFuture(_composeEntryResponse)
+                                                                .thenApplyAsync(_revealEntryResponse -> notifyReveal(_revealEntryResponse), executorService())
+                                                                // wait for transaction acknowledgement
+                                                                .thenComposeAsync(_revealEntryResponse -> transactionAcknowledgeConfirmation(_revealEntryResponse)
+                                                                                .thenApplyAsync(_transactionAcknowledgeResponse ->
+                                                                                        notifyEntryTransaction(_transactionAcknowledgeResponse), executorService())
+                                                                                // wait for block confirmed
+                                                                                .thenComposeAsync(_transactionAcknowledgeResponse ->
+                                                                                                transactionCommitConfirmation(confirmCommit, _revealEntryResponse)
+                                                                                                        .thenApplyAsync(_commitConfirmedResponse -> {
+                                                                                                            notifyCommitConfirmed(_commitConfirmedResponse);
+                                                                                                            // create response
+                                                                                                            CommitAndRevealEntryResponse response = new CommitAndRevealEntryResponse();
+                                                                                                            response.setCommitEntryResponse(_commitEntryResponse.getResult());
+                                                                                                            response.setRevealResponse(_revealEntryResponse.getResult());
+                                                                                                            return response;
+                                                                                                        }, executorService()),
+                                                                                        executorService()),
+                                                                        executorService()),
                                                         executorService()),
-                                                executorService()),
                                         executorService()),
-                                executorService()),
                         executorService()
                 );
 
@@ -287,7 +287,7 @@ public class EntryApiImpl {
                 int maxSeconds = timeout / sleepTime;
                 int seconds = 0;
                 while (!confirmed && seconds < maxSeconds) {
-                    logger.debug("Transaction verification of chain id={}, entry hash={} at {}", chainId, entryHash, seconds);
+                    logger.debug("Transaction verification of chain id=%s, entry hash=%s at %d", chainId, entryHash, seconds);
                     transactionsResponse = getFactomdClient().ackTransactions(entryHash, chainId, EntryTransactionResponse.class).join();
 
                     if (!transactionsResponse.hasErrors()) {
@@ -301,11 +301,11 @@ public class EntryApiImpl {
                     throw new FactomException.ClientException(String.format("Transaction of chain id=%s, entry hash=%s didn't return a response after %s. " +
                             "Probably will not succeed! ", chainId, entryHash, seconds));
                 } else if (transactionsResponse.hasErrors()) {
-                    logger.error("Transaction of chain id={}, entry hash={} received error after {}, errors={}. Probably will not succeed! ",
+                    logger.error("Transaction of chain id=%s, entry hash=%s received error after %d, errors=%s. Probably will not succeed! ",
                             chainId, entryHash, seconds, transactionsResponse.getRpcErrorResponse());
                 } else if (!confirmed) {
                     EntryTransactionResponse.Status status = transactionsResponse.getResult().getCommitData().getStatus();
-                    logger.error("Transaction of chain id={}, entry hash={} still not in desired status after {}, state = {}. Probably will not succeed! ",
+                    logger.error("Transaction of chain id=%s, entry hash=%s still not in desired status after %d, state = %s. Probably will not succeed! ",
                             chainId, entryHash, seconds, status);
                 }
                 return transactionsResponse;

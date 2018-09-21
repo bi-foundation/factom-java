@@ -1,6 +1,8 @@
 package org.blockchain_innovation.factom.client;
 
 import org.blockchain_innovation.factom.client.api.AddressKeyConversions;
+import org.blockchain_innovation.factom.client.api.errors.FactomRuntimeException;
+import org.blockchain_innovation.factom.client.api.model.Address;
 import org.blockchain_innovation.factom.client.api.model.types.AddressType;
 import org.blockchain_innovation.factom.client.api.ops.Encoding;
 import org.blockchain_innovation.factom.client.impl.OfflineAddressKeyConversions;
@@ -10,6 +12,35 @@ import org.junit.Test;
 public class AddressTest extends AbstractClientTest {
     private static AddressKeyConversions conversions = new AddressKeyConversions();
 
+    @Test
+    public void testInvalidAddress() {
+        Assert.assertFalse(AddressType.isValidAddress("nope"));
+        Assert.assertFalse(AddressType.isValidAddress(EC_PUBLIC_ADDRESS + "nope"));
+        try {
+            conversions.addressToKey("nope");
+            Assert.fail("Invalid address should have failed here");
+        } catch (FactomRuntimeException re) {
+        }
+
+        try {
+            conversions.addressToKey(EC_PUBLIC_ADDRESS + "nope");
+            Assert.fail("Invalid address should have failed here");
+        } catch (FactomRuntimeException re) {
+        }
+
+        try {
+            conversions.addressToKey((String) null);
+            Assert.fail("Invalid address should have failed here");
+        } catch (FactomRuntimeException re) {
+        }
+        try {
+            Address address = new Address("nope");
+            Assert.fail("Invalid address should have failed here");
+        } catch (FactomRuntimeException re) {
+        }
+
+
+    }
 
     @Test
     public void testPublicECAddress() {
