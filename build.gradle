@@ -23,25 +23,23 @@ plugins {
     id 'org.springframework.boot' version '2.0.5.RELEASE' apply false
 }
 
+
 // In this section you declare where to find the dependencies of your project
 allprojects {
     repositories {
         jcenter()
+        mavenLocal()
     }
+    apply plugin: "maven"
+
     version = '0.2.1'
     group = 'org.blockchain_innovation.factom.client'
-
-
 }
-
-
-
 
 subprojects {
     apply plugin: 'checkstyle'
     apply plugin: 'findbugs'
     apply plugin: 'pmd'
-
 
     buildscript {
         repositories {
@@ -55,13 +53,13 @@ subprojects {
     tasks.withType(JavaCompile) {
         options.encoding = "UTF-8"
     }
-
-    tasks.withType(Pmd) {
-        ignoreFailures = false
+    tasks.withType(Pmd){
+        ignoreFailures = true
         consoleOutput = true
-        reports {
-            xml.enabled = true
-            html.enabled = true
+        ruleSets = ["java-basic", "java-braces", "java-clone", "java-design", "java-unnecessary", "java-sunsecure"]
+        reports{
+            xml.enabled=true
+            html.enabled=true
             html.destination file("${project.projectDir}/../quality/reports/${project.name}-pmd.html")
         }
     }
@@ -207,7 +205,6 @@ project(':frameworks:spring-boot-support') {
 
 
 }
-
 project(':factom-client-tests') {
     apply plugin: 'java'
     dependencies {
@@ -215,7 +212,7 @@ project(':factom-client-tests') {
         compile project(':factom-client-offline-signing')
         testCompile project(':json:json-converter-gson')
 //        testCompile project(':json:json-converter-jee')
-        testCompile 'org.mock-server:mockserver-netty:5.4.1'
+       testCompile 'org.mock-server:mockserver-netty:5.4.1'
         testCompile 'org.mock-server:mockserver-client-java:5.4.1'
         testCompile 'org.glassfish:javax.json:1.1.2'
         testCompile 'org.eclipse:yasson:1.0.1'
@@ -225,7 +222,6 @@ project(':factom-client-tests') {
 }
 
 project(':docs') {
-
     def exportedProjects = [
             ":factom-client-api",
             ":factom-client-impl",
@@ -235,7 +231,6 @@ project(':docs') {
             ":frameworks:jee-support",
             ":frameworks:spring-boot-support"
     ]
-
 
     buildscript {
         repositories {
@@ -276,7 +271,6 @@ project(':docs') {
     task epub3(type: AsciidoctorTask, description: 'Generates EPUB3') {
         backends 'epub3'
     }
-
     task javadocs(type: Javadoc) {
         source exportedProjects.collect { project(it).sourceSets.main.allJava }
         classpath = files(exportedProjects.collect { project(it).sourceSets.main.compileClasspath })

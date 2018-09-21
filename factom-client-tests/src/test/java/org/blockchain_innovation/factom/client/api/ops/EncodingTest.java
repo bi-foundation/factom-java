@@ -38,7 +38,6 @@ public class EncodingTest {
 
     }
 
-
     @Test
     public void hexTests() {
         String hexEncoded = Encoding.HEX.encode(Encoding.UTF_8.decode(EXAMPLE));
@@ -68,6 +67,20 @@ public class EncodingTest {
             Encoding.HEX.decode(null);
             Assert.fail("Decoding null hex value should throw assertionException");
         } catch (FactomRuntimeException.AssertionException e) {
+        }
+    }
+
+    @Test
+    public void deepHexTest() {
+        char[] chars = "0123456789abcdef".toCharArray();
+
+        for (int i = 0; i < chars.length; i++) {
+            for (int j = 0; j < chars.length; j++) {
+                String hex = chars[i] + "" + chars[j];
+                byte[] encoded = Encoding.HEX.decode(hex);
+                String hexEncoded = Encoding.HEX.encode(encoded);
+                Assert.assertEquals(hex, hexEncoded);
+            }
         }
     }
 
