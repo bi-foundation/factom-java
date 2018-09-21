@@ -23,7 +23,6 @@ plugins {
     id 'org.springframework.boot' version '2.0.5.RELEASE' apply false
 }
 
-
 // In this section you declare where to find the dependencies of your project
 allprojects {
     repositories {
@@ -53,13 +52,13 @@ subprojects {
     tasks.withType(JavaCompile) {
         options.encoding = "UTF-8"
     }
-    tasks.withType(Pmd){
+    tasks.withType(Pmd) {
         ignoreFailures = true
         consoleOutput = true
         ruleSets = ["java-basic", "java-braces", "java-clone", "java-design", "java-unnecessary", "java-sunsecure"]
-        reports{
-            xml.enabled=true
-            html.enabled=true
+        reports {
+            xml.enabled = true
+            html.enabled = true
             html.destination file("${project(':').projectDir}/quality/reports/${project.name}-pmd.html")
         }
     }
@@ -107,7 +106,7 @@ project(':factom-client-api') {
 
     dependencies {
         compileOnly 'javax.enterprise:cdi-api:2.0.SP1'
-//        api 'org.slf4j:slf4j-api:1.7.25'
+        testCompile project(':service-providers:logger-slf4j')
     }
 }
 
@@ -116,9 +115,9 @@ project(':factom-client-impl') {
     apply plugin: 'java'
     dependencies {
         compile project(':factom-client-api')
-        compile 'org.slf4j:slf4j-api:1.7.25'
         compileOnly 'javax.enterprise:cdi-api:2.0.SP1'
 
+        testCompile project(':service-providers:logger-slf4j')
         testCompile 'org.mock-server:mockserver-netty:5.4.1'
         testCompile 'org.mock-server:mockserver-client-java:5.4.1'
         testCompile 'junit:junit:4.12'
@@ -131,16 +130,25 @@ project(':factom-client-offline-signing') {
     dependencies {
         compile project(':factom-client-api')
         compile project(':factom-client-impl')
-        compile 'org.slf4j:slf4j-api:1.7.25'
         compile 'net.i2p.crypto:eddsa:0.3.0'
 
+        testCompile project(':service-providers:logger-slf4j')
         testCompile 'org.mock-server:mockserver-netty:5.4.1'
         testCompile 'org.mock-server:mockserver-client-java:5.4.1'
         testCompile 'junit:junit:4.12'
     }
 }
 
-project(':json:json-converter-gson') {
+project(':service-providers:logger-slf4j') {
+    apply plugin: 'java'
+
+    dependencies {
+        compile project(':factom-client-api')
+        compile 'org.slf4j:slf4j-api:1.7.25'
+    }
+}
+
+project(':service-providers:json-converter-gson') {
     apply plugin: 'java'
 
     dependencies {
@@ -152,7 +160,7 @@ project(':json:json-converter-gson') {
     }
 }
 
-project(':json:json-converter-jee') {
+project(':service-providers:json-converter-jee') {
     apply plugin: 'java'
 
     dependencies {
@@ -173,8 +181,10 @@ project(':frameworks:jee-support') {
     dependencies {
         compile project(':factom-client-impl')
 //        compile project(':json-converter-jee')
-        compile project(':json:json-converter-gson') //fixme
+        compile project(':service-providers:json-converter-gson') //fixme
         compileOnly 'javax:javaee-api:7.0'
+
+        testCompile project(':service-providers:logger-slf4j')
         testCompile 'org.jboss.arquillian.container:arquillian-glassfish-embedded-3.1:1.0.2'
         testCompile 'org.glassfish.main.extras:glassfish-embedded-all:5.0'
         testCompile 'org.jboss.arquillian.junit:arquillian-junit-container:1.4.0.Final'
@@ -194,7 +204,8 @@ project(':frameworks:spring-boot-support') {
 
     dependencies {
         compile project(':factom-client-impl')
-        testCompile project(':json:json-converter-gson')
+        testCompile project(':service-providers:logger-slf4j')
+        testCompile project(':service-providers:json-converter-gson')
         testCompile 'com.google.code.gson:gson:2.8.5'
         testCompile 'junit:junit:4.12'
         testCompile 'javax.enterprise:cdi-api:2.0.SP1'
@@ -208,11 +219,12 @@ project(':frameworks:spring-boot-support') {
 project(':factom-client-tests') {
     apply plugin: 'java'
     dependencies {
+        testCompile project(':service-providers:logger-slf4j')
         testCompile project(':factom-client-impl')
-        compile project(':factom-client-offline-signing')
-        testCompile project(':json:json-converter-gson')
-//        testCompile project(':json:json-converter-jee')
-       testCompile 'org.mock-server:mockserver-netty:5.4.1'
+        testCompile project(':factom-client-offline-signing')
+        testCompile project(':service-providers:json-converter-gson')
+//        testCompile project(':service-providers:json-converter-jee')
+        testCompile 'org.mock-server:mockserver-netty:5.4.1'
         testCompile 'org.mock-server:mockserver-client-java:5.4.1'
         testCompile 'org.glassfish:javax.json:1.1.2'
         testCompile 'org.eclipse:yasson:1.0.1'
@@ -226,8 +238,8 @@ project(':docs') {
             ":factom-client-api",
             ":factom-client-impl",
             ":factom-client-offline-signing",
-            ":json:json-converter-gson",
-            ":json:json-converter-jee",
+            ":service-providers:json-converter-gson",
+            ":service-providers:json-converter-jee",
             ":frameworks:jee-support",
             ":frameworks:spring-boot-support"
     ]

@@ -1,6 +1,8 @@
 package org.blockchain_innovation.factom.client.api;
 
 import org.blockchain_innovation.factom.client.api.errors.FactomRuntimeException;
+import org.blockchain_innovation.factom.client.api.log.LogFactory;
+import org.blockchain_innovation.factom.client.api.log.Logger;
 import org.blockchain_innovation.factom.client.api.model.Address;
 import org.blockchain_innovation.factom.client.api.model.types.AddressType;
 import org.blockchain_innovation.factom.client.api.model.types.RCDType;
@@ -19,6 +21,8 @@ import java.util.Arrays;
 @Singleton
 public class AddressKeyConversions {
 
+    private static Logger logger = LogFactory.getLogger(AddressKeyConversions.class);
+
     /**
      * Get the key from the address. This strips an identifiable prefix and a checksum from the address.
      * The result will be encoded in a given encoding.
@@ -28,8 +32,9 @@ public class AddressKeyConversions {
      * @return the key of the address encoded by the given encoding
      */
     public String addressToKey(String address, Encoding encoding) {
-        return encoding.encode(addressToKey(address));
-
+        String key = encoding.encode(addressToKey(address));
+        logger.debug("Extracted key '%s' from '%s' using %s-encoding", key, address, encoding.name());
+        return key;
     }
 
     /**
@@ -44,7 +49,9 @@ public class AddressKeyConversions {
         if (addressBytes.length != 38) {
             throw new FactomRuntimeException.AssertionException(String.format("Address '%s' is not 38 bytes long!", address));
         }
-        return Arrays.copyOfRange(addressBytes, 2, 34);
+        byte[] key = Arrays.copyOfRange(addressBytes, 2, 34);
+        logger.debug("Extracted raw key from address '%s'", address);
+        return key;
 
     }
 
@@ -101,6 +108,8 @@ public class AddressKeyConversions {
             address = new ByteOperations().concat(targetAddressType.getAddressPrefix(), key);
         }
         byte[] checksum = Arrays.copyOf(Digests.SHA_256.doubleDigest(address), 4);
-        return Encoding.BASE58.encode(new ByteOperations().concat(address, checksum));
+        String result = Encoding.BASE58.encode(new ByteOperations().concat(address, checksum));
+        logger.debug("Extracted address '%s' from %s-key '%s'", result, targetAddressType.name(), hexKey);
+        return result;
     }
 }
