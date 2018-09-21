@@ -38,9 +38,8 @@ public class JsonConverterGSON implements JsonConverter {
         GsonBuilder builder = builder();
 
         // Init new properties so we get default values
-        if (properties == null) {
-            properties = new Properties();
-        }
+        Properties props = properties == null ?  new Properties() : properties;
+
         boolean lenient = Boolean.parseBoolean(properties.getProperty("json.lenient", "true"));
         if (lenient) {
             builder.setLenient();

@@ -30,28 +30,31 @@ import javax.json.bind.config.PropertyVisibilityStrategy;
 import javax.json.bind.serializer.JsonbSerializer;
 import javax.json.bind.serializer.SerializationContext;
 import javax.json.stream.JsonGenerator;
-import java.lang.reflect.*;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Properties;
 
 import static javax.json.bind.config.PropertyOrderStrategy.LEXICOGRAPHICAL;
 
 @Named
+@SuppressWarnings("PMD.LawOfDemeter")
 public class JsonConverterJEE implements JsonConverter {
-    protected static final String RPC_METHOD = "method";
     public static final String NAME = "JEE";
-
+    protected static final String RPC_METHOD = "method";
     private Jsonb jsonb;
 
     @Override
     public JsonConverterJEE configure(Properties properties) {
-
-        JsonbConfig jsonbConfig = config();
+        final JsonbConfig jsonbConfig = config();
         // Init new properties so we get default values
-        if (properties == null) {
-            properties = new Properties();
-        }
-        boolean prettyprint = Boolean.parseBoolean(properties.getProperty("json.prettyprint", "true"));
+        Properties props = new Properties(properties);
+
+        boolean prettyprint = Boolean.parseBoolean(props.getProperty("json.prettyprint", "true"));
         jsonbConfig.withFormatting(prettyprint);
         this.jsonb = JsonbBuilder.create(jsonbConfig);
         return this;
@@ -85,7 +88,7 @@ public class JsonConverterJEE implements JsonConverter {
     @Override
     public <T> RpcResponse<T> fromJson(String json, Class<T> resultClass) {
         ParameterizedType parameterizedType = new ResolvedParameterizedType(RpcResponse.class, new Type[]{resultClass});
-        return jsonb().fromJson(json, parameterizedType);
+            return jsonb().fromJson(json, parameterizedType);
     }
 
     @Override
@@ -118,7 +121,7 @@ public class JsonConverterJEE implements JsonConverter {
             if (propertyName.startsWith("_")) {
                 translated = translated.replaceFirst("_", "");
             }
-            return translated.toLowerCase();
+            return translated.toLowerCase(Locale.getDefault());
         };
     }
 
@@ -135,10 +138,11 @@ public class JsonConverterJEE implements JsonConverter {
             @Override
             public boolean isVisible(Method method) {
 
-                if ("getJsonRPC".equals(method.getName())) {
+                String name = method.getName();
+                if ("getJsonRPC".equals(name)) {
                     return false;
                 }
-                if (method.getName().equals("getId") || method.getName().equals("getParams") || method.getName().equals("getMethod") || method.getName().startsWith("set")) {
+                if ("getId".equals(name) || "getParams".equals(name) || "getMethod".equals(name) || "set".equals(name)) {
                     return Modifier.isProtected(method.getModifiers()) || Modifier.isPublic(method.getModifiers());
                 }
                 return false;

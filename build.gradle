@@ -56,7 +56,21 @@ subprojects {
     tasks.withType(Pmd){
         ignoreFailures = true
         consoleOutput = true
-        ruleSets = ["java-basic", "java-braces", "java-clone", "java-design", "java-unnecessary", "java-sunsecure"]
+        ruleSetFiles = files("${project(':').projectDir}/quality/config/ruleset.xml")
+        ruleSets = [
+                "java-basic",
+                "java-braces",
+                "java-clone",
+                "java-design",
+                "java-finalizers",
+                "java-j2ee",
+                "java-strictexception",
+                "java-strings",
+                "java-sunsecure",
+                "java-typeresolution",
+                "java-unnecessary",
+                "java-unusedcode"
+        ]
         reports{
             xml.enabled=true
             html.enabled=true
@@ -64,7 +78,7 @@ subprojects {
         }
     }
     tasks.withType(FindBugs) {
-        ignoreFailures = true
+        ignoreFailures = false
         reports {
             xml.enabled = false
             html.enabled = true
@@ -72,7 +86,7 @@ subprojects {
         }
     }
     tasks.withType(Checkstyle) {
-        ignoreFailures = true
+        ignoreFailures = false
         configFile = file("${project(':').projectDir}/quality/config/checkstyle.xml")
         reports {
             xml.enabled false

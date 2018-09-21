@@ -12,7 +12,7 @@ import java.util.Properties;
 @Configuration
 @ConfigurationProperties
 public class SpringRpcSettings {
-    private Map<RpcSettings.SubSystem, RpcSettings> settings = new HashMap<>();
+    private final Map<RpcSettings.SubSystem, RpcSettings> settings = new HashMap<>();
 
     private Factomd factomd;
     private Walletd walletd;

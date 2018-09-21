@@ -263,8 +263,7 @@ public class RpcRequest {
             if (params != null) {
                 rpcRequest.setParams(params);
             }
-
-            return rpcRequest;
+            return rpcRequest.assertValid();
         }
     }
 }

@@ -28,9 +28,9 @@ public class ManagedClientProducers {
     @Inject
     private JsonConverter jsonConverter;
 
+    private final Map<RpcSettings.SubSystem, RpcSettings> settings = new HashMap<>();
     private FactomdClientImpl factomdClient;
     private WalletdClientImpl walletdClient;
-    private Map<RpcSettings.SubSystem, RpcSettings> settings = new HashMap<>();
     private EntryApiImpl entryApi;
 
     private boolean enableCommitRevealEvents = false;

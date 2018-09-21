@@ -10,6 +10,7 @@ import java.util.Objects;
  *
  * @author Roman Grigoriadi
  */
+@SuppressWarnings("PMD.LawOfDemeter")
 public class ResolvedParameterizedType implements ParameterizedType {
 
     /**
@@ -28,7 +29,7 @@ public class ResolvedParameterizedType implements ParameterizedType {
      * @param original         Original type.
      * @param resolvedTypeArgs Resolved type arguments.
      */
-    public ResolvedParameterizedType(Type original, Type[] resolvedTypeArgs) {
+    public ResolvedParameterizedType(Type original, Type... resolvedTypeArgs) {
         this.original = original;
         this.resolvedTypeArgs = resolvedTypeArgs.clone();
     }
@@ -73,7 +74,7 @@ public class ResolvedParameterizedType implements ParameterizedType {
         if (this == o) {
             return true;
         }
-        if (o == null || !(o instanceof ParameterizedType)) {
+        if (!(o instanceof ParameterizedType)) {
             return false;
         }
         final ParameterizedType that = (ParameterizedType) o;
