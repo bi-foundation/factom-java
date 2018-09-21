@@ -201,7 +201,7 @@ public class FactomdClientTest extends AbstractClientTest {
         Assert.assertTrue(currentMinute.getDirectoryBlockHeight() > 0);
         Assert.assertTrue(currentMinute.getDirectoryBlockInSeconds() > 0);
         Assert.assertTrue(currentMinute.getLeaderHeight() > 0);
-        Assert.assertTrue(currentMinute.getMinute() > 0);
+        Assert.assertTrue(currentMinute.getMinute() >= 0);
         Assert.assertFalse("Something is wrong with factom test network. Stall detected", currentMinute.isStallDetected());
     }
 

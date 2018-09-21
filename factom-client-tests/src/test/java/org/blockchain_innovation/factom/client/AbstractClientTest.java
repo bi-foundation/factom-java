@@ -22,7 +22,6 @@ import org.blockchain_innovation.factom.client.impl.EntryApiImpl;
 import org.blockchain_innovation.factom.client.impl.FactomdClientImpl;
 import org.blockchain_innovation.factom.client.impl.OfflineWalletdClientImpl;
 import org.blockchain_innovation.factom.client.impl.WalletdClientImpl;
-import org.blockchain_innovation.factom.client.impl.json.gson.JsonConverterGSON;
 import org.blockchain_innovation.factom.client.impl.settings.RpcSettingsImpl;
 import org.junit.Assert;
 import org.junit.Before;
@@ -35,7 +34,7 @@ public class AbstractClientTest {
 
     protected static final String EC_PUBLIC_ADDRESS = System.getProperty("FACTOM_CLIENT_TEST_EC_PUBLIC_ADDRESS", "EC3cqLZPq5ypwRB5CLfXnud5vkWAV2sd235CFf9KcWcE3FH9GRxv");
     protected static final String EC_SECRET_ADDRESS = System.getProperty("FACTOM_CLIENT_TEST_EC_SECRET_ADDRESS", "Es3Y6U6H1Pfg4wYag8VMtRZEGuEJnfkJ2ZuSyCVcQKweB6y4WvGH");
-    protected static final String FCT_PUBLIC_ADDRESS = System.getProperty("FACTOM_CLIENT_TEST_FACTOID_PUBLIC_ADDRESS","FA2ZrcG8xkwWWNfdMRw5pGNjMPEkLaxRGqacvzfLS6TGHEHZqAA4");
+    protected static final String FCT_PUBLIC_ADDRESS = System.getProperty("FACTOM_CLIENT_TEST_FACTOID_PUBLIC_ADDRESS", "FA2ZrcG8xkwWWNfdMRw5pGNjMPEkLaxRGqacvzfLS6TGHEHZqAA4");
     protected static final String FCT_SECRET_ADDRESS = System.getProperty("FACTOM_CLIENT_TEST_FACTOID_SECRET_ADDRESS", "Fs1jQGc9GJjyWNroLPq7x6LbYQHveyjWNPXSqAvCEKpETNoTU5dP");
 
     static {
@@ -50,9 +49,6 @@ public class AbstractClientTest {
 
     @Before
     public void setup() throws IOException {
-        //// FIXME: 06/08/2018 Only needed now to init the converter
-        JsonConverterGSON conv = new JsonConverterGSON();
-//        JsonConverterJEE conv = new JsonConverterJEE();
 
         factomdClient.setSettings(new RpcSettingsImpl(RpcSettings.SubSystem.FACTOMD, getProperties()));
         walletdClient.setSettings(new RpcSettingsImpl(RpcSettings.SubSystem.WALLETD, getProperties()));

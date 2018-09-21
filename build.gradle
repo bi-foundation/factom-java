@@ -142,7 +142,7 @@ project(':factom-client-offline-signing') {
     }
 }
 
-project(':json-converter-gson') {
+project(':json:json-converter-gson') {
     apply plugin: 'java'
 
     dependencies {
@@ -154,7 +154,7 @@ project(':json-converter-gson') {
     }
 }
 
-project(':json-converter-jee') {
+project(':json:json-converter-jee') {
     apply plugin: 'java'
 
     dependencies {
@@ -175,7 +175,7 @@ project(':jee-support') {
     dependencies {
         compile project(':factom-client-impl')
 //        compile project(':json-converter-jee')
-        compile project(':json-converter-gson') //fixme
+        compile project(':json:json-converter-gson') //fixme
         compileOnly 'javax:javaee-api:7.0'
         testCompile 'org.jboss.arquillian.container:arquillian-glassfish-embedded-3.1:1.0.2'
         testCompile 'org.glassfish.main.extras:glassfish-embedded-all:5.0'
@@ -196,7 +196,7 @@ project(':spring-support') {
 
     dependencies {
         compile project(':factom-client-impl')
-        testCompile project(':json-converter-gson')
+        testCompile project(':json:json-converter-gson')
         testCompile 'com.google.code.gson:gson:2.8.5'
         testCompile 'junit:junit:4.12'
         testCompile 'javax.enterprise:cdi-api:2.0.SP1'
@@ -213,8 +213,8 @@ project(':factom-client-tests') {
     dependencies {
         testCompile project(':factom-client-impl')
         compile project(':factom-client-offline-signing')
-        testCompile project(':json-converter-gson')
-        testCompile project(':json-converter-jee')
+        testCompile project(':json:json-converter-gson')
+//        testCompile project(':json:json-converter-jee')
         testCompile 'org.mock-server:mockserver-netty:5.4.1'
         testCompile 'org.mock-server:mockserver-client-java:5.4.1'
         testCompile 'org.glassfish:javax.json:1.1.2'
@@ -230,8 +230,8 @@ project(':docs') {
             ":factom-client-api",
             ":factom-client-impl",
             ":factom-client-offline-signing",
-            ":json-converter-gson",
-            ":json-converter-jee",
+            ":json:json-converter-gson",
+            ":json:json-converter-jee",
             ":jee-support"
     ]
 
