@@ -16,15 +16,7 @@
 
 package org.blockchain_innovation.factom.client.impl.json.gson;
 
-import com.google.gson.FieldNamingPolicy;
-import com.google.gson.FieldNamingStrategy;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
+import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 import org.blockchain_innovation.factom.client.api.json.JsonConverter;
 import org.blockchain_innovation.factom.client.api.rpc.RpcErrorResponse;
@@ -37,10 +29,8 @@ import java.util.Properties;
 
 @Named
 public class JsonConverterGSON implements JsonConverter {
-    static {
-        Registry.register(JsonConverterGSON.class);
-    }
 
+    public static final String NAME = "GSON";
     private Gson gson;
 
     @Override
@@ -125,4 +115,10 @@ public class JsonConverterGSON implements JsonConverter {
             return RpcMethod.fromJsonValue(json.getAsJsonPrimitive().getAsString());
         }
     }*/
+
+
+    @Override
+    public String getName() {
+        return NAME;
+    }
 }

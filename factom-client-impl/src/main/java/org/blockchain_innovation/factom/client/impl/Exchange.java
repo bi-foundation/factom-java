@@ -101,7 +101,7 @@ public class Exchange<Result> {
     protected void sendRequest() throws FactomException.ClientException {
         if (getFactomRequest().getRpcRequest() != null) {
             try (OutputStream outputStream = connection().getOutputStream(); OutputStreamWriter out = new OutputStreamWriter(outputStream, Charset.defaultCharset())) {
-                String json = JsonConverter.Registry.newInstance().toJson(getFactomRequest().getRpcRequest());
+                String json = JsonConverter.Provider.getInstance().toJson(getFactomRequest().getRpcRequest());
                 logger.debug("request({}): {} ", getFactomRequest().getRpcRequest().getId(), json);
                 out.write(json);
             } catch (IOException e) {
@@ -116,8 +116,8 @@ public class Exchange<Result> {
              InputStreamReader streamReader = new InputStreamReader(is, Charset.defaultCharset());
              BufferedReader reader = new BufferedReader(streamReader)) {
             String json = reader.lines().collect(Collectors.joining());
-            logger.debug("response({}): {}", getFactomRequest().getRpcRequest().getId(), JsonConverter.Registry.newInstance().prettyPrint(json));
-            RpcResponse<Result> rpcResult = JsonConverter.Registry.newInstance().fromJson(json, rpcResultClass);
+            logger.debug("response({}): {}", getFactomRequest().getRpcRequest().getId(), JsonConverter.Provider.getInstance().prettyPrint(json));
+            RpcResponse<Result> rpcResult = JsonConverter.Provider.getInstance().fromJson(json, rpcResultClass);
             this.factomResponse = new FactomResponseImpl<>(this, rpcResult, connection().getResponseCode(), connection().getResponseMessage());
             return factomResponse;
         } catch (IOException e) {
@@ -125,14 +125,14 @@ public class Exchange<Result> {
             try (BufferedReader br = new BufferedReader(new InputStreamReader(connection().getErrorStream(), Charset.defaultCharset()))) {
                 error = br.lines().collect(Collectors.joining(System.lineSeparator()));
 
-                RpcErrorResponse errorResponse = JsonConverter.Registry.newInstance().errorFromJson(error);
+                RpcErrorResponse errorResponse = JsonConverter.Provider.getInstance().errorFromJson(error);
                 this.factomResponse = new FactomResponseImpl<>(this, errorResponse, connection().getResponseCode(), connection().getResponseMessage());
 
                 // No you never log yourself and rethrow an exception. We are however a library so are reliant on the implementor
                 // to do proper logging on exception. Hence we bind to debug level to not upset everybody ;)
                 if (logger.isDebugEnabled()) {
                     logger.error("RPC Server returned an error response. HTTP code: {}, message: {}", getFactomResponse().getHTTPResponseCode(), getFactomResponse().getHTTPResponseMessage());
-                    logger.error("error response({}): {}", getFactomRequest().getRpcRequest().getId(), JsonConverter.Registry.newInstance().prettyPrint(error) + "\n");
+                    logger.error("error response({}): {}", getFactomRequest().getRpcRequest().getId(), JsonConverter.Provider.getInstance().prettyPrint(error) + "\n");
                 }
             } catch (RuntimeException | IOException e2) {
                 logger.error("Error after handling an error response of the server: " + e2.getMessage() + ". Error body: " + error, e2);

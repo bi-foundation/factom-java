@@ -21,6 +21,7 @@ import org.blockchain_innovation.factom.client.api.rpc.RpcErrorResponse;
 import org.blockchain_innovation.factom.client.api.rpc.RpcResponse;
 
 import java.util.Properties;
+import java.util.ServiceLoader;
 
 public interface JsonConverter {
 
@@ -67,41 +68,47 @@ public interface JsonConverter {
      */
     String toJson(Object source);
 
-    class Registry {
+    String getName();
 
-        private static JsonConverter instance;
-        private static Class<? extends JsonConverter> converterClass;
 
-        public static void register(Class<? extends JsonConverter> converterClass) {
-            if (Registry.converterClass == null || Registry.converterClass.equals(converterClass)) {
-                Registry.converterClass = converterClass;
-            } else {
-                throw new FactomRuntimeException("Only one Factom Json converter class is allowed on the classpath. Please make sure you configured it correctly");
-            }
+    class Provider {
+
+        public static JsonConverter getInstance() {
+            assertRegistered();
+            JsonConverter converter = serviceLoader(false).iterator().next();
+            return converter;
         }
 
-        public static JsonConverter newInstance() {
-            try {
-                assertRegistered();
-                return converterClass.newInstance();
-            } catch (IllegalAccessException | InstantiationException e) {
-                throw new FactomRuntimeException(e);
-            }
-        }
+        public static JsonConverter getInstance(String converterName) {
+            assertRegistered();
+            for (JsonConverter jsonConverter : serviceLoader(false)) {
+                if (jsonConverter.getName().equalsIgnoreCase(converterName)) {
+                    return jsonConverter;
+                }
 
-        public static JsonConverter sharedInstance() {
-            if (instance == null) {
-                instance = newInstance();
             }
-            return instance;
+            throw new FactomRuntimeException(String.format("Could not find Json converter named %s. Please make sure a Factom json converter jar is on the classpath.", converterName));
         }
-
 
         private static void assertRegistered() {
-            if (converterClass == null) {
-                throw new FactomRuntimeException("No Factom Json converter class has been registered. Please make sure a Factom json converter jar is on the classpath.");
+            ServiceLoader<JsonConverter> jsonConverters = serviceLoader(false);
+            if (!jsonConverters.iterator().hasNext()) {
+                jsonConverters.reload();
+                if (!jsonConverters.iterator().hasNext()) {
+                    throw new FactomRuntimeException("No Factom Json converter class has been registered. Please make sure a Factom json converter jar is on the classpath.");
+                }
             }
         }
+
+        private static ServiceLoader<JsonConverter> serviceLoader(boolean reload) {
+            ServiceLoader<JsonConverter> loader = ServiceLoader.load(JsonConverter.class);
+            if (reload) {
+                loader.reload();
+            }
+            return loader;
+        }
+
+
     }
 
 }

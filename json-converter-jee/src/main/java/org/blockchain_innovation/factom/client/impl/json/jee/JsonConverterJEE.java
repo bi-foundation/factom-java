@@ -30,11 +30,7 @@ import javax.json.bind.config.PropertyVisibilityStrategy;
 import javax.json.bind.serializer.JsonbSerializer;
 import javax.json.bind.serializer.SerializationContext;
 import javax.json.stream.JsonGenerator;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
+import java.lang.reflect.*;
 import java.util.Objects;
 import java.util.Properties;
 
@@ -43,10 +39,7 @@ import static javax.json.bind.config.PropertyOrderStrategy.LEXICOGRAPHICAL;
 @Named
 public class JsonConverterJEE implements JsonConverter {
     protected static final String RPC_METHOD = "method";
-
-    static {
-        Registry.register(JsonConverterJEE.class);
-    }
+    public static final String NAME = "JEE";
 
     private Jsonb jsonb;
 
@@ -103,6 +96,11 @@ public class JsonConverterJEE implements JsonConverter {
     @Override
     public String toJson(Object input) {
         return jsonb().toJson(input);
+    }
+
+    @Override
+    public String getName() {
+        return NAME;
     }
 
 

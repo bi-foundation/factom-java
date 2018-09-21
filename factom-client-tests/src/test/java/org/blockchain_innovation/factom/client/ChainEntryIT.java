@@ -147,7 +147,7 @@ public class ChainEntryIT extends AbstractClientTest {
 
     @Test
     public void _06_verifyCommitEntry() throws FactomException.ClientException, InterruptedException {
-        boolean confirmed = waitOnConfirmation(EntryTransactionResponse.Status.TransactionACK, 10);
+        boolean confirmed = waitOnConfirmation(EntryTransactionResponse.Status.TransactionACK, 20);
         Assert.assertTrue(confirmed);
     }
 

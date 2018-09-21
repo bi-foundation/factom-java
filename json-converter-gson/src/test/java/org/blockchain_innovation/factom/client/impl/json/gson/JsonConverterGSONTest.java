@@ -19,12 +19,11 @@ public class JsonConverterGSONTest {
 
     @Test
     public void testRegistration() {
-        Assert.assertNotNull(JsonConverter.Registry.newInstance());
-        Assert.assertNotNull(JsonConverter.Registry.sharedInstance());
-        Assert.assertEquals(CONV.getClass(), JsonConverter.Registry.newInstance().getClass());
-        Assert.assertEquals(CONV.getClass(), JsonConverter.Registry.sharedInstance().getClass());
-        Assert.assertTrue(JsonConverter.Registry.sharedInstance() == JsonConverter.Registry.sharedInstance());
-        Assert.assertFalse(JsonConverter.Registry.newInstance() == JsonConverter.Registry.newInstance());
+        Assert.assertNotNull(JsonConverter.Provider.getInstance());
+        Assert.assertNotNull(JsonConverter.Provider.getInstance(JsonConverterGSON.NAME));
+        Assert.assertEquals(CONV.getClass(), JsonConverter.Provider.getInstance().getClass());
+        Assert.assertEquals(CONV.getClass(), JsonConverter.Provider.getInstance(JsonConverterGSON.NAME).getClass());
+        Assert.assertTrue(JsonConverter.Provider.getInstance() == JsonConverter.Provider.getInstance());
     }
 
     @Test
