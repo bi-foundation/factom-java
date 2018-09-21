@@ -19,7 +19,10 @@ package org.blockchain_innovation.factom.client.api.ops;
 import org.blockchain_innovation.factom.client.api.errors.FactomRuntimeException;
 
 import javax.xml.bind.DatatypeConverter;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Formatter;
 
 /**
  * Create a common entry point for all ancoding and decoding operations needed. Supports hex, base58, base64, utf-8
@@ -27,20 +30,27 @@ import java.nio.charset.StandardCharsets;
  */
 public enum Encoding {
 
-
     HEX {
         @Override
         public String encode(byte[] input) {
             assertNotNull(input);
-            return DatatypeConverter.printHexBinary(input).toLowerCase();
+            Formatter formatter = new Formatter();
+            for (byte b : input) {
+                formatter.format("%02x", b);
+            }
+            return formatter.toString();
         }
 
         @Override
         public byte[] decode(String hex) {
             assertNotNull(hex);
-            try {
-                return DatatypeConverter.parseHexBinary(hex);
-            } catch (IllegalArgumentException e) {
+            try (ByteArrayOutputStream bas = new ByteArrayOutputStream()) {
+                for (int i = 0; i < hex.length(); i+=2) {
+                    int b = Integer.parseInt(hex.substring(i, i + 2), 16);
+                    bas.write(b);
+                }
+                return bas.toByteArray();
+            } catch (NumberFormatException | IOException e) {
                 throw new FactomRuntimeException.AssertionException(e);
             }
         }

@@ -22,12 +22,13 @@ plugins {
     id 'org.asciidoctor.convert' version '1.5.6' apply false
 }
 
-
 // In this section you declare where to find the dependencies of your project
 allprojects {
     repositories {
         jcenter()
+        mavenLocal()
     }
+    apply plugin: "maven"
 
     version = '0.2.1'
     group = 'org.blockchain_innovation.factom'
@@ -47,12 +48,13 @@ subprojects {
         }
     }
 
-    tasks.withType(Pmd){
-        ignoreFailures = false
+    tasks.withType(Pmd) {
+        ignoreFailures = true
         consoleOutput = true
-        reports{
-            xml.enabled=true
-            html.enabled=true
+        ruleSets = ["java-basic", "java-braces", "java-clone", "java-design", "java-unnecessary", "java-sunsecure"]
+        reports {
+            xml.enabled = true
+            html.enabled = true
             html.destination file("${project.projectDir}/../quality/reports/${project.name}-pmd.html")
         }
     }
