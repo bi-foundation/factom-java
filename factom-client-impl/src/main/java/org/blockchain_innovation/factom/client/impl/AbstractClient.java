@@ -29,10 +29,15 @@ import java.util.concurrent.*;
 
 abstract class AbstractClient implements LowLevelClient {
 
+    protected EncodeOperations encodeOperations = new EncodeOperations();
     private URL url;
     private RpcSettings settings;
-    protected EncodeOperations encodeOperations = new EncodeOperations();
     private ExecutorService executorService;
+
+
+    public LowLevelClient lowLevelClient() {
+        return this;
+    }
 
     @Override
     public RpcSettings getSettings() {
@@ -84,14 +89,10 @@ abstract class AbstractClient implements LowLevelClient {
     }
 
     @Override
-    public ExecutorService getExecutorService() {
+    public synchronized ExecutorService getExecutorService() {
         if (executorService == null) {
-            synchronized (this) {
-                if (executorService == null) {
-                    this.executorService = new ThreadPoolExecutor(2, 10, 5, TimeUnit.MINUTES,
-                            new SynchronousQueue<>(), threadFactory("FactomApi Dispatcher", false));
-                }
-            }
+            this.executorService = new ThreadPoolExecutor(2, 10, 5, TimeUnit.MINUTES,
+                    new SynchronousQueue<>(), threadFactory("Factom Client Dispatcher", false));
         }
         return executorService;
     }

@@ -16,7 +16,9 @@
 
 package org.blockchain_innovation.factom.client.api.model.response.walletd;
 
-public class ExecutedTransactionResponse extends TransactionResponse {
+import java.io.Serializable;
+
+public class ExecutedTransactionResponse extends TransactionResponse implements Serializable {
 
     private long feespaid;
 

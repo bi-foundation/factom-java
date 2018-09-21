@@ -3,7 +3,9 @@ package org.blockchain_innovation.factom.client.api.model.response;
 import org.blockchain_innovation.factom.client.api.model.response.factomd.CommitEntryResponse;
 import org.blockchain_innovation.factom.client.api.model.response.factomd.RevealResponse;
 
-public class CommitAndRevealEntryResponse {
+import java.io.Serializable;
+
+public class CommitAndRevealEntryResponse implements Serializable {
     private CommitEntryResponse commitEntryResponse;
     private RevealResponse revealResponse;
 

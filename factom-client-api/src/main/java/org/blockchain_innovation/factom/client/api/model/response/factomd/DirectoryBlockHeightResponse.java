@@ -16,9 +16,10 @@
 
 package org.blockchain_innovation.factom.client.api.model.response.factomd;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class DirectoryBlockHeightResponse {
+public class DirectoryBlockHeightResponse implements Serializable {
 
     private DirectoryBlock dblock;
     private String rawdata;
@@ -31,7 +32,7 @@ public class DirectoryBlockHeightResponse {
         return rawdata;
     }
 
-    public static class DirectoryBlock {
+    public static class DirectoryBlock implements Serializable {
         private Header header;
         private List<Entry> dbentries;
 
@@ -54,7 +55,7 @@ public class DirectoryBlockHeightResponse {
             return keymr;
         }
 
-        public static class Header {
+        public static class Header implements Serializable {
             private int version;
             private long networkid;
             private String bodymr;
@@ -102,7 +103,7 @@ public class DirectoryBlockHeightResponse {
             }
         }
 
-        public static class Entry {
+        public static class Entry implements Serializable {
             private String chainid;
             private String keymr;
 

@@ -18,42 +18,42 @@ public interface CommitAndRevealListener {
     void onCompose(ComposeResponse composeResponse);
 
     /**
-     * Fired whenever a commit entry response is received
+     * Fired whenever a commit entry response is received.
      *
      * @param commitResponse The commit entry response
      */
     void onCommit(CommitEntryResponse commitResponse);
 
     /**
-     * Fired whenever a commit chain response is received
+     * Fired whenever a commit chain response is received.
      *
      * @param commitResponse The commit chain response
      */
     void onCommit(CommitChainResponse commitResponse);
 
     /**
-     * Fired whenever a reveal response is received
+     * Fired whenever a reveal response is received.
      *
      * @param revealResponse The reveal response
      */
     void onReveal(RevealResponse revealResponse);
 
     /**
-     * Fired whenever a transaction response is received on acknowledgement of the transaction
+     * Fired whenever a transaction response is received on acknowledgement of the transaction.
      *
      * @param transactionResponse The transaction response
      */
     void onTransactionAcknowledged(EntryTransactionResponse transactionResponse);
 
     /**
-     * Fired whenever a transaction response is received on commit of the transaction
+     * Fired whenever a transaction response is received on commit of the transaction.
      *
      * @param transactionResponse The transaction response
      */
     void onCommitConfirmed(EntryTransactionResponse transactionResponse);
 
     /**
-     * Fired upon an error response
+     * Fired upon an error response.
      *
      * @param errorResponse The error response
      */

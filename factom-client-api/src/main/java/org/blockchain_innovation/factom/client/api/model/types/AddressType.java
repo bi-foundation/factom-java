@@ -1,7 +1,7 @@
 package org.blockchain_innovation.factom.client.api.model.types;
 
-import org.blockchain_innovation.factom.client.api.model.Address;
 import org.blockchain_innovation.factom.client.api.errors.FactomRuntimeException;
+import org.blockchain_innovation.factom.client.api.model.Address;
 import org.blockchain_innovation.factom.client.api.ops.Digests;
 import org.blockchain_innovation.factom.client.api.ops.Encoding;
 import org.blockchain_innovation.factom.client.api.ops.StringUtils;
@@ -22,47 +22,6 @@ public enum AddressType {
         this.humanReadablePrefix = humanReadablePrefix;
         this.addressPrefix = addressPrefix;
         this.visibility = visibility;
-    }
-
-    public enum Visibility {
-        PUBLIC, PRIVATE
-    }
-
-    public String getHumanReadablePrefix() {
-        return humanReadablePrefix;
-    }
-
-    public byte[] getAddressPrefix() {
-        return Encoding.HEX.decode(addressPrefix);
-    }
-
-    public Visibility getVisibility() {
-        return visibility;
-    }
-
-    public boolean isPublic() {
-        return getVisibility() == Visibility.PUBLIC;
-    }
-
-    public boolean isPrivate() {
-        return getVisibility() == Visibility.PRIVATE;
-    }
-
-    public boolean isValid(String address) {
-        return isValidAddress(address) && address.startsWith(getHumanReadablePrefix());
-    }
-
-    public void assertValid(Address address) {
-        if (this != address.getType()) {
-            throw new FactomRuntimeException.AssertionException(String.format("Type of address '%s' is not a valid", address));
-        }
-    }
-
-    public void assertValid(String address) {
-        assertValidAddress(address);
-        if (!address.startsWith(getHumanReadablePrefix())) {
-            throw new FactomRuntimeException.AssertionException(String.format("Type of address '%s' is not a valid", address));
-        }
     }
 
     public static boolean isValidAddress(String address) {
@@ -124,5 +83,46 @@ public enum AddressType {
 
     public static List<String> getValidPrefixes() {
         return Arrays.stream(values()).map(AddressType::getHumanReadablePrefix).collect(Collectors.toList());
+    }
+
+    public String getHumanReadablePrefix() {
+        return humanReadablePrefix;
+    }
+
+    public byte[] getAddressPrefix() {
+        return Encoding.HEX.decode(addressPrefix);
+    }
+
+    public Visibility getVisibility() {
+        return visibility;
+    }
+
+    public boolean isPublic() {
+        return getVisibility() == Visibility.PUBLIC;
+    }
+
+    public boolean isPrivate() {
+        return getVisibility() == Visibility.PRIVATE;
+    }
+
+    public boolean isValid(String address) {
+        return isValidAddress(address) && address.startsWith(getHumanReadablePrefix());
+    }
+
+    public void assertValid(Address address) {
+        if (this != address.getType()) {
+            throw new FactomRuntimeException.AssertionException(String.format("Type of address '%s' is not a valid", address));
+        }
+    }
+
+    public void assertValid(String address) {
+        assertValidAddress(address);
+        if (!address.startsWith(getHumanReadablePrefix())) {
+            throw new FactomRuntimeException.AssertionException(String.format("Type of address '%s' is not a valid", address));
+        }
+    }
+
+    public enum Visibility {
+        PUBLIC, PRIVATE
     }
 }

@@ -54,7 +54,6 @@ public class OfflineWalletdClientImplTest extends AbstractClientTest {
     private static int height = 40879;
     private static FactomResponse<ExecutedTransactionResponse> addFeeResponse;
 
-
     @Test
     public void _00_properties() throws FactomException.ClientException {
         FactomResponse<PropertiesResponse> response = walletdClient.properties().join();

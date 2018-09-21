@@ -103,7 +103,7 @@ public class EntryApiImpl {
     }
 
     /**
-     * Compose, reveal and commit a chain
+     * Compose, reveal and commit a chain.
      *
      * @param chain
      * @param address
@@ -114,7 +114,7 @@ public class EntryApiImpl {
     }
 
     /**
-     * Compose, reveal and commit a chain
+     * Compose, reveal and commit a chain.
      *
      * @param chain
      * @param address
@@ -148,7 +148,7 @@ public class EntryApiImpl {
     }
 
     /**
-     * Compose, reveal and commit an entry
+     * Compose, reveal and commit an entry.
      *
      * @param entry
      * @param address
@@ -159,7 +159,7 @@ public class EntryApiImpl {
     }
 
     /**
-     * Compose, reveal and commit an entry
+     * Compose, reveal and commit an entry.
      *
      * @param entry
      * @param address
@@ -171,7 +171,7 @@ public class EntryApiImpl {
                 .thenApplyAsync(_composeEntryResponse -> notifyCompose(_composeEntryResponse), executorService())
                 // commit chain
                 .thenComposeAsync(_composeEntryResponse -> commitEntryFuture(_composeEntryResponse)
-                        .thenApplyAsync(_commitEntryResponse -> notifyEntryCommit(_commitEntryResponse),executorService())
+                        .thenApplyAsync(_commitEntryResponse -> notifyEntryCommit(_commitEntryResponse), executorService())
                         // wait to transaction is known
                         .thenComposeAsync(_commitEntryResponse -> waitFuture()
                                 // reveal chain
@@ -179,9 +179,11 @@ public class EntryApiImpl {
                                         .thenApplyAsync(_revealEntryResponse -> notifyReveal(_revealEntryResponse), executorService())
                                         // wait for transaction acknowledgement
                                         .thenComposeAsync(_revealEntryResponse -> transactionAcknowledgeConfirmation(_revealEntryResponse)
-                                                .thenApplyAsync(_transactionAcknowledgeResponse -> notifyEntryTransaction(_transactionAcknowledgeResponse), executorService())
+                                                .thenApplyAsync(_transactionAcknowledgeResponse ->
+                                                        notifyEntryTransaction(_transactionAcknowledgeResponse), executorService())
                                                 // wait for block confirmed
-                                                .thenComposeAsync(_transactionAcknowledgeResponse -> transactionCommitConfirmation(confirmCommit, _revealEntryResponse)
+                                                .thenComposeAsync(_transactionAcknowledgeResponse ->
+                                                        transactionCommitConfirmation(confirmCommit, _revealEntryResponse)
                                                         .thenApplyAsync(_commitConfirmedResponse -> {
                                                             notifyCommitConfirmed(_commitConfirmedResponse);
                                                             // create response
@@ -189,7 +191,13 @@ public class EntryApiImpl {
                                                             response.setCommitEntryResponse(_commitEntryResponse.getResult());
                                                             response.setRevealResponse(_revealEntryResponse.getResult());
                                                             return response;
-                                                        }, executorService()), executorService()), executorService()), executorService()), executorService()), executorService());
+                                                        }, executorService()),
+                                                        executorService()),
+                                                executorService()),
+                                        executorService()),
+                                executorService()),
+                        executorService()
+                );
 
         return commitAndRevealEntryFuture;
     }
@@ -247,13 +255,16 @@ public class EntryApiImpl {
     private ExecutorService executorService() {
         return client().getExecutorService();
     }
+
     private LowLevelClient client() {
         return (LowLevelClient) factomdClient;
     }
+
     private CompletionStage<FactomResponse<EntryTransactionResponse>> transactionAcknowledgeConfirmation(FactomResponse<RevealResponse> revealChainResponse) {
         String entryHash = revealChainResponse.getResult().getEntryHash();
         String chainId = revealChainResponse.getResult().getChainId();
-        return transactionConfirmation(entryHash, chainId, Arrays.asList(EntryTransactionResponse.Status.TransactionACK, EntryTransactionResponse.Status.DBlockConfirmed), transactionAcknowledgeTimeout, 1000);
+        List<EntryTransactionResponse.Status> desiredStatus = Arrays.asList(EntryTransactionResponse.Status.TransactionACK, EntryTransactionResponse.Status.DBlockConfirmed);
+        return transactionConfirmation(entryHash, chainId, desiredStatus, transactionAcknowledgeTimeout, 1000);
     }
 
     private CompletableFuture<FactomResponse<EntryTransactionResponse>> transactionCommitConfirmation(boolean waitForConfirmation, FactomResponse<RevealResponse> revealChainResponse) {
@@ -266,7 +277,9 @@ public class EntryApiImpl {
         }
     }
 
-    private CompletableFuture<FactomResponse<EntryTransactionResponse>> transactionConfirmation(String entryHash, String chainId, List<EntryTransactionResponse.Status> desiredStatus, int timeout, int sleepTime) {
+    private CompletableFuture<FactomResponse<EntryTransactionResponse>> transactionConfirmation(String entryHash, String chainId,
+                                                                                                List<EntryTransactionResponse.Status> desiredStatus,
+                                                                                                int timeout, int sleepTime) {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 FactomResponse<EntryTransactionResponse> transactionsResponse = null;
@@ -285,12 +298,15 @@ public class EntryApiImpl {
                 }
 
                 if (transactionsResponse == null) {
-                    throw new FactomException.ClientException(String.format("Transaction of chain id=%s, entry hash=%s didn't return a response after %s. Probably will not succeed! ", chainId, entryHash, seconds));
+                    throw new FactomException.ClientException(String.format("Transaction of chain id=%s, entry hash=%s didn't return a response after %s. " +
+                            "Probably will not succeed! ", chainId, entryHash, seconds));
                 } else if (transactionsResponse.hasErrors()) {
-                    logger.error("Transaction of chain id={}, entry hash={} received error after {}, errors={}. Probably will not succeed! ", chainId, entryHash, seconds, transactionsResponse.getRpcErrorResponse());
+                    logger.error("Transaction of chain id={}, entry hash={} received error after {}, errors={}. Probably will not succeed! ",
+                            chainId, entryHash, seconds, transactionsResponse.getRpcErrorResponse());
                 } else if (!confirmed) {
                     EntryTransactionResponse.Status status = transactionsResponse.getResult().getCommitData().getStatus();
-                    logger.error("Transaction of chain id={}, entry hash={} still not in desired status after {}, state = {}. Probably will not succeed! ", chainId, entryHash, seconds, status);
+                    logger.error("Transaction of chain id={}, entry hash={} still not in desired status after {}, state = {}. Probably will not succeed! ",
+                            chainId, entryHash, seconds, status);
                 }
                 return transactionsResponse;
             } catch (InterruptedException e) {

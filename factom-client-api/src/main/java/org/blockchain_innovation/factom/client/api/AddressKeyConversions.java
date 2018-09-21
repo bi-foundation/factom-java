@@ -1,7 +1,7 @@
 package org.blockchain_innovation.factom.client.api;
 
-import org.blockchain_innovation.factom.client.api.model.Address;
 import org.blockchain_innovation.factom.client.api.errors.FactomRuntimeException;
+import org.blockchain_innovation.factom.client.api.model.Address;
 import org.blockchain_innovation.factom.client.api.model.types.AddressType;
 import org.blockchain_innovation.factom.client.api.model.types.RCDType;
 import org.blockchain_innovation.factom.client.api.ops.ByteOperations;
@@ -12,6 +12,9 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import java.util.Arrays;
 
+/**
+ * Address Conversions class to help with extracting keys from addresses or creating an address from a key.
+ */
 @Named
 @Singleton
 public class AddressKeyConversions {

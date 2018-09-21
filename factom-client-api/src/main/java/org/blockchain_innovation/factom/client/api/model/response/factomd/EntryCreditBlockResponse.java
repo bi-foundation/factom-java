@@ -16,9 +16,10 @@
 
 package org.blockchain_innovation.factom.client.api.model.response.factomd;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class EntryCreditBlockResponse {
+public class EntryCreditBlockResponse implements Serializable {
 
     private EntryCreditBlock ecblock;
     private String rawdata;
@@ -31,7 +32,7 @@ public class EntryCreditBlockResponse {
         return rawdata;
     }
 
-    public static class EntryCreditBlock {
+    public static class EntryCreditBlock implements Serializable {
         private Header header;
         private Body body;
 
@@ -43,7 +44,7 @@ public class EntryCreditBlockResponse {
             return body;
         }
 
-        public static class Header {
+        public static class Header implements Serializable {
             private String bodyhash;
             private String prevheaderhash;
             private String prevfullhash;
@@ -86,14 +87,14 @@ public class EntryCreditBlockResponse {
             }
         }
 
-        public static class Body {
+        public static class Body implements Serializable {
             private List<Entry> entries;
 
             public List<Entry> getEntries() {
                 return entries;
             }
 
-            public static class Entry {
+            public static class Entry implements Serializable {
                 private long serverindexnumber;
                 private long number;
                 private int version;

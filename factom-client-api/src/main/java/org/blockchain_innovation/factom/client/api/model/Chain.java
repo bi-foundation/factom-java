@@ -16,10 +16,11 @@
 
 package org.blockchain_innovation.factom.client.api.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Chain {
+public class Chain implements Serializable {
 
     private Entry firstentry;
 

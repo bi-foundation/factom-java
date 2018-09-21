@@ -16,10 +16,14 @@ For a detailed view of what has changed, refer to our {uri-repo}/commits/master[
 
 Added::
 
- * factomd and walletd lowlevel synchronous and asynchronous clients
+ * factomd and walletd lowlevel asynchronous clients
+ * Offline signing support. So not using walletd, but using private keys directly
+ * High level entry API for chains and entries
+ * Address and key conversion and checks
  * Full POJO responses
  * JSON pluggable (de)serialization, with GSON plugin
  * SLF4J logging (requires https://www.slf4j.org/[SLF4J] implementation on classpath):
+ * JEE 7 support: Managed clients, CDI, Events, Managed Executor Service
 
 Changed::
 Deprecated::

@@ -16,9 +16,10 @@
 
 package org.blockchain_innovation.factom.client.api.model.response.factomd;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class AdminBlockResponse {
+public class AdminBlockResponse implements Serializable {
 
     private AdminBlock ablock;
     private String rawdata;
@@ -31,7 +32,7 @@ public class AdminBlockResponse {
         return rawdata;
     }
 
-    public static class AdminBlock {
+    public static class AdminBlock implements Serializable {
         private Header header;
         private List<Entry> abentries;
 
@@ -54,7 +55,7 @@ public class AdminBlockResponse {
             return lookuphash;
         }
 
-        public static class Header {
+        public static class Header implements Serializable {
 
             private String prevbackrefhash;
             private long dbheight;
@@ -98,7 +99,7 @@ public class AdminBlockResponse {
             }
         }
 
-        public static class Entry {
+        public static class Entry implements Serializable {
             private String identityadminchainid;
             private DirectoryBlockSignature prevdbsig;
             private String minutenumber;
@@ -115,7 +116,7 @@ public class AdminBlockResponse {
                 return minutenumber;
             }
 
-            public static class DirectoryBlockSignature {
+            public static class DirectoryBlockSignature implements Serializable {
                 private String pub;
                 private String sig;
 
@@ -130,6 +131,4 @@ public class AdminBlockResponse {
         }
 
     }
-
-
 }

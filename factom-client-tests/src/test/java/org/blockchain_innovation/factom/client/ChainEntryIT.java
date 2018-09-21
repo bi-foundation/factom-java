@@ -94,7 +94,7 @@ public class ChainEntryIT extends AbstractClientTest {
     public void _03_verifyCommitChain() throws FactomException.ClientException, InterruptedException {
         boolean confirmed = waitOnConfirmation(EntryTransactionResponse.Status.TransactionACK, 15);
         Assert.assertTrue(confirmed);
-        Thread.sleep(1000);
+        Thread.sleep(2000);
     }
 
     @Test
@@ -147,7 +147,7 @@ public class ChainEntryIT extends AbstractClientTest {
 
     @Test
     public void _06_verifyCommitEntry() throws FactomException.ClientException, InterruptedException {
-        boolean confirmed = waitOnConfirmation(EntryTransactionResponse.Status.TransactionACK, 10);
+        boolean confirmed = waitOnConfirmation(EntryTransactionResponse.Status.TransactionACK, 20);
         Assert.assertTrue(confirmed);
     }
 

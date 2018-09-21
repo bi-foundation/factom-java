@@ -16,9 +16,10 @@
 
 package org.blockchain_innovation.factom.client.api.model.response.walletd;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class WalletBackupResponse {
+public class WalletBackupResponse implements Serializable {
 
     private String walletSeed;
     private List<AddressResponse> addresses;

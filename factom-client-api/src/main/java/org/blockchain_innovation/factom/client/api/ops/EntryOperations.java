@@ -29,7 +29,7 @@ public class EntryOperations {
     private final ByteOperations byteOps = new ByteOperations();
 
     /**
-     * Calculates the chain Id from an entry response object
+     * Calculates the chain Id from an entry response object.
      *
      * @param entryResponse Entry response
      * @return
@@ -39,7 +39,7 @@ public class EntryOperations {
     }
 
     /**
-     * Calculates the chain Id from a list of external Ids
+     * Calculates the chain Id from a list of external Ids.
      *
      * @param externalIds The external ids
      * @return
@@ -58,7 +58,7 @@ public class EntryOperations {
 
     /**
      * Calculates the entryHash of the first entry in a chain.
-     * This is only applicable to the first entry, hence you do not have to provide the chain Id
+     * This is only applicable to the first entry, hence you do not have to provide the chain Id.
      *
      * @param externalIds The external Ids
      * @param content     The content
@@ -74,8 +74,8 @@ public class EntryOperations {
      *
      * @param externalIds The external Ids
      * @param content     The content
+     * @param chainId     The chain Id
      * @return The entryHash
-     * @Param chainId The chain Id
      */
     public byte[] calculateEntryHash(List<String> externalIds, String content, String chainId) {
         byte[] entryBytes = entryToBytes(externalIds, content, chainId);
@@ -85,7 +85,7 @@ public class EntryOperations {
     }
 
     /**
-     * Converts the first entry of a chain to a byte array. This is needed in some lower level messages
+     * Converts the first entry of a chain to a byte array. This is needed in some lower level messages.
      *
      * @param externalIds The external Ids
      * @param content     The content
@@ -96,12 +96,12 @@ public class EntryOperations {
     }
 
     /**
-     * Converts an entry of a chain to a byte array. This is needed in some lower level messages
+     * Converts an entry of a chain to a byte array. This is needed in some lower level messages.
      *
      * @param externalIds The external Ids
      * @param content     The content
+     * @param chainId     The chain Id
      * @return
-     * @Param chainId The chain Id
      */
     public byte[] entryToBytes(List<String> externalIds, String content, String chainId) {
         byte[] chainIdBytes;
@@ -125,7 +125,7 @@ public class EntryOperations {
 
 
     /**
-     * Converts the external Ids to a byte-array. Part of the entry to byte conversion
+     * Converts the external Ids to a byte-array. Part of the entry to byte conversion.
      *
      * @param externalIds
      * @return

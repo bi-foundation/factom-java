@@ -16,7 +16,9 @@
 
 package org.blockchain_innovation.factom.client.api.model;
 
-public class Range {
+import java.io.Serializable;
+
+public class Range implements Serializable {
 
     private int start;
     private int end;

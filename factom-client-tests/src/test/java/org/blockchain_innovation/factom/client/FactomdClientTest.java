@@ -16,17 +16,38 @@
 
 package org.blockchain_innovation.factom.client;
 
-import org.blockchain_innovation.factom.client.api.errors.FactomException;
 import org.blockchain_innovation.factom.client.api.FactomResponse;
+import org.blockchain_innovation.factom.client.api.errors.FactomException;
 import org.blockchain_innovation.factom.client.api.model.Address;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.*;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.AdminBlockResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.ChainHeadResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.CurrentMinuteResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.DirectoryBlockHeadResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.DirectoryBlockHeightResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.DirectoryBlockResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.EntryBlockResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.EntryCreditBalanceResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.EntryCreditBlockResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.EntryCreditRateResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.EntryTransactionResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.FactoidBalanceResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.FactoidBlockResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.FactoidSubmitResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.FactoidTransactionsResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.HeightsResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.PendingEntriesResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.PendingTransactionsResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.PropertiesResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.RawDataResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.ReceiptResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.RevealResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.TransactionResponse;
 import org.blockchain_innovation.factom.client.api.rpc.RpcMethod;
 import org.blockchain_innovation.factom.client.impl.FactomRequestImpl;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 
 import static org.junit.Assert.fail;
 
@@ -34,7 +55,7 @@ public class FactomdClientTest extends AbstractClientTest {
 
     @Test
     public void manualRequest() throws FactomException.ClientException {
-        Assert.assertNull(new FactomRequestImpl(null).toString());
+        Assert.assertEquals("null", new FactomRequestImpl(null).toString());
 
         FactomRequestImpl factomRequest = new FactomRequestImpl(RpcMethod.PROPERTIES.toRequestBuilder().id(5).build());
         Assert.assertNotNull(factomRequest.toString());
@@ -180,7 +201,7 @@ public class FactomdClientTest extends AbstractClientTest {
         Assert.assertTrue(currentMinute.getDirectoryBlockHeight() > 0);
         Assert.assertTrue(currentMinute.getDirectoryBlockInSeconds() > 0);
         Assert.assertTrue(currentMinute.getLeaderHeight() > 0);
-        Assert.assertTrue(currentMinute.getMinute() > 0);
+        Assert.assertTrue(currentMinute.getMinute() >= 0);
         Assert.assertFalse("Something is wrong with factom test network. Stall detected", currentMinute.isStallDetected());
     }
 

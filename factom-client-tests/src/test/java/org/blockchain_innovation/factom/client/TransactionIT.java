@@ -33,7 +33,7 @@ import org.junit.runners.MethodSorters;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TransactionIT extends AbstractClientTest {
 
-    private final static String TRANSACTION_NAME = "TransactionName" + System.currentTimeMillis();
+    private static final String TRANSACTION_NAME = "TransactionName" + System.currentTimeMillis();
     private static FactomResponse<EntryCreditRateResponse> entryCreditRateResponse;
     private static FactomResponse<TransactionResponse> newTransactionResponse;
     private static FactomResponse<AddressResponse> toAddressResponse;

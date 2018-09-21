@@ -245,7 +245,7 @@ public class EntryApiTest extends AbstractClientTest {
         CompletableFuture<CommitAndRevealChainResponse> future = entryClient.commitAndRevealChain(chain, address, true);
 
         int count = 0;
-        while(transactionAcknowledgedResponse.get() == null && count < 100) {
+        while (transactionAcknowledgedResponse.get() == null && count < 100) {
             count++;
             Thread.sleep(1000);
             if (future.isCompletedExceptionally()) {

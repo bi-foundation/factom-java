@@ -16,7 +16,9 @@
 
 package org.blockchain_innovation.factom.client.api.rpc;
 
-public class RpcErrorResponse {
+import java.io.Serializable;
+
+public class RpcErrorResponse implements Serializable {
     private Error error;
     private int id;
     private String jsonrpc;
@@ -45,7 +47,7 @@ public class RpcErrorResponse {
                 '}';
     }
 
-    public static class Error {
+    public static class Error implements Serializable {
         private int code;
         private String message;
         private Object data;

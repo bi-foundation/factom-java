@@ -16,6 +16,8 @@
 
 package org.blockchain_innovation.factom.client.api.model.response.walletd;
 
-public class DeleteTransactionResponse extends AbstractTransactionResponse {
+import java.io.Serializable;
+
+public class DeleteTransactionResponse extends AbstractTransactionResponse implements Serializable {
 
 }

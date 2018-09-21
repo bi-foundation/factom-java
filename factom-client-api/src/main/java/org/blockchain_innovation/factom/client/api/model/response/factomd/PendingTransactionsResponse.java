@@ -16,12 +16,13 @@
 
 package org.blockchain_innovation.factom.client.api.model.response.factomd;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PendingTransactionsResponse extends ArrayList<PendingTransactionsResponse.PendingTransaction> {
+public class PendingTransactionsResponse extends ArrayList<PendingTransactionsResponse.PendingTransaction> implements Serializable {
 
-    public static class PendingTransaction {
+    public static class PendingTransaction implements Serializable {
 
         private String transactionid;
         private String status;
@@ -54,7 +55,7 @@ public class PendingTransactionsResponse extends ArrayList<PendingTransactionsRe
             return fees;
         }
 
-        public static abstract class IO {
+        public abstract static class IO implements Serializable {
             private long amount;
             private String address;
             private String useraddress;
@@ -75,7 +76,6 @@ public class PendingTransactionsResponse extends ArrayList<PendingTransactionsRe
         public static class Input extends IO {
 
         }
-
 
         public static class Output extends IO {
 

@@ -16,7 +16,9 @@
 
 package org.blockchain_innovation.factom.client.api.model.response.factomd;
 
-public class CommitChainResponse extends CommitEntryResponse {
+import java.io.Serializable;
+
+public class CommitChainResponse extends CommitEntryResponse implements Serializable {
     private String chainidhash;
 
     public String getChainIdHash() {

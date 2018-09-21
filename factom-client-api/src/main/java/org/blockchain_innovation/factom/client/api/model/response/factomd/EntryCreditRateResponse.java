@@ -16,7 +16,9 @@
 
 package org.blockchain_innovation.factom.client.api.model.response.factomd;
 
-public class EntryCreditRateResponse {
+import java.io.Serializable;
+
+public class EntryCreditRateResponse implements Serializable {
 
     private long rate;
 

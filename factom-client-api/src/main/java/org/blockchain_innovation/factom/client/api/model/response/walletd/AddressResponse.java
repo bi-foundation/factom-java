@@ -16,7 +16,9 @@
 
 package org.blockchain_innovation.factom.client.api.model.response.walletd;
 
-public class AddressResponse {
+import java.io.Serializable;
+
+public class AddressResponse implements Serializable {
 
     private String _public;
     private String secret;

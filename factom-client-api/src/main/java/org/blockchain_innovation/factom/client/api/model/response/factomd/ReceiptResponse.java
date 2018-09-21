@@ -16,9 +16,10 @@
 
 package org.blockchain_innovation.factom.client.api.model.response.factomd;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class ReceiptResponse {
+public class ReceiptResponse implements Serializable {
 
     private Receipt receipt;
 
@@ -26,7 +27,7 @@ public class ReceiptResponse {
         return receipt;
     }
 
-    public static class Receipt {
+    public static class Receipt implements Serializable {
         private Entry entry;
         private List<MerkleBranch> merklebranch;
         private String entryblockkeymr;
@@ -58,7 +59,7 @@ public class ReceiptResponse {
             return bitcoinblockhash;
         }
 
-        public static class Entry {
+        public static class Entry implements Serializable {
             private String entryhash;
 
             public String getEntryHash() {
@@ -66,7 +67,7 @@ public class ReceiptResponse {
             }
         }
 
-        public static class MerkleBranch {
+        public static class MerkleBranch implements Serializable {
             private String left;
             private String right;
             private String top;
