@@ -38,9 +38,11 @@ import org.blockchain_innovation.factom.client.api.model.response.walletd.Wallet
 import org.blockchain_innovation.factom.client.api.model.types.AddressType;
 import org.blockchain_innovation.factom.client.api.rpc.RpcMethod;
 
+import javax.inject.Named;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+@Named
 public class WalletdClientImpl extends AbstractClient implements WalletdClient {
 
     @Override

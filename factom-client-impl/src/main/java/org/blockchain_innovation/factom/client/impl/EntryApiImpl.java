@@ -19,6 +19,7 @@ import org.blockchain_innovation.factom.client.api.model.response.walletd.Compos
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Named;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -28,6 +29,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
+@Named
 public class EntryApiImpl {
 
     private static final int ENTRY_REVEAL_WAIT = 2000;

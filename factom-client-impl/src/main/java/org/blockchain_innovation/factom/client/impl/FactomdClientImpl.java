@@ -50,8 +50,10 @@ import org.blockchain_innovation.factom.client.api.model.response.factomd.Transa
 import org.blockchain_innovation.factom.client.api.model.types.AddressType;
 import org.blockchain_innovation.factom.client.api.rpc.RpcMethod;
 
+import javax.inject.Named;
 import java.util.concurrent.CompletableFuture;
 
+@Named
 public class FactomdClientImpl extends AbstractClient implements FactomdClient {
 
     @Override
