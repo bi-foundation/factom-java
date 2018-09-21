@@ -97,7 +97,6 @@ public class EntryApiTest extends AbstractClientTest {
     @Test
     public void testEntry() throws InterruptedException {
         Entry entry = entry();
-        AtomicBoolean transactionAcknowledge = new AtomicBoolean(false);
         AtomicReference<CommitEntryResponse> commitEntryResponse = new AtomicReference<>();
         AtomicReference<RevealResponse> revealEntryResponse = new AtomicReference<>();
         AtomicReference<EntryTransactionResponse> transactionAcknowledgedResponse = new AtomicReference<>();

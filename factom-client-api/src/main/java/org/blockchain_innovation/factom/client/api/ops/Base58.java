@@ -40,22 +40,22 @@ public class Base58 {
         }
 
         // Make a copy of the input since we are going to modify it.
-        input = copyOfRange(input, 0, input.length);
+        byte[] result = copyOfRange(input, 0, input.length);
 
         // Count leading zeroes
         int zeroCount = 0;
-        while (zeroCount < input.length && input[zeroCount] == 0) {
+        while (zeroCount < result.length && result[zeroCount] == 0) {
             ++zeroCount;
         }
 
         // The actual encoding
-        byte[] temp = new byte[input.length * 2];
+        byte[] temp = new byte[result.length * 2];
         int j = temp.length;
 
         int startAt = zeroCount;
-        while (startAt < input.length) {
-            byte mod = divmod58(input, startAt);
-            if (input[startAt] == 0) {
+        while (startAt < result.length) {
+            byte mod = divmod58(result, startAt);
+            if (result[startAt] == 0) {
                 ++startAt;
             }
 

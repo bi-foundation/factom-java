@@ -23,6 +23,7 @@ import org.blockchain_innovation.factom.client.api.settings.RpcSettings;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Locale;
 import java.util.Properties;
 
 public class RpcSettingsImpl implements RpcSettings {
@@ -36,12 +37,11 @@ public class RpcSettingsImpl implements RpcSettings {
     }
 
     public RpcSettingsImpl(SubSystem subSystem, Properties properties) {
-        setSubSystem(subSystem);
-        setServer(new ServerImpl(subSystem, properties));
+        this(subSystem, new ServerImpl(subSystem, properties));
     }
 
     protected static String constructKey(SubSystem subSystem, String key) {
-        return (subSystem.configKey() + "." + key).toLowerCase();
+        return (subSystem.configKey() + "." + key).toLowerCase(Locale.getDefault());
     }
 
     @Override
@@ -82,6 +82,10 @@ public class RpcSettingsImpl implements RpcSettings {
         }
 
         public ServerImpl(SubSystem subSystem, Properties properties) {
+            initProperties(subSystem, properties);
+        }
+
+        private void initProperties(SubSystem subSystem, Properties properties) {
             setURL(properties.getProperty(constructKey(subSystem, "url"), "http://localhost:" + (subSystem == SubSystem.FACTOMD ? 8088 : 8089) + "/v2"));
 
             setTimeout(properties.getProperty(constructKey(subSystem, "timeout"), "30"));
@@ -98,7 +102,7 @@ public class RpcSettingsImpl implements RpcSettings {
             try {
                 setURL(new URL(url));
             } catch (MalformedURLException e) {
-                throw new FactomRuntimeException.AssertionException("Invalid URL supplied for connection: " + url);
+                throw new FactomRuntimeException.AssertionException("Invalid URL supplied for connection: " + url, e);
             }
             return this;
         }

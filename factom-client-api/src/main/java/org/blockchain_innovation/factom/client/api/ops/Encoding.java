@@ -45,7 +45,7 @@ public enum Encoding {
         public byte[] decode(String hex) {
             assertNotNull(hex);
             try (ByteArrayOutputStream bas = new ByteArrayOutputStream()) {
-                for (int i = 0; i < hex.length(); i+=2) {
+                for (int i = 0; i < hex.length(); i += 2) {
                     int b = Integer.parseInt(hex.substring(i, i + 2), 16);
                     bas.write(b);
                 }

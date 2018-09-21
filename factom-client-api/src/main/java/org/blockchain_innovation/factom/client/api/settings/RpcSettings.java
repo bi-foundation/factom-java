@@ -17,13 +17,14 @@
 package org.blockchain_innovation.factom.client.api.settings;
 
 import java.net.URL;
+import java.util.Locale;
 
 public interface RpcSettings {
     enum SubSystem {
         FACTOMD, WALLETD;
 
         public String configKey() {
-            return name().toLowerCase();
+            return name().toLowerCase(Locale.getDefault());
         }
     }
 

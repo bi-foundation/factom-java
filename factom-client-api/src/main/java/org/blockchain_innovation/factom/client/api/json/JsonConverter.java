@@ -70,7 +70,6 @@ public interface JsonConverter {
 
     String getName();
 
-
     class Provider {
 
         public static JsonConverter getInstance() {

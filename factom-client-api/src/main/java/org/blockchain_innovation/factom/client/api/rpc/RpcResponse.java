@@ -28,6 +28,7 @@ public class RpcResponse<Result> {
     private Result result;
 
     public RpcResponse() {
+        // This constructor is intentionally empty. Nothing special is needed here.
     }
 
     public RpcResponse(Result result) {

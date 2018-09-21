@@ -19,6 +19,7 @@ package org.blockchain_innovation.factom.client.api.rpc;
 import org.blockchain_innovation.factom.client.api.errors.FactomRuntimeException;
 
 import java.util.Collection;
+import java.util.Locale;
 
 public enum RpcMethod {
     // factomd api
@@ -93,7 +94,7 @@ public enum RpcMethod {
             }
         }
 
-        return valueOf(value.toUpperCase());
+        return valueOf(value.toUpperCase(Locale.getDefault()));
     }
 
     public RpcRequest toRequest() {

@@ -25,7 +25,8 @@ public class Address implements Serializable {
     private String secret;
 
     public Address(String hexAddress) {
-        setValue(hexAddress);
+        AddressType.assertValidAddress(hexAddress);
+        this.secret = hexAddress;
     }
 
     public String getValue() {

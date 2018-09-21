@@ -9,7 +9,7 @@ public enum RCDType {
     private final byte[] value;
 
     RCDType(byte[] value) {
-        this.value = value;
+        this.value = value.clone();
     }
 
     public byte[] getValue() {

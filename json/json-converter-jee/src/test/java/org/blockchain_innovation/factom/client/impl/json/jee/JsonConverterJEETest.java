@@ -14,7 +14,66 @@ import java.util.List;
 import java.util.Properties;
 
 public class JsonConverterJEETest {
+
     private static final JsonConverterJEE CONV = new JsonConverterJEE();
+
+    private static final String PROPERTIES_REQ =
+            "\n" +
+                    "{\n" +
+                    "    \"id\": \n" +
+                    "    0,\n" +
+                    "    \"jsonrpc\": \n" +
+                    "    \"2.0\",\n" +
+                    "    \"method\": \n" +
+                    "    \"properties\"\n" +
+                    "}";
+    private static final String CHAINHEAD_REQ = "\n" +
+            "{\n" +
+            "    \"id\": \n" +
+            "    5,\n" +
+            "    \"jsonrpc\": \n" +
+            "    \"2.0\",\n" +
+            "    \"method\": \n" +
+            "    \"chain-head\",\n" +
+            "    \"params\": \n" +
+            "    {\n" +
+            "        \"chainid\": \n" +
+            "        \"TEST\"\n" +
+            "    }\n" +
+            "}";
+    private static final String METHOD_NOT_FOUND_RESP = "{\n" +
+            "    \"jsonrpc\": \"2.0\",\n" +
+            "    \"id\": 51,\n" +
+            "    \"error\": {\n" +
+            "        \"code\": -32601,\n" +
+            "        \"message\": \"Method not found\"\n" +
+            "    }\n" +
+            "}";
+    private static final String DIRECTORY_BLOCK_RESP = "{  \n" +
+            "   \"jsonrpc\":\"2.0\",\n" +
+            "   \"id\":3,\n" +
+            "   \"result\":{  \n" +
+            "      \"header\":{  \n" +
+            "         \"prevblockkeymr\":\"7d15d82e70201e960655ce3e7cf475c9da593dfb82c6dca6377349bd148bf001\",\n" +
+            "         \"sequencenumber\":72497,\n" +
+            "         \"timestamp\":1484858820\n" +
+            "      },\n" +
+            "      \"entryblocklist\":[  \n" +
+            "         {  \n" +
+            "            \"chainid\":\"000000000000000000000000000000000000000000000000000000000000000a\",\n" +
+            "            \"keymr\":\"3faa880a97ef6ce1feca643cffa015dd6be6a597b3f9260e408c5ac9351d1f8d\"\n" +
+            "         },\n" +
+            "         {  \n" +
+            "            \"chainid\":\"000000000000000000000000000000000000000000000000000000000000000c\",\n" +
+            "            \"keymr\":\"5f8c98930a1874a46b47b65b9376a02fbff65b760f6866519799d69e2bc019ee\"\n" +
+            "         },\n" +
+            "         {  \n" +
+            "            \"chainid\":\"000000000000000000000000000000000000000000000000000000000000000f\",\n" +
+            "            \"keymr\":\"8c6fed0f41317cc45201b5b170a9ac5bc045029e39a90b6061211be2c0678718\"\n" +
+            "         }\n" +
+            "      ]\n" +
+            "   }\n" +
+            "}";
 
     @Test
     public void testRegistration() {
@@ -33,7 +92,6 @@ public class JsonConverterJEETest {
         String json = CONV.toJson(rpcRequest);
         Assert.assertEquals(CHAINHEAD_REQ, json);
     }
-
 
     @Test
     public void testFactomChainHeadReqToJsonWithPrettyPrintDisabled() {
@@ -72,7 +130,6 @@ public class JsonConverterJEETest {
                         "  \"three\": \"lines\"\n" +
                         "}",
                 json);
-
     }
 
     @Test
@@ -107,69 +164,5 @@ public class JsonConverterJEETest {
         DirectoryBlockResponse.Entry entry = entries.get(1);
         Assert.assertEquals("000000000000000000000000000000000000000000000000000000000000000c", entry.getChainId());
         Assert.assertEquals("5f8c98930a1874a46b47b65b9376a02fbff65b760f6866519799d69e2bc019ee", entry.getKeyMR());
-
-
     }
-
-
-    private static final String PROPERTIES_REQ =
-            "\n" +
-                    "{\n" +
-                    "    \"id\": \n" +
-                    "    0,\n" +
-                    "    \"jsonrpc\": \n" +
-                    "    \"2.0\",\n" +
-                    "    \"method\": \n" +
-                    "    \"properties\"\n" +
-                    "}";
-
-    private static final String CHAINHEAD_REQ = "\n" +
-            "{\n" +
-            "    \"id\": \n" +
-            "    5,\n" +
-            "    \"jsonrpc\": \n" +
-            "    \"2.0\",\n" +
-            "    \"method\": \n" +
-            "    \"chain-head\",\n" +
-            "    \"params\": \n" +
-            "    {\n" +
-            "        \"chainid\": \n" +
-            "        \"TEST\"\n" +
-            "    }\n" +
-            "}";
-
-    private static final String METHOD_NOT_FOUND_RESP = "{\n" +
-            "    \"jsonrpc\": \"2.0\",\n" +
-            "    \"id\": 51,\n" +
-            "    \"error\": {\n" +
-            "        \"code\": -32601,\n" +
-            "        \"message\": \"Method not found\"\n" +
-            "    }\n" +
-            "}";
-
-    private static final String DIRECTORY_BLOCK_RESP = "{  \n" +
-            "   \"jsonrpc\":\"2.0\",\n" +
-            "   \"id\":3,\n" +
-            "   \"result\":{  \n" +
-            "      \"header\":{  \n" +
-            "         \"prevblockkeymr\":\"7d15d82e70201e960655ce3e7cf475c9da593dfb82c6dca6377349bd148bf001\",\n" +
-            "         \"sequencenumber\":72497,\n" +
-            "         \"timestamp\":1484858820\n" +
-            "      },\n" +
-            "      \"entryblocklist\":[  \n" +
-            "         {  \n" +
-            "            \"chainid\":\"000000000000000000000000000000000000000000000000000000000000000a\",\n" +
-            "            \"keymr\":\"3faa880a97ef6ce1feca643cffa015dd6be6a597b3f9260e408c5ac9351d1f8d\"\n" +
-            "         },\n" +
-            "         {  \n" +
-            "            \"chainid\":\"000000000000000000000000000000000000000000000000000000000000000c\",\n" +
-            "            \"keymr\":\"5f8c98930a1874a46b47b65b9376a02fbff65b760f6866519799d69e2bc019ee\"\n" +
-            "         },\n" +
-            "         {  \n" +
-            "            \"chainid\":\"000000000000000000000000000000000000000000000000000000000000000f\",\n" +
-            "            \"keymr\":\"8c6fed0f41317cc45201b5b170a9ac5bc045029e39a90b6061211be2c0678718\"\n" +
-            "         }\n" +
-            "      ]\n" +
-            "   }\n" +
-            "}";
 }

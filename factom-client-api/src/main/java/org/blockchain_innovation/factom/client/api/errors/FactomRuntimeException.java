@@ -37,5 +37,9 @@ public class FactomRuntimeException extends RuntimeException {
         public AssertionException(String message) {
             super(message);
         }
+
+        public AssertionException(String message, Throwable cause) {
+            super(message, cause);
+        }
     }
 }

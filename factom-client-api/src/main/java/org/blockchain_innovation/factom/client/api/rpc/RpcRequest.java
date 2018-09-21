@@ -32,24 +32,16 @@ import java.util.Map;
 
 public class RpcRequest {
     private static final String VERSION = "2.0";
-    private String jsonrpc = VERSION;
+    private final String jsonrpc = VERSION;
     private RpcMethod method;
     private int id;
     private Map<String, Object> params;
-
-
-    private RpcRequest(Builder builder) {
-        this.method = builder.method;
-        setId(builder.id);
-        if (builder.params != null) {
-            setParams(builder.params);
-        }
-    }
 
     public RpcRequest(RpcMethod rpcMethod) {
         this.method = rpcMethod;
     }
 
+    @SuppressWarnings("PMD.ConstructorCallsOverridableMethod")
     public RpcRequest(RpcMethod rpcMethod, Param<?> param) {
         this(rpcMethod);
         addParam(param);
@@ -60,6 +52,7 @@ public class RpcRequest {
         Arrays.stream(extraParams).forEach(this::addParam);
     }
 
+    @SuppressWarnings("PMD.ConstructorCallsOverridableMethod")
     public RpcRequest(RpcMethod rpcMethod, Collection<Param<?>> params) {
         this(rpcMethod);
         setParams(params);
@@ -88,15 +81,6 @@ public class RpcRequest {
         return params;
     }
 
-    private List<Param<?>> getParamsAsList() {
-        if (params == null) {
-            return null;
-        }
-        List<Param<?>> paramList = new ArrayList<>();
-        params.forEach((key, value) -> paramList.add(new Param<>(key, value)));
-        return paramList;
-    }
-
     public RpcRequest setParams(Collection<Param<?>> params) {
         if (params == null) {
             this.params = null;
@@ -105,6 +89,15 @@ public class RpcRequest {
             params.forEach(param -> param.addToMap(this.params));
         }
         return this;
+    }
+
+    private List<Param<?>> getParamsAsList() {
+        if (params == null) {
+            return null;
+        }
+        List<Param<?>> paramList = new ArrayList<>();
+        params.forEach((key, value) -> paramList.add(new Param<>(key, value)));
+        return paramList;
     }
 
     public RpcRequest addParam(Param<?> param) {
@@ -134,8 +127,8 @@ public class RpcRequest {
         private T value;
 
         protected Param(String key, T value) {
-            setKey(key);
-            setValue(value);
+            this.key = key;
+            this.value = value;
         }
 
         public String getKey() {
@@ -208,9 +201,9 @@ public class RpcRequest {
     }
 
     public static class Builder {
+        private final RpcMethod method;
         // We allow both using the builder or not
         private int id;
-        private final RpcMethod method;
         private List<Param<?>> params;
 
         public Builder(RpcMethod rpcMethod) {
@@ -265,7 +258,13 @@ public class RpcRequest {
 
 
         public RpcRequest build() {
-            return new RpcRequest(this).assertValid();
+            RpcRequest rpcRequest = new RpcRequest(method);
+            rpcRequest.setId(id);
+            if (params != null) {
+                rpcRequest.setParams(params);
+            }
+
+            return rpcRequest;
         }
     }
 }

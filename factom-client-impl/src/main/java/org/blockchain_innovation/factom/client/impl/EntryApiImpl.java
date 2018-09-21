@@ -30,6 +30,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 @Named
+@SuppressWarnings("PMD.GodClass")
 public class EntryApiImpl {
 
     private static final int ENTRY_REVEAL_WAIT = 2000;
@@ -40,8 +41,7 @@ public class EntryApiImpl {
     private FactomdClient factomdClient;
     private WalletdClient walletdClient;
 
-    private List<CommitAndRevealListener> listeners = new ArrayList<>();
-
+    private final List<CommitAndRevealListener> listeners = new ArrayList<>();
 
     public EntryApiImpl addListener(CommitAndRevealListener listener) {
         if (listener != null) {

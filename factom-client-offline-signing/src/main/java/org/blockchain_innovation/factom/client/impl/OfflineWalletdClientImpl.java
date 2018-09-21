@@ -31,9 +31,9 @@ import java.util.function.Supplier;
 
 public class OfflineWalletdClientImpl extends WalletdClientImpl {
 
-    private OfflineAddressKeyConversions addressKeyConversions = new OfflineAddressKeyConversions();
-    private EntryOperations entryOperations = new EntryOperations();
-    private ByteOperations byteOperations = new ByteOperations();
+    private final OfflineAddressKeyConversions addressKeyConversions = new OfflineAddressKeyConversions();
+    private final EntryOperations entryOperations = new EntryOperations();
+    private final ByteOperations byteOperations = new ByteOperations();
 
     @Override
     public CompletableFuture<FactomResponse<ComposeResponse>> composeChain(Chain chain, Address address) throws FactomException.ClientException {

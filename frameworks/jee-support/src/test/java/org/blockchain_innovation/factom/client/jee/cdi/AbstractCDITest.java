@@ -15,10 +15,23 @@ import java.io.InputStream;
 import java.util.Properties;
 
 public abstract class AbstractCDITest {
-    protected static final Address EC_PUBLIC_ADDRESS = new Address(System.getProperty("FACTOM_CLIENT_TEST_EC_PUBLIC_ADDRESS","EC3cqLZPq5ypwRB5CLfXnud5vkWAV2sd235CFf9KcWcE3FH9GRxv"));
+    protected static final Address EC_PUBLIC_ADDRESS = new Address(System.getProperty("FACTOM_CLIENT_TEST_EC_PUBLIC_ADDRESS", "EC3cqLZPq5ypwRB5CLfXnud5vkWAV2sd235CFf9KcWcE3FH9GRxv"));
 
     @Inject
     protected ManagedClientProducers managedClientProducers;
+
+    @Deployment
+    public static JavaArchive createJavaTestArchive() {
+
+        return ShrinkWrap.create(JavaArchive.class)
+                .addPackage("org.blockchain_innovation.factom.client.jee.cdi")
+                .addPackage("org.blockchain_innovation.factom.client.api")
+                .addPackage("org.blockchain_innovation.factom.client.api.ops")
+                .addPackage("org.blockchain_innovation.factom.client.impl")
+//                .addPackage("org.blockchain_innovation.factom.client.impl.json.jee")
+                .addPackage("org.blockchain_innovation.factom.client.impl.json.gson") //fixme
+                .addAsManifestResource(EmptyAsset.INSTANCE, "beans.xml");
+    }
 
     @Before
     public void setup() throws IOException {
@@ -34,18 +47,4 @@ public abstract class AbstractCDITest {
         is.close();
         return properties;
     }
-
-    @Deployment
-    public static JavaArchive createJavaTestArchive() {
-
-        return ShrinkWrap.create(JavaArchive.class)
-                .addPackage("org.blockchain_innovation.factom.client.jee.cdi")
-                .addPackage("org.blockchain_innovation.factom.client.api")
-                .addPackage("org.blockchain_innovation.factom.client.api.ops")
-                .addPackage("org.blockchain_innovation.factom.client.impl")
-//                .addPackage("org.blockchain_innovation.factom.client.impl.json.jee")
-                .addPackage("org.blockchain_innovation.factom.client.impl.json.gson") //fixme
-                .addAsManifestResource(EmptyAsset.INSTANCE, "beans.xml");
-    }
-
 }
