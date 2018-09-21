@@ -38,13 +38,13 @@ public class JsonConverterGSON implements JsonConverter {
         GsonBuilder builder = builder();
 
         // Init new properties so we get default values
-        Properties props = properties == null ?  new Properties() : properties;
+        Properties props = properties == null ? new Properties() : properties;
 
-        boolean lenient = Boolean.parseBoolean(properties.getProperty("json.lenient", "true"));
+        boolean lenient = Boolean.parseBoolean(props.getProperty("json.lenient", "true"));
         if (lenient) {
             builder.setLenient();
         }
-        boolean prettyprint = Boolean.parseBoolean(properties.getProperty("json.prettyprint", "true"));
+        boolean prettyprint = Boolean.parseBoolean(props.getProperty("json.prettyprint", "true"));
         if (prettyprint) {
             builder.setPrettyPrinting();
         }
