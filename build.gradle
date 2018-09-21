@@ -29,7 +29,7 @@ allprojects {
         jcenter()
     }
     version = '0.2.1'
-    group = 'org.blockchain_innovation.factom'
+    group = 'org.blockchain_innovation.factom.client'
 
 
 }
@@ -169,7 +169,7 @@ project(':json:json-converter-jee') {
     }
 }
 
-project(':jee-support') {
+project(':frameworks:jee-support') {
     apply plugin: 'java'
 
     dependencies {
@@ -185,7 +185,7 @@ project(':jee-support') {
     }
 }
 
-project(':spring-support') {
+project(':frameworks:spring-boot-support') {
 
     repositories {
         jcenter()
@@ -232,7 +232,8 @@ project(':docs') {
             ":factom-client-offline-signing",
             ":json:json-converter-gson",
             ":json:json-converter-jee",
-            ":jee-support"
+            ":frameworks:jee-support",
+            ":frameworks:spring-boot-support"
     ]
 
 
@@ -279,7 +280,7 @@ project(':docs') {
     task javadocs(type: Javadoc) {
         source exportedProjects.collect { project(it).sourceSets.main.allJava }
         classpath = files(exportedProjects.collect { project(it).sourceSets.main.compileClasspath })
-        destinationDir = file("${buildDir}/docs/javadoc")
+        destinationDir = file("docs/javadoc")
         options.encoding = "UTF-8"
 
     }

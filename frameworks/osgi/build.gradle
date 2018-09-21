@@ -35,6 +35,7 @@ group = 'org.blockchain_innovation.factom'
 dependencies {
     compile project(':factom-client-api')
     compile project(':factom-client-impl')
-    compile project(':json-converter-gson')
+    compile project(':json:json-converter-gson')
+    compile project(':json:json-converter-jee')
     compile 'org.slf4j:slf4j-simple:1.7.25'
 }
