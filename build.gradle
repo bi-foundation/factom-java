@@ -60,7 +60,7 @@ subprojects {
         reports{
             xml.enabled=true
             html.enabled=true
-            html.destination file("${project.projectDir}/../quality/reports/${project.name}-pmd.html")
+            html.destination file("${project(':').projectDir}/quality/reports/${project.name}-pmd.html")
         }
     }
     tasks.withType(FindBugs) {
@@ -68,16 +68,16 @@ subprojects {
         reports {
             xml.enabled = false
             html.enabled = true
-            html.destination file("${project.projectDir}/../quality/reports/${project.name}-findbugs.html")
+            html.destination file("${project(':').projectDir}/quality/reports/${project.name}-findbugs.html")
         }
     }
     tasks.withType(Checkstyle) {
         ignoreFailures = true
-        configFile = file("${project.projectDir}/../quality/config/checkstyle.xml")
+        configFile = file("${project(':').projectDir}/quality/config/checkstyle.xml")
         reports {
             xml.enabled false
             html.enabled true
-            html.destination file("${project.projectDir}/../quality/reports/${project.name}-checkstyle.html")
+            html.destination file("${project(':').projectDir}/quality/reports/${project.name}-checkstyle.html")
         }
     }
     task qualityCheck {
@@ -89,12 +89,12 @@ subprojects {
 
 task cleanReports(type: Delete) {
     doLast {
-        FileTree tree = fileTree(dir: "${project.projectDir}/quality/reports");
+        FileTree tree = fileTree(dir: "${project(':').projectDir}/quality/reports");
         tree.include "*.html"
         tree.each { File file ->
             delete(file)
         }
-        println "clean reports: ${project.projectDir}/quality/reports"
+        println "clean reports: ${project(':').projectDir}/quality/reports"
     }
     // clean.dependsOn cleanReports
 }
