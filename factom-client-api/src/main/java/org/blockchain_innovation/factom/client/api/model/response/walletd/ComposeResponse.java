@@ -23,6 +23,14 @@ public class ComposeResponse implements Serializable {
     private Commit commit;
     private Reveal reveal;
 
+    public ComposeResponse() {
+    }
+
+    public ComposeResponse(Commit commit, Reveal reveal) {
+        this.commit = commit;
+        this.reveal = reveal;
+    }
+
     public Commit getCommit() {
         return commit;
     }
@@ -31,17 +39,20 @@ public class ComposeResponse implements Serializable {
         return reveal;
     }
 
-    public ComposeResponse setCommit(Commit commit) {
-        this.commit = commit;
-        return this;
-    }
-
-    public ComposeResponse setReveal(Reveal reveal) {
-        this.reveal = reveal;
-        return this;
-    }
 
     public static class Commit implements Serializable {
+
+        public Commit() {
+
+        }
+
+        public Commit(String jsonrpc, String method, int id, Params params) {
+            this.jsonrpc = jsonrpc;
+            this.method = method;
+            this.id = id;
+            this.params = params;
+        }
+
         private String jsonrpc;
         private int id;
         private Params params;
@@ -63,37 +74,21 @@ public class ComposeResponse implements Serializable {
             return method;
         }
 
-        public Commit setJsonrpc(String jsonrpc) {
-            this.jsonrpc = jsonrpc;
-            return this;
-        }
-
-        public Commit setId(int id) {
-            this.id = id;
-            return this;
-        }
-
-        public Commit setParams(Params params) {
-            this.params = params;
-            return this;
-        }
-
-        public Commit setMethod(String method) {
-            this.method = method;
-            return this;
-        }
 
         public static class Params implements Serializable {
             private String message;
+
+            public Params() {
+            }
+
+            public Params(String message) {
+                this.message = message;
+            }
 
             public String getMessage() {
                 return message;
             }
 
-            public Params setMessage(String message) {
-                this.message = message;
-                return this;
-            }
         }
     }
 
@@ -103,6 +98,17 @@ public class ComposeResponse implements Serializable {
         private Params params;
         private String method;
 
+        public Reveal() {
+
+        }
+
+        public Reveal(String jsonrpc, String method, int id, Reveal.Params params) {
+            this.jsonrpc = jsonrpc;
+            this.method = method;
+            this.id = id;
+            this.params = params;
+        }
+
         public String getJsonRpc() {
             return jsonrpc;
         }
@@ -119,37 +125,21 @@ public class ComposeResponse implements Serializable {
             return method;
         }
 
-        public Reveal setJsonrpc(String jsonrpc) {
-            this.jsonrpc = jsonrpc;
-            return this;
-        }
-
-        public Reveal setId(int id) {
-            this.id = id;
-            return this;
-        }
-
-        public Reveal setParams(Params params) {
-            this.params = params;
-            return this;
-        }
-
-        public Reveal setMethod(String method) {
-            this.method = method;
-            return this;
-        }
 
         public static class Params implements Serializable {
             private String entry;
+
+            public Params() {
+            }
+
+            public Params(String entry) {
+                this.entry = entry;
+            }
 
             public String getEntry() {
                 return entry;
             }
 
-            public Params setEntry(String entry) {
-                this.entry = entry;
-                return this;
-            }
         }
     }
 }

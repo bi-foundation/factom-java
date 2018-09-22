@@ -39,24 +39,12 @@ public class RpcResponse<Result> {
         return id;
     }
 
-    protected void setId(int id) {
-        this.id = id;
-    }
-
     public String getJsonrpc() {
         return jsonrpc;
     }
 
-    protected void setJsonrpc(String jsonrpc) {
-        this.jsonrpc = jsonrpc;
-    }
-
     public Result getResult() {
         return result;
-    }
-
-    protected void setResult(Result result) {
-        this.result = result;
     }
 
 }

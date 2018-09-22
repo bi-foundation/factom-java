@@ -4,8 +4,8 @@ import net.i2p.crypto.eddsa.EdDSAEngine;
 import net.i2p.crypto.eddsa.EdDSAPrivateKey;
 import net.i2p.crypto.eddsa.spec.EdDSANamedCurveTable;
 import net.i2p.crypto.eddsa.spec.EdDSAPrivateKeySpec;
-import org.blockchain_innovation.factom.client.api.errors.FactomException;
 import org.blockchain_innovation.factom.client.api.FactomResponse;
+import org.blockchain_innovation.factom.client.api.errors.FactomException;
 import org.blockchain_innovation.factom.client.api.model.Address;
 import org.blockchain_innovation.factom.client.api.model.Chain;
 import org.blockchain_innovation.factom.client.api.model.Entry;
@@ -20,11 +20,7 @@ import org.blockchain_innovation.factom.client.api.rpc.RpcResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.security.InvalidKeyException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.Signature;
-import java.security.SignatureException;
+import java.security.*;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
@@ -64,32 +60,16 @@ public class OfflineWalletdClientImpl extends WalletdClientImpl {
     }
 
     private FactomResponse<ComposeResponse> composeResponse(String commitMethod, String commitMessage, String revealMethod, String revealEntry) {
-        ComposeResponse.Commit.Params commitParams = new ComposeResponse.Commit.Params();
-        commitParams.setMessage(commitMessage);
+        ComposeResponse.Commit.Params commitParams = new ComposeResponse.Commit.Params(commitMessage);
 
-        ComposeResponse.Commit commit = new ComposeResponse.Commit();
-        commit.setId(0);
-        commit.setJsonrpc("2.0");
-        commit.setMethod(commitMethod);
-        commit.setParams(commitParams);
 
-        ComposeResponse.Reveal.Params revealParams = new ComposeResponse.Reveal.Params();
-        revealParams.setEntry(revealEntry);
-
-        ComposeResponse.Reveal reveal = new ComposeResponse.Reveal();
-        reveal.setId(0);
-        reveal.setJsonrpc("2.0");
-        reveal.setMethod(revealMethod);
-        reveal.setParams(revealParams);
-
-        ComposeResponse composeResponse = new ComposeResponse();
-        composeResponse.setCommit(commit);
-        composeResponse.setReveal(reveal);
+        ComposeResponse.Commit commit = new ComposeResponse.Commit("2.0", commitMethod, 0, commitParams);
+        ComposeResponse.Reveal.Params revealParams = new ComposeResponse.Reveal.Params(revealEntry);
+        ComposeResponse.Reveal reveal = new ComposeResponse.Reveal("2.0", revealMethod, 0, revealParams);
+        ComposeResponse composeResponse = new ComposeResponse(commit, reveal);
 
         RpcResponse<ComposeResponse> rpcResponse = new RpcResponse<>(composeResponse);
-        // rpcResponse.setId(0);
-        // rpcResponse.setJsonrpc("2.0");
-        return new OfflineFactomResponseImpl<ComposeResponse>(rpcResponse);
+        return new OfflineFactomResponseImpl<>(rpcResponse);
     }
 
     protected String composeChainCommit(Chain chain, Address entryCreditAddress) throws FactomException.ClientException {

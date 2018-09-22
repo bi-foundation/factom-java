@@ -84,6 +84,7 @@ public class JsonConverterGSON implements JsonConverter {
      * @see org.blockchain_innovation.factom.client.api.model.response.walletd.AddressResponse#_public public member of AddressResponse
      */
     private FieldNamingStrategy fieldNamingStrategy() {
+//        return FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES;
         return f -> FieldNamingPolicy.LOWER_CASE_WITH_DASHES.translateName(f).replace("_", "");
     }
 

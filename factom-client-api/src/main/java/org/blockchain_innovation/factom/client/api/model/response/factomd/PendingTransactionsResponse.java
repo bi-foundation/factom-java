@@ -20,7 +20,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PendingTransactionsResponse extends ArrayList<PendingTransactionsResponse.PendingTransaction> implements Serializable {
+public class PendingTransactionsResponse extends ArrayList<PendingTransactionsResponse.PendingTransaction> implements Serializable, List<PendingTransactionsResponse.PendingTransaction> {
 
     public static class PendingTransaction implements Serializable {
 

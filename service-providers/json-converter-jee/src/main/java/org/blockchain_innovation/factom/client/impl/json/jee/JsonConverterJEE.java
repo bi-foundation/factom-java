@@ -17,25 +17,27 @@
 package org.blockchain_innovation.factom.client.impl.json.jee;
 
 import org.blockchain_innovation.factom.client.api.json.JsonConverter;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.PendingTransactionsResponse;
 import org.blockchain_innovation.factom.client.api.rpc.RpcErrorResponse;
 import org.blockchain_innovation.factom.client.api.rpc.RpcMethod;
 import org.blockchain_innovation.factom.client.api.rpc.RpcResponse;
 
 import javax.inject.Named;
+import javax.json.JsonArray;
+import javax.json.JsonValue;
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
 import javax.json.bind.JsonbConfig;
 import javax.json.bind.config.PropertyNamingStrategy;
 import javax.json.bind.config.PropertyVisibilityStrategy;
+import javax.json.bind.serializer.DeserializationContext;
+import javax.json.bind.serializer.JsonbDeserializer;
 import javax.json.bind.serializer.JsonbSerializer;
 import javax.json.bind.serializer.SerializationContext;
 import javax.json.stream.JsonGenerator;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.util.Locale;
+import javax.json.stream.JsonParser;
+import java.lang.reflect.*;
+import java.nio.CharBuffer;
 import java.util.Objects;
 import java.util.Properties;
 
@@ -65,9 +67,9 @@ public class JsonConverterJEE implements JsonConverter {
                 withFormatting(true).
                 withPropertyOrderStrategy(LEXICOGRAPHICAL).
                 withSerializers(new RpcMethodSerializer()).
-//                withDeserializers(new RpcMethodDeserializer()).
-        withPropertyVisibilityStrategy(propertyVisibilityStrategy()).
-                        withPropertyNamingStrategy(propertyNamingStrategy());
+                withDeserializers(new PendingTransactionsResponseDeserializer()).
+                withPropertyVisibilityStrategy(propertyVisibilityStrategy()).
+                withPropertyNamingStrategy(propertyNamingStrategy());
         return config;
     }
 
@@ -88,7 +90,7 @@ public class JsonConverterJEE implements JsonConverter {
     @Override
     public <T> RpcResponse<T> fromJson(String json, Class<T> resultClass) {
         ParameterizedType parameterizedType = new ResolvedParameterizedType(RpcResponse.class, new Type[]{resultClass});
-            return jsonb().fromJson(json, parameterizedType);
+        return jsonb().fromJson(json, parameterizedType);
     }
 
     @Override
@@ -121,7 +123,18 @@ public class JsonConverterJEE implements JsonConverter {
             if (propertyName.startsWith("_")) {
                 translated = translated.replaceFirst("_", "");
             }
-            return translated.toLowerCase(Locale.getDefault());
+
+            CharBuffer charBuffer = CharBuffer.allocate(translated.length() * 2);
+            char last = Character.MIN_VALUE;
+            for (int i = 0; i < translated.length(); i++) {
+                final char current = translated.charAt(i);
+                if (i > 0 && Character.isUpperCase(current) && (Character.isAlphabetic(last) && Character.isLowerCase(last))) {
+                    charBuffer.append('-');
+                }
+                charBuffer.append(Character.toLowerCase(current));
+                last = current;
+            }
+            return new String(charBuffer.array(), 0, charBuffer.position());
         };
     }
 
@@ -139,7 +152,7 @@ public class JsonConverterJEE implements JsonConverter {
             public boolean isVisible(Method method) {
 
                 String name = method.getName();
-                if ("getJsonRPC".equals(name)) {
+                if ("getJsonrpc".equals(name)) {
                     return false;
                 }
                 if ("getId".equals(name) || "getParams".equals(name) || "getMethod".equals(name) || "set".equals(name)) {
@@ -156,6 +169,22 @@ public class JsonConverterJEE implements JsonConverter {
             if (rpcMethod != null) {
                 serializationContext.serialize(rpcMethod.toJsonValue(), jsonGenerator);
             }
+        }
+    }
+
+    private class PendingTransactionsResponseDeserializer implements JsonbDeserializer<PendingTransactionsResponse> {
+
+        public PendingTransactionsResponse deserialize(JsonParser jsonParser, DeserializationContext deserializationContext, Type type) {
+
+            PendingTransactionsResponse response = new PendingTransactionsResponse();
+            JsonArray transactionsArray = jsonParser.getArray();
+            for (int i = 0; i < transactionsArray.size(); i++) {
+                JsonValue transactionValue = transactionsArray.get(i);
+                String json = transactionValue.toString();
+                PendingTransactionsResponse.PendingTransaction pendingTransaction = jsonb.fromJson(json, PendingTransactionsResponse.PendingTransaction.class);
+                response.add(pendingTransaction);
+            }
+            return response;
         }
     }
 

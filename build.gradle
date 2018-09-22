@@ -194,15 +194,17 @@ project(':frameworks:jee-support') {
 
     dependencies {
         compile project(':factom-client-impl')
-//        compile project(':json-converter-jee')
-        compile project(':service-providers:json-converter-gson') //fixme
+        compile project(':service-providers:json-converter-jee')
+//        compile project(':service-providers:json-converter-gson') //fixme
         compileOnly 'javax:javaee-api:7.0'
 
         testCompile project(':service-providers:logger-slf4j')
         testCompile 'org.jboss.arquillian.container:arquillian-glassfish-embedded-3.1:1.0.2'
         testCompile 'org.glassfish.main.extras:glassfish-embedded-all:5.0'
         testCompile 'org.jboss.arquillian.junit:arquillian-junit-container:1.4.0.Final'
-        compile 'com.google.code.gson:gson:2.8.5' //fixme
+//        compile 'com.google.code.gson:gson:2.8.5' //fixme
+        testCompile 'org.glassfish:javax.json:1.1.2'
+        testCompile 'org.eclipse:yasson:1.0.1'
         testCompile 'junit:junit:4.12'
     }
 }
@@ -236,8 +238,8 @@ project(':factom-client-tests') {
         testCompile project(':service-providers:logger-slf4j')
         testCompile project(':factom-client-impl')
         testCompile project(':factom-client-offline-signing')
-        testCompile project(':service-providers:json-converter-gson')
-//        testCompile project(':service-providers:json-converter-jee')
+//        testCompile project(':service-providers:json-converter-gson')
+        testCompile project(':service-providers:json-converter-jee')
         testCompile 'org.mock-server:mockserver-netty:5.4.1'
         testCompile 'org.mock-server:mockserver-client-java:5.4.1'
         testCompile 'org.glassfish:javax.json:1.1.2'

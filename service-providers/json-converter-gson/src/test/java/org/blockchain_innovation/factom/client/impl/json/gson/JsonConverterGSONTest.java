@@ -2,6 +2,8 @@ package org.blockchain_innovation.factom.client.impl.json.gson;
 
 import org.blockchain_innovation.factom.client.api.json.JsonConverter;
 import org.blockchain_innovation.factom.client.api.model.response.factomd.DirectoryBlockResponse;
+import org.blockchain_innovation.factom.client.api.model.response.walletd.AddressResponse;
+import org.blockchain_innovation.factom.client.api.model.response.walletd.WalletBackupResponse;
 import org.blockchain_innovation.factom.client.api.rpc.RpcErrorResponse;
 import org.blockchain_innovation.factom.client.api.rpc.RpcMethod;
 import org.blockchain_innovation.factom.client.api.rpc.RpcRequest;
@@ -65,6 +67,41 @@ public class JsonConverterGSONTest {
             "         }\n" +
             "      ]\n" +
             "   }\n" +
+            "}";
+
+    private static final String ADDRESS_RESP = "{\n" +
+            "    \"jsonrpc\": \"2.0\",\n" +
+            "    \"id\": 6,\n" +
+            "    \"result\": {\n" +
+            "        \"public\": \"FA2jK2HcLnRdS94dEcU27rF3meoJfpUcZPSinpb7AwQvPRY6RL1Q\",\n" +
+            "        \"secret\": \"Fs3E9gV6DXsYzf7Fqx1fVBQPQXV695eP3k5XbmHEZVRLkMdD9qCK\"\n" +
+            "    }\n" +
+            "}";
+
+    private static final String WALLET_BACKUP_RESP = "{\n" +
+            "    \"jsonrpc\": \"2.0\",\n" +
+            "    \"id\": 0,\n" +
+            "    \"result\": {\n" +
+            "        \"wallet-seed\": \"yellow yellow yellow yellow yellow yellow yellow yellow yellow yellow yellow yellow\",\n" +
+            "        \"addresses\": [\n" +
+            "            {\n" +
+            "                \"public\": \"FA2jK2HcLnRdS94dEcU27rF3meoJfpUcZPSinpb7AwQvPRY6RL1Q\",\n" +
+            "                \"secret\": \"Fs3E9gV6DXsYzf7Fqx1fVBQPQXV695eP3k5XbmHEZVRLkMdD9qCK\"\n" +
+            "            },\n" +
+            "            {\n" +
+            "                \"public\": \"FA3cih2o2tjEUsnnFR4jX1tQXPpSXFwsp3rhVp6odL5PNCHWvZV1\",\n" +
+            "                \"secret\": \"Fs1Nifx4n5BCsS277ozuWpHqX4vRo54eYNvT3cv3wLdFbfSMMjyx\"\n" +
+            "            },\n" +
+            "            {\n" +
+            "                \"public\": \"EC1r4PvxinJgUVXA1j5RhvHZSWuCHtxtH3KsA5jqKAVsxY53F3tU\",\n" +
+            "                \"secret\": \"Es3XpT2AZaG6vWGWYEjru17mS5rP4rzKUmLfwjEiez9R3fSuy5pB\"\n" +
+            "            },\n" +
+            "            {\n" +
+            "                \"public\": \"EC2LV5w7pMD9fwtoAnv2wiCSGm2WzYpxjCMz84reWmBsxLuCPoBp\",\n" +
+            "                \"secret\": \"Es3tXbGBVKZDhUWzDKzQtg4rcpmmHPXAY9vxSM2JddwJSD5td3f8\"\n" +
+            "            }\n" +
+            "        ]\n" +
+            "    }\n" +
             "}";
 
     @Test
@@ -159,5 +196,25 @@ public class JsonConverterGSONTest {
         DirectoryBlockResponse.Entry entry = entries.get(1);
         Assert.assertEquals("000000000000000000000000000000000000000000000000000000000000000c", entry.getChainId());
         Assert.assertEquals("5f8c98930a1874a46b47b65b9376a02fbff65b760f6866519799d69e2bc019ee", entry.getKeyMR());
+    }
+
+    @Test
+    public void testReservedRespFromJson() {
+        RpcResponse<AddressResponse> response = CONV.fromJson(ADDRESS_RESP, AddressResponse.class);
+        Assert.assertNotNull(response);
+        Assert.assertEquals("2.0", response.getJsonrpc());
+        Assert.assertEquals(6, response.getId());
+        Assert.assertNotNull(response.getResult());
+
+        Assert.assertEquals("FA2jK2HcLnRdS94dEcU27rF3meoJfpUcZPSinpb7AwQvPRY6RL1Q", response.getResult().getPublicAddress());
+        Assert.assertEquals("Fs3E9gV6DXsYzf7Fqx1fVBQPQXV695eP3k5XbmHEZVRLkMdD9qCK", response.getResult().getSecret());
+
+        RpcResponse<WalletBackupResponse> backupResponse = CONV.fromJson(WALLET_BACKUP_RESP, WalletBackupResponse.class);
+        Assert.assertNotNull(backupResponse);
+        Assert.assertEquals("2.0", backupResponse.getJsonrpc());
+        Assert.assertEquals(0, backupResponse.getId());
+        Assert.assertNotNull(backupResponse.getResult());
+        Assert.assertEquals("yellow yellow yellow yellow yellow yellow yellow yellow yellow yellow yellow yellow", backupResponse.getResult().getWalletSeed());
+
     }
 }
