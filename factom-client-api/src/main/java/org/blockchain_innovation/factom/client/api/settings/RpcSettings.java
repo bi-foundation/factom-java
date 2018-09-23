@@ -19,34 +19,96 @@ package org.blockchain_innovation.factom.client.api.settings;
 import java.net.URL;
 import java.util.Locale;
 
+/**
+ * The settings like URL, proxy for the factomd and walletd clients
+ */
 public interface RpcSettings {
+    /**
+     * The subsystem to apply this configuration to.
+     */
     enum SubSystem {
         FACTOMD, WALLETD;
 
+        /**
+         * Translates the sybsystem to a configuration value key
+         *
+         * @return
+         */
         public String configKey() {
             return name().toLowerCase(Locale.getDefault());
         }
     }
 
+    /**
+     * Get the appropriate subsystem.
+     *
+     * @return The subsystem.
+     */
     SubSystem getSubSystem();
 
+    /**
+     * Get the server settings..
+     *
+     * @return Server settings.
+     */
     Server getServer();
 
+    /**
+     * Gets proxy settings.
+     *
+     * @return Proxy settings.
+     */
     Proxy getProxy();
 
+    /**
+     * Represents the server settings for the factomd/walletd clients
+     */
     interface Server {
+        /**
+         * Gets the URL of factomd/walletd V2 API the clients needs to connect to.
+         *
+         * @return The URL of factomd/walletd V2 API.
+         */
         URL getURL();
 
+        /**
+         * Gets the username for Basic Auth to the API.
+         *
+         * @return The username.
+         */
         String getUsername();
 
+        /**
+         * Gets the password for Basic Auth to the API.
+         *
+         * @return The password.
+         */
         String getPassword();
 
+        /**
+         * Gets the timeout for connections to factomd/walletd.
+         *
+         * @return The timeout for connections.
+         */
         int getTimeout();
     }
 
+    /**
+     * Represnets the proxy settings for the client.
+     */
     interface Proxy {
+        /**
+         * Gets the host of the proxy server.
+         *
+         * @return The proxy server.
+         */
         String getHost();
 
+        /**
+         * The port of the proxy server.
+         *
+         * @return Proxy server port.
+         */
         int getPort();
     }
 }

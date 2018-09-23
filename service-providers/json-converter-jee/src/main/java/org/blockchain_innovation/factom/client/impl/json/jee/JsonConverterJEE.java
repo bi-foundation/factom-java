@@ -43,8 +43,9 @@ import java.util.Properties;
 
 import static javax.json.bind.config.PropertyOrderStrategy.LEXICOGRAPHICAL;
 
-@Named
+
 @SuppressWarnings("PMD.LawOfDemeter")
+@Named
 public class JsonConverterJEE implements JsonConverter {
     public static final String NAME = "JEE";
     protected static final String RPC_METHOD = "method";

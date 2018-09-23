@@ -28,8 +28,8 @@ public abstract class AbstractCDITest {
                 .addPackage("org.blockchain_innovation.factom.client.api")
                 .addPackage("org.blockchain_innovation.factom.client.api.ops")
                 .addPackage("org.blockchain_innovation.factom.client.impl")
-//                .addPackage("org.blockchain_innovation.factom.client.impl.json.jee")
-                .addPackage("org.blockchain_innovation.factom.client.impl.json.gson") //fixme
+                .addPackage("org.blockchain_innovation.factom.client.impl.json.jee")
+//                .addPackage("org.blockchain_innovation.factom.client.impl.json.gson")
                 .addAsManifestResource(EmptyAsset.INSTANCE, "beans.xml");
     }
 

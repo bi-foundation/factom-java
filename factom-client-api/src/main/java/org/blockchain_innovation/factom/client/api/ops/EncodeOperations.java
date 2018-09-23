@@ -11,6 +11,9 @@ import java.util.stream.Collectors;
 
 @Named
 @Singleton
+/**
+ * Allows Hex encoding of commonly used values
+ */
 public class EncodeOperations {
 
     /**
@@ -53,20 +56,20 @@ public class EncodeOperations {
     /**
      * Encode each UTF-8 value in a list to HEX.
      *
-     * @param list
+     * @param utf8Values
      * @return
      */
-    public List<String> encodeHex(List<String> list) {
-        return list.stream().map(this::encodeHex).collect(Collectors.toList());
+    public List<String> encodeHex(List<String> utf8Values) {
+        return utf8Values.stream().map(this::encodeHex).collect(Collectors.toList());
     }
 
     /**
      * Encode a UFT-8 value to HEX.
      *
-     * @param value
+     * @param utf8Value
      * @return
      */
-    public String encodeHex(String value) {
-        return Encoding.HEX.encode(Encoding.UTF_8.decode(value));
+    public String encodeHex(String utf8Value) {
+        return Encoding.HEX.encode(Encoding.UTF_8.decode(utf8Value));
     }
 }

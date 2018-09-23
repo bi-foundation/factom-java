@@ -27,6 +27,9 @@ import java.util.Arrays;
 
 @Named
 @Singleton
+/**
+ * Allows some byte array operations like concatenation
+ */
 public class ByteOperations {
 
     /**

@@ -7,9 +7,9 @@ import org.blockchain_innovation.factom.client.api.rpc.RpcRequest;
  */
 public interface FactomRequest {
     /**
-     * The RpCRequest object.
+     * The Rpc Request object.
      *
-     * @return
+     * @return The Rpc request
      */
     RpcRequest getRpcRequest();
 }

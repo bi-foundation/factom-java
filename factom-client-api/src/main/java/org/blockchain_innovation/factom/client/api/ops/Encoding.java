@@ -118,7 +118,7 @@ public enum Encoding {
     /**
      * Assert the input string is not null.
      *
-     * @param input
+     * @param input The input string.
      */
     protected void assertNotNull(String input) {
         if (StringUtils.isEmpty(input)) {
@@ -129,7 +129,7 @@ public enum Encoding {
     /**
      * Assert the input bytes are not null.
      *
-     * @param input
+     * @param input The input bytes.
      */
     protected void assertNotNull(byte[] input) {
         if (input == null) {

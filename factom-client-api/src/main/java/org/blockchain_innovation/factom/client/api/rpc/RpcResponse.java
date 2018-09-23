@@ -27,22 +27,46 @@ public class RpcResponse<Result> {
     private String jsonrpc;
     private Result result;
 
+    /**
+     * The Rpc Response.
+     */
     public RpcResponse() {
-        // This constructor is intentionally empty. Nothing special is needed here.
+        // This constructor is intentionally empty. Nothing special is needed here, since we leave it up to deserializers
     }
 
+    /**
+     * The Rpc Response populated with a result.
+     *
+     * @param result
+     */
     public RpcResponse(Result result) {
         this.result = result;
     }
 
+    /**
+     * The id that correlates with the id provided in the Rpc Request.
+     *
+     * @return The correlated id
+     * @see org.blockchain_innovation.factom.client.api.rpc.RpcRequest#setId(int)
+     */
     public int getId() {
         return id;
     }
 
+    /**
+     * Gets the Json RPC version ("2.0").
+     *
+     * @return "2.0"
+     */
     public String getJsonrpc() {
         return jsonrpc;
     }
 
+    /**
+     * Gets the typed deserilized result from the response of the factomd or walletd node.
+     *
+     * @return The typed result
+     */
     public Result getResult() {
         return result;
     }

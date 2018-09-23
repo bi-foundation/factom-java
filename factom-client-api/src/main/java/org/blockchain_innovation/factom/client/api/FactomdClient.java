@@ -1,38 +1,19 @@
 package org.blockchain_innovation.factom.client.api;
 
-import org.blockchain_innovation.factom.client.api.errors.FactomException;
 import org.blockchain_innovation.factom.client.api.model.Address;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.AdminBlockResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.ChainHeadResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.CommitChainResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.CommitEntryResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.CurrentMinuteResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.DirectoryBlockHeadResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.DirectoryBlockHeightResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.DirectoryBlockResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.EntryBlockResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.EntryCreditBalanceResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.EntryCreditBlockResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.EntryCreditRateResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.EntryResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.EntryTransactionResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.FactoidBalanceResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.FactoidBlockResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.FactoidSubmitResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.FactoidTransactionsResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.HeightsResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.PendingEntriesResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.PendingTransactionsResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.PropertiesResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.RawDataResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.ReceiptResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.RevealResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.SendRawMessageResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.TransactionResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.*;
 
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * This is the factomd client that allows you to access all Rpc Methods of factomd
+ */
 public interface FactomdClient {
+    /**
+     * Retrieve the lowlevel client (this object). This allows you to directly interact with request/response exchanges and set settings, urls etc.
+     *
+     * @return The lowlevel client
+     */
     LowLevelClient lowLevelClient();
 
     /**
@@ -45,9 +26,8 @@ public interface FactomdClient {
      *
      * @param height The height at which you want to retrieve the adminblock by
      * @return The adminblock response
-     * @throws FactomException.ClientException
      */
-    CompletableFuture<FactomResponse<AdminBlockResponse>> adminBlockByHeight(long height) throws FactomException.ClientException;
+    CompletableFuture<FactomResponse<AdminBlockResponse>> adminBlockByHeight(long height);
 
 
     /**
@@ -60,9 +40,8 @@ public interface FactomdClient {
      *
      * @param keyMR the Merkle Root Key
      * @return The adminblock response
-     * @throws FactomException.ClientException
      */
-    CompletableFuture<FactomResponse<AdminBlockResponse>> adminBlockByKeyMerkleRoot(String keyMR) throws FactomException.ClientException;
+    CompletableFuture<FactomResponse<AdminBlockResponse>> adminBlockByKeyMerkleRoot(String keyMR);
 
     /**
      * This api call is used to find the status of a transaction, whether it be a factoid, reveal entry, or commit entry. When using this, you must specify the type of the
@@ -103,9 +82,8 @@ public interface FactomdClient {
      * @param rpcResultClass The result class depending on the transactiontype
      * @param <T>
      * @return The Transaction response
-     * @throws FactomException.ClientException
      */
-    <T> CompletableFuture<FactomResponse<T>> ackTransactions(String hash, String chainId, Class<T> rpcResultClass) throws FactomException.ClientException;
+    <T> CompletableFuture<FactomResponse<T>> ackTransactions(String hash, String chainId, Class<T> rpcResultClass);
 
     /**
      * The hash field for a factoid transaction is equivalent to txid.
@@ -122,9 +100,8 @@ public interface FactomdClient {
      *
      * @param txId txid for factoid trans
      * @return The Transaction response
-     * @throws FactomException.ClientException
      */
-    CompletableFuture<FactomResponse<FactoidTransactionsResponse>> ackFactoidTransactions(String txId) throws FactomException.ClientException;
+    CompletableFuture<FactomResponse<FactoidTransactionsResponse>> ackFactoidTransactions(String txId);
 
     /**
      * Requesting an entry requires you to specify if the hash you provide is a commit or an entry hash. The chainid field is used to specify this. If you are searching for a
@@ -138,18 +115,16 @@ public interface FactomdClient {
      *
      * @param hash
      * @return
-     * @throws FactomException.ClientException
      */
-    CompletableFuture<FactomResponse<EntryTransactionResponse>> ackEntryTransactions(String hash) throws FactomException.ClientException;
+    CompletableFuture<FactomResponse<EntryTransactionResponse>> ackEntryTransactions(String hash);
 
     /**
      * Return the keymr of the head of the chain for a chain ID (the unique hash created when the chain was created).
      *
      * @param chainId
      * @return The chain head response
-     * @throws FactomException.ClientException
      */
-    CompletableFuture<FactomResponse<ChainHeadResponse>> chainHead(String chainId) throws FactomException.ClientException;
+    CompletableFuture<FactomResponse<ChainHeadResponse>> chainHead(String chainId);
 
     /**
      * Send a Chain Commit Message to factomd to create a new Chain. The commit chain hex encoded string is documented here: <a
@@ -166,9 +141,8 @@ public interface FactomdClient {
      *
      * @param message The Chain Commit Message
      * @return
-     * @throws FactomException.ClientException
      */
-    CompletableFuture<FactomResponse<CommitChainResponse>> commitChain(String message) throws FactomException.ClientException;
+    CompletableFuture<FactomResponse<CommitChainResponse>> commitChain(String message);
 
     /**
      * Send an Entry Commit Message to factom to create a new Entry. The entry commit hex encoded string is documented here: <a
@@ -185,9 +159,8 @@ public interface FactomdClient {
      *
      * @param message The entry commit message
      * @return
-     * @throws FactomException.ClientException
      */
-    CompletableFuture<FactomResponse<CommitEntryResponse>> commitEntry(String message) throws FactomException.ClientException;
+    CompletableFuture<FactomResponse<CommitEntryResponse>> commitEntry(String message);
 
 
     /**
@@ -204,9 +177,8 @@ public interface FactomdClient {
      * - roundtimeout returns the number of seconds between rounds of an election during a fault.
      *
      * @return
-     * @throws FactomException.ClientException
      */
-    CompletableFuture<FactomResponse<CurrentMinuteResponse>> currentMinute() throws FactomException.ClientException;
+    CompletableFuture<FactomResponse<CurrentMinuteResponse>> currentMinute();
 
     /**
      * Retrieve a directory block given only its height.
@@ -214,9 +186,8 @@ public interface FactomdClient {
      *
      * @param height The height of the blockchain to rertieve the directory block for
      * @return
-     * @throws FactomException.ClientException
      */
-    CompletableFuture<FactomResponse<DirectoryBlockHeightResponse>> directoryBlockByHeight(long height) throws FactomException.ClientException;
+    CompletableFuture<FactomResponse<DirectoryBlockHeightResponse>> directoryBlockByHeight(long height);
 
     /**
      * Every directory block has a KeyMR (Key Merkle Root), which can be used to retrieve it. The response will contain information that can be used to navigate through all
@@ -225,90 +196,80 @@ public interface FactomdClient {
      *
      * @param keyMR Key Merkle Root
      * @return
-     * @throws FactomException.ClientException
      */
-    CompletableFuture<FactomResponse<DirectoryBlockResponse>> directoryBlockByKeyMerkleRoot(String keyMR) throws FactomException.ClientException;
+    CompletableFuture<FactomResponse<DirectoryBlockResponse>> directoryBlockByKeyMerkleRoot(String keyMR);
 
     /**
      * The directory block head is the last known directory block by factom, or in other words, the most recently recorded block. This can be used to grab the latest block and the
      * information required to traverse the entire blockchain.
      *
      * @return
-     * @throws FactomException.ClientException
      */
-    CompletableFuture<FactomResponse<DirectoryBlockHeadResponse>> directoryBlockHead() throws FactomException.ClientException;
+    CompletableFuture<FactomResponse<DirectoryBlockHeadResponse>> directoryBlockHead();
 
     /**
      * Retrieve the entry credit block for any given height. These blocks contain entry credit transaction information.
      *
      * @param height The blockchain height to retrieve the entry credit block for
      * @return
-     * @throws FactomException.ClientException
      */
-    CompletableFuture<FactomResponse<EntryCreditBlockResponse>> entryCreditBlockByHeight(int height) throws FactomException.ClientException;
+    CompletableFuture<FactomResponse<EntryCreditBlockResponse>> entryCreditBlockByHeight(int height);
 
     /**
      * Get an Entry from factomd specified by the Entry Hash.
      *
      * @param entryHash The entry Hash
      * @return
-     * @throws FactomException.ClientException
      */
-    CompletableFuture<FactomResponse<EntryResponse>> entry(String entryHash) throws FactomException.ClientException;
+    CompletableFuture<FactomResponse<EntryResponse>> entry(String entryHash);
 
     /**
      * Retrieve a specified entry block given its merkle root key. The entry block contains 0 to many entries
      *
      * @param keyMR Key Merkle Root
      * @return
-     * @throws FactomException.ClientException
      */
-    CompletableFuture<FactomResponse<EntryBlockResponse>> entryBlockByKeyMerkleRoot(String keyMR) throws FactomException.ClientException;
+    CompletableFuture<FactomResponse<EntryBlockResponse>> entryBlockByKeyMerkleRoot(String keyMR);
 
     /**
      * Return its current balance for a specific entry credit address.
      *
      * @param entryCreditAddress The entry credit address
      * @return
-     * @throws FactomException.ClientException
      */
-    CompletableFuture<FactomResponse<EntryCreditBalanceResponse>> entryCreditBalance(Address entryCreditAddress) throws FactomException.ClientException;
+    CompletableFuture<FactomResponse<EntryCreditBalanceResponse>> entryCreditBalance(Address entryCreditAddress);
 
     /**
      * Retrieve a specified entrycredit block given its merkle root key. The numbers are minute markers.
      *
      * @param keymr Key merkle root
      * @return
-     * @throws FactomException.ClientException
      */
-    CompletableFuture<FactomResponse<EntryCreditBlockResponse>> entryCreditBlock(String keymr) throws FactomException.ClientException;
+    CompletableFuture<FactomResponse<EntryCreditBlockResponse>> entryCreditBlock(String keymr);
 
     /**
      * Returns the number of Factoshis (Factoids *10^-8) that purchase a single Entry Credit. The minimum factoid fees are also determined by this rate, along with how complex the
      * factoid transaction is.
      *
      * @return
-     * @throws FactomException.ClientException
      */
-    CompletableFuture<FactomResponse<EntryCreditRateResponse>> entryCreditRate() throws FactomException.ClientException;
+    CompletableFuture<FactomResponse<EntryCreditRateResponse>> entryCreditRate();
 
     /**
      * This call returns the number of Factoshis (Factoids *10^-8) that are currently available at the address specified.
      *
      * @param factoidAddress The factoidAddress
      * @return
-     * @throws FactomException.ClientException
      */
-    CompletableFuture<FactomResponse<FactoidBalanceResponse>> factoidBalance(Address factoidAddress) throws FactomException.ClientException;
+    CompletableFuture<FactomResponse<FactoidBalanceResponse>> factoidBalance(Address factoidAddress);
 
     /**
      * Retrieve a specified factoid block given its merkle root key.
      *
      * @param keymr key merkle root
      * @return
-     * @throws FactomException.ClientException
      */
-    CompletableFuture<FactomResponse<FactoidBlockResponse>> factoidBlock(String keymr) throws FactomException.ClientException;
+    CompletableFuture<FactomResponse<FactoidBlockResponse>> factoidBlock(String keymr);
 
     /**
      * Submit a factoid transaction. The transaction hex encoded string is documented here: Github Documentation
@@ -317,18 +278,16 @@ public interface FactomdClient {
      *
      * @param factoidTransaction The factoid transaction
      * @return
-     * @throws FactomException.ClientException
      */
-    CompletableFuture<FactomResponse<FactoidSubmitResponse>> factoidSubmit(String factoidTransaction) throws FactomException.ClientException;
+    CompletableFuture<FactomResponse<FactoidSubmitResponse>> factoidSubmit(String factoidTransaction);
 
     /**
      * Retrieve the factoid block for any given height. These blocks contain factoid transaction information.
      *
      * @param height The height to retrieve the factoid block at
      * @return
-     * @throws FactomException.ClientException
      */
-    CompletableFuture<FactomResponse<FactoidBlockResponse>> factoidBlockByHeight(int height) throws FactomException.ClientException;
+    CompletableFuture<FactomResponse<FactoidBlockResponse>> factoidBlockByHeight(int height);
 
     /**
      * Returns various heights that allows you to view the state of the blockchain. The heights returned provide a lot of information regarding the state of factomd, but not all
@@ -345,44 +304,39 @@ public interface FactomdClient {
      * </p>
      *
      * @return
-     * @throws FactomException.ClientException
      */
-    CompletableFuture<FactomResponse<HeightsResponse>> heights() throws FactomException.ClientException;
+    CompletableFuture<FactomResponse<HeightsResponse>> heights();
 
     /**
      * Returns an array of the entries that have been submitted but have not been recorded into the blockchain.
      *
      * @param height The height to retrieve the pending entries at
      * @return
-     * @throws FactomException.ClientException
      */
-    CompletableFuture<FactomResponse<PendingEntriesResponse>> pendingEntries(int height) throws FactomException.ClientException;
+    CompletableFuture<FactomResponse<PendingEntriesResponse>> pendingEntries(int height);
 
     /**
      * Returns an array of factoid transactions that have not yet been recorded in the blockchain, but are known to the system.
      *
      * @param height The height to retrieve the pending entries at
      * @return
-     * @throws FactomException.ClientException
      */
-    CompletableFuture<FactomResponse<PendingTransactionsResponse>> pendingTransactions(int height) throws FactomException.ClientException;
+    CompletableFuture<FactomResponse<PendingTransactionsResponse>> pendingTransactions(int height);
 
     /**
      * Retrieve current properties of the Factom system, including the software and the API versions.
      *
      * @return
-     * @throws FactomException.ClientException
      */
-    CompletableFuture<FactomResponse<PropertiesResponse>> properties() throws FactomException.ClientException;
+    CompletableFuture<FactomResponse<PropertiesResponse>> properties();
 
     /**
      * Retrieve an entry or transaction in raw format, the data is a hex encoded string.
      *
      * @param hash
      * @return
-     * @throws FactomException.ClientException
      */
-    CompletableFuture<FactomResponse<RawDataResponse>> rawData(String hash) throws FactomException.ClientException;
+    CompletableFuture<FactomResponse<RawDataResponse>> rawData(String hash);
 
     /**
      * Retrieve a receipt providing cryptographically verifiable proof that information was recorded in the factom blockchain and that this was subsequently anchored in the bitcoin
@@ -390,9 +344,8 @@ public interface FactomdClient {
      *
      * @param hash
      * @return
-     * @throws FactomException.ClientException
      */
-    CompletableFuture<FactomResponse<ReceiptResponse>> receipt(String hash) throws FactomException.ClientException;
+    CompletableFuture<FactomResponse<ReceiptResponse>> receipt(String hash);
 
     /**
      * Reveal the First Entry in a Chain to factomd after the Commit to complete the Chain creation. The reveal-chain hex encoded string is documented here: Github Documentation
@@ -403,9 +356,8 @@ public interface FactomdClient {
      *
      * @param entry
      * @return
-     * @throws FactomException.ClientException
      */
-    CompletableFuture<FactomResponse<RevealResponse>> revealChain(String entry) throws FactomException.ClientException;
+    CompletableFuture<FactomResponse<RevealResponse>> revealChain(String entry);
 
     /**
      * Reveal an Entry to factomd after the Commit to complete the Entry creation. The reveal-entry hex encoded string is documented here: Github Documentation
@@ -416,9 +368,8 @@ public interface FactomdClient {
      *
      * @param entry
      * @return
-     * @throws FactomException.ClientException
      */
-    CompletableFuture<FactomResponse<RevealResponse>> revealEntry(String entry) throws FactomException.ClientException;
+    CompletableFuture<FactomResponse<RevealResponse>> revealEntry(String entry);
 
     /**
      * Send a raw hex encoded binary message to the Factom network. This is mostly just for debugging and testing.
@@ -447,9 +398,8 @@ public interface FactomdClient {
      *
      * @param message
      * @return
-     * @throws FactomException.ClientException
      */
-    CompletableFuture<FactomResponse<SendRawMessageResponse>> sendRawMessage(String message) throws FactomException.ClientException;
+    CompletableFuture<FactomResponse<SendRawMessageResponse>> sendRawMessage(String message);
 
     /**
      * Retrieve details of a factoid transaction using a transaction’s hash (or corresponding transaction id).
@@ -472,7 +422,6 @@ public interface FactomdClient {
      *
      * @param hash
      * @return
-     * @throws FactomException.ClientException
      */
-    CompletableFuture<FactomResponse<TransactionResponse>> transaction(String hash) throws FactomException.ClientException;
+    CompletableFuture<FactomResponse<TransactionResponse>> transaction(String hash);
 }

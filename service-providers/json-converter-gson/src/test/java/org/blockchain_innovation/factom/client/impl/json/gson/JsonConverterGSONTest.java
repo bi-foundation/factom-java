@@ -110,7 +110,7 @@ public class JsonConverterGSONTest {
         Assert.assertNotNull(JsonConverter.Provider.getInstance(JsonConverterGSON.NAME));
         Assert.assertEquals(CONV.getClass(), JsonConverter.Provider.getInstance().getClass());
         Assert.assertEquals(CONV.getClass(), JsonConverter.Provider.getInstance(JsonConverterGSON.NAME).getClass());
-        Assert.assertTrue(JsonConverter.Provider.getInstance() == JsonConverter.Provider.getInstance());
+        Assert.assertFalse(JsonConverter.Provider.getInstance() == JsonConverter.Provider.getInstance());
     }
 
     @Test

@@ -15,30 +15,74 @@
  */
 
 // Apply the java-library plugin to add support for Java Library
-//apply plugin: 'idea'
+//apply plugin: "idea"
 import org.asciidoctor.gradle.AsciidoctorTask
+
 
 plugins {
     id 'org.asciidoctor.convert' version '1.5.6' apply false
     id 'org.springframework.boot' version '2.0.5.RELEASE' apply false
 }
 
+
+ext {
+    libVersions = [
+            eddsa : "0.3.0",
+            gson  : "2.8.5",
+            slf4j : "1.7.25",
+            jee   : [
+                    cdiApi : "2.0.SP1",
+                    jsonb  : "1.0.0-RC2",
+                    jsonApi: "1.1.2"
+            ],
+            spring: [
+                    boot: "2.0.5.RELEASE"
+            ]
+    ]
+    testVersions = [
+            junit4: "4.12",
+            jee   : [
+                    yasson   : "1.0.1",
+                    javaxJson: "1.1.2"
+            ]
+    ]
+
+    exportedProjects = [
+            ":factom-client-api",
+            ":factom-client-impl",
+            ":factom-client-offline-signing",
+            ":service-providers:logger-slf4j",
+            ":service-providers:json-converter-gson",
+            ":service-providers:json-converter-jee",
+            ":frameworks:jee-support",
+            ":frameworks:spring-boot-support"
+    ]
+
+
+}
+
 // In this section you declare where to find the dependencies of your project
 allprojects {
+    apply plugin: "maven"
+    version = "0.2.1"
+    group = "org.blockchain_innovation.factom.client"
+
+
     repositories {
         jcenter()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
         mavenLocal()
     }
-    apply plugin: "maven"
 
-    version = '0.2.1'
-    group = 'org.blockchain_innovation.factom.client'
 }
 
 subprojects {
-    apply plugin: 'checkstyle'
-    apply plugin: 'findbugs'
-    apply plugin: 'pmd'
+    apply plugin: "checkstyle"
+    apply plugin: "findbugs"
+    apply plugin: "pmd"
+
 
     buildscript {
         repositories {
@@ -46,6 +90,7 @@ subprojects {
             maven {
                 url "https://plugins.gradle.org/m2/"
             }
+            mavenLocal()
         }
     }
 
@@ -70,14 +115,14 @@ subprojects {
                 "java-unnecessary",
                 "java-unusedcode"
         ]
-        reports{
-            xml.enabled=true
-            html.enabled=true
+        reports {
+            xml.enabled = true
+            html.enabled = true
             html.destination file("${project(':').projectDir}/quality/reports/${project.name}-pmd.html")
         }
     }
     tasks.withType(FindBugs) {
-        ignoreFailures = false
+        ignoreFailures = true
         reports {
             xml.enabled = false
             html.enabled = true
@@ -85,7 +130,7 @@ subprojects {
         }
     }
     tasks.withType(Checkstyle) {
-        ignoreFailures = false
+        ignoreFailures = true
         configFile = file("${project(':').projectDir}/quality/config/checkstyle.xml")
         reports {
             xml.enabled false
@@ -100,6 +145,10 @@ subprojects {
     }
 }
 
+
+
+
+
 task cleanReports(type: Delete) {
     doLast {
         FileTree tree = fileTree(dir: "${project(':').projectDir}/quality/reports");
@@ -113,99 +162,85 @@ task cleanReports(type: Delete) {
 }
 
 project(':factom-client-api') {
-    apply plugin: 'java'
-    tasks.withType(JavaCompile) {
-        options.encoding = "UTF-8"
-    }
-
+    apply plugin: "java"
     dependencies {
-        compileOnly 'javax.enterprise:cdi-api:2.0.SP1'
-        testCompile project(':service-providers:logger-slf4j')
+        // Provided by JEE Environment
+        compileOnly "javax.enterprise:cdi-api:$libVersions.jee.cdiApi"
     }
 }
 
 
 project(':factom-client-impl') {
-    apply plugin: 'java'
+    apply plugin: "java"
     dependencies {
         compile project(':factom-client-api')
-        compileOnly 'javax.enterprise:cdi-api:2.0.SP1'
-
-        testCompile project(':service-providers:logger-slf4j')
-        testCompile 'org.mock-server:mockserver-netty:5.4.1'
-        testCompile 'org.mock-server:mockserver-client-java:5.4.1'
-        testCompile 'junit:junit:4.12'
-
+        // Provided by JEE Environment
+        compileOnly "javax.enterprise:cdi-api:$libVersions.jee.cdiApi"
     }
 }
 
 project(':factom-client-offline-signing') {
-    apply plugin: 'java'
+    apply plugin: "java"
     dependencies {
-        compile project(':factom-client-api')
         compile project(':factom-client-impl')
-        compile 'net.i2p.crypto:eddsa:0.3.0'
-
-        testCompile project(':service-providers:logger-slf4j')
-        testCompile 'org.mock-server:mockserver-netty:5.4.1'
-        testCompile 'org.mock-server:mockserver-client-java:5.4.1'
-        testCompile 'junit:junit:4.12'
+        compile "net.i2p.crypto:eddsa:$libVersions.eddsa"
     }
 }
 
 project(':service-providers:logger-slf4j') {
-    apply plugin: 'java'
+    apply plugin: "java"
 
     dependencies {
         compile project(':factom-client-api')
-        compile 'org.slf4j:slf4j-api:1.7.25'
+        compile "org.slf4j:slf4j-api:$libVersions.slf4j"
     }
 }
 
 project(':service-providers:json-converter-gson') {
-    apply plugin: 'java'
+    apply plugin: "java"
 
     dependencies {
         compile project(':factom-client-api')
-        compile 'com.google.code.gson:gson:2.8.5'
-        compileOnly 'javax.enterprise:cdi-api:2.0.SP1'
-        testCompile 'junit:junit:4.12'
+        compile "com.google.code.gson:gson:$libVersions.gson"
+        compileOnly "javax.enterprise:cdi-api:$libVersions.jee.cdiApi"
+        testCompile "junit:junit:$testVersions.junit4"
         testCompile project(':factom-client-impl')
     }
 }
 
 project(':service-providers:json-converter-jee') {
-    apply plugin: 'java'
+    apply plugin: "java"
 
     dependencies {
         compile project(':factom-client-api')
-        compile 'javax.json:javax.json-api:1.1.2'
-        compile 'javax.json.bind:javax.json.bind-api:1.0.0-RC2'
-        compileOnly 'javax.enterprise:cdi-api:2.0.SP1'
-        testCompile 'org.glassfish:javax.json:1.1.2'
-        testCompile 'org.eclipse:yasson:1.0.1'
-        testCompile 'junit:junit:4.12'
+        // Provided by JEE env
+        compileOnly "javax.json:javax.json-api:$libVersions.jee.jsonApi"
+        compileOnly "javax.json.bind:javax.json.bind-api:$libVersions.jee.jsonb"
+        compileOnly "javax.enterprise:cdi-api:$libVersions.jee.cdiApi"
+        // Use reference implementations for tests
+        testCompile "org.glassfish:javax.json:$testVersions.jee.javaxJson"
+        testCompile "org.eclipse:yasson:$testVersions.jee.yasson"
+        testCompile "junit:junit:$testVersions.junit4"
         testCompile project(':factom-client-impl')
     }
 }
 
 project(':frameworks:jee-support') {
-    apply plugin: 'java'
+    apply plugin: "java"
 
     dependencies {
         compile project(':factom-client-impl')
         compile project(':service-providers:json-converter-jee')
-//        compile project(':service-providers:json-converter-gson') //fixme
-        compileOnly 'javax:javaee-api:7.0'
+        // Provided by JEE Env (full spec, since we use more than CDI alone)
+        compileOnly "javax:javaee-api:7.0"
 
         testCompile project(':service-providers:logger-slf4j')
-        testCompile 'org.jboss.arquillian.container:arquillian-glassfish-embedded-3.1:1.0.2'
-        testCompile 'org.glassfish.main.extras:glassfish-embedded-all:5.0'
-        testCompile 'org.jboss.arquillian.junit:arquillian-junit-container:1.4.0.Final'
-//        compile 'com.google.code.gson:gson:2.8.5' //fixme
-        testCompile 'org.glassfish:javax.json:1.1.2'
-        testCompile 'org.eclipse:yasson:1.0.1'
-        testCompile 'junit:junit:4.12'
+        testCompile "org.jboss.arquillian.container:arquillian-glassfish-embedded-3.1:1.0.2"
+        testCompile "org.glassfish.main.extras:glassfish-embedded-all:5.0"
+        testCompile "org.jboss.arquillian.junit:arquillian-junit-container:1.4.0.Final"
+        testCompile "org.glassfish:javax.json:$testVersions.jee.javaxJson"
+        testCompile "org.eclipse:yasson:$testVersions.jee.yasson"
+        testCompile "junit:junit:$testVersions.junit4"
     }
 }
 
@@ -214,51 +249,45 @@ project(':frameworks:spring-boot-support') {
     repositories {
         jcenter()
     }
-    apply plugin: 'java'
-    apply plugin: 'org.springframework.boot'
-    apply plugin: 'io.spring.dependency-management'
+    apply plugin: "java"
+//    apply plugin: "org.springframework.boot"
+    apply plugin: "io.spring.dependency-management"
 
     dependencies {
         compile project(':factom-client-impl')
-        testCompile project(':service-providers:logger-slf4j')
-        testCompile project(':service-providers:json-converter-gson')
-        testCompile 'com.google.code.gson:gson:2.8.5'
-        testCompile 'junit:junit:4.12'
-        testCompile 'javax.enterprise:cdi-api:2.0.SP1'
-        compile('org.springframework.boot:spring-boot-starter')
-        testCompile('org.springframework.boot:spring-boot-starter-test')
+        // Explicit dep on CDI, since it might not be on classpath of spring boot application
+        compile "javax.enterprise:cdi-api:$libVersions.jee.cdiApi"
+        compileOnly "org.springframework.boot:spring-boot-starter:$libVersions.spring.boot"
+        testCompile project(":service-providers:logger-slf4j")
+        testCompile project(":service-providers:json-converter-gson")
+        testCompile "com.google.code.gson:gson:$libVersions.gson"
+        testCompile "junit:junit:$testVersions.junit4"
+
+        testCompile "org.springframework.boot:spring-boot-starter:$libVersions.spring.boot"
+        testCompile "org.springframework.boot:spring-boot-starter-test:$libVersions.spring.boot"
 
     }
 
 
 }
 project(':factom-client-tests') {
-    apply plugin: 'java'
+    apply plugin: "java"
     dependencies {
         testCompile project(':service-providers:logger-slf4j')
         testCompile project(':factom-client-impl')
         testCompile project(':factom-client-offline-signing')
 //        testCompile project(':service-providers:json-converter-gson')
         testCompile project(':service-providers:json-converter-jee')
-        testCompile 'org.mock-server:mockserver-netty:5.4.1'
-        testCompile 'org.mock-server:mockserver-client-java:5.4.1'
-        testCompile 'org.glassfish:javax.json:1.1.2'
-        testCompile 'org.eclipse:yasson:1.0.1'
-        testCompile 'junit:junit:4.12'
+        testCompile "org.mock-server:mockserver-netty:5.4.1"
+        testCompile "org.mock-server:mockserver-client-java:5.4.1"
+        testCompile "org.glassfish:javax.json:$testVersions.jee.javaxJson"
+        testCompile "org.eclipse:yasson:$testVersions.jee.yasson"
+        testCompile "junit:junit:$testVersions.junit4"
 
     }
 }
 
 project(':docs') {
-    def exportedProjects = [
-            ":factom-client-api",
-            ":factom-client-impl",
-            ":factom-client-offline-signing",
-            ":service-providers:json-converter-gson",
-            ":service-providers:json-converter-jee",
-            ":frameworks:jee-support",
-            ":frameworks:spring-boot-support"
-    ]
 
     buildscript {
         repositories {
@@ -266,38 +295,38 @@ project(':docs') {
         }
 
         dependencies {
-            classpath 'org.asciidoctor:asciidoctor-gradle-plugin:1.5.6'
-            classpath 'org.asciidoctor:asciidoctorj-epub3:1.5.0-alpha.6'
-            classpath 'org.asciidoctor:asciidoctorj-pdf:1.5.0-alpha.15'
+            classpath "org.asciidoctor:asciidoctor-gradle-plugin:1.5.6"
+            classpath "org.asciidoctor:asciidoctorj-epub3:1.5.0-alpha.6"
+            classpath "org.asciidoctor:asciidoctorj-pdf:1.5.0-alpha.15"
         }
     }
-    apply plugin: 'java'
-    apply plugin: 'org.asciidoctor.convert'
+    apply plugin: "java"
+    apply plugin: "org.asciidoctor.convert"
 
 
     tasks.withType(AsciidoctorTask) { task ->
 
         sources {
-            include 'README.adoc'
+            include "README.adoc"
         }
         attributes 'sourcedir': project.sourceSets.main.java.srcDirs[0],
-                'source-highlighter': 'coderay',
+                'source-highlighter': "coderay",
                 experimental: true,
-                toc: 'right',
-                idprefix: '',
-                idseparator: '-'
+                toc: "right",
+                idprefix: "",
+                idseparator: "-"
     }
 
-    task html5(type: AsciidoctorTask, description: 'Generates single page HTML') {
-        backends 'html5'
+    task html5(type: AsciidoctorTask, description: "Generates single page HTML") {
+        backends "html5"
     }
 
-    task pdf(type: AsciidoctorTask, description: 'Generates PDF') {
-        backends 'pdf'
+    task pdf(type: AsciidoctorTask, description: "Generates PDF") {
+        backends "pdf"
     }
 
-    task epub3(type: AsciidoctorTask, description: 'Generates EPUB3') {
-        backends 'epub3'
+    task epub3(type: AsciidoctorTask, description: "Generates EPUB3") {
+        backends "epub3"
     }
     task javadocs(type: Javadoc) {
         source exportedProjects.collect { project(it).sourceSets.main.allJava }
@@ -307,5 +336,5 @@ project(':docs') {
 
     }
 
-    defaultTasks 'html5', 'javadocs'
+    defaultTasks "html5", "javadocs"
 }

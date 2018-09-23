@@ -51,7 +51,6 @@ public class EntryOperations {
                 bytes = byteOps.concat(bytes, Digests.SHA_256.digest(externalId));
             }
         }
-        // TODO: 14-8-2018 Check empty/null list
         byte[] chainId = Digests.SHA_256.digest(bytes);
         return chainId;
     }

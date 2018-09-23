@@ -22,6 +22,9 @@ import org.blockchain_innovation.factom.client.api.errors.FactomRuntimeException
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+/**
+ * Allows digests/hashes of input messages using different algorithms
+ */
 public enum Digests {
 
     SHA_256("SHA-256"),
