@@ -96,21 +96,17 @@ subprojects {
 
     tasks.withType(JavaCompile) {
         options.encoding = "UTF-8"
-
-
     }
 
     tasks.withType(Pmd) {
-
-//        pmd.sourceSets = [sourceSets.main]
-        ignoreFailures = true
+        pmd.sourceSets = [sourceSets.main]
+        ignoreFailures = false
         consoleOutput = true
         ruleSetFiles = files("${project(':').projectDir}/quality/config/ruleset.xml")
         ruleSets = [
                 "java-basic",
                 "java-braces",
                 "java-clone",
-                "java-design",
                 "java-finalizers",
                 "java-j2ee",
                 "java-strictexception",
@@ -127,7 +123,8 @@ subprojects {
         }
     }
     tasks.withType(FindBugs) {
-        ignoreFailures = true
+        findbugs.sourceSets = [sourceSets.main]
+        ignoreFailures = false
         reports {
             xml.enabled = false
             html.enabled = true
@@ -135,6 +132,7 @@ subprojects {
         }
     }
     tasks.withType(Checkstyle) {
+        checkstyle.sourceSets = [sourceSets.main]
         ignoreFailures = true
         configFile = file("${project(':').projectDir}/quality/config/checkstyle.xml")
         reports {
