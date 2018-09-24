@@ -10,6 +10,7 @@ import javax.inject.Singleton;
  */
 @Named
 @Singleton
+@SuppressWarnings("PMD")
 public class Base58 {
 
     private static final char[] ALPHABET = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz".toCharArray();

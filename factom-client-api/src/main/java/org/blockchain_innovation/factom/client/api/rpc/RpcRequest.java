@@ -172,7 +172,7 @@ public class RpcRequest implements Serializable {
      *
      * @return This request.
      */
-    private RpcRequest assertValid() {
+    protected RpcRequest assertValid() {
         if (getMethod() == null) {
             throw new FactomRuntimeException("Cannot build a request without an RPC method specified");
         }

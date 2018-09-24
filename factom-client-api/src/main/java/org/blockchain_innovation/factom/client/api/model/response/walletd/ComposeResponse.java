@@ -24,6 +24,7 @@ public class ComposeResponse implements Serializable {
     private Reveal reveal;
 
     public ComposeResponse() {
+        // This constructor is intentionally empty. Is needed for serialization.
     }
 
     public ComposeResponse(Commit commit, Reveal reveal) {
@@ -42,21 +43,19 @@ public class ComposeResponse implements Serializable {
 
     public static class Commit implements Serializable {
 
+        private String jsonrpc;
+        private int id;
+        private Params params;
+        private String method;
         public Commit() {
-
+            // This constructor is intentionally empty. Is needed for serialization.
         }
-
         public Commit(String jsonrpc, String method, int id, Params params) {
             this.jsonrpc = jsonrpc;
             this.method = method;
             this.id = id;
             this.params = params;
         }
-
-        private String jsonrpc;
-        private int id;
-        private Params params;
-        private String method;
 
         public String getJsonRpc() {
             return jsonrpc;
@@ -79,6 +78,7 @@ public class ComposeResponse implements Serializable {
             private String message;
 
             public Params() {
+                // This constructor is intentionally empty. Is needed for serialization.
             }
 
             public Params(String message) {
@@ -99,7 +99,7 @@ public class ComposeResponse implements Serializable {
         private String method;
 
         public Reveal() {
-
+            // This constructor is intentionally empty. Is needed for serialization.
         }
 
         public Reveal(String jsonrpc, String method, int id, Reveal.Params params) {
@@ -130,6 +130,7 @@ public class ComposeResponse implements Serializable {
             private String entry;
 
             public Params() {
+                // This constructor is intentionally empty. Is needed for serialization.
             }
 
             public Params(String entry) {
