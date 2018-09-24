@@ -64,7 +64,7 @@ ext {
 // In this section you declare where to find the dependencies of your project
 allprojects {
     apply plugin: "maven"
-    version = "0.2.1"
+    version = "0.2.1-SNAPSHOT"
     group = "org.blockchain_innovation.factom.client"
 
 
