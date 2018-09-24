@@ -16,8 +16,6 @@
 
 package org.blockchain_innovation.factom.client.api.model;
 
-import org.blockchain_innovation.factom.client.api.errors.FactomRuntimeException;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;

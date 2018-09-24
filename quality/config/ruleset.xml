@@ -8,7 +8,6 @@
     </description>
 
     <rule ref="rulesets/java/codesize.xml">
-        <priority>5</priority>
     </rule>
 
     <rule ref="rulesets/java/coupling.xml">
@@ -18,6 +17,7 @@
 
     <rule ref="rulesets/java/design.xml">
         <exclude name="AvoidSynchronizedAtMethodLevel"/>
+        <exclude name="ConstructorCallsOverridableMethod"/>
         <exclude name="UnnecessaryLocalBeforeReturn"/>
         <exclude name="UseUtilityClass"/>
     </rule>

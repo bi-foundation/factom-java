@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
+@SuppressWarnings("PMD.TooManyMethods")
 public class OfflineWalletdClientImpl extends WalletdClientImpl {
 
     private final OfflineAddressKeyConversions addressKeyConversions = new OfflineAddressKeyConversions();

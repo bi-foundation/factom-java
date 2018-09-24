@@ -16,7 +16,6 @@
 
 package org.blockchain_innovation.factom.client.impl;
 
-import org.blockchain_innovation.factom.client.api.errors.FactomException;
 import org.blockchain_innovation.factom.client.api.FactomResponse;
 import org.blockchain_innovation.factom.client.api.WalletdClient;
 import org.blockchain_innovation.factom.client.api.model.Address;
@@ -43,6 +42,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 @Named
+@SuppressWarnings({"PMD.AvoidDuplicateLiterals", "PMD.TooManyMethods"})
 public class WalletdClientImpl extends AbstractClient implements WalletdClient {
 
     @Override

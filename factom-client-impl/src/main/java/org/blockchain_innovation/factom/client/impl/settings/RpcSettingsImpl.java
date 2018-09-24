@@ -70,6 +70,7 @@ public class RpcSettingsImpl implements RpcSettings {
     }
 
 
+    @SuppressWarnings("PMD.ConstructorCallsOverridableMethod")
     public static class ServerImpl implements Server {
 
         private URL url;

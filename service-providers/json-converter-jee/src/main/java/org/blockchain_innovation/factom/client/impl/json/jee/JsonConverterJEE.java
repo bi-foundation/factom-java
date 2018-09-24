@@ -44,7 +44,7 @@ import java.util.Properties;
 import static javax.json.bind.config.PropertyOrderStrategy.LEXICOGRAPHICAL;
 
 
-@SuppressWarnings("PMD.LawOfDemeter")
+@SuppressWarnings({"PMD.LawOfDemeter", "PMD.AccessorMethodGeneration"})
 @Named
 public class JsonConverterJEE implements JsonConverter {
     public static final String NAME = "JEE";
@@ -121,7 +121,7 @@ public class JsonConverterJEE implements JsonConverter {
         return propertyName -> {
             Objects.requireNonNull(propertyName);
             String translated = propertyName;
-            if (propertyName.startsWith("_")) {
+            if (propertyName.charAt(0) == '_') {
                 translated = translated.replaceFirst("_", "");
             }
 

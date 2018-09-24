@@ -33,7 +33,11 @@ public class ManagedClientProducers {
     private WalletdClientImpl walletdClient;
     private EntryApiImpl entryApi;
 
-    private boolean enableCommitRevealEvents = false;
+    private boolean enableCommitRevealEvents;
+
+    public ManagedClientProducers() {
+        this.enableCommitRevealEvents = false;
+    }
 
     public ManagedClientProducers addSettings(RpcSettings subsystemSettings) {
         settings.put(subsystemSettings.getSubSystem(), subsystemSettings);
