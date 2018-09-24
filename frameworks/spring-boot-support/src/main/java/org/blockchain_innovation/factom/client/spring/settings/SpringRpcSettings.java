@@ -6,6 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 
@@ -88,7 +89,7 @@ public class SpringRpcSettings {
     }
 
     protected String constructKey(RpcSettings.SubSystem subSystem, String key) {
-        return (subSystem + "." + key).toLowerCase();
+        return (subSystem + "." + key).toLowerCase(Locale.getDefault());
     }
 
 }

@@ -129,7 +129,7 @@ public class JsonConverterJEE implements JsonConverter {
             char last = Character.MIN_VALUE;
             for (int i = 0; i < translated.length(); i++) {
                 final char current = translated.charAt(i);
-                if (i > 0 && Character.isUpperCase(current) && (Character.isAlphabetic(last) && Character.isLowerCase(last))) {
+                if (i > 0 && Character.isUpperCase(current) && Character.isAlphabetic(last) && Character.isLowerCase(last)) {
                     charBuffer.append('-');
                 }
                 charBuffer.append(Character.toLowerCase(current));

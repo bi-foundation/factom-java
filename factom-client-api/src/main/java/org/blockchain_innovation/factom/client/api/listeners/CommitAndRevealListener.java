@@ -8,6 +8,10 @@ import org.blockchain_innovation.factom.client.api.model.response.walletd.Compos
 import org.blockchain_innovation.factom.client.api.rpc.RpcErrorResponse;
 
 // TODO: 19/09/2018 We need access to the RpcResponse class for ID correlation or add that as argument here
+
+/**
+ * A listener for commit and reveal events
+ */
 public interface CommitAndRevealListener {
 
     /**
