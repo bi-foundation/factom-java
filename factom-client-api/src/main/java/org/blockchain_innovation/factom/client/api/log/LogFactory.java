@@ -15,7 +15,7 @@ public interface LogFactory {
      * @param name The logger name.
      * @return The logger connected to the name
      */
-    Logger getInstance(String name);
+    Logger newInstance(String name);
 
     /**
      * Gets the logger by class. This is used internally and not called by the end user.
@@ -23,7 +23,7 @@ public interface LogFactory {
      * @param clazz The class to retrieve the logger for.
      * @return The logger connected to the class.
      */
-    Logger getInstance(Class<?> clazz);
+    Logger newInstance(Class<?> clazz);
 
     /**
      * Gets the engine name of the logger implementation.
@@ -39,7 +39,7 @@ public interface LogFactory {
      * @return The logger from the SPI implementation connected to the logger name
      */
     static Logger getLogger(String name) {
-        return Provider.getFactory().getInstance(name);
+        return Provider.getFactory().newInstance(name);
     }
 
     /**
@@ -49,7 +49,7 @@ public interface LogFactory {
      * @return The logger from the SPI implementation connected to the logger class
      */
     static Logger getLogger(Class<?> clazz) {
-        return Provider.getFactory().getInstance(clazz);
+        return Provider.getFactory().newInstance(clazz);
     }
 
     /**
