@@ -64,7 +64,7 @@ ext {
 // In this section you declare where to find the dependencies of your project
 allprojects {
     apply plugin: "maven"
-    version = "0.2.1"
+    version = "0.2.1-SNAPSHOT"
     group = "org.blockchain_innovation.factom.client"
 
 
@@ -102,7 +102,7 @@ subprojects {
 
     tasks.withType(Pmd) {
 
-//        pmd.sourceSets = [sourceSets.main]
+        pmd.sourceSets = [sourceSets.main]
         ignoreFailures = true
         consoleOutput = true
         ruleSetFiles = files("${project(':').projectDir}/quality/config/ruleset.xml")
@@ -127,6 +127,7 @@ subprojects {
         }
     }
     tasks.withType(FindBugs) {
+        findbugs.sourceSets = [sourceSets.main]
         ignoreFailures = true
         reports {
             xml.enabled = false
@@ -135,6 +136,7 @@ subprojects {
         }
     }
     tasks.withType(Checkstyle) {
+        checkstyle.sourceSets = [sourceSets.main]
         ignoreFailures = true
         configFile = file("${project(':').projectDir}/quality/config/checkstyle.xml")
         reports {
