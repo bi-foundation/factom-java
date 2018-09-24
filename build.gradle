@@ -124,7 +124,8 @@ subprojects {
     }
     tasks.withType(FindBugs) {
         findbugs.sourceSets = [sourceSets.main]
-        ignoreFailures = false
+        ignoreFailures =     false
+        excludeFilter = file("${project(':').projectDir}/quality/config/findbugs.exclude.xml")
         reports {
             xml.enabled = false
             html.enabled = true

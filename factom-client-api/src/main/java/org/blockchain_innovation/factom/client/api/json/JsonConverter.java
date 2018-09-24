@@ -72,13 +72,13 @@ public interface JsonConverter {
 
     class Provider {
 
-        public static JsonConverter getInstance() {
+        public static JsonConverter newInstance() {
             assertRegistered();
             JsonConverter converter = serviceLoader(false).iterator().next();
             return converter;
         }
 
-        public static JsonConverter getInstance(String converterName) {
+        public static JsonConverter newInstance(String converterName) {
             assertRegistered();
             for (JsonConverter jsonConverter : serviceLoader(false)) {
                 if (jsonConverter.getName().equalsIgnoreCase(converterName)) {
