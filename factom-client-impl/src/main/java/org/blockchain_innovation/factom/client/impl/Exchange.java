@@ -110,7 +110,7 @@ public class Exchange<Result> {
         }
     }
 
-    @SuppressWarnings("PMD.PreserveStackTrace")
+    @SuppressWarnings({"PMD.PreserveStackTrace", "PMD.AvoidCatchingGenericException"})
     protected FactomResponse<Result> retrieveResponse(Class<Result> rpcResultClass) throws FactomException.ClientException {
         try (InputStream is = connection().getInputStream();
              InputStreamReader streamReader = new InputStreamReader(is, Charset.defaultCharset());

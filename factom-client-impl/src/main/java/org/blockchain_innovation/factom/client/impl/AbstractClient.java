@@ -32,6 +32,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+@SuppressWarnings("PMD.DoNotUseThreads")
 abstract class AbstractClient implements LowLevelClient {
 
     protected EncodeOperations encodeOperations = new EncodeOperations();

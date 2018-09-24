@@ -4,7 +4,18 @@ import org.blockchain_innovation.factom.client.api.model.Address;
 import org.blockchain_innovation.factom.client.api.model.Chain;
 import org.blockchain_innovation.factom.client.api.model.Entry;
 import org.blockchain_innovation.factom.client.api.model.Range;
-import org.blockchain_innovation.factom.client.api.model.response.walletd.*;
+import org.blockchain_innovation.factom.client.api.model.response.walletd.AddressResponse;
+import org.blockchain_innovation.factom.client.api.model.response.walletd.AddressesResponse;
+import org.blockchain_innovation.factom.client.api.model.response.walletd.BlockHeightTransactionsResponse;
+import org.blockchain_innovation.factom.client.api.model.response.walletd.ComposeResponse;
+import org.blockchain_innovation.factom.client.api.model.response.walletd.ComposeTransactionResponse;
+import org.blockchain_innovation.factom.client.api.model.response.walletd.DeleteTransactionResponse;
+import org.blockchain_innovation.factom.client.api.model.response.walletd.ExecutedTransactionResponse;
+import org.blockchain_innovation.factom.client.api.model.response.walletd.GetHeightResponse;
+import org.blockchain_innovation.factom.client.api.model.response.walletd.PropertiesResponse;
+import org.blockchain_innovation.factom.client.api.model.response.walletd.TransactionResponse;
+import org.blockchain_innovation.factom.client.api.model.response.walletd.TransactionsResponse;
+import org.blockchain_innovation.factom.client.api.model.response.walletd.WalletBackupResponse;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -12,6 +23,7 @@ import java.util.concurrent.CompletableFuture;
 /**
  * This is the walletd client that allows you to access all Rpc Methods of walletd
  */
+@SuppressWarnings("PMD.TooManyMethods")
 public interface WalletdClient {
     /**
      * Retrieve the lowlevel client (this object). This allows you to directly interact with request/response exchanges and set settings, urls etc.
@@ -38,7 +50,8 @@ public interface WalletdClient {
      * Addfee is a shortcut and safeguard for adding the required additional factoshis to covert the fee. The fee is displayed in the returned transaction after each step, but
      * addfee should be used instead of manually adding the additional input. This will help to prevent overpaying.
      * Addfee will complain if your inputs and outputs do not match up. For example, in the steps above we added the inputs first. This was done intentionally to show a case of
-     * overpaying. Obviously, no one wants to overpay for a transaction, so addfee has returned an error and the message: ‘Inputs and outputs don’t add up’. This is because we have
+     * overpaying. Obviously, no one wants to overpay for a transaction, so addfee has returned an error and the message: ‘Inputs and outputs don’t add up’. This is because we
+     * have
      * 2,000,000,000 factoshis as input and only 1,000,000,000 + 10,000 as output. Let’s correct the input by doing 'add-input’, and putting 1000010000 as the amount for the
      * address. It will overwrite the previous input.
      * Curl to do that:

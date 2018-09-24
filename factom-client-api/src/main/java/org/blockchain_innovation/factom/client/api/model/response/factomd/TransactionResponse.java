@@ -109,6 +109,10 @@ public class TransactionResponse implements Serializable {
 
         public static class SigBlock implements Serializable {
             private List<String> signatures;
+
+            public List<String> getSignatures() {
+                return signatures;
+            }
         }
     }
 }

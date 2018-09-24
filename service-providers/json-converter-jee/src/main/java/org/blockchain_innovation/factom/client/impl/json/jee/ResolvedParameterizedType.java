@@ -64,7 +64,7 @@ public class ResolvedParameterizedType implements ParameterizedType {
             for (Type typeArg : resolvedTypeArgs) {
                 sb.append(String.valueOf(typeArg));
             }
-            sb.append("]");
+            sb.append(']');
         }
         return sb.toString();
     }

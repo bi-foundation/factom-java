@@ -16,7 +16,6 @@
 
 package org.blockchain_innovation.factom.client.impl;
 
-import org.blockchain_innovation.factom.client.api.errors.FactomException;
 import org.blockchain_innovation.factom.client.api.FactomResponse;
 import org.blockchain_innovation.factom.client.api.FactomdClient;
 import org.blockchain_innovation.factom.client.api.model.Address;
@@ -54,6 +53,7 @@ import javax.inject.Named;
 import java.util.concurrent.CompletableFuture;
 
 @Named
+@SuppressWarnings({"PMD.AvoidDuplicateLiterals", "PMD.TooManyMethods", "PMD.CouplingBetweenObjects", "PMD.ExcessiveImports"})
 public class FactomdClientImpl extends AbstractClient implements FactomdClient {
 
     @Override

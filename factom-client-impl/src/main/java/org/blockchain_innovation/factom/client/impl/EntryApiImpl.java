@@ -30,7 +30,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 @Named
-@SuppressWarnings("PMD.GodClass")
+@SuppressWarnings({"PMD.GodClass", "PMD.TooManyMethods"})
 public class EntryApiImpl {
 
     private static final int ENTRY_REVEAL_WAIT = 2000;

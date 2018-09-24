@@ -96,8 +96,13 @@ subprojects {
 
     tasks.withType(JavaCompile) {
         options.encoding = "UTF-8"
+
+
     }
+
     tasks.withType(Pmd) {
+
+//        pmd.sourceSets = [sourceSets.main]
         ignoreFailures = true
         consoleOutput = true
         ruleSetFiles = files("${project(':').projectDir}/quality/config/ruleset.xml")
@@ -139,9 +144,16 @@ subprojects {
         }
     }
     task qualityCheck {
-        dependsOn tasks.withType(Pmd)
-        dependsOn tasks.withType(FindBugs)
-        dependsOn tasks.withType(Checkstyle)
+        // Extreme ugly way to disable pmdTest task, since changing the sourceSets to [sourceSets.main] doesn't seem to work
+        dependsOn tasks.withType(Pmd).matching {
+            !it.name.toLowerCase().contains("test")
+        }
+        dependsOn tasks.withType(FindBugs).matching {
+            !it.name.toLowerCase().contains("test")
+        }
+        dependsOn tasks.withType(Checkstyle).matching {
+            !it.name.toLowerCase().contains("test")
+        }
     }
 }
 
