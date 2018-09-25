@@ -56,7 +56,7 @@ public interface LogFactory {
      * The SPI work is being done in the provider
      */
     class Provider {
-        static LogFactory logFactory;
+        static LogFactory logFactory = serviceLoader(false).iterator().next();
 
         static {
             assertRegistered(false);
@@ -68,9 +68,6 @@ public interface LogFactory {
          * @return
          */
         public static LogFactory getFactory() {
-            if (logFactory == null) {
-                logFactory = serviceLoader(false).iterator().next();
-            }
             return logFactory;
         }
 

@@ -106,11 +106,11 @@ public class JsonConverterGSONTest {
 
     @Test
     public void testRegistration() {
-        Assert.assertNotNull(JsonConverter.Provider.getInstance());
-        Assert.assertNotNull(JsonConverter.Provider.getInstance(JsonConverterGSON.NAME));
-        Assert.assertEquals(CONV.getClass(), JsonConverter.Provider.getInstance().getClass());
-        Assert.assertEquals(CONV.getClass(), JsonConverter.Provider.getInstance(JsonConverterGSON.NAME).getClass());
-        Assert.assertFalse(JsonConverter.Provider.getInstance() == JsonConverter.Provider.getInstance());
+        Assert.assertNotNull(JsonConverter.Provider.newInstance());
+        Assert.assertNotNull(JsonConverter.Provider.newInstance(JsonConverterGSON.NAME));
+        Assert.assertEquals(CONV.getClass(), JsonConverter.Provider.newInstance().getClass());
+        Assert.assertEquals(CONV.getClass(), JsonConverter.Provider.newInstance(JsonConverterGSON.NAME).getClass());
+        Assert.assertFalse(JsonConverter.Provider.newInstance() == JsonConverter.Provider.newInstance());
     }
 
     @Test
