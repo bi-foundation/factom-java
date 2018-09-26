@@ -71,7 +71,9 @@ ext {
             ":frameworks:spring-boot-support"
     ]
 
-
+    // the password needs to be specified via command line
+    repoUser = project.hasProperty('repoUser') ? project.getProperty('repoUser') : ''
+    repoPass = project.hasProperty('repoPass') ? project.getProperty('repoPass') : ''
 }
 
 
@@ -81,7 +83,6 @@ allprojects {
 
 
 
-    version = "0.2.1-SNAPSHOT"
     group = "org.blockchain-innovation.factom.client"
 
 
