@@ -113,7 +113,7 @@ public class JsonConverterJEETest {
             "}";
     @Test
     public void testRegistration() {
-        Assert.assertEquals(CONV.getClass(), JsonConverter.Provider.getInstance().getClass());
+        Assert.assertEquals(CONV.getClass(), JsonConverter.Provider.newInstance().getClass());
     }
 
     @Test

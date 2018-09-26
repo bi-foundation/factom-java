@@ -69,6 +69,7 @@ fabric.properties
 ### Gradle template
 .gradle
 /build/
+**/build/
 
 # Ignore Gradle GUI config
 gradle-app.setting
@@ -110,3 +111,7 @@ hs_err_pid*
 
 # Quality output reports
 quality/reports/*
+/.idea/azureSettings.xml
+/.idea/compiler.xml
+/.idea/misc.xml
+/.idea/vcs.xml

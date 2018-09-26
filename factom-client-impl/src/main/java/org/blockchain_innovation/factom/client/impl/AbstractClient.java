@@ -102,11 +102,18 @@ abstract class AbstractClient implements LowLevelClient {
     }
 
     @Override
-    public synchronized ExecutorService getExecutorService() {
+    public ExecutorService getExecutorService() {
         if (executorService == null) {
-            this.executorService = new ThreadPoolExecutor(2, 10, 5, TimeUnit.MINUTES,
-                    new SynchronousQueue<>(), threadFactory("Factom Client Dispatcher", false));
+            this.executorService = LazyExecutorServiceHolder.INSTANCE;
         }
         return executorService;
+    }
+
+    /**
+     * Initialization-on-demand holder idiom to lazy-load a singleton.
+     */
+    private static class LazyExecutorServiceHolder {
+        static final ExecutorService INSTANCE = new ThreadPoolExecutor(2, 10, 5, TimeUnit.MINUTES,
+                new SynchronousQueue<>(), threadFactory("Factom Client Dispatcher", false));
     }
 }

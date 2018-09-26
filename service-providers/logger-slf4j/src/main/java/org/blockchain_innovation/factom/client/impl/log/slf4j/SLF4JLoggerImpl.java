@@ -6,7 +6,7 @@ public class SLF4JLoggerImpl implements Logger {
 
     private final org.slf4j.Logger impl;
 
-    public SLF4JLoggerImpl(org.slf4j.Logger impl, Object... args) {
+    public SLF4JLoggerImpl(org.slf4j.Logger impl) {
         this.impl = impl;
     }
 
