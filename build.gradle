@@ -341,8 +341,9 @@ project(':docs') {
     task javadocs(type: Javadoc) {
         source exportedProjects.collect { project(it).sourceSets.main.allJava }
         classpath = files(exportedProjects.collect { project(it).sourceSets.main.compileClasspath })
-        destinationDir = file("docs/javadoc")
+        destinationDir = file("javadoc")
         options.encoding = "UTF-8"
+        title = "Factom Java Client v" + project.version
 
     }
 
