@@ -18,15 +18,25 @@
 //apply plugin: "idea"
 import org.asciidoctor.gradle.AsciidoctorTask
 
+buildscript {
+    repositories {
+        jcenter()
+    }
+
+    dependencies {
+        classpath 'io.github.robwin:jgitflow-gradle-plugin:0.6.0'
+    }
+}
+
+
 
 plugins {
     id 'org.asciidoctor.convert' version '1.5.6' apply false
     id 'org.springframework.boot' version '2.0.5.RELEASE' apply false
     id "com.athaydes.osgi-run" version "1.6.0" apply false
     id "org.dm.bundle" version "0.8.4" apply false
-
 }
-
+apply plugin: 'io.github.robwin.jgitflow'
 
 ext {
     libVersions = [
@@ -65,7 +75,7 @@ ext {
 }
 
 
-// In this section you declare where to find the dependencies of your project
+
 allprojects {
     apply plugin: "maven"
 
@@ -108,14 +118,38 @@ subprojects {
                 from components.java
                 artifact sourceJar
                 artifact javadocJar
-                // more goes in here
+
+                /*  pom {
+
+
+                      licenses {
+                          license {
+                              name = 'The Apache License, Version 2.0'
+                              url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                          }
+                      }
+                      developers {
+                          developer {
+                              id = 'bif'
+                              name = 'Blockchain Innovation Foundation'
+                              email = 'info@blockchain-innovation.org'
+                          }
+                      }
+                      scm {
+                          connection = 'scm:git:git://example.com/my-library.git'
+                          developerConnection = 'scm:git:ssh://example.com/my-library.git'
+                          url = 'http://example.com/my-library/'
+                      }
+                  }*/
             }
         }
 
 
         repositories {
             maven {
-                url 'http://nexus.qa.sphereon.com/repository/bif-snapshots'
+                def releasesRepoUrl = "http://nexus.qa.sphereon.com/repository/bif-releases"
+                def snapshotsRepoUrl = "http://nexus.qa.sphereon.com/repository/bif-snapshots"
+                url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
                 credentials {
                     username project.repoUser
                     password project.repoPass
