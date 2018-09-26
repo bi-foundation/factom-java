@@ -15,42 +15,446 @@
  */
 
 // Apply the java-library plugin to add support for Java Library
-//apply plugin: 'idea'
-apply plugin: 'java-library'
+//apply plugin: "idea"
+import org.asciidoctor.gradle.AsciidoctorTask
 
-// In this section you declare where to find the dependencies of your project
-repositories {
-    // Use jcenter for resolving your dependencies.
-    // You can declare any Maven/Ivy/file repository here.
-    jcenter()
-    maven { url 'http://repo1.maven.org/maven2' }
-}
-
-dependencies {
-    // This dependency is exported to consumers, that is to say found on their compile classpath.
-
-
-
-    api 'com.google.code.gson:gson:2.8.5'
-
-    // Use JUnit test framework
-    testCompile 'org.mock-server:mockserver-netty:5.4.1'
-    testCompile 'org.mock-server:mockserver-client-java:5.4.1'
-    testCompile 'junit:junit:4.12'
-
-
-}
-
-sourceSets {
-    main {
-        java {
-            srcDir 'src/main/java'
-        }
+buildscript {
+    repositories {
+        jcenter()
     }
-    test {
-        java {
-            srcDir 'src/test/java'
-        }
+
+    dependencies {
+        classpath 'io.github.robwin:jgitflow-gradle-plugin:0.6.0'
     }
 }
 
+
+
+plugins {
+    id 'org.asciidoctor.convert' version '1.5.6' apply false
+    id 'org.springframework.boot' version '2.0.5.RELEASE' apply false
+    id "com.athaydes.osgi-run" version "1.6.0" apply false
+    id "org.dm.bundle" version "0.8.4" apply false
+}
+apply plugin: 'io.github.robwin.jgitflow'
+
+ext {
+    libVersions = [
+            eddsa : "0.3.0",
+            gson  : "2.8.5",
+            slf4j : "1.7.25",
+            jee   : [
+                    cdiApi : "2.0.SP1",
+                    jsonb  : "1.0.0-RC2",
+                    jsonApi: "1.1.2"
+            ],
+            spring: [
+                    boot: "2.0.5.RELEASE"
+            ]
+    ]
+    testVersions = [
+            junit4: "4.12",
+            jee   : [
+                    yasson   : "1.0.1",
+                    javaxJson: "1.1.2"
+            ]
+    ]
+
+    exportedProjects = [
+            ":factom-client-api",
+            ":factom-client-impl",
+            ":factom-client-offline-signing",
+            ":service-providers:logger-slf4j",
+            ":service-providers:json-converter-gson",
+            ":service-providers:json-converter-jee",
+            ":frameworks:jee-support",
+            ":frameworks:spring-boot-support"
+    ]
+
+    // the password needs to be specified via command line
+    repoUser = project.hasProperty('repoUser') ? project.getProperty('repoUser') : ''
+    repoPass = project.hasProperty('repoPass') ? project.getProperty('repoPass') : ''
+}
+
+
+
+allprojects {
+    apply plugin: "maven"
+
+
+
+    group = "org.blockchain-innovation.factom.client"
+
+
+    repositories {
+        mavenLocal()
+        jcenter()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+
+    }
+
+}
+
+subprojects {
+    apply plugin: "checkstyle"
+    apply plugin: "findbugs"
+    apply plugin: "pmd"
+    apply plugin: "java"
+    apply plugin: "maven-publish"
+
+    buildscript {
+        repositories {
+            jcenter()
+            maven {
+                url "https://plugins.gradle.org/m2/"
+            }
+            mavenLocal()
+        }
+    }
+    publishing {
+        publications {
+            mavenJava(MavenPublication) {
+                from components.java
+                artifact sourceJar
+                artifact javadocJar
+
+                /*  pom {
+
+
+                      licenses {
+                          license {
+                              name = 'The Apache License, Version 2.0'
+                              url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                          }
+                      }
+                      developers {
+                          developer {
+                              id = 'bif'
+                              name = 'Blockchain Innovation Foundation'
+                              email = 'info@blockchain-innovation.org'
+                          }
+                      }
+                      scm {
+                          connection = 'scm:git:git://example.com/my-library.git'
+                          developerConnection = 'scm:git:ssh://example.com/my-library.git'
+                          url = 'http://example.com/my-library/'
+                      }
+                  }*/
+            }
+        }
+
+
+        repositories {
+            maven {
+                def releasesRepoUrl = "http://nexus.qa.sphereon.com/repository/bif-releases"
+                def snapshotsRepoUrl = "http://nexus.qa.sphereon.com/repository/bif-snapshots"
+                url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+                credentials {
+                    username project.repoUser
+                    password project.repoPass
+                }
+            }
+            mavenLocal()
+        }
+    }
+
+    task sourceJar(type: Jar, dependsOn: classes) {
+        classifier 'sources'
+        from sourceSets.main.allSource
+    }
+
+    task javadocJar(type: Jar, dependsOn: javadoc) {
+        classifier = 'javadoc'
+        from javadoc.destinationDir
+    }
+
+    tasks.withType(JavaCompile) {
+        options.encoding = "UTF-8"
+    }
+
+    tasks.withType(Pmd) {
+        pmd.sourceSets = [sourceSets.main]
+        ignoreFailures = false
+        consoleOutput = true
+        ruleSetFiles = files("${project(':').projectDir}/quality/config/ruleset.xml")
+        ruleSets = [
+                "java-basic",
+                "java-braces",
+                "java-clone",
+                "java-finalizers",
+                "java-j2ee",
+                "java-strictexception",
+                "java-strings",
+                "java-sunsecure",
+                "java-typeresolution",
+                "java-unnecessary",
+                "java-unusedcode"
+        ]
+        reports {
+            xml.enabled = true
+            html.enabled = true
+            html.destination file("${project(':').projectDir}/quality/reports/${project.name}-pmd.html")
+        }
+    }
+    tasks.withType(FindBugs) {
+        findbugs.sourceSets = [sourceSets.main]
+        ignoreFailures = false
+        excludeFilter = file("${project(':').projectDir}/quality/config/findbugs.exclude.xml")
+        reports {
+            xml.enabled = false
+            html.enabled = true
+            html.destination file("${project(':').projectDir}/quality/reports/${project.name}-findbugs.html")
+        }
+    }
+    tasks.withType(Checkstyle) {
+        checkstyle.sourceSets = [sourceSets.main]
+        ignoreFailures = true
+        configFile = file("${project(':').projectDir}/quality/config/checkstyle.xml")
+        reports {
+            xml.enabled false
+            html.enabled true
+            html.destination file("${project(':').projectDir}/quality/reports/${project.name}-checkstyle.html")
+        }
+    }
+    task qualityCheck {
+        // Extreme ugly way to disable pmdTest task, since changing the sourceSets to [sourceSets.main] doesn't seem to work on explicit dependencies
+        dependsOn tasks.withType(Pmd).matching {
+            !it.name.toLowerCase().contains("test")
+        }
+        dependsOn tasks.withType(FindBugs).matching {
+            !it.name.toLowerCase().contains("test")
+        }
+        dependsOn tasks.withType(Checkstyle).matching {
+            !it.name.toLowerCase().contains("test")
+        }
+    }
+}
+
+
+
+
+
+task cleanReports(type: Delete) {
+    doLast {
+        FileTree tree = fileTree(dir: "${project(':').projectDir}/quality/reports");
+        tree.include "*.html"
+        tree.each { File file ->
+            delete(file)
+        }
+        println "clean reports: ${project(':').projectDir}/quality/reports"
+    }
+    // clean.dependsOn cleanReports
+}
+
+project(':factom-client-api') {
+    apply plugin: "java"
+    dependencies {
+        // Provided by JEE Environment
+        compileOnly "javax.enterprise:cdi-api:$libVersions.jee.cdiApi"
+    }
+//    publishing {
+//        publications {
+//            mavenJava(MavenPublication) {
+//                from components.java
+//                // more goes in here
+//            }
+//        }
+//    }
+}
+
+
+project(':factom-client-impl') {
+    apply plugin: "java"
+    dependencies {
+        compile project(':factom-client-api')
+        // Provided by JEE Environment
+        compileOnly "javax.enterprise:cdi-api:$libVersions.jee.cdiApi"
+    }
+}
+
+project(':factom-client-offline-signing') {
+    apply plugin: "java"
+    dependencies {
+        compile project(':factom-client-impl')
+        compile "net.i2p.crypto:eddsa:$libVersions.eddsa"
+    }
+}
+
+project(':service-providers:logger-slf4j') {
+    apply plugin: "java"
+
+    dependencies {
+        compile project(':factom-client-api')
+        compile "org.slf4j:slf4j-api:$libVersions.slf4j"
+    }
+}
+
+project(':service-providers:json-converter-gson') {
+    apply plugin: "java"
+
+    dependencies {
+        compile project(':factom-client-api')
+        compile "com.google.code.gson:gson:$libVersions.gson"
+        compileOnly "javax.enterprise:cdi-api:$libVersions.jee.cdiApi"
+        testCompile "junit:junit:$testVersions.junit4"
+        testCompile project(':factom-client-impl')
+    }
+}
+
+project(':service-providers:json-converter-jee') {
+    apply plugin: "java"
+
+    dependencies {
+        compile project(':factom-client-api')
+        // Provided by JEE env
+        compileOnly "javax.json:javax.json-api:$libVersions.jee.jsonApi"
+        compileOnly "javax.json.bind:javax.json.bind-api:$libVersions.jee.jsonb"
+        compileOnly "javax.enterprise:cdi-api:$libVersions.jee.cdiApi"
+        // Use reference implementations for tests
+        testCompile "org.glassfish:javax.json:$testVersions.jee.javaxJson"
+        testCompile "org.eclipse:yasson:$testVersions.jee.yasson"
+        testCompile "junit:junit:$testVersions.junit4"
+        testCompile project(':factom-client-impl')
+    }
+}
+
+project(':frameworks:jee-support') {
+    apply plugin: "java"
+
+    dependencies {
+        compile project(':factom-client-impl')
+        compile project(':service-providers:json-converter-jee')
+        // Provided by JEE Env (full spec, since we use more than CDI alone)
+        compileOnly "javax:javaee-api:7.0"
+
+        testCompile project(':service-providers:logger-slf4j')
+        testCompile "org.jboss.arquillian.container:arquillian-glassfish-embedded-3.1:1.0.2"
+        testCompile "org.glassfish.main.extras:glassfish-embedded-all:5.0"
+        testCompile "org.jboss.arquillian.junit:arquillian-junit-container:1.4.0.Final"
+        testCompile "org.glassfish:javax.json:$testVersions.jee.javaxJson"
+        testCompile "org.eclipse:yasson:$testVersions.jee.yasson"
+        testCompile "junit:junit:$testVersions.junit4"
+    }
+}
+
+project(':frameworks:spring-boot-support') {
+
+    repositories {
+        jcenter()
+    }
+    apply plugin: "java"
+//    apply plugin: "org.springframework.boot"
+    apply plugin: "io.spring.dependency-management"
+
+    dependencies {
+        compile project(':factom-client-impl')
+        // Explicit dep on CDI, since it might not be on classpath of spring boot application
+        compile "javax.enterprise:cdi-api:$libVersions.jee.cdiApi"
+        compileOnly "org.springframework.boot:spring-boot-starter:$libVersions.spring.boot"
+        testCompile project(":service-providers:logger-slf4j")
+        testCompile project(":service-providers:json-converter-gson")
+        testCompile "com.google.code.gson:gson:$libVersions.gson"
+        testCompile "junit:junit:$testVersions.junit4"
+
+        testCompile "org.springframework.boot:spring-boot-starter:$libVersions.spring.boot"
+        testCompile "org.springframework.boot:spring-boot-starter-test:$libVersions.spring.boot"
+
+    }
+
+}
+
+
+project(':frameworks:osgi') {
+
+    apply plugin: "java"
+    apply plugin: "com.athaydes.osgi-run"
+    apply plugin: "org.dm.bundle"
+
+    runOsgi {
+        bundles += project
+    }
+
+    repositories {
+        jcenter()
+    }
+
+
+    dependencies {
+        compile project(':factom-client-api')
+        compile project(':factom-client-impl')
+        compile project(':service-providers:json-converter-gson')
+        compile project(':service-providers:json-converter-jee')
+        compile project(':service-providers:logger-slf4j')
+    }
+}
+
+project(':factom-client-tests') {
+    apply plugin: "java"
+    dependencies {
+        testCompile project(':service-providers:logger-slf4j')
+        testCompile project(':factom-client-impl')
+        testCompile project(':factom-client-offline-signing')
+//        testCompile project(':service-providers:json-converter-gson')
+        testCompile project(':service-providers:json-converter-jee')
+        testCompile "org.mock-server:mockserver-netty:5.4.1"
+        testCompile "org.mock-server:mockserver-client-java:5.4.1"
+        testCompile "org.glassfish:javax.json:$testVersions.jee.javaxJson"
+        testCompile "org.eclipse:yasson:$testVersions.jee.yasson"
+        testCompile "junit:junit:$testVersions.junit4"
+
+    }
+}
+
+project(':docs') {
+
+    buildscript {
+        repositories {
+            jcenter()
+        }
+
+        dependencies {
+            classpath "org.asciidoctor:asciidoctor-gradle-plugin:1.5.6"
+            classpath "org.asciidoctor:asciidoctorj-epub3:1.5.0-alpha.6"
+            classpath "org.asciidoctor:asciidoctorj-pdf:1.5.0-alpha.15"
+        }
+    }
+    apply plugin: "java"
+    apply plugin: "org.asciidoctor.convert"
+
+
+    tasks.withType(AsciidoctorTask) { task ->
+
+        sources {
+            include "README.adoc"
+        }
+        attributes 'sourcedir': project.sourceSets.main.java.srcDirs[0],
+                'source-highlighter': "coderay",
+                experimental: true,
+                toc: "right",
+                idprefix: "",
+                idseparator: "-"
+    }
+
+    task html5(type: AsciidoctorTask, description: "Generates single page HTML") {
+        backends "html5"
+    }
+
+    task pdf(type: AsciidoctorTask, description: "Generates PDF") {
+        backends "pdf"
+    }
+
+    task epub3(type: AsciidoctorTask, description: "Generates EPUB3") {
+        backends "epub3"
+    }
+    task javadocs(type: Javadoc) {
+        source exportedProjects.collect { project(it).sourceSets.main.allJava }
+        classpath = files(exportedProjects.collect { project(it).sourceSets.main.compileClasspath })
+        destinationDir = file("docs/javadoc")
+        options.encoding = "UTF-8"
+
+    }
+
+    defaultTasks "html5", "javadocs"
+}

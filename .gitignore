@@ -47,6 +47,7 @@ cmake-build-release/
 
 # IntelliJ
 out/
+*.iml
 
 # mpeltonen/sbt-idea plugin
 .idea_modules/
@@ -68,12 +69,13 @@ fabric.properties
 ### Gradle template
 .gradle
 /build/
+**/build/
 
 # Ignore Gradle GUI config
 gradle-app.setting
 
 # Avoid ignoring Gradle wrapper jar file (.jar files are usually ignored)
-!gradle-wrapper.jar
+#!/gradle/wrapper/gradle-wrapper.jar
 
 # Cache of project
 .gradletasknamecache
@@ -105,3 +107,11 @@ gradle-app.setting
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 
+!/gradle/wrapper/gradle-wrapper.jar
+
+# Quality output reports
+quality/reports/*
+/.idea/azureSettings.xml
+/.idea/compiler.xml
+/.idea/misc.xml
+/.idea/vcs.xml
