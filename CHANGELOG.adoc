@@ -12,18 +12,27 @@ endif::[]
 This document provides a high-level overview of the changes introduced in Factom-Java by release.
 For a detailed view of what has changed, refer to our {uri-repo}/commits/master[commit history] on GitHub.
 
-== Unreleased
+
+== 0.2.1 - release date 20180926
+
+This is the initial version of the Factom-java project. It is fully functional, but lacks documentation mostly.
+That is currently the top priority.
 
 Added::
 
- * factomd and walletd lowlevel asynchronous clients
+ * factomd and walletd lowlevel asynchronous RPC clients
  * Offline signing support. So not using walletd, but using private keys directly
- * High level entry API for chains and entries
+ * High level entry API for chains and entries with event support
  * Address and key conversion and checks
  * Full POJO responses
- * JSON pluggable (de)serialization, with GSON plugin
- * SLF4J logging (requires https://www.slf4j.org/[SLF4J] implementation on classpath):
+ * JSON, pluggable SPI (de)serialization, with GSON and JEE compliant plugins
+ * Logging, pluggable SPI SLF4J logging (requires https://www.slf4j.org/[SLF4J] implementation on classpath):
  * JEE 7 support: Managed clients, CDI, Events, Managed Executor Service
+ * Spring Boot support: Configuration, DI, Executor Service
+ * Compatible with Android 7 and up
+ * Initial OSGI support (not officially supported yet)
+ * Javadocs and Asciidocs
+
 
 Changed::
 Deprecated::

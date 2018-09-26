@@ -22,6 +22,9 @@ import org.asciidoctor.gradle.AsciidoctorTask
 plugins {
     id 'org.asciidoctor.convert' version '1.5.6' apply false
     id 'org.springframework.boot' version '2.0.5.RELEASE' apply false
+    id "com.athaydes.osgi-run" version "1.6.0" apply false
+    id "org.dm.bundle" version "0.8.4" apply false
+
 }
 
 
@@ -61,19 +64,24 @@ ext {
 
 }
 
+
 // In this section you declare where to find the dependencies of your project
 allprojects {
     apply plugin: "maven"
+
+
+
     version = "0.2.1-SNAPSHOT"
-    group = "org.blockchain_innovation.factom.client"
+    group = "org.blockchain-innovation.factom.client"
 
 
     repositories {
+        mavenLocal()
         jcenter()
         maven {
             url "https://plugins.gradle.org/m2/"
         }
-        mavenLocal()
+
     }
 
 }
@@ -82,7 +90,8 @@ subprojects {
     apply plugin: "checkstyle"
     apply plugin: "findbugs"
     apply plugin: "pmd"
-
+    apply plugin: "java"
+    apply plugin: "maven-publish"
 
     buildscript {
         repositories {
@@ -92,6 +101,38 @@ subprojects {
             }
             mavenLocal()
         }
+    }
+    publishing {
+        publications {
+            mavenJava(MavenPublication) {
+                from components.java
+                artifact sourceJar
+                artifact javadocJar
+                // more goes in here
+            }
+        }
+
+
+        repositories {
+            maven {
+                url 'http://nexus.qa.sphereon.com/repository/bif-snapshots'
+                credentials {
+                    username project.repoUser
+                    password project.repoPass
+                }
+            }
+            mavenLocal()
+        }
+    }
+
+    task sourceJar(type: Jar, dependsOn: classes) {
+        classifier 'sources'
+        from sourceSets.main.allSource
+    }
+
+    task javadocJar(type: Jar, dependsOn: javadoc) {
+        classifier = 'javadoc'
+        from javadoc.destinationDir
     }
 
     tasks.withType(JavaCompile) {
@@ -124,7 +165,7 @@ subprojects {
     }
     tasks.withType(FindBugs) {
         findbugs.sourceSets = [sourceSets.main]
-        ignoreFailures =     false
+        ignoreFailures = false
         excludeFilter = file("${project(':').projectDir}/quality/config/findbugs.exclude.xml")
         reports {
             xml.enabled = false
@@ -143,7 +184,7 @@ subprojects {
         }
     }
     task qualityCheck {
-        // Extreme ugly way to disable pmdTest task, since changing the sourceSets to [sourceSets.main] doesn't seem to work
+        // Extreme ugly way to disable pmdTest task, since changing the sourceSets to [sourceSets.main] doesn't seem to work on explicit dependencies
         dependsOn tasks.withType(Pmd).matching {
             !it.name.toLowerCase().contains("test")
         }
@@ -178,6 +219,14 @@ project(':factom-client-api') {
         // Provided by JEE Environment
         compileOnly "javax.enterprise:cdi-api:$libVersions.jee.cdiApi"
     }
+//    publishing {
+//        publications {
+//            mavenJava(MavenPublication) {
+//                from components.java
+//                // more goes in here
+//            }
+//        }
+//    }
 }
 
 
@@ -279,8 +328,33 @@ project(':frameworks:spring-boot-support') {
 
     }
 
-
 }
+
+
+project(':frameworks:osgi') {
+
+    apply plugin: "java"
+    apply plugin: "com.athaydes.osgi-run"
+    apply plugin: "org.dm.bundle"
+
+    runOsgi {
+        bundles += project
+    }
+
+    repositories {
+        jcenter()
+    }
+
+
+    dependencies {
+        compile project(':factom-client-api')
+        compile project(':factom-client-impl')
+        compile project(':service-providers:json-converter-gson')
+        compile project(':service-providers:json-converter-jee')
+        compile project(':service-providers:logger-slf4j')
+    }
+}
+
 project(':factom-client-tests') {
     apply plugin: "java"
     dependencies {
