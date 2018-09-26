@@ -1,6 +1,6 @@
 = Factom Java
 
-A Factom Java enterprise client to interact with Factom.
+A Factom Java enterprise client to interact with Factom. Please see the docs module for documentation.
 
 Currently the client implements all factomd and factom-walletd lowlevel API calls both synchronously and asynchronously. Higher level functions are being worked on.
 
@@ -10,13 +10,15 @@ The client consists of several modules to support the following use cases:
 * Java Enterprise Edition (JEE)
 ** Dependency Injection
 ** Managed Threads
-** JSON processing using javax.json
+** JSON processing using javax.json and jsonb
 * Spring (boot)
 ** Dependency Injection
 ** Managed Threads
 ** Configuration
 
-To minimize dependencies and allow the implementor to choose, it has plugable JSON (de)serialization support
+== JSON plugins (SPI)
+To minimize dependencies and allow the implementor to choose, it has plugable JSON (de)serialization support.
+This is handled as an SPI. That means you need to have one of the json-providers below on the classpath!
 
 * GSON
 * JEE (javax.json)
@@ -24,6 +26,84 @@ To minimize dependencies and allow the implementor to choose, it has plugable JS
 
 Whenever one of the JSON plugins is on the classpath it will use that plugin to do the (de)serialization. Please note that at least one plugin is needed for this library to function.
 
-== Active Development
+== Logging plugins (SPI)
+There is pluggable support for logging as well. We will enhance that support in the future. Currently it needs the SLF4J SPI on the classpath.
+Without it, the library will not function. That will be fixed in future releases.
 
-IMPORTANT: This software still is in early development stage. As such you should expect breaking changes in APIs.
+== Offline signing
+Instead of using walletd to sign transactions and commits it is also possible to do that offline using private keys directly.
+To enable this you will need to include the offline signing client on the classpath. This module also has an external dependency on an encryption library.
+
+== Android support
+Since this project has no external dependencies besides a JSON library and optional logging, it is fully compatible with Android 7 and up.
+An example project can be found at https://github.com/bi-foundation/factom-java-examples/tree/develop/android/FactomApiDemo[Github].
+
+== Javadocs
+Javadocs can be found at https://bi-foundation.github.io/factom-java/javadoc/
+
+
+== Maven installation
+This is a gradle project but maven snapshots and releases are distributed on the Nexus installation of Sphereon at
+http://nexus.qa.sphereon.com/repository/bif/
+
+You need at least the following dependencies in your application
+
+....
+
+<dependency>
+    groupId>org.blockchain-innovation.factom.client</groupId>
+    <artifactId>factom-client-impl</artifactId>
+    <version>0.2.1</version>
+    <scope>compile</scope>
+</dependency>
+<dependency>
+    groupId>org.blockchain-innovation.factom.client</groupId>
+    <artifactId>logger-slf4j</artifactId>
+    <version>0.2.1</version>
+    <scope>compile</scope>
+</dependency>
+
+<!-- At least one of the following dependencies -->
+<dependency>
+    groupId>org.blockchain-innovation.factom.client</groupId>
+    <artifactId>json-converter-jee</artifactId>
+    <version>0.2.1</version>
+    <scope>compile</scope>
+</dependency>
+<dependency>
+    groupId>org.blockchain-innovation.factom.client</groupId>
+    <artifactId>json-converter-gson</artifactId>
+    <version>0.2.1</version>
+    <scope>compile</scope>
+</dependency>
+
+<!-- Offline signing support -->
+<dependency>
+    groupId>org.blockchain-innovation.factom.client</groupId>
+    <artifactId>factom-client-offline-signing</artifactId>
+    <version>0.2.1</version>
+    <scope>compile</scope>
+</dependency>
+
+
+<!-- Optional JEE support (only in JEE environment) -->
+<dependency>
+    groupId>org.blockchain-innovation.factom.client</groupId>
+    <artifactId>jee-support</artifactId>
+    <version>0.2.1</version>
+    <scope>compile</scope>
+</dependency>
+
+<!-- Optional Spring Boot support (only in Spring Boot environment) -->
+<dependency>
+    groupId>org.blockchain-innovation.factom.client</groupId>
+    <artifactId>spring-boot-support</artifactId>
+    <version>0.2.1</version>
+    <scope>compile</scope>
+</dependency>
+
+....
+
+== Active Development
+IMPORTANT: This software still is in early development stage. As such you should expect breaking changes in APIs, we expect
+to keep that to a minimum though.

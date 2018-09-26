@@ -38,8 +38,11 @@ To enable this you will need to include the offline signing client on the classp
 Since this project has no external dependencies besides a JSON library and optional logging, it is fully compatible with Android 7 and up.
 An example project can be found at https://github.com/bi-foundation/factom-java-examples/tree/develop/android/FactomApiDemo[Github].
 
+== Javadocs
+Javadocs can be found at https://bi-foundation.github.io/factom-java/javadoc/
 
-= Maven installation
+
+== Maven installation
 This is a gradle project but maven snapshots and releases are distributed on the Nexus installation of Sphereon at
 http://nexus.qa.sphereon.com/repository/bif/
 
@@ -101,6 +104,6 @@ You need at least the following dependencies in your application
 
 ....
 
-= Active Development
+== Active Development
 IMPORTANT: This software still is in early development stage. As such you should expect breaking changes in APIs, we expect
 to keep that to a minimum though.
