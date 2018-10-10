@@ -1,17 +1,17 @@
 package org.blockchain_innovation.factom.client;
 
+import org.blockchain_innovation.factom.client.api.FactomResponse;
 import org.blockchain_innovation.factom.client.api.listeners.CommitAndRevealListener;
 import org.blockchain_innovation.factom.client.api.model.Address;
 import org.blockchain_innovation.factom.client.api.model.Chain;
 import org.blockchain_innovation.factom.client.api.model.Entry;
 import org.blockchain_innovation.factom.client.api.model.response.CommitAndRevealChainResponse;
 import org.blockchain_innovation.factom.client.api.model.response.CommitAndRevealEntryResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.CommitChainResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.CommitEntryResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.EntryTransactionResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.RevealResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.*;
 import org.blockchain_innovation.factom.client.api.model.response.walletd.ComposeResponse;
+import org.blockchain_innovation.factom.client.api.ops.Digests;
 import org.blockchain_innovation.factom.client.api.ops.Encoding;
+import org.blockchain_innovation.factom.client.api.ops.EntryOperations;
 import org.blockchain_innovation.factom.client.api.rpc.RpcErrorResponse;
 import org.junit.Assert;
 import org.junit.Test;
@@ -23,6 +23,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.logging.Logger;
 
 public class EntryApiTest extends AbstractClientTest {
 
@@ -77,6 +78,9 @@ public class EntryApiTest extends AbstractClientTest {
 
         entryClient.clearListeners().addListener(listener);
         Address address = new Address(EC_PUBLIC_ADDRESS);
+//        EntryOperations entryOperations = new EntryOperations();
+
+
 
         CommitAndRevealChainResponse commitAndRevealChain = entryClient.commitAndRevealChain(chain, address).join();
 
@@ -86,9 +90,13 @@ public class EntryApiTest extends AbstractClientTest {
         Assert.assertEquals("Chain Commit Success", commitChainResponse.get().getMessage());
         Assert.assertEquals("Entry Reveal Success", revealChainResponse.get().getMessage());
         Assert.assertEquals(commitChainResponse.get().getEntryHash(), revealChainResponse.get().getEntryHash());
-
         Assert.assertNotNull(transactionAcknowledgedResponse.get());
         Assert.assertNotNull(commitAndRevealChain.getCommitChainResponse().getEntryHash(), transactionAcknowledgedResponse.get().getEntryHash());
+
+//            String chainId = Encoding.HEX.encode(entryOperations.calculateChainId(chain.getFirstEntry().getExternalIds()));
+//            Assert.assertNotNull(chainId);
+//            Boolean exists = entryClient.chainExists(chain).join();
+//            Assert.assertEquals(true, exists);
 
         System.out.println("commitAndRevealChain = " + commitAndRevealChain);
     }

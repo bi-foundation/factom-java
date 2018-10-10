@@ -1,5 +1,6 @@
 package org.blockchain_innovation.factom.client.spring.settings;
 
+import org.blockchain_innovation.factom.client.api.errors.FactomException;
 import org.blockchain_innovation.factom.client.api.settings.RpcSettings;
 import org.blockchain_innovation.factom.client.impl.settings.RpcSettingsImpl;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -60,10 +61,16 @@ public class SpringRpcSettings {
 
 
     public Factomd getFactomdServer() {
+        if(factomd == null){
+            throw new FactomException.ClientException("Please configure Factomd settings");
+        }
         return factomd;
     }
 
     public Walletd getWalletdServer() {
+        if(walletd == null){
+            throw new FactomException.ClientException("Please configure Walletd settings");
+        }
         return walletd;
     }
 
