@@ -28,7 +28,6 @@ public class FactomConfiguration {
     @Scope("prototype")
     public EntryApi entryApi(){
         EntryApiImpl entryApi = new EntryApiImpl();
-
         return entryApi;
     }
 

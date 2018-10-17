@@ -27,6 +27,7 @@ import java.util.function.Consumer;
 @SuppressWarnings({"PMD.GodClass", "PMD.TooManyMethods"})
 public class EntryApiImpl extends AbstractClient implements EntryApi {
 
+    public static final String NO_PREVIOUS_KEY_MERKLE_ROOT = "0000000000000000000000000000000000000000000000000000000000000000";
     private static final int ENTRY_REVEAL_WAIT = 2000;
     private static Logger logger = LogFactory.getLogger(EntryApiImpl.class);
     private int transactionAcknowledgeTimeout = 10000; // 10 sec
@@ -113,6 +114,36 @@ public class EntryApiImpl extends AbstractClient implements EntryApi {
          return factomdClient.chainHead(chainId)
                 .thenApplyAsync(response -> response.getResult() !=null &&
                         StringUtils.isNotEmpty(response.getResult().getChainHead()));
+    }
+
+    public List<EntryBlockResponse> allEntryBlocks (String chainId){
+        return entryBlocksUpTilKeyMR(factomdClient.chainHead(chainId).join().getResult().getChainHead());
+    }
+
+    public List<EntryBlockResponse> entryBlocksUpTilKeyMR(String keyMR){
+        List<EntryBlockResponse> entryBlockResponseList = new ArrayList<>();
+
+        String currentKeyMR = keyMR;
+        EntryBlockResponse currentBlock;
+
+        while(!currentKeyMR.equals(NO_PREVIOUS_KEY_MERKLE_ROOT)){
+            currentBlock = factomdClient.entryBlockByKeyMerkleRoot(currentKeyMR).join().getResult();
+            currentKeyMR = currentBlock.getHeader().getPreviousKeyMR();
+            entryBlockResponseList.add(currentBlock);
+        }
+        return entryBlockResponseList;
+    }
+
+    public List<EntryBlockResponse.Entry> entryBlocks(String chainID, String entryID) {
+        List<EntryBlockResponse.Entry> entries = new ArrayList<>();
+        for (EntryBlockResponse response : allEntryBlocks(chainID)) {
+            for (EntryBlockResponse.Entry entry : response.getEntryList()) {
+                if (entryID.equalsIgnoreCase(entry.getEntryHash())) {
+                    entries.add(entry);
+                }
+            }
+        }
+        return entries;
     }
 
     /**

@@ -268,4 +268,11 @@ public class EntryApiTest extends AbstractClientTest {
         Assert.assertNotNull(transactionAcknowledgedResponse.get());
         Assert.assertNotNull(commitChainResponse.get().getEntryHash(), transactionAcknowledgedResponse.get().getEntryHash());
     }
+
+    @Test
+    public void testGetAllEntryBlocks(){
+        List<EntryBlockResponse> entryBlockResponses = entryClient.allEntryBlocks("3013a7505c90a957d93c5a54a46705e44fe6bf08de396496a61c9a5b65bc9fb7");
+        Assert.assertEquals(2, entryBlockResponses.size());
+        Assert.assertEquals("0be1ea15aca70381b57c34697cfe2105daa2c7fa8992a170876e864c954657e1", entryBlockResponses.get(0).getHeader().getPreviousKeyMR());
+    }
 }

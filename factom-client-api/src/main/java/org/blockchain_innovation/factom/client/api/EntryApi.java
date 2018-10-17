@@ -8,28 +8,32 @@ import org.blockchain_innovation.factom.client.api.model.Chain;
 import org.blockchain_innovation.factom.client.api.model.Entry;
 import org.blockchain_innovation.factom.client.api.model.response.CommitAndRevealChainResponse;
 import org.blockchain_innovation.factom.client.api.model.response.CommitAndRevealEntryResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.EntryBlockResponse;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public interface EntryApi {
 
-    public EntryApi addListener(CommitAndRevealListener listener);
+     EntryApi addListener(CommitAndRevealListener listener);
 
-    public EntryApi removeListener(CommitAndRevealListener listener);
+     EntryApi removeListener(CommitAndRevealListener listener);
 
-    public EntryApi clearListeners();
+     EntryApi clearListeners();
 
-    public EntryApi setFactomdClient(FactomdClient factomdClient);
+     EntryApi setFactomdClient(FactomdClient factomdClient);
 
-    public EntryApi setWalletdClient(WalletdClient walletdClient);
+     EntryApi setWalletdClient(WalletdClient walletdClient);
 
-    public int getTransactionAcknowledgeTimeout();
+     int getTransactionAcknowledgeTimeout();
 
-    public EntryApi setTransactionAcknowledgeTimeout(int transactionAcknowledgeTimeout);
+     EntryApi setTransactionAcknowledgeTimeout(int transactionAcknowledgeTimeout);
 
-    public int getCommitConfirmedTimeout();
+     int getCommitConfirmedTimeout();
 
-    public EntryApi setCommitConfirmedTimeout(int commitConfirmedTimeout);
+     EntryApi setCommitConfirmedTimeout(int commitConfirmedTimeout);
+
+    List<EntryBlockResponse> allEntryBlocks (String chainId);
 
         /**
          * Compose, reveal and commit a chain.
