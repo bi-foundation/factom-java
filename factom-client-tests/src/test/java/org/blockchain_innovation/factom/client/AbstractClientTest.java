@@ -16,12 +16,10 @@
 
 package org.blockchain_innovation.factom.client;
 
+import org.blockchain_innovation.factom.client.api.BalanceApi;
 import org.blockchain_innovation.factom.client.api.FactomResponse;
 import org.blockchain_innovation.factom.client.api.settings.RpcSettings;
-import org.blockchain_innovation.factom.client.impl.EntryApiImpl;
-import org.blockchain_innovation.factom.client.impl.FactomdClientImpl;
-import org.blockchain_innovation.factom.client.impl.OfflineWalletdClientImpl;
-import org.blockchain_innovation.factom.client.impl.WalletdClientImpl;
+import org.blockchain_innovation.factom.client.impl.*;
 import org.blockchain_innovation.factom.client.impl.settings.RpcSettingsImpl;
 import org.junit.Assert;
 import org.junit.Before;
@@ -46,6 +44,7 @@ public class AbstractClientTest {
     protected final EntryApiImpl entryClient = new EntryApiImpl();
     protected final EntryApiImpl offlineEntryClient = new EntryApiImpl();
     protected final OfflineWalletdClientImpl offlineWalletdClient = new OfflineWalletdClientImpl();
+    protected final BalanceApiImpl balanceApi = new BalanceApiImpl();
 
     @Before
     public void setup() throws IOException {
@@ -58,6 +57,9 @@ public class AbstractClientTest {
 
         offlineEntryClient.setFactomdClient(factomdClient);
         offlineEntryClient.setWalletdClient(offlineWalletdClient);
+
+        balanceApi.setEntryApi(entryClient);
+        balanceApi.setFactomdClient(factomdClient);
     }
 
     protected Properties getProperties() throws IOException {
