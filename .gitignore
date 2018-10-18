@@ -21,6 +21,7 @@ buildNumber.properties
 .idea/**/tasks.xml
 .idea/**/dictionaries
 .idea/**/shelf
+.idea/**/modules.xml
 
 # Sensitive or high-churn files
 .idea/**/dataSources/
