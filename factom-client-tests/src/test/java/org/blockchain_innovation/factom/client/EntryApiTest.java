@@ -1,6 +1,5 @@
 package org.blockchain_innovation.factom.client;
 
-import org.blockchain_innovation.factom.client.api.FactomResponse;
 import org.blockchain_innovation.factom.client.api.listeners.CommitAndRevealListener;
 import org.blockchain_innovation.factom.client.api.model.Address;
 import org.blockchain_innovation.factom.client.api.model.Chain;
@@ -9,9 +8,7 @@ import org.blockchain_innovation.factom.client.api.model.response.CommitAndRevea
 import org.blockchain_innovation.factom.client.api.model.response.CommitAndRevealEntryResponse;
 import org.blockchain_innovation.factom.client.api.model.response.factomd.*;
 import org.blockchain_innovation.factom.client.api.model.response.walletd.ComposeResponse;
-import org.blockchain_innovation.factom.client.api.ops.Digests;
 import org.blockchain_innovation.factom.client.api.ops.Encoding;
-import org.blockchain_innovation.factom.client.api.ops.EntryOperations;
 import org.blockchain_innovation.factom.client.api.rpc.RpcErrorResponse;
 import org.junit.Assert;
 import org.junit.Test;
@@ -21,9 +18,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.logging.Logger;
 
 public class EntryApiTest extends AbstractClientTest {
 
@@ -78,9 +73,6 @@ public class EntryApiTest extends AbstractClientTest {
 
         entryClient.clearListeners().addListener(listener);
         Address address = new Address(EC_PUBLIC_ADDRESS);
-//        EntryOperations entryOperations = new EntryOperations();
-
-
 
         CommitAndRevealChainResponse commitAndRevealChain = entryClient.commitAndRevealChain(chain, address).join();
 
@@ -92,11 +84,6 @@ public class EntryApiTest extends AbstractClientTest {
         Assert.assertEquals(commitChainResponse.get().getEntryHash(), revealChainResponse.get().getEntryHash());
         Assert.assertNotNull(transactionAcknowledgedResponse.get());
         Assert.assertNotNull(commitAndRevealChain.getCommitChainResponse().getEntryHash(), transactionAcknowledgedResponse.get().getEntryHash());
-
-//            String chainId = Encoding.HEX.encode(entryOperations.calculateChainId(chain.getFirstEntry().getExternalIds()));
-//            Assert.assertNotNull(chainId);
-//            Boolean exists = entryClient.chainExists(chain).join();
-//            Assert.assertEquals(true, exists);
 
         System.out.println("commitAndRevealChain = " + commitAndRevealChain);
     }
@@ -271,8 +258,8 @@ public class EntryApiTest extends AbstractClientTest {
 
     @Test
     public void testGetAllEntryBlocks(){
-        List<EntryBlockResponse> entryBlockResponses = entryClient.allEntryBlocks("3013a7505c90a957d93c5a54a46705e44fe6bf08de396496a61c9a5b65bc9fb7");
-        Assert.assertEquals(2, entryBlockResponses.size());
-        Assert.assertEquals("0be1ea15aca70381b57c34697cfe2105daa2c7fa8992a170876e864c954657e1", entryBlockResponses.get(0).getHeader().getPreviousKeyMR());
+        CompletableFuture<List<EntryBlockResponse>> entryBlockResponses = entryClient.allEntryBlocks("3013a7505c90a957d93c5a54a46705e44fe6bf08de396496a61c9a5b65bc9fb7");
+        Assert.assertEquals(2, entryBlockResponses.join().size());
+        Assert.assertEquals("0be1ea15aca70381b57c34697cfe2105daa2c7fa8992a170876e864c954657e1", entryBlockResponses.join().get(0).getHeader().getPreviousKeyMR());
     }
 }

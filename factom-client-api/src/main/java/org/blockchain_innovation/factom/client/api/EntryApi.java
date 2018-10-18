@@ -33,7 +33,7 @@ public interface EntryApi {
 
      EntryApi setCommitConfirmedTimeout(int commitConfirmedTimeout);
 
-    List<EntryBlockResponse> allEntryBlocks (String chainId);
+    CompletableFuture<List<EntryBlockResponse>> allEntryBlocks (String chainId);
 
         /**
          * Compose, reveal and commit a chain.

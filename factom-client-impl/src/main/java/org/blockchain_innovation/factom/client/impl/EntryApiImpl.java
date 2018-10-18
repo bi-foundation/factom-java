@@ -109,41 +109,34 @@ public class EntryApiImpl extends AbstractClient implements EntryApi {
         return commitAndRevealChain(chain, address, false);
     }
 
-    public CompletableFuture<Boolean> chainExists(Chain chain){
+    public CompletableFuture<Boolean> chainExists(Chain chain) {
         String chainId = Encoding.HEX.encode(entryOperations.calculateChainId(chain.getFirstEntry().getExternalIds()));
-         return factomdClient.chainHead(chainId)
-                .thenApplyAsync(response -> response.getResult() !=null &&
+        return factomdClient.chainHead(chainId)
+                .thenApplyAsync(response -> response.getResult() != null &&
                         StringUtils.isNotEmpty(response.getResult().getChainHead()));
     }
 
-    public List<EntryBlockResponse> allEntryBlocks (String chainId){
+    /**
+     * @param chainId
+     * @return list of all EntryBlocks within a certain chain up till genesis block
+     */
+    public CompletableFuture<List<EntryBlockResponse>> allEntryBlocks(String chainId) {
         return entryBlocksUpTilKeyMR(factomdClient.chainHead(chainId).join().getResult().getChainHead());
     }
 
-    public List<EntryBlockResponse> entryBlocksUpTilKeyMR(String keyMR){
+    public CompletableFuture<List<EntryBlockResponse>> entryBlocksUpTilKeyMR(String keyMR) {
         List<EntryBlockResponse> entryBlockResponseList = new ArrayList<>();
 
         String currentKeyMR = keyMR;
-        EntryBlockResponse currentBlock;
 
-        while(!currentKeyMR.equals(NO_PREVIOUS_KEY_MERKLE_ROOT)){
-            currentBlock = factomdClient.entryBlockByKeyMerkleRoot(currentKeyMR).join().getResult();
+        while (!currentKeyMR.equals(NO_PREVIOUS_KEY_MERKLE_ROOT)) {
+            EntryBlockResponse currentBlock = factomdClient.entryBlockByKeyMerkleRoot(currentKeyMR).join().getResult();
             currentKeyMR = currentBlock.getHeader().getPreviousKeyMR();
             entryBlockResponseList.add(currentBlock);
         }
-        return entryBlockResponseList;
-    }
-
-    public List<EntryBlockResponse.Entry> entryBlocks(String chainID, String entryID) {
-        List<EntryBlockResponse.Entry> entries = new ArrayList<>();
-        for (EntryBlockResponse response : allEntryBlocks(chainID)) {
-            for (EntryBlockResponse.Entry entry : response.getEntryList()) {
-                if (entryID.equalsIgnoreCase(entry.getEntryHash())) {
-                    entries.add(entry);
-                }
-            }
-        }
-        return entries;
+        CompletableFuture<List<EntryBlockResponse>> completableFuture = new CompletableFuture<>();
+        completableFuture.complete(entryBlockResponseList);
+        return completableFuture;
     }
 
     /**
