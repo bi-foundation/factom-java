@@ -2,13 +2,16 @@ package org.blockchain_innovation.factom.client.impl;
 
 import org.blockchain_innovation.factom.client.api.BalanceApi;
 import org.blockchain_innovation.factom.client.api.EntryApi;
-import org.blockchain_innovation.factom.client.api.FactomResponse;
 import org.blockchain_innovation.factom.client.api.FactomdClient;
 import org.blockchain_innovation.factom.client.api.errors.FactomException;
 import org.blockchain_innovation.factom.client.api.model.Address;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.FactoidBalanceResponse;
+import org.blockchain_innovation.factom.client.api.model.FAT.Token;
+import org.blockchain_innovation.factom.client.api.model.FAT.TokenBalanceResponse;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class BalanceApiImpl extends AbstractClient implements BalanceApi {
 
@@ -39,8 +42,32 @@ public class BalanceApiImpl extends AbstractClient implements BalanceApi {
         return this;
     }
 
-    public CompletableFuture<FactomResponse<FactoidBalanceResponse>> getBalance(String hexAddress){
+    public CompletableFuture<TokenBalanceResponse> getBalance(String hexAddress) {
         Address address = new Address(hexAddress);
-        return factomdClient.factoidBalance(address);
+        CompletableFuture<TokenBalanceResponse> completableFuture = new CompletableFuture<>();
+        completableFuture.complete(generateBalance());
+        return completableFuture;
     }
+
+    private TokenBalanceResponse generateBalance(){
+        TokenBalanceResponse tokenBalanceResponse = new TokenBalanceResponse();
+        tokenBalanceResponse.setBalance(generateTokens());
+        return tokenBalanceResponse;
+    }
+
+    private List<Token> generateTokens(){
+        String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        int randomTokenAmount = (int) (Math.random() * 8 + 1);
+        List<Token> tokenList = new ArrayList<>();
+
+        for(int i = 0; i < randomTokenAmount; i++){
+            StringBuilder stringBuilder = new StringBuilder();
+            for(int j = 0; j < 3; j++){
+                stringBuilder.append(alphabet.charAt((int) (Math.random() * 25)));
+            }
+            tokenList.add(new Token(stringBuilder.toString(), (long) ThreadLocalRandom.current().nextLong(0, 1000000)));
+        }
+        return tokenList;
+    }
+
 }

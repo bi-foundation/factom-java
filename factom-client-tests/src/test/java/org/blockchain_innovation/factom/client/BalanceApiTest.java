@@ -1,5 +1,7 @@
 package org.blockchain_innovation.factom.client;
 
+import org.blockchain_innovation.factom.client.api.model.FAT.Token;
+import org.blockchain_innovation.factom.client.api.model.FAT.TokenBalanceResponse;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -7,7 +9,10 @@ public class BalanceApiTest extends AbstractClientTest {
 
     @Test
     public void checkBalance(){
-        long balance = balanceApi.getBalance(FCT_PUBLIC_ADDRESS).join().getResult().getBalance();
-        Assert.assertTrue(balance >= 0);
+        TokenBalanceResponse balance = balanceApi.getBalance(FCT_PUBLIC_ADDRESS).join();
+        Assert.assertNotNull(balance);
+        for(Token token : balance.getBalance()){
+            System.out.println(token.getName() + ": " + token.getAmount());
+        }
     }
 }
