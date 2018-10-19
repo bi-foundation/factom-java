@@ -18,6 +18,7 @@ package org.blockchain_innovation.factom.client;
 
 import org.blockchain_innovation.factom.client.api.BalanceApi;
 import org.blockchain_innovation.factom.client.api.FactomResponse;
+import org.blockchain_innovation.factom.client.api.TransactionApi;
 import org.blockchain_innovation.factom.client.api.settings.RpcSettings;
 import org.blockchain_innovation.factom.client.impl.*;
 import org.blockchain_innovation.factom.client.impl.settings.RpcSettingsImpl;
@@ -45,6 +46,7 @@ public class AbstractClientTest {
     protected final EntryApiImpl offlineEntryClient = new EntryApiImpl();
     protected final OfflineWalletdClientImpl offlineWalletdClient = new OfflineWalletdClientImpl();
     protected final BalanceApiImpl balanceApi = new BalanceApiImpl();
+    protected final TransactionApiImpl transactionApi = new TransactionApiImpl();
 
     @Before
     public void setup() throws IOException {

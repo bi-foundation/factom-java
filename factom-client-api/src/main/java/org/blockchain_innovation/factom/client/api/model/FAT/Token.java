@@ -26,4 +26,6 @@ public class Token implements Serializable {
     public void setAmount(long amount) {
         this.amount = amount;
     }
+
+
 }
