@@ -32,7 +32,7 @@ import org.blockchain_innovation.factom.client.api.model.response.factomd.Transa
 import java.util.concurrent.CompletableFuture;
 
 /**
- * This is the factomd client that allows you to access all Rpc Methods of factomd
+ * This is the factomd client that allows you to access all Rpc Methods of factomd.
  */
 @SuppressWarnings("PMD.TooManyMethods")
 public interface FactomdClient {

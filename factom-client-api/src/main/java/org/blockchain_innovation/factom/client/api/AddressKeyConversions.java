@@ -20,7 +20,6 @@ import java.util.Arrays;
 @Named
 @Singleton
 public class AddressKeyConversions {
-
     private static Logger logger = LogFactory.getLogger(AddressKeyConversions.class);
 
     /**
@@ -99,14 +98,14 @@ public class AddressKeyConversions {
         if (hexKey.length() != 64) {
             throw new FactomRuntimeException.AssertionException("Invalid key supplied. Key " + hexKey + " is not 64 bytes long");
         }
-        byte[] address;
 
-        //// TODO: 13/09/2018
-        if (targetAddressType == AddressType.FACTOID_PUBLIC && false) {
-            address = Digests.SHA_256.doubleDigest(new ByteOperations().concat(RCDType.TYPE_1.getValue(), key));
-        } else {
-            address = new ByteOperations().concat(targetAddressType.getAddressPrefix(), key);
+        byte[] addressKey = key;
+        if (targetAddressType == AddressType.FACTOID_PUBLIC) {
+            addressKey = Digests.SHA_256.doubleDigest(new ByteOperations().concat(RCDType.TYPE_1.getValue(), addressKey));
         }
+
+        byte[] address = new ByteOperations().concat(targetAddressType.getAddressPrefix(), addressKey);
+
         byte[] checksum = Arrays.copyOf(Digests.SHA_256.doubleDigest(address), 4);
         String result = Encoding.BASE58.encode(new ByteOperations().concat(address, checksum));
         logger.debug("Extracted address '%s' from %s-key '%s'", result, targetAddressType.name(), hexKey);

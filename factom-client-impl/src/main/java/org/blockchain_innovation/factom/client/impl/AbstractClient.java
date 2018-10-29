@@ -63,7 +63,7 @@ public abstract class AbstractClient implements LowLevelClient {
     @Override
     public LowLevelClient setSettings(RpcSettings settings) {
         this.settings = settings;
-        if(settings == null || settings.getServer() == null){
+        if (settings == null || settings.getServer() == null) {
             throw new FactomException.ClientException("Please provide Factom settings");
         }
         setUrl(settings.getServer().getURL());

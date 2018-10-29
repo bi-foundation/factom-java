@@ -45,7 +45,7 @@ public interface EntryApi {
     CompletableFuture<CommitAndRevealChainResponse> commitAndRevealChain(Chain chain, Address address);
 
     /**
-     * Check whether a chain exists
+     * Check whether a chain exists.
      *
      * @param chain
      */
