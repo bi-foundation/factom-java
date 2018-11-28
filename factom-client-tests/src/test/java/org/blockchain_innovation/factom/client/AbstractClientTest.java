@@ -35,6 +35,8 @@ public class AbstractClientTest {
     protected static final String EC_SECRET_ADDRESS = System.getProperty("FACTOM_CLIENT_TEST_EC_SECRET_ADDRESS", "Es3Y6U6H1Pfg4wYag8VMtRZEGuEJnfkJ2ZuSyCVcQKweB6y4WvGH");
     protected static final String FCT_PUBLIC_ADDRESS = System.getProperty("FACTOM_CLIENT_TEST_FACTOID_PUBLIC_ADDRESS", "FA2ZrcG8xkwWWNfdMRw5pGNjMPEkLaxRGqacvzfLS6TGHEHZqAA4");
     protected static final String FCT_SECRET_ADDRESS = System.getProperty("FACTOM_CLIENT_TEST_FACTOID_SECRET_ADDRESS", "Fs1jQGc9GJjyWNroLPq7x6LbYQHveyjWNPXSqAvCEKpETNoTU5dP");
+    protected static final String IDENTITY1_PUBLIC_ADDRESS = System.getProperty("FACTOM_CLIENT_TEST_IDENTITY1_SECRET_ADDRESS", "id11qFJ7fe26N29hrY3f1gUQC7UYArUg2GEy1rpPp2ExbnJdSj3mN");
+    protected static final String IDENTITY1_SECRET_ADDRESS = System.getProperty("FACTOM_CLIENT_TEST_IDENTITY1_SECRET_ADDRESS", "sk11pz4AG9XgB1eNVkbppYAWsgyg7sftDXqBASsagKJqvVRKYodCU");
     protected static final Map<String, String> publicPrivateKeyMap = new HashMap<>();
 
     static {

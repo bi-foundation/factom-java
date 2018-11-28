@@ -45,13 +45,18 @@ public class AddressKeyConversions {
     public byte[] addressToKey(String address) {
         AddressType.assertValidAddress(address);
         byte[] addressBytes = Encoding.BASE58.decode(address);
-        if (addressBytes.length != 38) {
+        if (addressBytes.length == 38) {
+            byte[] key = Arrays.copyOfRange(addressBytes, 2, 34);
+            logger.debug("Extracted raw key from address '%s'", address);
+            return key;
+        } else if (addressBytes.length == 39) {
+            byte[] key = Arrays.copyOfRange(addressBytes, 3, 35);
+            logger.debug("Extracted raw key from address '%s'", address);
+            return key;
+        } else {
             throw new FactomRuntimeException.AssertionException(String.format("Address '%s' is not 38 bytes long!", address));
-        }
-        byte[] key = Arrays.copyOfRange(addressBytes, 2, 34);
-        logger.debug("Extracted raw key from address '%s'", address);
-        return key;
 
+        }
     }
 
     /**
@@ -96,7 +101,7 @@ public class AddressKeyConversions {
     public String keyToAddress(byte[] key, AddressType targetAddressType) {
         String hexKey = Encoding.HEX.encode(key);
         if (hexKey.length() != 64) {
-            throw new FactomRuntimeException.AssertionException("Invalid key supplied. Key " + hexKey + " is not 64 bytes long");
+            throw new FactomRuntimeException.AssertionException("Invalid key supplied. Key " + hexKey + " is not 64 bytes long but was " + hexKey.length());
         }
 
         byte[] addressKey = key;

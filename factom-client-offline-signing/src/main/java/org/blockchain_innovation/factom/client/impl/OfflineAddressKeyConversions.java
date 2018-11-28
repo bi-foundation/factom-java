@@ -39,7 +39,7 @@ public class OfflineAddressKeyConversions extends AddressKeyConversions {
         }
         byte[] privateKey = addressToKey(address);
 
-        // EdDSAPrivateKeySpec privateKeySpec = new EdDSAPrivateKeySpec(privateKey, EdDSANamedCurveTable.ED_25519_CURVE_SPEC);
+        //EdDSAPrivateKeySpec privateKeySpec = new EdDSAPrivateKeySpec(privateKey, EdDSANamedCurveTable.ED_25519_CURVE_SPEC);
         // EdDSAPrivateKey keyIn = new EdDSAPrivateKey(privateKeySpec);
         // byte[] pk = keyIn.getA().toByteArray();
 

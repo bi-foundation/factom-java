@@ -17,9 +17,10 @@ public class SigningOperationsTest extends AbstractClientTest {
     public void testSignAndVerify() {
         Assert.assertTrue(testSignAndVerify(FCT_SECRET_ADDRESS));
         Assert.assertTrue(testSignAndVerify(EC_SECRET_ADDRESS));
+        Assert.assertTrue(testSignAndVerify(IDENTITY1_SECRET_ADDRESS));
     }
 
-    private boolean testSignAndVerify(String privateAddress){
+    private boolean testSignAndVerify(String privateAddress) {
         byte[] bytesToSign = new byte[64];
         try {
             SecureRandom.getInstanceStrong().nextBytes(bytesToSign);
@@ -32,5 +33,4 @@ public class SigningOperationsTest extends AbstractClientTest {
 
         return signingOperations.verifySign(signature, bytesToSign, publicKey);
     }
-
 }
