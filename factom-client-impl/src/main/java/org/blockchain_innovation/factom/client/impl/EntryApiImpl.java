@@ -20,8 +20,12 @@ import javax.inject.Named;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 @Named
 @SuppressWarnings({"PMD.GodClass", "PMD.TooManyMethods"})
@@ -56,25 +60,29 @@ public class EntryApiImpl extends AbstractClient implements EntryApi {
         return this;
     }
 
-    private FactomdClient getFactomdClient() throws FactomException.ClientException {
+    @Override
+    public FactomdClient getFactomdClient() throws FactomException.ClientException {
         if (factomdClient == null) {
             throw new FactomException.ClientException("factomd client not provided");
         }
         return factomdClient;
     }
 
+    @Override
     public EntryApiImpl setFactomdClient(FactomdClient factomdClient) {
         this.factomdClient = factomdClient;
         return this;
     }
 
-    private WalletdClient getWalletdClient() throws FactomException.ClientException {
+    @Override
+    public WalletdClient getWalletdClient() throws FactomException.ClientException {
         if (walletdClient == null) {
             throw new FactomException.ClientException("walletd client not provided");
         }
         return walletdClient;
     }
 
+    @Override
     public EntryApiImpl setWalletdClient(WalletdClient walletdClient) {
         this.walletdClient = walletdClient;
         return this;
@@ -120,10 +128,38 @@ public class EntryApiImpl extends AbstractClient implements EntryApi {
      * @param chainId
      * @return list of all EntryBlocks within a certain chain up till genesis block
      */
+    @Override
     public CompletableFuture<List<EntryBlockResponse>> allEntryBlocks(String chainId) {
         return entryBlocksUpTilKeyMR(factomdClient.chainHead(chainId).join().getResult().getChainHead());
     }
 
+    /**
+     * All entry blocks of a chain
+     *
+     * @param chainId
+     * @return
+     */
+    @Override
+    public CompletableFuture<List<EntryBlockResponse.Entry>> allEntryBlocksEntries(String chainId) {
+        return entryBlocksEntriesUpTilKeyMR(factomdClient.chainHead(chainId).join().getResult().getChainHead());
+    }
+
+    @Override
+    public CompletableFuture<List<EntryResponse>> allEntries(String chainId) {
+        return entriesUpTilKeyMR(factomdClient.chainHead(chainId).join().getResult().getChainHead());
+    }
+
+    @Override
+    public CompletableFuture<List<EntryResponse>> entriesUpTilKeyMR(String keyMR) {
+        List<EntryBlockResponse.Entry> entriesUpTilKeyMR = entryBlocksEntriesUpTilKeyMR(keyMR).join();
+        List<EntryResponse> entries = entriesUpTilKeyMR.stream().map(entryInfo -> factomdClient.entry(entryInfo.getEntryHash()).join().getResult()).collect(Collectors.toList());
+        CompletableFuture<List<EntryResponse>> completableFuture = new CompletableFuture<>();
+        completableFuture.complete(entries);
+        return completableFuture;
+    }
+
+
+    @Override
     public CompletableFuture<List<EntryBlockResponse>> entryBlocksUpTilKeyMR(String keyMR) {
         List<EntryBlockResponse> entryBlockResponseList = new ArrayList<>();
 
@@ -136,6 +172,23 @@ public class EntryApiImpl extends AbstractClient implements EntryApi {
         }
         CompletableFuture<List<EntryBlockResponse>> completableFuture = new CompletableFuture<>();
         completableFuture.complete(entryBlockResponseList);
+        return completableFuture;
+    }
+
+
+    /**
+     * List of all entry hashes and timestamps uptil a certain key merkle root.
+     *
+     * @param keyMR
+     * @return
+     */
+    @Override
+    public CompletableFuture<List<EntryBlockResponse.Entry>> entryBlocksEntriesUpTilKeyMR(String keyMR) {
+        List<EntryBlockResponse> entryBlocksUpTilKeyMR = entryBlocksUpTilKeyMR(keyMR).join();
+        List<EntryBlockResponse.Entry> entries = new ArrayList<>();
+        entryBlocksUpTilKeyMR.stream().map(EntryBlockResponse::getEntryList).forEach(entries::addAll);
+        CompletableFuture<List<EntryBlockResponse.Entry>> completableFuture = new CompletableFuture<>();
+        completableFuture.complete(entries);
         return completableFuture;
     }
 

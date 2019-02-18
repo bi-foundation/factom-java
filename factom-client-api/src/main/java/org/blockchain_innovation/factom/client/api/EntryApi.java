@@ -9,6 +9,7 @@ import org.blockchain_innovation.factom.client.api.model.Entry;
 import org.blockchain_innovation.factom.client.api.model.response.CommitAndRevealChainResponse;
 import org.blockchain_innovation.factom.client.api.model.response.CommitAndRevealEntryResponse;
 import org.blockchain_innovation.factom.client.api.model.response.factomd.EntryBlockResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.EntryResponse;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -21,9 +22,13 @@ public interface EntryApi {
 
      EntryApi clearListeners();
 
-     EntryApi setFactomdClient(FactomdClient factomdClient);
+    FactomdClient getFactomdClient() throws FactomException.ClientException;
 
-     EntryApi setWalletdClient(WalletdClient walletdClient);
+    EntryApi setFactomdClient(FactomdClient factomdClient);
+
+    WalletdClient getWalletdClient() throws FactomException.ClientException;
+
+    EntryApi setWalletdClient(WalletdClient walletdClient);
 
      int getTransactionAcknowledgeTimeout();
 
@@ -50,6 +55,16 @@ public interface EntryApi {
      * @param chain
      */
     CompletableFuture<Boolean> chainExists(Chain chain);
+
+    CompletableFuture<List<EntryBlockResponse.Entry>> allEntryBlocksEntries(String chainId);
+
+    CompletableFuture<List<EntryResponse>> allEntries(String chainId);
+
+    CompletableFuture<List<EntryResponse>> entriesUpTilKeyMR(String keyMR);
+
+    CompletableFuture<List<EntryBlockResponse>> entryBlocksUpTilKeyMR(String keyMR);
+
+    CompletableFuture<List<EntryBlockResponse.Entry>> entryBlocksEntriesUpTilKeyMR(String keyMR);
 
     /**
      * Compose, reveal and commit a chain.
