@@ -1,8 +1,10 @@
 package org.blockchain_innovation.factom.client.spring;
 
+import org.blockchain_innovation.factom.client.api.EntryApi;
 import org.blockchain_innovation.factom.client.api.FactomdClient;
 import org.blockchain_innovation.factom.client.api.WalletdClient;
 import org.blockchain_innovation.factom.client.api.settings.RpcSettings;
+import org.blockchain_innovation.factom.client.impl.EntryApiImpl;
 import org.blockchain_innovation.factom.client.impl.FactomdClientImpl;
 import org.blockchain_innovation.factom.client.impl.WalletdClientImpl;
 import org.blockchain_innovation.factom.client.impl.settings.RpcSettingsImpl;
@@ -21,6 +23,13 @@ public class FactomConfiguration {
 
     @Autowired
     private SpringRpcSettings springRpcSettings;
+
+    @Bean
+    @Scope("prototype")
+    public EntryApi entryApi(){
+        EntryApiImpl entryApi = new EntryApiImpl();
+        return entryApi;
+    }
 
     @Bean
     @Scope("prototype")

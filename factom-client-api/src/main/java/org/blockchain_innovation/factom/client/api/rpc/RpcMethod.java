@@ -156,7 +156,7 @@ public enum RpcMethod {
     }
 
     /**
-     * Get the official walletd/factomd request method value
+     * Get the official walletd/factomd request method value.
      *
      * @return The walletd/factomd method value
      */

@@ -1,9 +1,5 @@
 package org.blockchain_innovation.factom.client.impl;
 
-import net.i2p.crypto.eddsa.EdDSAEngine;
-import net.i2p.crypto.eddsa.EdDSAPrivateKey;
-import net.i2p.crypto.eddsa.spec.EdDSANamedCurveTable;
-import net.i2p.crypto.eddsa.spec.EdDSAPrivateKeySpec;
 import org.blockchain_innovation.factom.client.api.FactomResponse;
 import org.blockchain_innovation.factom.client.api.errors.FactomException;
 import org.blockchain_innovation.factom.client.api.model.Address;
@@ -12,15 +8,15 @@ import org.blockchain_innovation.factom.client.api.model.Entry;
 import org.blockchain_innovation.factom.client.api.model.response.walletd.ComposeResponse;
 import org.blockchain_innovation.factom.client.api.model.types.AddressType;
 import org.blockchain_innovation.factom.client.api.ops.ByteOperations;
-import org.blockchain_innovation.factom.client.api.ops.Digests;
 import org.blockchain_innovation.factom.client.api.ops.Encoding;
+import org.blockchain_innovation.factom.client.api.ops.Digests;
 import org.blockchain_innovation.factom.client.api.ops.EntryOperations;
+import org.blockchain_innovation.factom.client.api.ops.SigningOperations;
 import org.blockchain_innovation.factom.client.api.rpc.RpcResponse;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.security.*;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
@@ -31,6 +27,7 @@ public class OfflineWalletdClientImpl extends WalletdClientImpl {
     private final OfflineAddressKeyConversions addressKeyConversions = new OfflineAddressKeyConversions();
     private final EntryOperations entryOperations = new EntryOperations();
     private final ByteOperations byteOperations = new ByteOperations();
+    private final SigningOperations signingOperations = new SigningOperations();
 
     @Override
     public CompletableFuture<FactomResponse<ComposeResponse>> composeChain(Chain chain, Address address) throws FactomException.ClientException {
@@ -106,7 +103,7 @@ public class OfflineWalletdClientImpl extends WalletdClientImpl {
 
             // 32 byte Entry Credit Address Public Key + 64 byte Signature
             byte[] message = outputStream.toByteArray();
-            byte[] signature = sign(message, entryCreditAddress);
+            byte[] signature = signingOperations.sign(message, entryCreditAddress);
             byte[] entryCreditKey = addressKeyConversions.addressToKey(addressKeyConversions.addressToPublicAddress(entryCreditAddress));
 
             outputStream.write(entryCreditKey);
@@ -147,7 +144,7 @@ public class OfflineWalletdClientImpl extends WalletdClientImpl {
 
             // 32 byte Entry Credit Address Public Key + 64 byte Signature
             byte[] message = outputStream.toByteArray();
-            byte[] signature = sign(message, address);
+            byte[] signature = signingOperations.sign(message, address);
             byte[] entryCreditKey = addressKeyConversions.addressToKey(addressKeyConversions.addressToPublicAddress(address));
 
             outputStream.write(entryCreditKey);
@@ -181,34 +178,6 @@ public class OfflineWalletdClientImpl extends WalletdClientImpl {
     protected String composeEntryReveal(Entry entry) {
         byte[] revealParam = entryOperations.entryToBytes(entry.getExternalIds(), entry.getContent(), entry.getChainId());
         return Encoding.HEX.encode(revealParam);
-    }
-
-    /**
-     * sign message.
-     *
-     * @param message
-     * @param address
-     * @return
-     * @throws FactomException.ClientException
-     */
-    private byte[] sign(byte[] message, Address address) throws FactomException.ClientException {
-        byte[] privateKey = addressKeyConversions.addressToKey(address);
-
-        EdDSAPrivateKeySpec privateKeySpec = new EdDSAPrivateKeySpec(privateKey, EdDSANamedCurveTable.ED_25519_CURVE_SPEC);
-        EdDSAPrivateKey keyIn = new EdDSAPrivateKey(privateKeySpec);
-
-        try {
-            Signature instance = new EdDSAEngine(MessageDigest.getInstance("SHA-512"));
-            instance.initSign(keyIn);
-            instance.update(message);
-
-            byte[] signed = instance.sign();
-            return signed;
-        } catch (InvalidKeyException e) {
-            throw new FactomException.ClientException(String.format("invalid key: %s", e.getMessage()), e);
-        } catch (SignatureException | NoSuchAlgorithmException e) {
-            throw new FactomException.ClientException("failed to sign message", e);
-        }
     }
 
     /**

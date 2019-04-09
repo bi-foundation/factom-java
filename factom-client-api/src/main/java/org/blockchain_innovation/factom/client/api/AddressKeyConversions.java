@@ -20,7 +20,6 @@ import java.util.Arrays;
 @Named
 @Singleton
 public class AddressKeyConversions {
-
     private static Logger logger = LogFactory.getLogger(AddressKeyConversions.class);
 
     /**
@@ -46,13 +45,18 @@ public class AddressKeyConversions {
     public byte[] addressToKey(String address) {
         AddressType.assertValidAddress(address);
         byte[] addressBytes = Encoding.BASE58.decode(address);
-        if (addressBytes.length != 38) {
+        if (addressBytes.length == 38) {
+            byte[] key = Arrays.copyOfRange(addressBytes, 2, 34);
+            logger.debug("Extracted raw key from address '%s'", address);
+            return key;
+        } else if (addressBytes.length == 39) {
+            byte[] key = Arrays.copyOfRange(addressBytes, 3, 35);
+            logger.debug("Extracted raw key from address '%s'", address);
+            return key;
+        } else {
             throw new FactomRuntimeException.AssertionException(String.format("Address '%s' is not 38 bytes long!", address));
-        }
-        byte[] key = Arrays.copyOfRange(addressBytes, 2, 34);
-        logger.debug("Extracted raw key from address '%s'", address);
-        return key;
 
+        }
     }
 
     /**
@@ -97,16 +101,16 @@ public class AddressKeyConversions {
     public String keyToAddress(byte[] key, AddressType targetAddressType) {
         String hexKey = Encoding.HEX.encode(key);
         if (hexKey.length() != 64) {
-            throw new FactomRuntimeException.AssertionException("Invalid key supplied. Key " + hexKey + " is not 64 bytes long");
+            throw new FactomRuntimeException.AssertionException("Invalid key supplied. Key " + hexKey + " is not 64 bytes long but was " + hexKey.length());
         }
-        byte[] address;
 
-        //// TODO: 13/09/2018
-        if (targetAddressType == AddressType.FACTOID_PUBLIC && false) {
-            address = Digests.SHA_256.doubleDigest(new ByteOperations().concat(RCDType.TYPE_1.getValue(), key));
-        } else {
-            address = new ByteOperations().concat(targetAddressType.getAddressPrefix(), key);
+        byte[] addressKey = key;
+        if (targetAddressType == AddressType.FACTOID_PUBLIC) {
+            addressKey = Digests.SHA_256.doubleDigest(new ByteOperations().concat(RCDType.TYPE_1.getValue(), addressKey));
         }
+
+        byte[] address = new ByteOperations().concat(targetAddressType.getAddressPrefix(), addressKey);
+
         byte[] checksum = Arrays.copyOf(Digests.SHA_256.doubleDigest(address), 4);
         String result = Encoding.BASE58.encode(new ByteOperations().concat(address, checksum));
         logger.debug("Extracted address '%s' from %s-key '%s'", result, targetAddressType.name(), hexKey);

@@ -279,6 +279,7 @@ project(':factom-client-offline-signing') {
     dependencies {
         compile project(':factom-client-impl')
         compile "net.i2p.crypto:eddsa:$libVersions.eddsa"
+        compileOnly "javax.enterprise:cdi-api:$libVersions.jee.cdiApi"
     }
 }
 

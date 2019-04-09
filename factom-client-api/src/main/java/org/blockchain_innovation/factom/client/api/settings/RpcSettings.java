@@ -20,7 +20,7 @@ import java.net.URL;
 import java.util.Locale;
 
 /**
- * The settings like URL, proxy for the factomd and walletd clients
+ * The settings like URL, proxy for the factomd and walletd clients.
  */
 public interface RpcSettings {
     /**
@@ -30,7 +30,7 @@ public interface RpcSettings {
         FACTOMD, WALLETD;
 
         /**
-         * Translates the sybsystem to a configuration value key
+         * Translates the sybsystem to a configuration value key.
          *
          * @return
          */
@@ -47,7 +47,7 @@ public interface RpcSettings {
     SubSystem getSubSystem();
 
     /**
-     * Get the server settings..
+     * Get the server settings.
      *
      * @return Server settings.
      */
@@ -61,7 +61,7 @@ public interface RpcSettings {
     Proxy getProxy();
 
     /**
-     * Represents the server settings for the factomd/walletd clients
+     * Represents the server settings for the factomd/walletd clients.
      */
     interface Server {
         /**

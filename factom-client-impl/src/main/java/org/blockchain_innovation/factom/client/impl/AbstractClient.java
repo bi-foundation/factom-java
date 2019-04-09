@@ -33,7 +33,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings("PMD.DoNotUseThreads")
-abstract class AbstractClient implements LowLevelClient {
+public abstract class AbstractClient implements LowLevelClient {
 
     protected EncodeOperations encodeOperations = new EncodeOperations();
     private URL url;
@@ -63,6 +63,9 @@ abstract class AbstractClient implements LowLevelClient {
     @Override
     public LowLevelClient setSettings(RpcSettings settings) {
         this.settings = settings;
+        if (settings == null || settings.getServer() == null) {
+            throw new FactomException.ClientException("Please provide Factom settings");
+        }
         setUrl(settings.getServer().getURL());
         return this;
     }

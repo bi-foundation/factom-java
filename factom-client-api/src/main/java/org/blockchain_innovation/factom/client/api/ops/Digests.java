@@ -23,7 +23,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 /**
- * Allows digests/hashes of input messages using different algorithms
+ * Allows digests/hashes of input messages using different algorithms.
  */
 public enum Digests {
 

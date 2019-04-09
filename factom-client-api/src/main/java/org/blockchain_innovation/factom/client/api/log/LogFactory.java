@@ -53,7 +53,7 @@ public interface LogFactory {
     }
 
     /**
-     * The SPI work is being done in the provider
+     * The SPI work is being done in the provider.
      */
     class Provider {
         static LogFactory logFactory = serviceLoader(false).iterator().next();
@@ -63,7 +63,7 @@ public interface LogFactory {
         }
 
         /**
-         * Get the correct LogFactory implementation from the SPI implementation on the classpath
+         * Get the correct LogFactory implementation from the SPI implementation on the classpath.
          *
          * @return
          */
@@ -72,7 +72,7 @@ public interface LogFactory {
         }
 
         /**
-         * Gets the logfactory implementation by SPI enging name
+         * Gets the logfactory implementation by SPI enging name.
          *
          * @param engine The engine SPI name of the implementation. eg: SLF4J
          * @return

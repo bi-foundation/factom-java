@@ -1,9 +1,6 @@
 package org.blockchain_innovation.factom.client.impl;
 
-import org.blockchain_innovation.factom.client.api.FactomResponse;
-import org.blockchain_innovation.factom.client.api.FactomdClient;
-import org.blockchain_innovation.factom.client.api.LowLevelClient;
-import org.blockchain_innovation.factom.client.api.WalletdClient;
+import org.blockchain_innovation.factom.client.api.*;
 import org.blockchain_innovation.factom.client.api.errors.FactomException;
 import org.blockchain_innovation.factom.client.api.listeners.CommitAndRevealListener;
 import org.blockchain_innovation.factom.client.api.log.LogFactory;
@@ -13,26 +10,24 @@ import org.blockchain_innovation.factom.client.api.model.Chain;
 import org.blockchain_innovation.factom.client.api.model.Entry;
 import org.blockchain_innovation.factom.client.api.model.response.CommitAndRevealChainResponse;
 import org.blockchain_innovation.factom.client.api.model.response.CommitAndRevealEntryResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.CommitChainResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.CommitEntryResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.EntryTransactionResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.RevealResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.*;
 import org.blockchain_innovation.factom.client.api.model.response.walletd.ComposeResponse;
+import org.blockchain_innovation.factom.client.api.ops.Encoding;
+import org.blockchain_innovation.factom.client.api.ops.EntryOperations;
+import org.blockchain_innovation.factom.client.api.ops.StringUtils;
 
 import javax.inject.Named;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionStage;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.function.Consumer;
 
 @Named
 @SuppressWarnings({"PMD.GodClass", "PMD.TooManyMethods"})
-public class EntryApiImpl {
+public class EntryApiImpl extends AbstractClient implements EntryApi {
 
+    public static final String NO_PREVIOUS_KEY_MERKLE_ROOT = "0000000000000000000000000000000000000000000000000000000000000000";
     private static final int ENTRY_REVEAL_WAIT = 2000;
     private static Logger logger = LogFactory.getLogger(EntryApiImpl.class);
     private int transactionAcknowledgeTimeout = 10000; // 10 sec
@@ -40,6 +35,7 @@ public class EntryApiImpl {
 
     private FactomdClient factomdClient;
     private WalletdClient walletdClient;
+    private final EntryOperations entryOperations = new EntryOperations();
 
     private final List<CommitAndRevealListener> listeners = new ArrayList<>();
 
@@ -111,6 +107,36 @@ public class EntryApiImpl {
      */
     public CompletableFuture<CommitAndRevealChainResponse> commitAndRevealChain(Chain chain, Address address) throws FactomException.ClientException {
         return commitAndRevealChain(chain, address, false);
+    }
+
+    public CompletableFuture<Boolean> chainExists(Chain chain) {
+        String chainId = Encoding.HEX.encode(entryOperations.calculateChainId(chain.getFirstEntry().getExternalIds()));
+        return factomdClient.chainHead(chainId)
+                .thenApplyAsync(response -> response.getResult() != null &&
+                        StringUtils.isNotEmpty(response.getResult().getChainHead()));
+    }
+
+    /**
+     * @param chainId
+     * @return list of all EntryBlocks within a certain chain up till genesis block
+     */
+    public CompletableFuture<List<EntryBlockResponse>> allEntryBlocks(String chainId) {
+        return entryBlocksUpTilKeyMR(factomdClient.chainHead(chainId).join().getResult().getChainHead());
+    }
+
+    public CompletableFuture<List<EntryBlockResponse>> entryBlocksUpTilKeyMR(String keyMR) {
+        List<EntryBlockResponse> entryBlockResponseList = new ArrayList<>();
+
+        String currentKeyMR = keyMR;
+
+        while (!currentKeyMR.equals(NO_PREVIOUS_KEY_MERKLE_ROOT)) {
+            EntryBlockResponse currentBlock = factomdClient.entryBlockByKeyMerkleRoot(currentKeyMR).join().getResult();
+            currentKeyMR = currentBlock.getHeader().getPreviousKeyMR();
+            entryBlockResponseList.add(currentBlock);
+        }
+        CompletableFuture<List<EntryBlockResponse>> completableFuture = new CompletableFuture<>();
+        completableFuture.complete(entryBlockResponseList);
+        return completableFuture;
     }
 
     /**
