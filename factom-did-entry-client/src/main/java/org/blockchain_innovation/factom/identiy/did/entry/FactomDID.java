@@ -9,7 +9,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public enum FactomDID {
-    FCTR_V1("^did:ftcr:(\\S*)$", "1.0");
+    FCTR_V1("^did:fctr:(\\S*)$", "1.0");
+
+    private static final EntryOperations ENTRY_OPS = new EntryOperations();
 
     private final Pattern pattern;
     private final String protocolVersion;
@@ -20,9 +22,9 @@ public enum FactomDID {
         this.protocolVersion = protocolVersion;
     }
 
-    public String getTargetDid(String identifier) {
+    public String getTargetId(String didReference) {
         // parse identifier
-        Matcher matcher = getPattern().matcher(identifier);
+        Matcher matcher = getPattern().matcher(didReference);
         if (!matcher.matches()) {
             return null;
         }
@@ -30,9 +32,13 @@ public enum FactomDID {
         return matcher.group(1);
     }
 
-    public String determineDidChainId(byte[] nonce) {
-        EntryOperations entryOperations = new EntryOperations();
-        return Encoding.HEX.encode(entryOperations.calculateChainId(createDIDExternalIds(nonce)));
+    public String determineChainId(String nonce, Encoding encoding) {
+        return determineChainId(encoding.decode(nonce));
+    }
+
+
+    public String determineChainId(byte[] nonce) {
+        return Encoding.HEX.encode(ENTRY_OPS.calculateChainId(createDIDExternalIds(nonce)));
     }
 
     protected List<String> createDIDExternalIds(byte[] nonce) {

@@ -121,7 +121,9 @@ public class EntryApiImpl extends AbstractClient implements EntryApi {
         String chainId = Encoding.HEX.encode(entryOperations.calculateChainId(chain.getFirstEntry().getExternalIds()));
         return factomdClient.chainHead(chainId)
                 .thenApplyAsync(response -> response.getResult() != null &&
-                        StringUtils.isNotEmpty(response.getResult().getChainHead()));
+                        StringUtils.isNotEmpty(response.getResult().getChainHead()))
+                .exceptionally(throwable -> false);
+
     }
 
     /**

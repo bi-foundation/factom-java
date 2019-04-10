@@ -55,7 +55,7 @@ public class DIDEntryClient {
 
 
     public List<EntryResponse> getAllEntriesByIdentifier(String identifier) {
-        return getEntryApi().allEntries(FactomDID.FCTR_V1.getTargetDid(identifier)).join();
+        return getEntryApi().allEntries(FactomDID.FCTR_V1.getTargetId(identifier)).join();
     }
 
     /**
@@ -67,8 +67,8 @@ public class DIDEntryClient {
      * @return
      */
     public CommitAndRevealChainResponse create(DIDDocument didDocument, byte[] nonce, Address address) {
-        String chainId = FactomDID.FCTR_V1.determineDidChainId(nonce);
-        if (!chainId.equals(didDocument.getId())) {
+        String chainId = FactomDID.FCTR_V1.determineChainId(nonce);
+        if (!chainId.equals(FactomDID.FCTR_V1.getTargetId((String) didDocument.getJsonLdObject().get(DIDDocument.JSONLD_TERM_ID)))) {
             throw new DIDRuntimeException(String.format("Provided DID %s and determined chain id %s for the supplied nonce do no match", didDocument.getId(), chainId));
         }
 

@@ -1,10 +1,9 @@
 package org.blockchain_innovation.factom.identiy.did.entry;
 
 import did.parser.ParserException;
+import org.blockchain_innovation.factom.client.api.errors.FactomRuntimeException;
 
-public class DIDRuntimeException extends RuntimeException {
-    public DIDRuntimeException() {
-    }
+public class DIDRuntimeException extends FactomRuntimeException {
 
     public DIDRuntimeException(String message) {
         super(message);
@@ -16,10 +15,6 @@ public class DIDRuntimeException extends RuntimeException {
 
     public DIDRuntimeException(Throwable cause) {
         super(cause);
-    }
-
-    public DIDRuntimeException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
     }
 
     public static class ParseException extends DIDRuntimeException {
