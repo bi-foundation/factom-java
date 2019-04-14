@@ -47,7 +47,7 @@ public class DIDEntryClient {
      */
     public List<EntryResponse> getAllByDidReference(String didReference) {
         try {
-            return getAllEntriesByIdentifier(DID.fromString(didReference).getDid());
+            return getAllEntriesByIdentifier(DID.fromString(didReference).getDidString());
         } catch (ParserException e) {
             throw new DIDRuntimeException.ParseException(e);
         }

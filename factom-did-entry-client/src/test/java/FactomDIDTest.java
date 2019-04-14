@@ -28,26 +28,28 @@ public class FactomDIDTest {
 
     @Test
     public void test() throws IOException {
-        String chainId = FactomDID.FCTR_V1.determineChainId("test".getBytes());
+        byte[] nonce = ("test" + System.currentTimeMillis()).getBytes();
+        String chainId = FactomDID.FCTR_V1.determineChainId(nonce);
         String didReference = "did:fctr:" + chainId;
         String targetId = FactomDID.FCTR_V1.getTargetId(didReference);
-  /*      DIDDocument didDocument = DIDDocument.fromJson("{\n" +
+        DIDDocument didDocument = DIDDocument.fromJson("{\n" +
                 "  \"@context\": \"https://w3id.org/did/v1\",\n" +
-                "  \"id\": \"did:example:123456789abcdefghi\",\n" +
+                "  \"id\": \"did:fctr:"+ chainId +"\",\n" +
                 "  \"authentication\": [{\n" +
-                "    \"id\": \"did:example:123456789abcdefghi#keys-1\",\n" +
+                "    \"id\": \"" + chainId + "#keys-1\",\n" +
                 "    \"type\": \"RsaVerificationKey2018\",\n" +
                 "    \"controller\": \"did:example:123456789abcdefghi\",\n" +
                 "    \"publicKeyPem\": \"-----BEGIN PUBLIC KEY...END PUBLIC KEY-----\\r\\n\"\n" +
                 "  }],\n" +
                 "  \"service\": [{\n" +
-                "    \"id\": \"did:example:123456789abcdefghi#service123\",\n" +
+                "    \"id\": \""+ chainId + "#service123\",\n" +
                 "    \"type\": \"ExampleService\",\n" +
                 "    \"serviceEndpoint\": \"https://example.com/endpoint/8377464\"\n" +
                 "  }]\n" +
-                "}");*/
-        DIDDocument didDocument = DIDDocument.build(didReference, null, null, null, null);
-        CommitAndRevealChainResponse commitAndRevealChainResponse = didEntryClient.create(didDocument, "test".getBytes(), new Address(EC_SECRET_ADDRESS));
+                "}");
+
+//        DIDDocument didDocument = DIDDocument.build(didReference, null, null, null);
+        CommitAndRevealChainResponse commitAndRevealChainResponse = didEntryClient.create(didDocument, nonce, new Address(EC_SECRET_ADDRESS));
 
         Assert.assertNotNull(chainId);
     }
