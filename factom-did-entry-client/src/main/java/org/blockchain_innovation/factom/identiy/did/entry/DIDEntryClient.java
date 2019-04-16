@@ -73,7 +73,7 @@ public class DIDEntryClient {
         }
 
         Entry entry = new Entry();
-        entry.setExternalIds(FactomDID.FCTR_V1.createDIDExternalIds(nonce));
+        entry.setExternalIds(DIDOperations.CreateDID.externalIds(FactomDID.FCTR_V1, nonce));
         try {
             entry.setContent(didDocument.toJson());
         } catch (IOException | JsonLdError e) {

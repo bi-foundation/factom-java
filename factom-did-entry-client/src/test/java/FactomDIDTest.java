@@ -33,7 +33,7 @@ public class FactomDIDTest {
         String didReference = "did:fctr:" + chainId;
         String targetId = FactomDID.FCTR_V1.getTargetId(didReference);
         DIDDocument didDocument = DIDDocument.fromJson("{\n" +
-                "  \"@context\": \"https://w3id.org/did/v1\",\n" +
+                "  \"@context\": \"https://w3id.org/did/v0.11\",\n" +
                 "  \"id\": \"did:fctr:"+ chainId +"\",\n" +
                 "  \"authentication\": [{\n" +
                 "    \"id\": \"" + chainId + "#keys-1\",\n" +
