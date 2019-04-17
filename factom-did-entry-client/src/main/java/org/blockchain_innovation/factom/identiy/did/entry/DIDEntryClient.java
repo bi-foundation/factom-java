@@ -10,6 +10,7 @@ import org.blockchain_innovation.factom.client.api.model.Address;
 import org.blockchain_innovation.factom.client.api.model.Chain;
 import org.blockchain_innovation.factom.client.api.model.Entry;
 import org.blockchain_innovation.factom.client.api.model.response.CommitAndRevealChainResponse;
+import org.blockchain_innovation.factom.client.api.model.response.CommitAndRevealEntryResponse;
 import org.blockchain_innovation.factom.client.api.model.response.factomd.EntryResponse;
 
 import java.io.IOException;
@@ -73,7 +74,7 @@ public class DIDEntryClient {
         }
 
         Entry entry = new Entry();
-        entry.setExternalIds(DIDOperations.CreateDID.externalIds(FactomDID.FCTR_V1, nonce));
+        entry.setExternalIds(new CreateDIDOperation(FactomDID.FCTR_V1, nonce).externalIds());
         try {
             entry.setContent(didDocument.toJson());
         } catch (IOException | JsonLdError e) {
@@ -88,4 +89,55 @@ public class DIDEntryClient {
     }
 
 
+    /**
+     * Update a FactomDID chain by the provided (valid entry)
+     *
+     * @param didDocument
+     * @param nonce
+     * @param keyId
+     * @param address     The paying EC address
+     * @return
+     */
+    public CommitAndRevealEntryResponse update(DIDDocument didDocument, byte[] nonce, String keyId, Address address) {
+        String chainId = FactomDID.FCTR_V1.getTargetId(didDocument.getId());
+
+        Entry entry = new Entry();
+        entry.setChainId(chainId);
+        entry.setExternalIds(new UpdateDIDOperation(FactomDID.FCTR_V1, keyId, nonce).externalIds());
+        try {
+            entry.setContent(didDocument.toJson());
+        } catch (IOException | JsonLdError e) {
+            throw new DIDRuntimeException(e);
+        }
+
+      /*  if (getEntryApi().allEntryBlocks(chainId).join().size() == 0) {
+            throw new FactomRuntimeException.AssertionException(String.format("Factom DID chain for id '%s' did not exist", chainId));
+        }*/
+        return getEntryApi().commitAndRevealEntry(entry, address).join();
+    }
+
+
+
+    /**
+     * Deactivate a FactomDID chain by the provided (valid entry)
+     *
+     * @param didDocument
+     * @param keyId
+     * @param address     The paying EC address
+     * @return
+     */
+    public CommitAndRevealEntryResponse deactivate(DIDDocument didDocument, String keyId, Address address) {
+        String chainId = FactomDID.FCTR_V1.getTargetId(didDocument.getId());
+
+        Entry entry = new Entry();
+        entry.setChainId(chainId);
+        entry.setExternalIds(new DeactivateDIDOperation(FactomDID.FCTR_V1, keyId).externalIds());
+        try {
+            entry.setContent(didDocument.toJson());
+        } catch (IOException | JsonLdError e) {
+            throw new DIDRuntimeException(e);
+        }
+
+        return getEntryApi().commitAndRevealEntry(entry, address).join();
+    }
 }

@@ -7,7 +7,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public enum FactomDID {
-    FCTR_V1("^did:fctr:(\\S*)$", "1.0");
+    FCTR_V1("^did:fctr:(\\S*)(#[-a-z]+)*$", "1.0");
 
     private static final EntryOperations ENTRY_OPS = new EntryOperations();
 
@@ -36,9 +36,8 @@ public enum FactomDID {
 
 
     public String determineChainId(byte[] nonce) {
-        return Encoding.HEX.encode(ENTRY_OPS.calculateChainId(DIDOperations.CreateDID.externalIds(this, nonce)));
+        return Encoding.HEX.encode(ENTRY_OPS.calculateChainId(new CreateDIDOperation(this, nonce).externalIds()));
     }
-
 
 
     public Pattern getPattern() {
