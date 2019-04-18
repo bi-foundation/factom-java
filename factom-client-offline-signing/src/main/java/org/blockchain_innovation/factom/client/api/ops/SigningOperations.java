@@ -7,6 +7,7 @@ import net.i2p.crypto.eddsa.spec.EdDSANamedCurveTable;
 import net.i2p.crypto.eddsa.spec.EdDSAPrivateKeySpec;
 import net.i2p.crypto.eddsa.spec.EdDSAPublicKeySpec;
 import org.blockchain_innovation.factom.client.api.AddressKeyConversions;
+import org.blockchain_innovation.factom.client.api.SignatureProdiver;
 import org.blockchain_innovation.factom.client.api.errors.FactomException;
 import org.blockchain_innovation.factom.client.api.model.Address;
 
@@ -23,6 +24,10 @@ import java.security.NoSuchAlgorithmException;
 public class SigningOperations {
 
     private final AddressKeyConversions addressKeyConversions = new AddressKeyConversions();
+
+    public byte[] sign(byte[] message, SignatureProdiver signatureProdiver) {
+        return signatureProdiver.sign(message);
+    }
 
     /**
      * sign message.

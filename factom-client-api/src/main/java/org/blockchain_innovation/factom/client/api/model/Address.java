@@ -22,20 +22,30 @@ import java.io.Serializable;
 
 public class Address implements Serializable {
 
-    private String secret;
+    private String hexAddressValue;
+
+    public static Address fromBytes(byte[] hexAddress) {
+        return new Address().setValue(String.valueOf(hexAddress));
+    }
+
+    public static Address fromString(String hexAddress) {
+        return new Address().setValue(hexAddress);
+    }
+
+    private Address() {
+    }
 
     public Address(String hexAddress) {
-        AddressType.assertValidAddress(hexAddress);
-        this.secret = hexAddress;
+        setValue(hexAddress);
     }
 
     public String getValue() {
-        return secret;
+        return hexAddressValue;
     }
 
     protected Address setValue(String value) {
         AddressType.assertValidAddress(value);
-        this.secret = value;
+        this.hexAddressValue = value;
         return this;
     }
 
@@ -45,6 +55,6 @@ public class Address implements Serializable {
 
     @Override
     public String toString() {
-        return "Address{" + secret + '}';
+        return "Address{" + hexAddressValue + '}';
     }
 }
