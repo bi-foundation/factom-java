@@ -1,5 +1,6 @@
 package org.blockchain_innovation.factom.client.api;
 
+import org.blockchain_innovation.factom.client.api.errors.FactomException;
 import org.blockchain_innovation.factom.client.api.model.Address;
 import org.blockchain_innovation.factom.client.api.model.Chain;
 import org.blockchain_innovation.factom.client.api.model.Entry;
@@ -106,6 +107,8 @@ public interface WalletdClient {
      */
     CompletableFuture<FactomResponse<AddressesResponse>> allAddresses();
 
+    CompletableFuture<FactomResponse<ComposeResponse>> composeChain(Chain chain, SignatureProdiver signatureProdiver) throws FactomException.ClientException;
+
     /**
      * This method, compose-chain, will return the appropriate API calls to create a chain in factom. You must first call the commit-chain, then the reveal-chain API calls. To be
      * safe, wait a few seconds after calling commit.
@@ -117,6 +120,8 @@ public interface WalletdClient {
      * @return
      */
     CompletableFuture<FactomResponse<ComposeResponse>> composeChain(Chain chain, Address entryCreditAddress);
+
+    CompletableFuture<FactomResponse<ComposeResponse>> composeEntry(Entry entry, SignatureProdiver signatureProdiver) throws FactomException.ClientException;
 
     /**
      * This method, compose-entry, will return the appropriate API calls to create an entry in factom. You must first call the commit-entry, then the reveal-entry API calls. To be

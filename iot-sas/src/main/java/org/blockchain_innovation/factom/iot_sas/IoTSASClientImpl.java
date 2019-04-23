@@ -2,6 +2,8 @@ package org.blockchain_innovation.factom.iot_sas;
 
 import org.blockchain_innovation.factom.client.api.SignatureProdiver;
 import org.blockchain_innovation.factom.client.api.errors.FactomRuntimeException;
+import org.blockchain_innovation.factom.client.api.log.LogFactory;
+import org.blockchain_innovation.factom.client.api.log.Logger;
 import org.blockchain_innovation.factom.client.api.model.Address;
 
 import java.io.IOException;
@@ -11,8 +13,18 @@ import java.io.OutputStream;
 public class IoTSASClientImpl implements SignatureProdiver {
 
     private IoTSASPort port;
+    private final Logger logger = LogFactory.getLogger(IoTSASClientImpl.class);
+
+    @Override
+    protected void finalize() throws Throwable {
+        if (port != null) {
+            port.close();
+        }
+        super.finalize();
+    }
 
     public IoTSASClientImpl() {
+        // Call to setPort needed
     }
 
     public IoTSASClientImpl(IoTSASPort port) {
@@ -32,19 +44,28 @@ public class IoTSASClientImpl implements SignatureProdiver {
         return port;
     }
 
+    @Override
     public Address getPublicECAddress() {
 
         OutputStream outStream;
         try {
+            logger.debug(String.format("Getting public EC address from SAS device on port %s", port()));
             outStream = port().get().getOutputStream();
+            if (outStream == null) {
+                throw new IoTSASPort.IoTSASPortException(String.format("Could not get output stream from port %s", port()));
+            }
             InputStream inStream = port().get().getInputStream();
 
             // Sending data
+            logger.debug(String.format("Sending public EC address retrieval header to SAS device on port %s", port()));
             byte[] getECHeader = new byte[]{(byte) 0xFA, 0x01, 0x01, 0x00, 0x00, 0x00, 0x00};
             outStream.write(getECHeader, 0, getECHeader.length);
+            logger.debug(String.format("Public EC address retrieval header sent to SAS device on port %s", port()));
 
 
             //Read the IOT-SAS reply, which should be a 52 byte key
+
+            logger.debug(String.format("Retrieving public EC address from SAS device on port %s", port()));
             byte[] key = new byte[52];
             int count = 0;
             int bytesRx;
@@ -53,7 +74,9 @@ public class IoTSASClientImpl implements SignatureProdiver {
                 count += bytesRx;
             }
 
-            return Address.fromBytes(key);
+            Address address = Address.fromBytes(key);
+            logger.debug(String.format("Retrieved public EC address %s from SAS device on port %s", address, port()));
+            return address;
         } catch (IOException e) {
             throw new IoTSASPort.IoTSASPortException(e);
         }

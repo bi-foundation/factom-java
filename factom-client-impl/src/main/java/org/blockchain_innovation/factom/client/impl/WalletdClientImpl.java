@@ -17,7 +17,9 @@
 package org.blockchain_innovation.factom.client.impl;
 
 import org.blockchain_innovation.factom.client.api.FactomResponse;
+import org.blockchain_innovation.factom.client.api.SignatureProdiver;
 import org.blockchain_innovation.factom.client.api.WalletdClient;
+import org.blockchain_innovation.factom.client.api.errors.FactomException;
 import org.blockchain_innovation.factom.client.api.model.Address;
 import org.blockchain_innovation.factom.client.api.model.Chain;
 import org.blockchain_innovation.factom.client.api.model.Entry;
@@ -80,10 +82,20 @@ public class WalletdClientImpl extends AbstractClient implements WalletdClient {
     }
 
     @Override
+    public CompletableFuture<FactomResponse<ComposeResponse>> composeChain(Chain chain, SignatureProdiver signatureProdiver) throws FactomException.ClientException {
+        return composeChain(chain, signatureProdiver.getPublicECAddress());
+    }
+
+    @Override
     public CompletableFuture<FactomResponse<ComposeResponse>> composeChain(Chain chain, Address entryCreditAddress) {
         AddressType.ENTRY_CREDIT_PUBLIC.assertValid(entryCreditAddress);
         Chain encodedChain = encodeOperations.encodeHex(chain);
         return exchange(RpcMethod.COMPOSE_CHAIN.toRequestBuilder().param("chain", encodedChain).param("ecpub", entryCreditAddress.getValue()), ComposeResponse.class);
+    }
+
+    @Override
+    public CompletableFuture<FactomResponse<ComposeResponse>> composeEntry(Entry entry, SignatureProdiver signatureProdiver) throws FactomException.ClientException {
+        return composeEntry(entry, signatureProdiver.getPublicECAddress());
     }
 
     @Override

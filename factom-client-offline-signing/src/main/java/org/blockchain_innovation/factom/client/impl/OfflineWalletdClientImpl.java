@@ -1,17 +1,14 @@
 package org.blockchain_innovation.factom.client.impl;
 
 import org.blockchain_innovation.factom.client.api.FactomResponse;
+import org.blockchain_innovation.factom.client.api.SignatureProdiver;
 import org.blockchain_innovation.factom.client.api.errors.FactomException;
 import org.blockchain_innovation.factom.client.api.model.Address;
 import org.blockchain_innovation.factom.client.api.model.Chain;
 import org.blockchain_innovation.factom.client.api.model.Entry;
 import org.blockchain_innovation.factom.client.api.model.response.walletd.ComposeResponse;
 import org.blockchain_innovation.factom.client.api.model.types.AddressType;
-import org.blockchain_innovation.factom.client.api.ops.ByteOperations;
-import org.blockchain_innovation.factom.client.api.ops.Encoding;
-import org.blockchain_innovation.factom.client.api.ops.Digests;
-import org.blockchain_innovation.factom.client.api.ops.EntryOperations;
-import org.blockchain_innovation.factom.client.api.ops.SigningOperations;
+import org.blockchain_innovation.factom.client.api.ops.*;
 import org.blockchain_innovation.factom.client.api.rpc.RpcResponse;
 
 import java.io.ByteArrayOutputStream;
@@ -27,14 +24,12 @@ public class OfflineWalletdClientImpl extends WalletdClientImpl {
     private final OfflineAddressKeyConversions addressKeyConversions = new OfflineAddressKeyConversions();
     private final EntryOperations entryOperations = new EntryOperations();
     private final ByteOperations byteOperations = new ByteOperations();
-    private final SigningOperations signingOperations = new SigningOperations();
 
     @Override
-    public CompletableFuture<FactomResponse<ComposeResponse>> composeChain(Chain chain, Address address) throws FactomException.ClientException {
+    public CompletableFuture<FactomResponse<ComposeResponse>> composeChain(Chain chain, SignatureProdiver signatureProdiver) throws FactomException.ClientException {
         Supplier<FactomResponse<ComposeResponse>> supplier = () -> {
-            AddressType.ENTRY_CREDIT_SECRET.assertValid(address);
 
-            String message = composeChainCommit(chain, address);
+            String message = composeChainCommit(chain, signatureProdiver);
             String entryReveal = composeChainReveal(chain);
             FactomResponse<ComposeResponse> response = composeResponse("compose-chain", message, "reveal-chain", entryReveal);
             return response;
@@ -44,17 +39,28 @@ public class OfflineWalletdClientImpl extends WalletdClientImpl {
     }
 
     @Override
-    public CompletableFuture<FactomResponse<ComposeResponse>> composeEntry(Entry entry, Address address) throws FactomException.ClientException {
-        Supplier<FactomResponse<ComposeResponse>> supplier = () -> {
-            AddressType.ENTRY_CREDIT_SECRET.assertValid(address);
+    public CompletableFuture<FactomResponse<ComposeResponse>> composeChain(Chain chain, Address address) throws FactomException.ClientException {
+        AddressType.ENTRY_CREDIT_SECRET.assertValid(address);
+        return composeChain(chain, new AddressSignatureProvider(address));
+    }
 
-            String message = composeEntryCommit(entry, address);
+    @Override
+    public CompletableFuture<FactomResponse<ComposeResponse>> composeEntry(Entry entry, SignatureProdiver signatureProdiver) throws FactomException.ClientException {
+        Supplier<FactomResponse<ComposeResponse>> supplier = () -> {
+
+            String message = composeEntryCommit(entry, signatureProdiver);
             String entryReveal = composeEntryReveal(entry);
             FactomResponse<ComposeResponse> response = composeResponse("compose-entry", message, "reveal-entry", entryReveal);
             return response;
         };
 
         return CompletableFuture.supplyAsync(supplier);
+    }
+
+    @Override
+    public CompletableFuture<FactomResponse<ComposeResponse>> composeEntry(Entry entry, Address address) throws FactomException.ClientException {
+        AddressType.ENTRY_CREDIT_SECRET.assertValid(address);
+        return composeEntry(entry, new AddressSignatureProvider(address));
     }
 
     private FactomResponse<ComposeResponse> composeResponse(String commitMethod, String commitMessage, String revealMethod, String revealEntry) {
@@ -70,7 +76,7 @@ public class OfflineWalletdClientImpl extends WalletdClientImpl {
         return new OfflineFactomResponseImpl<>(rpcResponse);
     }
 
-    protected String composeChainCommit(Chain chain, Address entryCreditAddress) throws FactomException.ClientException {
+    protected String composeChainCommit(Chain chain, SignatureProdiver signatureProdiver) throws FactomException.ClientException {
         Entry firstEntry = chain.getFirstEntry();
         byte[] chainId = entryOperations.calculateChainId(firstEntry.getExternalIds());
         String chainIdHex = Encoding.HEX.encode(chainId);
@@ -103,8 +109,8 @@ public class OfflineWalletdClientImpl extends WalletdClientImpl {
 
             // 32 byte Entry Credit Address Public Key + 64 byte Signature
             byte[] message = outputStream.toByteArray();
-            byte[] signature = signingOperations.sign(message, entryCreditAddress);
-            byte[] entryCreditKey = addressKeyConversions.addressToKey(addressKeyConversions.addressToPublicAddress(entryCreditAddress));
+            byte[] signature = signatureProdiver.sign(message);
+            byte[] entryCreditKey = addressKeyConversions.addressToKey(signatureProdiver.getPublicECAddress());
 
             outputStream.write(entryCreditKey);
             outputStream.write(signature);
@@ -120,11 +126,11 @@ public class OfflineWalletdClientImpl extends WalletdClientImpl {
      * Compose an entry commit message that is needed to commit the entry.
      *
      * @param entry
-     * @param address
+     * @param signatureProdiver
      * @return
      * @throws FactomException.ClientException
      */
-    protected String composeEntryCommit(Entry entry, Address address) throws FactomException.ClientException {
+    protected String composeEntryCommit(Entry entry, SignatureProdiver signatureProdiver) throws FactomException.ClientException {
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
             // 1 byte version
             byte[] version = {0};
@@ -144,8 +150,8 @@ public class OfflineWalletdClientImpl extends WalletdClientImpl {
 
             // 32 byte Entry Credit Address Public Key + 64 byte Signature
             byte[] message = outputStream.toByteArray();
-            byte[] signature = signingOperations.sign(message, address);
-            byte[] entryCreditKey = addressKeyConversions.addressToKey(addressKeyConversions.addressToPublicAddress(address));
+            byte[] signature = signatureProdiver.sign(message);
+            byte[] entryCreditKey = addressKeyConversions.addressToKey(signatureProdiver.getPublicECAddress());
 
             outputStream.write(entryCreditKey);
             outputStream.write(signature);

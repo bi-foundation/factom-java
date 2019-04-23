@@ -22,7 +22,8 @@ import java.io.Serializable;
 
 public class Address implements Serializable {
 
-    private String hexAddressValue;
+    // Do not rename as it is used during serialization!
+    private String secret;
 
     public static Address fromBytes(byte[] hexAddress) {
         return new Address().setValue(String.valueOf(hexAddress));
@@ -40,12 +41,12 @@ public class Address implements Serializable {
     }
 
     public String getValue() {
-        return hexAddressValue;
+        return secret;
     }
 
     protected Address setValue(String value) {
         AddressType.assertValidAddress(value);
-        this.hexAddressValue = value;
+        this.secret = value;
         return this;
     }
 
@@ -55,6 +56,6 @@ public class Address implements Serializable {
 
     @Override
     public String toString() {
-        return "Address{" + hexAddressValue + '}';
+        return "Address{" + secret + '}';
     }
 }
