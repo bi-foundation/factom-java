@@ -1,0 +1,27 @@
+plugins {
+    id 'java'
+}
+
+group 'org.blockchain-innovation.factom.identity'
+version '0.2.2-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    /*compile group: 'org.blockchain-innovation.factom.client', name: 'factom-client-impl', version: '0.2.2-SNAPSHOT'*/
+    compile project(':factom-client-impl')
+    compile group: 'decentralized-identity', name: 'did-common-java', version: '0.1-SNAPSHOT'
+    testCompile project(':factom-client-offline-signing')
+    testCompile project(':service-providers:logger-slf4j')
+    testCompile project(':service-providers:json-converter-jee')
+    testCompile "org.mock-server:mockserver-netty:5.4.1"
+    testCompile "org.mock-server:mockserver-client-java:5.4.1"
+    testCompile "org.glassfish:javax.json:$testVersions.jee.javaxJson"
+    testCompile "org.eclipse:yasson:$testVersions.jee.yasson"
+
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
