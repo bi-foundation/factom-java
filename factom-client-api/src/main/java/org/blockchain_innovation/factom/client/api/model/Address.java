@@ -17,16 +17,22 @@
 package org.blockchain_innovation.factom.client.api.model;
 
 import org.blockchain_innovation.factom.client.api.model.types.AddressType;
+import org.blockchain_innovation.factom.client.api.ops.Encoding;
 
 import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
 
 public class Address implements Serializable {
 
     // Do not rename as it is used during serialization!
     private String secret;
 
-    public static Address fromBytes(byte[] hexAddress) {
-        return new Address().setValue(String.valueOf(hexAddress));
+    public static Address fromHexBytes(byte[] hexAddress) {
+        return new Address().setValue(new String(hexAddress, StandardCharsets.US_ASCII));
+    }
+
+    public static Address fromBytes(byte[] address) {
+        return new Address().setValue(Encoding.HEX.encode(address));
     }
 
     public static Address fromString(String hexAddress) {
