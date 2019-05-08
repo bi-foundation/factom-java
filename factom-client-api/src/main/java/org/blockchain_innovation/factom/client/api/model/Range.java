@@ -18,24 +18,49 @@ package org.blockchain_innovation.factom.client.api.model;
 
 import java.io.Serializable;
 
+/**
+ * Represents a range (start till end).
+ */
 public class Range implements Serializable {
 
     private int start;
     private int end;
 
+    /**
+     * Get the start.
+     *
+     * @return start value.
+     */
     public int getStart() {
         return start;
     }
 
+    /**
+     * Set the start.
+     *
+     * @param start start value.
+     * @return This range object.
+     */
     public Range setStart(int start) {
         this.start = start;
         return this;
     }
 
+    /**
+     * Get the end.
+     *
+     * @return end value.
+     */
     public int getEnd() {
         return end;
     }
 
+    /**
+     * Set the end.
+     *
+     * @param end end value.
+     * @return This range object.
+     */
     public Range setEnd(int end) {
         this.end = end;
         return this;

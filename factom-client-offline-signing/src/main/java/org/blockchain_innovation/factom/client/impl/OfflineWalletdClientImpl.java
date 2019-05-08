@@ -32,7 +32,7 @@ public class OfflineWalletdClientImpl extends WalletdClientImpl {
     @Override
     public CompletableFuture<FactomResponse<ComposeResponse>> composeChain(Chain chain, Address address) throws FactomException.ClientException {
         Supplier<FactomResponse<ComposeResponse>> supplier = () -> {
-            AddressType.ENTRY_CREDIT_SECRET.assertValid(address);
+            AddressType.ENTRY_CREDIT_SECRET.assertValidTypeFor(address);
 
             String message = composeChainCommit(chain, address);
             String entryReveal = composeChainReveal(chain);
@@ -46,7 +46,7 @@ public class OfflineWalletdClientImpl extends WalletdClientImpl {
     @Override
     public CompletableFuture<FactomResponse<ComposeResponse>> composeEntry(Entry entry, Address address) throws FactomException.ClientException {
         Supplier<FactomResponse<ComposeResponse>> supplier = () -> {
-            AddressType.ENTRY_CREDIT_SECRET.assertValid(address);
+            AddressType.ENTRY_CREDIT_SECRET.assertValidTypeFor(address);
 
             String message = composeEntryCommit(entry, address);
             String entryReveal = composeEntryReveal(entry);

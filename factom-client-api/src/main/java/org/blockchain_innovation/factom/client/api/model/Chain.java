@@ -20,19 +20,34 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Represents a chain in the Factom blockchain.
+ */
 public class Chain implements Serializable {
 
     private Entry firstentry;
 
+    /**
+     * Get the first entry of the chain (the entry constitutes the start of the chain).
+     * @return First entry of the chain.
+     */
     public Entry getFirstEntry() {
         return firstentry;
     }
 
+    /**
+     * Sets the first entry of the chain (the entry constitutes the start of the chain).
+     * @param firstEntry The first entry of the chain.
+     * @return This chain.
+     */
     public Chain setFirstEntry(Entry firstEntry) {
         this.firstentry = firstEntry;
         return this;
     }
 
+    /**
+     * A builder class to aid in building chain objects.
+     */
     public static class Builder {
 
         private List<String> externalIds;
@@ -42,15 +57,30 @@ public class Chain implements Serializable {
             this.externalIds = new ArrayList<>();
         }
 
+        /**
+         * Create a builder with a list of external Ids for the first entry.
+         * @param externalIds External Ids.
+         */
         public Builder(List<String> externalIds) {
             this.externalIds = externalIds;
         }
 
+
+        /**
+         * Create a builder with a list of external Ids and content field for the first entry.
+         * @param externalIds External Ids.
+         * @param content Content
+         */
         public Builder(List<String> externalIds, String content) {
             this.externalIds = externalIds;
             this.content = content;
         }
 
+
+        /**
+         * Create a builder with a single external Id for the first entry.
+         * @param externalId single external Id.
+         */
         public Builder addExternalIds(String externalId) {
             externalIds.add(externalId);
             return this;

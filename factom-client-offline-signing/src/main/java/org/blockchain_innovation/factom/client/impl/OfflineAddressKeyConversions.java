@@ -37,24 +37,7 @@ public class OfflineAddressKeyConversions extends AddressKeyConversions {
         if (addressType.isPublic()) {
             return address;
         }
-        byte[] privateKey = addressToKey(address);
-
-        //EdDSAPrivateKeySpec privateKeySpec = new EdDSAPrivateKeySpec(privateKey, EdDSANamedCurveTable.ED_25519_CURVE_SPEC);
-        // EdDSAPrivateKey keyIn = new EdDSAPrivateKey(privateKeySpec);
-        // byte[] pk = keyIn.getA().toByteArray();
-
-        byte[] digest = Digests.SHA_512.digest(privateKey);
-        digest[0] &= 248;
-        digest[31] &= 127;
-        digest[31] |= 64;
-
-        byte[] hBytes = Arrays.copyOf(digest, 32);
-
-        // GeScalarMultBase computes h = a*B, where
-        // a = a[0]+256*a[1]+...+256^31 a[31]
-        // B is the Ed25519 base point (x,4/5) with x positive.
-        GroupElement elementA = EdDSANamedCurveTable.ED_25519_CURVE_SPEC.getB().scalarMultiply(hBytes);
-        byte[] publicKey = elementA.toByteArray();
+        byte[] publicKey = addressToPublicKey(address);
 
         AddressType targetAddressType = addressType == AddressType.FACTOID_SECRET ? AddressType.FACTOID_PUBLIC : AddressType.ENTRY_CREDIT_PUBLIC;
 

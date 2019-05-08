@@ -47,25 +47,25 @@ public class WalletdClientImpl extends AbstractClient implements WalletdClient {
 
     @Override
     public CompletableFuture<FactomResponse<TransactionResponse>> addEntryCreditOutput(String txName, Address address, long amount) {
-        AddressType.ENTRY_CREDIT_PUBLIC.assertValid(address);
+        AddressType.ENTRY_CREDIT_PUBLIC.assertValidTypeFor(address);
         return exchange(RpcMethod.ADD_ENTRY_CREDIT_OUTPUT.toRequestBuilder().param("tx-name", txName).param("address", address.getValue()).param("amount", amount), TransactionResponse.class);
     }
 
     @Override
     public CompletableFuture<FactomResponse<ExecutedTransactionResponse>> addFee(String txName, Address address) {
-        AddressType.FACTOID_PUBLIC.assertValid(address);
+        AddressType.FACTOID_PUBLIC.assertValidTypeFor(address);
         return exchange(RpcMethod.ADD_FEE.toRequestBuilder().param("tx-name", txName).param("address", address.getValue()), ExecutedTransactionResponse.class);
     }
 
     @Override
     public CompletableFuture<FactomResponse<ExecutedTransactionResponse>> addInput(String txName, Address address, long amount) {
-        AddressType.FACTOID_PUBLIC.assertValid(address);
+        AddressType.FACTOID_PUBLIC.assertValidTypeFor(address);
         return exchange(RpcMethod.ADD_INPUT.toRequestBuilder().param("tx-name", txName).param("address", address.getValue()).param("amount", amount), ExecutedTransactionResponse.class);
     }
 
     @Override
     public CompletableFuture<FactomResponse<ExecutedTransactionResponse>> addOutput(String txName, Address address, long amount) {
-        AddressType.FACTOID_PUBLIC.assertValid(address);
+        AddressType.FACTOID_PUBLIC.assertValidTypeFor(address);
         return exchange(RpcMethod.ADD_OUTPUT.toRequestBuilder().param("tx-name", txName).param("address", address.getValue()).param("amount", amount), ExecutedTransactionResponse.class);
     }
 
@@ -81,14 +81,14 @@ public class WalletdClientImpl extends AbstractClient implements WalletdClient {
 
     @Override
     public CompletableFuture<FactomResponse<ComposeResponse>> composeChain(Chain chain, Address entryCreditAddress) {
-        AddressType.ENTRY_CREDIT_PUBLIC.assertValid(entryCreditAddress);
+        AddressType.ENTRY_CREDIT_PUBLIC.assertValidTypeFor(entryCreditAddress);
         Chain encodedChain = encodeOperations.encodeHex(chain);
         return exchange(RpcMethod.COMPOSE_CHAIN.toRequestBuilder().param("chain", encodedChain).param("ecpub", entryCreditAddress.getValue()), ComposeResponse.class);
     }
 
     @Override
     public CompletableFuture<FactomResponse<ComposeResponse>> composeEntry(Entry entry, Address entryCreditAddress) {
-        AddressType.ENTRY_CREDIT_PUBLIC.assertValid(entryCreditAddress);
+        AddressType.ENTRY_CREDIT_PUBLIC.assertValidTypeFor(entryCreditAddress);
         Entry encodedEntry = encodeOperations.encodeHex(entry);
         return exchange(RpcMethod.COMPOSE_ENTRY.toRequestBuilder().param("entry", encodedEntry).param("ecpub", entryCreditAddress.getValue()), ComposeResponse.class);
     }
@@ -148,7 +148,7 @@ public class WalletdClientImpl extends AbstractClient implements WalletdClient {
 
     @Override
     public CompletableFuture<FactomResponse<ExecutedTransactionResponse>> subFee(String txName, Address address) {
-        AddressType.FACTOID_PUBLIC.assertValid(address);
+        AddressType.FACTOID_PUBLIC.assertValidTypeFor(address);
         return exchange(RpcMethod.SUB_FEE.toRequestBuilder().param("tx-name", txName).param("address", address.getValue()), ExecutedTransactionResponse.class);
     }
 

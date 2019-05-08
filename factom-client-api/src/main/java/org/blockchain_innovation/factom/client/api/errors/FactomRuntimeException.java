@@ -16,28 +16,69 @@
 
 package org.blockchain_innovation.factom.client.api.errors;
 
+/**
+ * A specific non-checked Factom root exception class.
+ */
 public class FactomRuntimeException extends RuntimeException {
+
+    /**
+     * Create a Factom runtime exception with a detail message and no cause.
+     *
+     * @param message The detail message.
+     */
     public FactomRuntimeException(String message) {
         super(message);
     }
 
-    public FactomRuntimeException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
+    /**
+     * Create a Factom runtime exception with a cause (wrap the cause into a Factom runtime exception).
+     *
+     * @param cause The cause.
+     */
     public FactomRuntimeException(Throwable cause) {
         super(cause);
     }
 
-    public static class AssertionException extends FactomRuntimeException {
-        public AssertionException(Throwable cause) {
-            super(cause);
-        }
+    /**
+     * Create a Factom runtime exception with a detail message and a cause.
+     *
+     * @param message The detail message.
+     * @param cause   The cause.
+     */
+    public FactomRuntimeException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
+
+    /**
+     * This assertion exception class can be thrown whenever certain prerequisites are not fulfilled.
+     */
+    public static class AssertionException extends FactomRuntimeException {
+
+        /**
+         * Create an assertion exception with a detail message and no cause.
+         *
+         * @param message The detail message.
+         */
         public AssertionException(String message) {
             super(message);
         }
 
+        /**
+         * Create an assertion exception with a cause (wrap the cause into a Factom runtime exception).
+         *
+         * @param cause The cause.
+         */
+        public AssertionException(Throwable cause) {
+            super(cause);
+        }
+
+        /**
+         * Create an assertion exception with a detail message and a cause.
+         *
+         * @param message The detail message.
+         * @param cause   The cause.
+         */
         public AssertionException(String message, Throwable cause) {
             super(message, cause);
         }

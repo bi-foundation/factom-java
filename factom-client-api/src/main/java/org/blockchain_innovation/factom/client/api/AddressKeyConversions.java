@@ -26,9 +26,9 @@ public class AddressKeyConversions {
      * Get the key from the address. This strips an identifiable prefix and a checksum from the address.
      * The result will be encoded in a given encoding.
      *
-     * @param address
-     * @param encoding of the address
-     * @return the key of the address encoded by the given encoding
+     * @param address  The address to get the key of.
+     * @param encoding of the key.
+     * @return the key of the address encoded using the supplied encoding.
      */
     public String addressToKey(String address, Encoding encoding) {
         String key = encoding.encode(addressToKey(address));
@@ -39,8 +39,8 @@ public class AddressKeyConversions {
     /**
      * Get the key from the address. This strips an identifiable prefix and a checksum from the address.
      *
-     * @param address
-     * @return the key of the address
+     * @param address The address to get the key of.
+     * @return the key of the address in byte form.
      */
     public byte[] addressToKey(String address) {
         AddressType.assertValidAddress(address);
@@ -62,18 +62,31 @@ public class AddressKeyConversions {
     /**
      * Get the key from the address. This strips an identifiable prefix and a checksum from the address.
      *
-     * @param address
-     * @return the key of the address
+     * @param address The address to get the key of.
+     * @return the key of the address in byte form.
      */
     public byte[] addressToKey(Address address) {
         return addressToKey(address.getValue());
     }
 
+    /**
+     * Converts a FCT address into an RCD hash. Checks for a valid FCT (public) address.
+     *
+     * @param address  The FCT address.
+     * @param encoding The encoding to use.
+     * @return The RCD hash using the supplied encoding.
+     */
     public String fctAddressToRcdHash(String address, Encoding encoding) {
         return encoding.encode(fctAddressToRcdHash(address));
 
     }
 
+    /**
+     * Converts a FCT address into an RCD hash. Checks for a valid FCT (public) address.
+     *
+     * @param address The FCT address.
+     * @return The RCD hash in raw form.
+     */
     public byte[] fctAddressToRcdHash(String address) {
         AddressType.assertValidAddress(address, AddressType.FACTOID_PUBLIC);
         return addressToKey(address);
@@ -82,10 +95,10 @@ public class AddressKeyConversions {
     /**
      * Creates an address from a key. The address has an identifiable prefix and a checksum to prevent typos.
      *
-     * @param key               of the address
-     * @param targetAddressType type of address
-     * @param keyEncoding
-     * @return the address in a a given encoding
+     * @param key               of the address.
+     * @param targetAddressType type of address.
+     * @param keyEncoding       The encoding used for the supplied key.
+     * @return the address in base58 encoding.
      */
     public String keyToAddress(String key, AddressType targetAddressType, Encoding keyEncoding) {
         return keyToAddress(keyEncoding.decode(key), targetAddressType);
@@ -94,9 +107,9 @@ public class AddressKeyConversions {
     /**
      * Creates an address from a key. The address has an identifiable prefix and a checksum to prevent typos.
      *
-     * @param key               of the address
-     * @param targetAddressType type of address
-     * @return the address
+     * @param key               of the address.
+     * @param targetAddressType type of address.
+     * @return the address in base58 encoding.
      */
     public String keyToAddress(byte[] key, AddressType targetAddressType) {
         String hexKey = Encoding.HEX.encode(key);

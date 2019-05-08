@@ -15,33 +15,33 @@ import java.util.concurrent.CompletableFuture;
 
 public interface EntryApi {
 
-     EntryApi addListener(CommitAndRevealListener listener);
+    EntryApi addListener(CommitAndRevealListener listener);
 
-     EntryApi removeListener(CommitAndRevealListener listener);
+    EntryApi removeListener(CommitAndRevealListener listener);
 
-     EntryApi clearListeners();
+    EntryApi clearListeners();
 
-     EntryApi setFactomdClient(FactomdClient factomdClient);
+    EntryApi setFactomdClient(FactomdClient factomdClient);
 
-     EntryApi setWalletdClient(WalletdClient walletdClient);
+    EntryApi setWalletdClient(WalletdClient walletdClient);
 
-     int getTransactionAcknowledgeTimeout();
+    int getTransactionAcknowledgeTimeout();
 
-     EntryApi setTransactionAcknowledgeTimeout(int transactionAcknowledgeTimeout);
+    EntryApi setTransactionAcknowledgeTimeout(int transactionAcknowledgeTimeout);
 
-     int getCommitConfirmedTimeout();
+    int getCommitConfirmedTimeout();
 
-     EntryApi setCommitConfirmedTimeout(int commitConfirmedTimeout);
+    EntryApi setCommitConfirmedTimeout(int commitConfirmedTimeout);
 
-    CompletableFuture<List<EntryBlockResponse>> allEntryBlocks (String chainId);
+    CompletableFuture<List<EntryBlockResponse>> allEntryBlocks(String chainId);
 
-        /**
-         * Compose, reveal and commit a chain.
-         *
-         * @param chain
-         * @param address
-         * @throws FactomException.ClientException
-         */
+    /**
+     * Compose, reveal and commit a chain.
+     *
+     * @param chain
+     * @param address
+     * @throws FactomException.ClientException
+     */
     CompletableFuture<CommitAndRevealChainResponse> commitAndRevealChain(Chain chain, Address address);
 
     /**
