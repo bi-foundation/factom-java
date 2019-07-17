@@ -1,3 +1,6 @@
+![Develop branch status](https://codebuild.eu-west-1.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoiM3M5em84bElqVEMwbFZORnN5SUgrbTd4TFV2RWxEUEFucXVncDEwM01KU0hIby9GbXNuelJ4cnF6NktBWnJ5TUsvVytudjA0RWgrZDUrTC90K2FQR3Y0PSIsIml2UGFyYW1ldGVyU3BlYyI6IitabTlJeHh6WDZFNWUzK2UiLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=master)
+
+
 = Factom Java
 
 A Factom Java enterprise client to interact with Factom. Please see the docs module for documentation.

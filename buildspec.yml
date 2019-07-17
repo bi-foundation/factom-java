@@ -1,0 +1,11 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+       java: openjdk8
+  build:
+    commands:
+       - echo "${CODEBUILD_WEBHOOK_HEAD_REF}"
+       - aws s3 cp s3://nexuscredentials-cm/maven/settings.xml .
+       - mvn clean install deploy -s settings.xml
