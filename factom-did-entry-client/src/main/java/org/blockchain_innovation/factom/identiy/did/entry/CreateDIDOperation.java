@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CreateDIDOperation extends DIDOperation {
-    public CreateDIDOperation(FactomDID didVersion, byte[] nonce) {
+    public CreateDIDOperation(DIDVersion didVersion, byte[] nonce) {
         super(didVersion, nonce);
     }
 

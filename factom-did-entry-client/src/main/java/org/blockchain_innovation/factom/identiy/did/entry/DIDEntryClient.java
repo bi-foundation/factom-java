@@ -56,7 +56,7 @@ public class DIDEntryClient {
 
 
     public List<EntryResponse> getAllEntriesByIdentifier(String identifier) {
-        return getEntryApi().allEntries(FactomDID.FCTR_V1.getTargetId(identifier)).join();
+        return getEntryApi().allEntries(DIDVersion.FACTOM_V1.getMethodSpecificId(identifier)).join();
     }
 
     /**
@@ -68,13 +68,13 @@ public class DIDEntryClient {
      * @return
      */
     public CommitAndRevealChainResponse create(DIDDocument didDocument, byte[] nonce, Address address) {
-        String chainId = FactomDID.FCTR_V1.determineChainId(nonce);
-        if (!chainId.equals(FactomDID.FCTR_V1.getTargetId((String) didDocument.getJsonLdObject().get(DIDDocument.JSONLD_TERM_ID)))) {
+        String chainId = DIDVersion.FACTOM_V1.determineChainId(nonce);
+        if (!chainId.equals(DIDVersion.FACTOM_V1.getMethodSpecificId((String) didDocument.getJsonLdObject().get(DIDDocument.JSONLD_TERM_ID)))) {
             throw new DIDRuntimeException(String.format("Provided DID %s and determined chain id %s for the supplied nonce do no match", didDocument.getId(), chainId));
         }
 
         Entry entry = new Entry();
-        entry.setExternalIds(new CreateDIDOperation(FactomDID.FCTR_V1, nonce).externalIds());
+        entry.setExternalIds(new CreateDIDOperation(DIDVersion.FACTOM_V1, nonce).externalIds());
         try {
             entry.setContent(didDocument.toJson());
         } catch (IOException | JsonLdError e) {
@@ -99,11 +99,11 @@ public class DIDEntryClient {
      * @return
      */
     public CommitAndRevealEntryResponse update(DIDDocument didDocument, byte[] nonce, String keyId, Address address) {
-        String chainId = FactomDID.FCTR_V1.getTargetId(didDocument.getId());
+        String chainId = DIDVersion.FACTOM_V1.getMethodSpecificId(didDocument.getId());
 
         Entry entry = new Entry();
         entry.setChainId(chainId);
-        entry.setExternalIds(new UpdateDIDOperation(FactomDID.FCTR_V1, keyId, nonce).externalIds());
+        entry.setExternalIds(new UpdateDIDOperation(DIDVersion.FACTOM_V1, keyId, nonce).externalIds());
         try {
             entry.setContent(didDocument.toJson());
         } catch (IOException | JsonLdError e) {
@@ -127,11 +127,11 @@ public class DIDEntryClient {
      * @return
      */
     public CommitAndRevealEntryResponse deactivate(DIDDocument didDocument, String keyId, Address address) {
-        String chainId = FactomDID.FCTR_V1.getTargetId(didDocument.getId());
+        String chainId = DIDVersion.FACTOM_V1.getMethodSpecificId(didDocument.getId());
 
         Entry entry = new Entry();
         entry.setChainId(chainId);
-        entry.setExternalIds(new DeactivateDIDOperation(FactomDID.FCTR_V1, keyId).externalIds());
+        entry.setExternalIds(new DeactivateDIDOperation(DIDVersion.FACTOM_V1, keyId).externalIds());
         try {
             entry.setContent(didDocument.toJson());
         } catch (IOException | JsonLdError e) {

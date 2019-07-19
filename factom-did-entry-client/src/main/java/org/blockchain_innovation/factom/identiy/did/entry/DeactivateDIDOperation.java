@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DeactivateDIDOperation extends DIDOperation {
-    public DeactivateDIDOperation(FactomDID didVersion, String keyId) {
+    public DeactivateDIDOperation(DIDVersion didVersion, String keyId) {
         super(didVersion, keyId);
     }
 
@@ -14,7 +14,7 @@ public class DeactivateDIDOperation extends DIDOperation {
         List<String> externalIds = new ArrayList<>();
         externalIds.add("DeactivateDID");
         externalIds.add(keyId);
-        String chainId = FactomDID.FCTR_V1.getTargetId(keyId);
+        String chainId = DIDVersion.FACTOM_V1.getMethodSpecificId(keyId);
         //fixme add signature according to spec
         externalIds.add(Encoding.BASE58.encode(chainId.getBytes()));
         return externalIds;

@@ -4,19 +4,19 @@ import java.util.List;
 
 public abstract class DIDOperation {
 
-    protected final FactomDID didVersion;
+    protected final DIDVersion didVersion;
     protected final byte[] nonce;
     protected final String keyId;
 
-    protected DIDOperation(FactomDID didVersion, byte[] nonce) {
+    protected DIDOperation(DIDVersion didVersion, byte[] nonce) {
         this(didVersion, null, nonce);
     }
 
-    protected DIDOperation(FactomDID didVersion, String keyId) {
+    protected DIDOperation(DIDVersion didVersion, String keyId) {
         this(didVersion, keyId, null);
     }
 
-    protected DIDOperation(FactomDID didVersion, String keyId, byte[] nonce) {
+    protected DIDOperation(DIDVersion didVersion, String keyId, byte[] nonce) {
         this.didVersion = didVersion;
         this.nonce = nonce;
         this.keyId = keyId;

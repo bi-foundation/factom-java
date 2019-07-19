@@ -8,13 +8,13 @@ import java.util.List;
 
 public class UpdateDIDOperation extends DIDOperation {
 
-    public UpdateDIDOperation(FactomDID didVersion, String keyId, byte[] nonce) {
+    public UpdateDIDOperation(DIDVersion didVersion, String keyId, byte[] nonce) {
         super(didVersion, keyId, nonce);
     }
 
     public List<String> externalIds() {
         List<String> externalIds = new ArrayList<>();
-        externalIds.add("UpdateDID");
+        externalIds.add(OperationValue.DID_UPDATE.getOperation());
         externalIds.add(keyId);
         // fixme add content according to spec and sign using key
         externalIds.add(Encoding.BASE58.encode(Digests.SHA_512.digest(nonce /* + content */)));
