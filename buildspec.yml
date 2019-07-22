@@ -8,4 +8,5 @@ phases:
     commands:
        - echo "${CODEBUILD_WEBHOOK_HEAD_REF}"
        - aws s3 cp s3://nexuscredentials-cm/maven/settings.xml .
-       - gradle build -s settings.xml
+       - gradle build
+       - gradle publishToMavenLocal -s settings.xml  
