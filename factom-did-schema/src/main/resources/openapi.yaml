@@ -1,0 +1,280 @@
+openapi: 3.0.1
+info:
+  title: Factom DIDs
+  description: Decentralized Identifiers (DID) on Factom, provides models, APIs, clients and universal resolver integrations for DIDs on top of Factom.
+  termsOfService: 'http://swagger.io/terms/'
+  contact:
+    name: Sphereon BV
+    email: dev@sphereon.com
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+  version: 0.3.0
+tags:
+  - name: identifiers
+    description: Factom DIDs
+    externalDocs:
+      description: Find out more
+      url: 'https://github.com/bi-foundation/FIS/blob/feature/DID/FIS/DID.md'
+paths:
+  /identifiers:
+    post:
+      tags:
+        - identifiers
+      summary: Create a new DID
+      operationId: createFactomDid
+      requestBody:
+        description: Create a new Factom DID chain
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FactomDidContent'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/FactomDidContent'
+        required: true
+      responses:
+        '405':
+          description: Validation exception
+          content: {}
+      security:
+        - dids_auth:
+            - 'write:dids'
+            - 'read:dids'
+      x-codegen-request-body-name: body
+  '/identifiers/{did}':
+    get:
+      tags:
+        - identifiers
+      summary: Find DID
+      description: Returns the Factom DID content
+      operationId: getFactomDidContent
+      parameters:
+        - name: did
+          in: path
+          description: DID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/FactomDidContent'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FactomDidContent'
+        '400':
+          description: Invalid DID supplied
+          content: {}
+        '404':
+          description: DID not found
+          content: {}
+      security:
+        - api_key: []
+    post:
+      tags:
+        - identifiers
+      summary: Updates a DID
+      operationId: updateFactomDid
+      parameters:
+        - name: did
+          in: path
+          description: DID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateRequest'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/UpdateRequest'
+        required: true
+      responses:
+        '405':
+          description: Invalid input
+          content: {}
+      security:
+        - dids_auth:
+            - 'write:dids'
+            - 'read:dids'
+    delete:
+      tags:
+        - identifiers
+      summary: Deactivate a DID
+      operationId: deactivateFactomDid
+      parameters:
+        - name: api_key
+          in: header
+          schema:
+            type: string
+        - name: did
+          in: path
+          description: DID to deactivate
+          required: true
+          schema:
+            type: string
+      responses:
+        '400':
+          description: Invalid DID supplied
+          content: {}
+        '404':
+          description: DID not found
+          content: {}
+      security:
+        - dids_auth:
+            - 'write:dids'
+            - 'read:dids'
+components:
+  schemas:
+    Key:
+      type: object
+      required:
+        - id
+        - type
+      properties:
+        id:
+          type: string
+          pattern: '^did:factom:$'
+          minLength: 43
+        type:
+          $ref: '#/components/schemas/KeyType'
+        controller:
+          type: string
+          minLength: 43
+        publicKeyBase58:
+          type: string
+        priorityRequirement:
+          type: integer
+          minimum: 0
+        bip44:
+          type: string
+    ManagementKey:
+      allOf:
+        - $ref: '#/components/schemas/Key'
+        - type: object
+          properties:
+            priority:
+              type: integer
+              minimum: 0
+    DidKey:
+      allOf:
+        - $ref: '#/components/schemas/Key'
+        - type: object
+          properties:
+            purpose:
+              type: array
+              items:
+                $ref: '#/components/schemas/KeyPurpose'
+    Service:
+      type: object
+      additionalProperties: true
+      required:
+        - id
+        - type
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+        serviceEndpoint:
+          type: string
+        priorityRequirement:
+          type: integer
+          minimum: 0
+    KeyType:
+      type: string
+      enum:
+        - Ed25519VerificationKey
+        - ECDSASecp256k1VerificationKey
+        - RSAVerificationKey
+    KeyPurpose:
+      type: string
+      enum:
+        - publicKey
+        - authentication
+    IdLookup:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: string
+    RevokeDidKey:
+      allOf:
+        - $ref: '#/components/schemas/IdLookup'
+        - type: object
+          properties:
+            purpose:
+              type: array
+              items:
+                $ref: '#/components/schemas/KeyPurpose'
+    FactomDidContent:
+      allOf:
+        - $ref: '#/components/schemas/KeyedObjects'
+        - type: object
+          properties:
+            didMethodVersion:
+              type: string
+              pattern: '^\d{1,2}\.\d{1,2}\.\d{1,2}$'
+      xml:
+        name: factom
+    UpdateRequest:
+      type: object
+      properties:
+        revoke:
+          type: array
+          items:
+            $ref: '#/components/schemas/RevocationObjects'
+        add:
+          type: array
+          items:
+            $ref: '#/components/schemas/KeyedObjects'
+    KeyedObjects:
+      type: object
+      properties:
+        managementKey:
+          type: array
+          items:
+            $ref: '#/components/schemas/ManagementKey'
+        didKey:
+          type: array
+          items:
+            $ref: '#/components/schemas/DidKey'
+        service:
+          type: array
+          items:
+            $ref: '#/components/schemas/Service'
+    RevocationObjects:
+      type: object
+      properties:
+        managementKey:
+          type: array
+          items:
+            $ref: '#/components/schemas/IdLookup'
+        didKey:
+          type: array
+          items:
+            $ref: '#/components/schemas/RevokeDidKey'
+        service:
+          type: array
+          items:
+            $ref: '#/components/schemas/IdLookup'
+  securitySchemes:
+    dids_auth:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: 'http://example/oauth/dialog'
+          scopes:
+            'write:dids': modify dids
+            'read:dids': read dids
+    api_key:
+      type: apiKey
+      name: api_key
+      in: header
