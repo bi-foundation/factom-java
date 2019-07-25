@@ -72,8 +72,8 @@ ext {
     ]
 
     // the password needs to be specified via command line
-    repoUser = project.hasProperty('repoUser') ? project.getProperty('repoUser') : ''
-    repoPass = project.hasProperty('repoPass') ? project.getProperty('repoPass') : ''
+    repoUser = project.hasProperty('repoUser') ? project.getProperty('repoUser') : nexusUser
+    repoPass = project.hasProperty('repoPass') ? project.getProperty('repoPass') : nexusPassword
 }
 
 
