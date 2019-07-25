@@ -9,6 +9,6 @@ phases:
        - echo "${CODEBUILD_WEBHOOK_HEAD_REF}"
        - chmod +x ./gradlew  
        - aws s3 cp s3://nexuscredentials-cms/maven/settings.xml .
-       - aws s3 cp s3://nexuscredentials-cms/maven/gradle.properties .
+       - aws s3 cp s3://nexuscredentials-cms/maven/gradle.properties ~
        - ./gradlew build --no-daemon  
-       - ./gradlew publishToMavenLocal --no-daemon  
+       - ./gradlew publish --no-daemon
