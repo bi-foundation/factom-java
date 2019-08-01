@@ -10,7 +10,6 @@ phases:
        - chmod +x ./gradlew
        - aws s3 cp s3://nexuscredentials-cms/maven/settings.xml .
        - mkdir ~/.gradle -p
-       - aws s3 cp s3://nexuscredentials-cms/maven/gradle.properties ~/.gradle
-       - aws s3 cp s3://nexuscredentials-cms/maven/gradle.encrypted.properties ~/.gradle
+       - aws s3 cp s3://nexuscredentials-cms/maven/gradle.encrypted.properties ~/.gradle/
        - ./gradlew build --no-daemon
        - ./gradlew publish --no-daemon
