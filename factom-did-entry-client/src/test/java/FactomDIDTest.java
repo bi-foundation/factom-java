@@ -8,7 +8,7 @@ import org.blockchain_innovation.factom.client.impl.FactomdClientImpl;
 import org.blockchain_innovation.factom.client.impl.OfflineWalletdClientImpl;
 import org.blockchain_innovation.factom.client.impl.settings.RpcSettingsImpl;
 import org.blockchain_innovation.factom.identiy.did.entry.DIDEntryClient;
-import org.blockchain_innovation.factom.identiy.did.entry.FactomDID;
+import org.blockchain_innovation.factom.identiy.did.entry.DIDVersion;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,10 +30,10 @@ public class FactomDIDTest {
     @Test
     public void test() throws IOException {
         byte[] nonce = ("test" + System.currentTimeMillis()).getBytes();
-        String chainId = FactomDID.FCTR_V1.determineChainId(nonce);
+        String chainId = DIDVersion.FACTOM_V1.determineChainId(nonce);
         Assert.assertNotNull(chainId);
-        String didReference = "did:fctr:" + chainId;
-        String targetId = FactomDID.FCTR_V1.getTargetId(didReference);
+        String didURL = "did:factom:" + chainId;
+        String targetId = DIDVersion.FACTOM_V1.getMethodSpecificId(didURL);
         DIDDocument didDocument = DIDDocument.fromJson("{\n" +
                 "  \"@context\": \"https://w3id.org/did/v0.11\",\n" +
                 "  \"id\": \"did:fctr:" + chainId + "\",\n" +
@@ -50,7 +50,7 @@ public class FactomDIDTest {
                 "  }]\n" +
                 "}");
 
-        String keyId = "did:fctr:" + chainId + "#keys-1";
+        String keyId = "did:factom:" + chainId + "#keys-1";
 //        DIDDocument didDocument = DIDDocument.build(didReference, null, null, null);
 
 

@@ -21,10 +21,10 @@ public class DIDV1CreationCompoundRule extends AbstractChainRule<FactomDidConten
         assertEntry();
 
         new ExternalIdsSizeRule(getEntry(), Optional.of(3), Optional.empty()).execute();
-        new AssertOperationRule(getChain(), OperationValue.DID_MANAGEMENT).execute();
+        new AssertOperationRule(getEntry(), OperationValue.DID_MANAGEMENT).execute();
         new EntrySchemeVersionRule(getEntry(), "1.0.0").execute();
 
-        ContentDeserializationRule<FactomDidContent> contentDeserializationRule = new ContentDeserializationRule<>(getChain(), FactomDidContent.class);
+        ContentDeserializationRule<FactomDidContent> contentDeserializationRule = new ContentDeserializationRule<>(getEntry(), FactomDidContent.class);
         FactomDidContent factomDidContent = contentDeserializationRule.execute();
 
         return factomDidContent;
