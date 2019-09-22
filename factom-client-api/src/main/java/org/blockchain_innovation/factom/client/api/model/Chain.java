@@ -35,6 +35,7 @@ public class Chain implements Serializable {
 
     public static class Builder {
 
+        private Entry firstEntry = new Entry();
         private List<String> externalIds;
         private String content;
 
@@ -49,6 +50,11 @@ public class Chain implements Serializable {
         public Builder(List<String> externalIds, String content) {
             this.externalIds = externalIds;
             this.content = content;
+        }
+
+        public Builder setFirstEntry(Entry firstEntry) {
+            this.firstEntry = firstEntry;
+            return this;
         }
 
         public Builder addExternalIds(String externalId) {
@@ -67,7 +73,9 @@ public class Chain implements Serializable {
         }
 
         public Chain build() {
-            Entry firstEntry = new Entry();
+            if (firstEntry == null) {
+                setFirstEntry(new Entry());
+            }
             firstEntry.setExternalIds(externalIds);
             firstEntry.setContent(content);
 

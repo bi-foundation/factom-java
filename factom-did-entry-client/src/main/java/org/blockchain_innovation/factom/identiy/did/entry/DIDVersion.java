@@ -6,17 +6,19 @@ import org.blockchain_innovation.factom.client.api.ops.Encoding;
 import org.blockchain_innovation.factom.client.api.ops.EntryOperations;
 
 public enum DIDVersion {
-    FACTOM_V1("factom", "1.0.0");
+    FACTOM_V1_JSON("factom", "1.0.0", "0.2.0");
 
     private static final EntryOperations ENTRY_OPS = new EntryOperations();
 
     private final String method;
     private final String protocolVersion;
+    private final String schemaVersion;
 
 
-    DIDVersion(String method, String protocolVersion) {
+    DIDVersion(String method, String protocolVersion, String schemaVersion) {
         this.method = method;
         this.protocolVersion = protocolVersion;
+        this.schemaVersion = schemaVersion;
     }
 
     public void assertFactomMethod(String didUrl) {
@@ -35,16 +37,6 @@ public enum DIDVersion {
 
     public DID getDid(String didUrl) {
         return getDidUrl(didUrl).getDid();
-    }
-
-
-    public String determineChainId(String nonce, Encoding encoding) {
-        return determineChainId(encoding.decode(nonce));
-    }
-
-
-    public String determineChainId(byte[] nonce) {
-        return Encoding.HEX.encode(ENTRY_OPS.calculateChainId(new CreateDIDOperation(this, nonce).externalIds()));
     }
 
     public String getProtocolVersion() {

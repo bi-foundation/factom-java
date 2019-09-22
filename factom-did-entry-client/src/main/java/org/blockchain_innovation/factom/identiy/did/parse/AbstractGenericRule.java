@@ -17,6 +17,6 @@ public abstract class AbstractGenericRule<T> implements Rule<T> {
     }
 
     protected Set<DIDVersion> getSupportedMethods() {
-        return EnumSet.of(DIDVersion.FACTOM_V1);
+        return EnumSet.of(DIDVersion.FACTOM_V1_JSON);
     }
 }

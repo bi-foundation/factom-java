@@ -36,6 +36,25 @@ public class EncodeOperations {
     }
 
     /**
+     * Decode a Chain. The content and external ids from the first entry will be decoded from HEX to UTF-8.
+     *
+     * @param chain
+     * @return
+     */
+    public Chain decodeHex(Chain chain) {
+        if (chain == null || chain.getFirstEntry() == null) {
+            throw new FactomRuntimeException.AssertionException(String.format("Invalid chain. First entry is required in chain '%s'", chain));
+        }
+
+        Chain decodedChain = new Chain();
+        Entry firstEntry = new Entry();
+        firstEntry.setContent(decodeHex(chain.getFirstEntry().getContent()));
+        firstEntry.setExternalIds(decodeHex(chain.getFirstEntry().getExternalIds()));
+        decodedChain.setFirstEntry(firstEntry);
+        return decodedChain;
+    }
+
+    /**
      * Encode an Entry to HEX. The content and external ids are encoded from UTF-8 to HEX.
      *
      * @param entry
@@ -54,6 +73,24 @@ public class EncodeOperations {
     }
 
     /**
+     * Decode an Entry from HEX. The content and external ids are encoded from HEX to URF-8.
+     *
+     * @param entry
+     * @return
+     */
+    public Entry decodeHex(Entry entry) {
+        if (entry == null || StringUtils.isEmpty(entry.getChainId())) {
+            throw new FactomRuntimeException.AssertionException(String.format("Invalid entry. Chain id is required in entry '%s'", entry));
+        }
+
+        Entry decodedEntry = new Entry();
+        decodedEntry.setChainId(entry.getChainId());
+        decodedEntry.setContent(decodeHex(entry.getContent()));
+        decodedEntry.setExternalIds(decodeHex(entry.getExternalIds()));
+        return decodedEntry;
+    }
+
+    /**
      * Encode each UTF-8 value in a list to HEX.
      *
      * @param utf8Values
@@ -64,6 +101,16 @@ public class EncodeOperations {
     }
 
     /**
+     * Decode each HEX value in a list to UTF-8.
+     *
+     * @param hexValues
+     * @return
+     */
+    public List<String> decodeHex(List<String> hexValues) {
+        return hexValues.stream().map(this::decodeHex).collect(Collectors.toList());
+    }
+
+    /**
      * Encode a UFT-8 value to HEX.
      *
      * @param utf8Value
@@ -71,5 +118,15 @@ public class EncodeOperations {
      */
     public String encodeHex(String utf8Value) {
         return Encoding.HEX.encode(Encoding.UTF_8.decode(utf8Value));
+    }
+
+    /**
+     * Decode a HEX value to UTF-8.
+     *
+     * @param hexValue
+     * @return
+     */
+    public String decodeHex(String hexValue) {
+        return Encoding.UTF_8.encode(Encoding.HEX.decode(hexValue));
     }
 }

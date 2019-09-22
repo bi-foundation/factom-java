@@ -12,4 +12,13 @@ public enum OperationValue {
     public String getOperation() {
         return operation;
     }
+
+    public static OperationValue fromOperation(String operation) {
+        for (OperationValue operationValue : values()) {
+            if (operationValue.getOperation().equalsIgnoreCase(operation)) {
+                return operationValue;
+            }
+        }
+        throw new DIDRuntimeException("No operation value found for :" + operation);
+    }
 }
