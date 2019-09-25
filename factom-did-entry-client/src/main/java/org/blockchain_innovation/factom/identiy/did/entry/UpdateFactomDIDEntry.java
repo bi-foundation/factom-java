@@ -1,13 +1,12 @@
 package org.blockchain_innovation.factom.identiy.did.entry;
 
 import org.blockchain_innovation.factom.client.api.model.Entry;
-import org.blockchain_innovation.factom.client.api.ops.Digests;
 import org.blockchain_innovation.factom.client.api.ops.Encoding;
+import org.blockchain_innovation.factom.identiy.did.DIDVersion;
+import org.blockchain_innovation.factom.identiy.did.OperationValue;
 import org.factom_protocol.identifiers.did.model.UpdateRequest;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 public class UpdateFactomDIDEntry extends FactomDIDEntry<UpdateRequest> {
 

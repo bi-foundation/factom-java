@@ -7,6 +7,7 @@ import org.factom_protocol.identifiers.did.invoker.JSON;
 
 /**
  * A rule that deserializes content from an entry using Gson and does some null/deserialization checks
+ *
  * @param <T>
  */
 public class ContentDeserializationRule<T> extends AbstractEntryRule<T> {

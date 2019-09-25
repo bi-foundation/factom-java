@@ -1,6 +1,6 @@
 package org.blockchain_innovation.factom.identiy.did.parse;
 
-import org.blockchain_innovation.factom.identiy.did.entry.DIDVersion;
+import org.blockchain_innovation.factom.identiy.did.DIDVersion;
 
 import java.util.EnumSet;
 import java.util.Set;

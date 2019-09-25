@@ -2,7 +2,7 @@ package org.blockchain_innovation.factom.identiy.did.parse;
 
 import org.blockchain_innovation.factom.client.api.ops.StringUtils;
 
-import static org.blockchain_innovation.factom.identiy.did.entry.DIDVersion.FACTOM_V1_JSON;
+import static org.blockchain_innovation.factom.identiy.did.DIDVersion.FACTOM_V1_JSON;
 
 /**
  * A rule that checks whether a Factom Method Specific Id (:factom: part in the DID Url) is present

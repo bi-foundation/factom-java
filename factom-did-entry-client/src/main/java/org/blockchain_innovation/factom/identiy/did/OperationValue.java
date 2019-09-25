@@ -1,4 +1,4 @@
-package org.blockchain_innovation.factom.identiy.did.entry;
+package org.blockchain_innovation.factom.identiy.did;
 
 public enum OperationValue {
     DID_MANAGEMENT("DIDManagement"), DID_UPDATE("DIDUpdate"), DID_METHOD_VERSION_UPGRADE("DIDMethodVersionUpgrade"), DID_DEACTIVATION("DIDDeactivation");

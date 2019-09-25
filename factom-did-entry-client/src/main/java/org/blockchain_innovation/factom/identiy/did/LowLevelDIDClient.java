@@ -1,4 +1,4 @@
-package org.blockchain_innovation.factom.identiy.did.entry;
+package org.blockchain_innovation.factom.identiy.did;
 
 import did.DID;
 import did.parser.ParserException;
@@ -9,6 +9,9 @@ import org.blockchain_innovation.factom.client.api.model.Chain;
 import org.blockchain_innovation.factom.client.api.model.response.CommitAndRevealChainResponse;
 import org.blockchain_innovation.factom.client.api.model.response.CommitAndRevealEntryResponse;
 import org.blockchain_innovation.factom.client.api.model.response.factomd.EntryResponse;
+import org.blockchain_innovation.factom.identiy.did.entry.CreateFactomDIDEntry;
+import org.blockchain_innovation.factom.identiy.did.entry.DeactivateFactomDIDEntry;
+import org.blockchain_innovation.factom.identiy.did.entry.UpdateFactomDIDEntry;
 
 import java.util.List;
 
@@ -75,7 +78,7 @@ public class LowLevelDIDClient {
      * Update a FactomDID chain by the provided (valid entry)
      *
      * @param updateEntry
-     * @param ecAddress     The paying EC address
+     * @param ecAddress   The paying EC address
      * @return
      */
     public CommitAndRevealEntryResponse update(UpdateFactomDIDEntry updateEntry, Address ecAddress) {

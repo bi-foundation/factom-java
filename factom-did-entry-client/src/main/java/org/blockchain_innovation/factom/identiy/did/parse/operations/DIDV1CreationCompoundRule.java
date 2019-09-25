@@ -1,7 +1,7 @@
 package org.blockchain_innovation.factom.identiy.did.parse.operations;
 
 import org.blockchain_innovation.factom.client.api.model.Chain;
-import org.blockchain_innovation.factom.identiy.did.entry.OperationValue;
+import org.blockchain_innovation.factom.identiy.did.OperationValue;
 import org.blockchain_innovation.factom.identiy.did.parse.*;
 import org.factom_protocol.identifiers.did.model.FactomDidContent;
 

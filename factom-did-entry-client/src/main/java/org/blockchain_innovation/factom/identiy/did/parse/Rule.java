@@ -1,6 +1,6 @@
 package org.blockchain_innovation.factom.identiy.did.parse;
 
-import org.blockchain_innovation.factom.identiy.did.entry.DIDVersion;
+import org.blockchain_innovation.factom.identiy.did.DIDVersion;
 
 /**
  * Chose a command like design pattern. A visitor pattern is more efficient probably, but also more complex for most people.

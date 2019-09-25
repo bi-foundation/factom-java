@@ -1,4 +1,4 @@
-package org.blockchain_innovation.factom.identiy.did.entry;
+package org.blockchain_innovation.factom.identiy.did;
 
 import did.parser.ParserException;
 import org.blockchain_innovation.factom.client.api.errors.FactomRuntimeException;

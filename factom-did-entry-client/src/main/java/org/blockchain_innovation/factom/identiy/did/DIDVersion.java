@@ -1,8 +1,7 @@
-package org.blockchain_innovation.factom.identiy.did.entry;
+package org.blockchain_innovation.factom.identiy.did;
 
 import did.DID;
 import did.DIDURL;
-import org.blockchain_innovation.factom.client.api.ops.Encoding;
 import org.blockchain_innovation.factom.client.api.ops.EntryOperations;
 
 public enum DIDVersion {
@@ -28,11 +27,11 @@ public enum DIDVersion {
     }
 
     public String getMethodSpecificId(String didUrl) {
-       return getDid(didUrl).getMethodSpecificId();
+        return getDid(didUrl).getMethodSpecificId();
     }
 
     public DIDURL getDidUrl(String didUrl) {
-       return DIDURL.fromString(didUrl);
+        return DIDURL.fromString(didUrl);
     }
 
     public DID getDid(String didUrl) {
