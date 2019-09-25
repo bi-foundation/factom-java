@@ -2,9 +2,8 @@ openapi: 3.0.1
 info:
   title: Factom DIDs
   description: Decentralized Identifiers (DID) on Factom, provides models, APIs, clients and universal resolver integrations for DIDs on top of Factom.
-  termsOfService: 'http://swagger.io/terms/'
   contact:
-    name: Sphereon BV
+    name: Sphereon B.V.
     email: dev@sphereon.com
   license:
     name: Apache 2.0
@@ -14,7 +13,7 @@ tags:
   - name: identifiers
     description: Factom DIDs
     externalDocs:
-      description: Find out more
+      description: See the Factom Specification
       url: 'https://github.com/bi-foundation/FIS/blob/feature/DID/FIS/DID.md'
 paths:
   /identifiers:
@@ -27,9 +26,6 @@ paths:
         description: Create a new Factom DID chain
         content:
           application/json:
-            schema:
-              $ref: '#/components/schemas/FactomDidContent'
-          application/xml:
             schema:
               $ref: '#/components/schemas/FactomDidContent'
         required: true
@@ -60,9 +56,6 @@ paths:
         '200':
           description: successful operation
           content:
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/FactomDidContent'
             application/json:
               schema:
                 $ref: '#/components/schemas/FactomDidContent'
@@ -89,9 +82,6 @@ paths:
       requestBody:
         content:
           application/json:
-            schema:
-              $ref: '#/components/schemas/UpdateRequest'
-          application/xml:
             schema:
               $ref: '#/components/schemas/UpdateRequest'
         required: true
@@ -154,6 +144,12 @@ components:
           minimum: 0
         bip44:
           type: string
+      example:
+        id: "did:factom:e21f9aef1ed841a7d7d634c9dd0dc204c694b51ad7152a44c326113326283eeb#my-key"
+        controller: "did:factom:e21f9aef1ed841a7d7d634c9dd0dc204c694b51ad7152a44c326113326283eeb"
+        publicKeyBase58: "H3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPV"
+        type: "Ed25519VerificationKey"
+        priorityRequirement: 0
     ManagementKey:
       allOf:
         - $ref: '#/components/schemas/Key'
@@ -162,6 +158,9 @@ components:
             priority:
               type: integer
               minimum: 0
+      example:
+        id: "did:factom:e21f9aef1ed841a7d7d634c9dd0dc204c694b51ad7152a44c326113326283eeb#management-key"
+        priority: 0
     DidKey:
       allOf:
         - $ref: '#/components/schemas/Key'
@@ -171,6 +170,10 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/KeyPurpose'
+      example:
+        purpose:
+          - "publicKey"
+          - "authentication"
     Service:
       type: object
       additionalProperties: true
@@ -187,6 +190,12 @@ components:
         priorityRequirement:
           type: integer
           minimum: 0
+      example:
+        id: "did:factom:e21f9aef1ed841a7d7d634c9dd0dc204c694b51ad7152a44c326113326283eeb#example-service"
+        type: "CredentialRepositoryService"
+        serviceEndpoint: "https://repository.example.com/service/8377464"
+        priorityRequirement: 0
+
     KeyType:
       type: string
       enum:
@@ -205,7 +214,9 @@ components:
       properties:
         id:
           type: string
-    RevokeDidKey:
+      example:
+        id: "did:factom:e21f9aef1ed841a7d7d634c9dd0dc204c694b51ad7152a44c326113326283eeb#example-key"
+    IdPurposeLookup:
       allOf:
         - $ref: '#/components/schemas/IdLookup'
         - type: object
@@ -214,27 +225,25 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/KeyPurpose'
+      example:
+        - id: "did:factom:e21f9aef1ed841a7d7d634c9dd0dc204c694b51ad7152a44c326113326283eeb#example-key3"
+          purpose:
+            - "publicKey"
+            - "authentication"
     FactomDidContent:
       allOf:
-        - $ref: '#/components/schemas/KeyedObjects'
         - type: object
           properties:
             didMethodVersion:
-              type: string
-              pattern: '^\d{1,2}\.\d{1,2}\.\d{1,2}$'
-      xml:
-        name: factom
+              $ref: '#/components/schemas/DidMethodVersion'
+        - $ref: '#/components/schemas/KeyedObjects'
     UpdateRequest:
       type: object
       properties:
         revoke:
-          type: array
-          items:
-            $ref: '#/components/schemas/RevocationObjects'
+          $ref: '#/components/schemas/RevocationLookups'
         add:
-          type: array
-          items:
-            $ref: '#/components/schemas/KeyedObjects'
+          $ref: '#/components/schemas/KeyedObjects'
     KeyedObjects:
       type: object
       properties:
@@ -250,7 +259,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Service'
-    RevocationObjects:
+    RevocationLookups:
       type: object
       properties:
         managementKey:
@@ -260,11 +269,29 @@ components:
         didKey:
           type: array
           items:
-            $ref: '#/components/schemas/RevokeDidKey'
+            $ref: '#/components/schemas/IdPurposeLookup'
         service:
           type: array
           items:
             $ref: '#/components/schemas/IdLookup'
+      example:
+        managementKey:
+          - id: "did:factom:e21f9aef1ed841a7d7d634c9dd0dc204c694b51ad7152a44c326113326283eeb#long-example-1"
+          - id: "#shorthand-example-2"
+        didKey:
+          - id: "did:factom:e21f9aef1ed841a7d7d634c9dd0dc204c694b51ad7152a44c326113326283eeb#example-did-1"
+            purpose:
+              - "publicKey"
+          - id: "did:factom:e21f9aef1ed841a7d7d634c9dd0dc204c694b51ad7152a44c326113326283eeb#example-2"
+            purpose:
+              - "authentication"
+              - "publicKey"
+        service:
+          - id: "did:factom:e21f9aef1ed841a7d7d634c9dd0dc204c694b51ad7152a44c326113326283eeb#example-service"
+    DidMethodVersion:
+      type: string
+      enum:
+        - "0.2.0"
   securitySchemes:
     dids_auth:
       type: oauth2
@@ -278,3 +305,4 @@ components:
       type: apiKey
       name: api_key
       in: header
+
