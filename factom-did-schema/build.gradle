@@ -11,17 +11,18 @@ sourceCompatibility = 1.8
 ext {
     v = [
             releaseNotes: "Initial release",
-            groupId: "org.factom-protocol.identity",
+            groupId: "org.factomprotocol.identity",
             artifactBaseModels: "factom-did-models",
             artifactBaseClient: "factom-did-client",
+            artifactBaseServer: "factom-did-server",
             artifactModelsDescription: "Factom DID models",
             artifactClientDescription: "Factom DID client",
             artifactServerDescription: "Factom DID server",
             artifactUrl: "https://github.com/bi-foundation/factom-did-schema",
             version: "0.3.0-SNAPSHOT",
-            apiPackage: "org.factom-protocol.identifiers.did.api",
-            invokerPackage: "org.factom-protocol.identifiers.did.invoker",
-            modelPackage: "org.factom-protocol.identifiers.did.model",
+            apiPackage: "org.factomprotocol.identity.did.api",
+            invokerPackage: "org.factomprotocol.identity.did.invoker",
+            modelPackage: "org.factomprotocol.identity.did.model",
             gitUserId: "bi-foundation",
             gitRepoId: "factom-did-models",
             developerEmail: "dev@sphereon.com",
@@ -44,7 +45,7 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }
 
-task codegen(dependsOn: ['buildJavaModelsGson', 'buildJavaClientOkHttp'])
+task codegen(dependsOn: ['buildJavaModelsGson', 'buildJavaClientOkHttp', 'buildJavaSpringServer'])
 
 task buildJavaModelsGson(type: org.openapitools.generator.gradle.plugin.tasks.GenerateTask){
     generatorName = "java"
@@ -120,3 +121,51 @@ task buildJavaClientOkHttp(type: org.openapitools.generator.gradle.plugin.tasks.
             supportingFiles: ""
     ]
 }
+
+
+task buildJavaSpringServer(type: org.openapitools.generator.gradle.plugin.tasks.GenerateTask){
+    generatorName = "spring"
+    groupId = "$v.groupId".toString()
+    id = "${v.artifactBaseServer}-java-spring-api".toString()
+    version = "$v.version".toString()
+    releaseNote = "$v.releaseNotes".toString()
+    inputSpec = "$projectDir/src/main/resources/openapi.yaml".toString()
+    outputDir = "$buildDir/$v.artifactBaseServer/java-spring-api".toString()
+    apiPackage = "$v.apiPackage".toString()
+    invokerPackage = "$v.invokerPackage".toString()
+    modelPackage = "$v.modelPackage".toString()
+    gitUserId = "$v.gitUserId".toString()
+    gitRepoId = "$v.gitRepoId".toString()
+    generateApiTests = true
+    generateModelTests = true
+    configOptions = [
+            artifactId: "${v.artifactBaseServer}-java-spring-api".toString(),
+            artifactDescription:  "$v.artifactServerDescription".toString(),
+            artifactUrl:  "$v.artifactUrl".toString(),
+            scmConnection: "$v.scmConnection".toString(),
+            scmDeveloperConnection: "$v.scmDeveloperConnection".toString(),
+            scmUrl: "$v.scmUrl".toString(),
+            booleanGetterPrefix: "is",
+            developerEmail: "$v.developerEmail".toString(),
+            developerName: "$v.developerName".toString(),
+            developerOrganization: "$v.developerOrganization".toString(),
+            developerOrganizationUrl: "$v.developerOrganizationUrl".toString(),
+            licenseName: "$v.licenseName".toString(),
+            java8: true,
+            dateLibrary: "java8",
+            interfaceOnly: true,
+            delegatePattern: true,
+            useTags: true,
+            useOptional: true,
+            useBeanValidation: true,
+            skipDefaultInterface: true,
+            openapiDocketConfig: true,
+
+    ]
+    systemProperties = [
+            apis: "",
+            models: "false",
+            supportingFiles: ""
+    ]
+}
+

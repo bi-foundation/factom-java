@@ -9,17 +9,24 @@ info:
     name: Apache 2.0
     url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
   version: 0.3.0
+servers:
+  - url: http://localhost:8080
 tags:
-  - name: identifiers
-    description: Factom DIDs
+  - name: FactomDID
+    description: Factom DID API endpoints to create, update and deactivate Factom DIDs
     externalDocs:
-      description: See the Factom Specification
+      description: Factom DID specification
       url: 'https://github.com/bi-foundation/FIS/blob/feature/DID/FIS/DID.md'
+  - name: UniversalResolver
+    description: Universal resolver compatible endpoints
+    externalDocs:
+      description: Universal resolver github
+      url: 'https://github.com/decentralized-identity/universal-resolver/'
 paths:
-  /identifiers:
+  /factom/identity/dids:
     post:
       tags:
-        - identifiers
+        - FactomDID
       summary: Create a new DID
       operationId: createFactomDid
       requestBody:
@@ -34,17 +41,20 @@ paths:
           description: Validation exception
           content: {}
       security:
-        - dids_auth:
-            - 'write:dids'
-            - 'read:dids'
+        - {}
+        - ApiKeyAuth: []
+        - BearerAuth: []
+        - OAuth2:
+            - read
+            - write
       x-codegen-request-body-name: body
-  '/identifiers/{did}':
+  '/factom/identity/dids/{did}':
     get:
       tags:
-        - identifiers
+        - FactomDID
       summary: Find DID
       description: Returns the Factom DID content
-      operationId: getFactomDidContent
+      operationId: getFactomDid
       parameters:
         - name: did
           in: path
@@ -60,16 +70,21 @@ paths:
               schema:
                 $ref: '#/components/schemas/FactomDidContent'
         '400':
-          description: Invalid DID supplied
+          description: Invalid DID suplied
           content: {}
         '404':
           description: DID not found
           content: {}
       security:
-        - api_key: []
+        - {}
+        - ApiKeyAuth: []
+        - BearerAuth: []
+        - OAuth2:
+            - read
+            - write
     post:
       tags:
-        - identifiers
+        - FactomDID
       summary: Updates a DID
       operationId: updateFactomDid
       parameters:
@@ -90,12 +105,14 @@ paths:
           description: Invalid input
           content: {}
       security:
-        - dids_auth:
-            - 'write:dids'
-            - 'read:dids'
+        - {}
+        - ApiKeyAuth: []
+        - BearerAuth: []
+        - OAuth2:
+            - write
     delete:
       tags:
-        - identifiers
+        - FactomDID
       summary: Deactivate a DID
       operationId: deactivateFactomDid
       parameters:
@@ -117,9 +134,50 @@ paths:
           description: DID not found
           content: {}
       security:
-        - dids_auth:
-            - 'write:dids'
-            - 'read:dids'
+        - {}
+        - ApiKeyAuth: []
+        - BearerAuth: []
+        - OAuth2:
+            - write
+
+  /identifiers/{identifier}:
+    get:
+      summary: Resolve a DID or other identifier (universal resolver).
+      operationId: resolve
+      tags:
+        - UniversalResolver
+      parameters:
+        - in: path
+          required: true
+          name: identifier
+          schema:
+            type: string
+          description: A DID or other identifier to be resolved.
+        - in: header
+          required: false
+          name: Accept
+          schema:
+            type: string
+          example: application/did+ld+json
+      responses:
+        '200':
+          description: successfully resolved!
+          content:
+            application/json:
+              schema:
+                type: object
+                description: The Resolution Result or DID document.
+        '400':
+          description: invalid input!
+        '500':
+          description: error!
+      security:
+        - {}
+        - ApiKeyAuth: []
+        - BearerAuth: []
+        - OAuth2:
+            - read
+            - write
 components:
   schemas:
     Key:
@@ -241,7 +299,7 @@ components:
       type: object
       properties:
         revoke:
-          $ref: '#/components/schemas/RevocationLookups'
+          $ref: '#/components/schemas/RevokeLookups'
         add:
           $ref: '#/components/schemas/KeyedObjects'
     KeyedObjects:
@@ -259,7 +317,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Service'
-    RevocationLookups:
+    RevokeLookups:
       type: object
       properties:
         managementKey:
@@ -293,16 +351,19 @@ components:
       enum:
         - "0.2.0"
   securitySchemes:
-    dids_auth:
+    BearerAuth:
+      type: http
+      scheme: bearer
+    OAuth2:
       type: oauth2
       flows:
         implicit:
           authorizationUrl: 'http://example/oauth/dialog'
           scopes:
-            'write:dids': modify dids
-            'read:dids': read dids
-    api_key:
+            write: modify dids
+            read: read dids
+    ApiKeyAuth:
       type: apiKey
-      name: api_key
+      name: X-API-Key
       in: header
 
