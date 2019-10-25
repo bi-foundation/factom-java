@@ -3,7 +3,7 @@ package org.blockchain_innovation.factom.identiy.did.parse;
 import com.google.gson.JsonSyntaxException;
 import org.blockchain_innovation.factom.client.api.model.Entry;
 import org.blockchain_innovation.factom.client.api.ops.StringUtils;
-import org.factom_protocol.identifiers.did.invoker.JSON;
+import org.factomprotocol.identity.did.invoker.JSON;
 
 /**
  * A rule that deserializes content from an entry using Gson and does some null/deserialization checks

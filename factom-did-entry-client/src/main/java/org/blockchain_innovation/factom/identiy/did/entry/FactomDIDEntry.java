@@ -7,7 +7,8 @@ import org.blockchain_innovation.factom.client.api.ops.EntryOperations;
 import org.blockchain_innovation.factom.identiy.did.DIDRuntimeException;
 import org.blockchain_innovation.factom.identiy.did.DIDVersion;
 import org.blockchain_innovation.factom.identiy.did.OperationValue;
-import org.factom_protocol.identifiers.did.invoker.JSON;
+import org.factomprotocol.identity.did.invoker.JSON;
+
 
 import java.util.ArrayList;
 import java.util.Arrays;

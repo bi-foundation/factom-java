@@ -5,6 +5,7 @@ version '0.3.0-SNAPSHOT'
 sourceCompatibility = 1.8
 
 repositories {
+    mavenLocal()
     google()
     jcenter()
     mavenCentral()
@@ -16,7 +17,7 @@ dependencies {
     /*compile group: 'org.blockchain-innovation.factom.client', name: 'factom-client-impl', version: '0.2.2-SNAPSHOT'*/
     compile project(':factom-client-impl')
     compile group: 'decentralized-identity', name: 'did-common-java', version: '0.1-SNAPSHOT'
-    compile group: 'org.factom-protocol.identity', name: 'factom-did-models-java-gson', version: '0.3.0-SNAPSHOT'
+    compile group: 'org.factomprotocol.identity', name: 'factom-did-models-java-gson', version: '0.3.0-SNAPSHOT'
     testCompile project(':factom-client-offline-signing')
     testCompile project(':service-providers:logger-slf4j')
     testCompile project(':service-providers:json-converter-jee')

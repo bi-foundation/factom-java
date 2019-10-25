@@ -4,7 +4,7 @@ import org.blockchain_innovation.factom.client.api.model.Entry;
 import org.blockchain_innovation.factom.client.api.ops.Encoding;
 import org.blockchain_innovation.factom.identiy.did.DIDVersion;
 import org.blockchain_innovation.factom.identiy.did.OperationValue;
-import org.factom_protocol.identifiers.did.model.UpdateRequest;
+import org.factomprotocol.identity.did.model.UpdateRequest;
 
 import java.util.Arrays;
 
