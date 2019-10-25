@@ -3,7 +3,7 @@ plugins {
     id "org.openapi.generator" version "4.0.3"
 }
 
-group 'org.factom-protocol.identity'
+group 'org.factomprotocol.identity'
 version '0.3.0-SNAPSHOT'
 
 sourceCompatibility = 1.8
@@ -18,7 +18,7 @@ ext {
             artifactModelsDescription: "Factom DID models",
             artifactClientDescription: "Factom DID client",
             artifactServerDescription: "Factom DID server",
-            artifactUrl: "https://github.com/bi-foundation/factom-did-schema",
+            artifactUrl: "https://github.com/bi-foundation/factom-identity-schemas",
             version: "0.3.0-SNAPSHOT",
             apiPackage: "org.factomprotocol.identity.did.api",
             invokerPackage: "org.factomprotocol.identity.did.invoker",
@@ -30,9 +30,9 @@ ext {
             developerOrganization: "Sphereon BV",
             developerOrganizationUrl: "https://sphereon.com",
             licenseName: "Apache2",
-            scmConnection: "https://github.com/bi-foundation/factom-did-schema.git",
-            scmDeveloperConnection: "https://github.com/bi-foundation/factom-did-schema.git",
-            scmUrl: "https://github.com/bi-foundation/factom-did-schema"
+            scmConnection: "https://github.com/bi-foundation/factom-identity-schemas.git",
+            scmDeveloperConnection: "https://github.com/bi-foundation/factom-identity-schemas.git",
+            scmUrl: "https://github.com/bi-foundation/factom-identity-schemas"
 
     ]
 }
