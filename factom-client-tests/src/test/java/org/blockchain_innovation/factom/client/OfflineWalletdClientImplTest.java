@@ -338,10 +338,12 @@ public class OfflineWalletdClientImplTest extends AbstractClientTest {
         ComposeResponse composeResponse = response.getResult();
         Assert.assertNotNull(composeResponse.getCommit());
         Assert.assertNotNull(composeResponse.getCommit().getId());
+        Assert.assertEquals("commit-entry", composeResponse.getCommit().getMethod());
         Assert.assertNotNull(composeResponse.getCommit().getParams());
         Assert.assertNotNull(composeResponse.getCommit().getParams().getMessage());
         Assert.assertNotNull(composeResponse.getReveal());
         Assert.assertNotNull(composeResponse.getReveal().getId());
+        Assert.assertEquals("reveal-entry", composeResponse.getReveal().getMethod());
         Assert.assertNotNull(composeResponse.getReveal().getParams());
         Assert.assertNotNull(composeResponse.getReveal().getParams().getEntry());
     }
