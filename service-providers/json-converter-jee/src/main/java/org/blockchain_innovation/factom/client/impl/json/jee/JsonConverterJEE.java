@@ -28,7 +28,9 @@ import javax.json.JsonValue;
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
 import javax.json.bind.JsonbConfig;
+import javax.json.bind.adapter.JsonbAdapter;
 import javax.json.bind.config.PropertyNamingStrategy;
+import javax.json.bind.config.PropertyOrderStrategy;
 import javax.json.bind.config.PropertyVisibilityStrategy;
 import javax.json.bind.serializer.DeserializationContext;
 import javax.json.bind.serializer.JsonbDeserializer;
@@ -38,8 +40,7 @@ import javax.json.stream.JsonGenerator;
 import javax.json.stream.JsonParser;
 import java.lang.reflect.*;
 import java.nio.CharBuffer;
-import java.util.Objects;
-import java.util.Properties;
+import java.util.*;
 
 import static javax.json.bind.config.PropertyOrderStrategy.LEXICOGRAPHICAL;
 
@@ -50,10 +51,18 @@ public class JsonConverterJEE implements JsonConverter {
     public static final String NAME = "JEE";
     protected static final String RPC_METHOD = "method";
     private Jsonb jsonb;
+    private Jsonb genericJsonb;
+    private Map<Type, JsonbAdapter> adapters = new HashMap<>();
+
+    @Override
+    public void addAdapter(Type type, Object adapter) {
+        JsonbAdapter jsonbAdapter = (JsonbAdapter) adapter;
+        adapters.put(type, jsonbAdapter);
+    }
 
     @Override
     public JsonConverterJEE configure(Properties properties) {
-        final JsonbConfig jsonbConfig = config();
+        final JsonbConfig jsonbConfig = rpcConfig();
         // Init new properties so we get default values
         Properties props = new Properties(properties);
 
@@ -63,7 +72,7 @@ public class JsonConverterJEE implements JsonConverter {
         return this;
     }
 
-    private JsonbConfig config() {
+    private JsonbConfig rpcConfig() {
         JsonbConfig config = new JsonbConfig().
                 withFormatting(true).
                 withPropertyOrderStrategy(LEXICOGRAPHICAL).
@@ -75,11 +84,29 @@ public class JsonConverterJEE implements JsonConverter {
     }
 
 
+    private JsonbConfig genericConfig() {
+
+        JsonbConfig config = new JsonbConfig().
+                withFormatting(false).
+                withAdapters(adapters.values().toArray(new JsonbAdapter[]{})).
+                withPropertyOrderStrategy(PropertyOrderStrategy.ANY).
+                withNullValues(false)/*.withPropertyNamingStrategy(PropertyNamingStrategy.CASE_INSENSITIVE)*/;
+        return config;
+    }
+
+
     private Jsonb jsonb() {
         if (jsonb == null) {
             configure(null);
         }
         return jsonb;
+    }
+
+    private Jsonb genericJsonb() {
+        if (genericJsonb == null) {
+            this.genericJsonb = JsonbBuilder.create(genericConfig());
+        }
+        return genericJsonb;
     }
 
     @Override
@@ -89,19 +116,29 @@ public class JsonConverterJEE implements JsonConverter {
 
 
     @Override
-    public <T> RpcResponse<T> fromJson(String json, Class<T> resultClass) {
+    public <T> RpcResponse<T> responseFromJson(String json, Class<T> resultClass) {
         ParameterizedType parameterizedType = new ResolvedParameterizedType(RpcResponse.class, new Type[]{resultClass});
         return jsonb().fromJson(json, parameterizedType);
     }
 
     @Override
-    public String prettyPrint(String json) {
-        return toJson(json);
+    public <T> T fromJson(String json, Class<T> resultClass) {
+        return genericJsonb().fromJson(json, resultClass);
     }
 
     @Override
-    public String toJson(Object input) {
+    public String prettyPrint(String json) {
+        return toRpcJson(json);
+    }
+
+    @Override
+    public String toRpcJson(Object input) {
         return jsonb().toJson(input);
+    }
+
+    @Override
+    public String toGenericJson(Object object, Type runtimeType) {
+        return genericJsonb().toJson(object, runtimeType);
     }
 
     @Override
@@ -115,7 +152,7 @@ public class JsonConverterJEE implements JsonConverter {
      * Examples are: TmpTransaction#Transaction tx-name and WalletBackupResponse wallet-seed
      *
      * @return custom PropertyNamingStrategy
-     * @see org.blockchain_innovation.factom.client.api.model.response.walletd.AddressResponse#_public public member of AddressResponse
+     * @see org.blockchain_innovation.factom.client.api.model.response.walletd.AddressResponse
      */
     private PropertyNamingStrategy propertyNamingStrategy() {
         return propertyName -> {
