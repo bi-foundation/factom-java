@@ -17,12 +17,320 @@ tags:
     externalDocs:
       description: Factom DID specification
       url: 'https://github.com/bi-foundation/FIS/blob/feature/DID/FIS/DID.md'
+  - name: FactomIdentity
+    description: Factom Identity API endpoints to create, update and Factom Identities
   - name: UniversalResolver
     description: Universal resolver compatible endpoints
     externalDocs:
       description: Universal resolver github
       url: 'https://github.com/decentralized-identity/universal-resolver/'
 paths:
+  /factom/identity/chains:
+    post:
+      tags:
+        - FactomIdentity
+      summary: Create a new Factom Identity chain
+      operationId: createFactomIdentity
+      requestBody:
+        description: Create a new Factom Identity chain
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IdentityEntry'
+        required: true
+      responses:
+        201:
+          description: Identity chain creation received
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdentityResponse'
+        '422':
+          description: Validation error
+          content: {}
+      security:
+        - {}
+        - ApiKeyAuth: []
+        - BearerAuth: []
+        - OAuth2:
+            - read
+            - write
+      x-codegen-request-body-name: body
+  /factom/identity/chains/{chainId}:
+    post:
+      tags:
+        - FactomIdentity
+      summary: Update a Factom Identity (replace keys)
+      operationId: updateFactomIdentity
+      parameters:
+        - name: chainId
+          in: path
+          description: target chain Id
+          required: true
+          schema:
+            type: string
+      responses:
+        201:
+          description: Identity updates received
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReplaceKeyRequest'
+        '404':
+          description: Identity chain not found
+          content: {}
+        '422':
+          description: Validation error
+          content: {}
+      security:
+        - {}
+        - ApiKeyAuth: []
+        - BearerAuth: []
+        - OAuth2:
+            - read
+            - write
+      x-codegen-request-body-name: body
+    get:
+      tags:
+        - FactomIdentity
+      summary: Get a Factom Identity
+      operationId: getFactomIdentity
+      parameters:
+        - name: chainId
+          in: path
+          description: Identity chain Id
+          required: true
+          schema:
+            type: string
+        - name: height
+          in: query
+          description: Give the identity as active at the specified block height
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+        - name: time
+          in: query
+          description: Give the identity as it was active at a specific time
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: include
+          in: query
+          description: Include certain values in the response
+          required: false
+          style: form
+          explode: false
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - heights
+                - times
+      responses:
+        200:
+          description: Resolved identity with optional metadata
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdentityResponse'
+        '404':
+          description: Identity chain not found
+          content: {}
+        '422':
+          description: Validation error
+          content: {}
+      security:
+        - {}
+        - ApiKeyAuth: []
+        - BearerAuth: []
+        - OAuth2:
+            - read
+            - write
+      x-codegen-request-body-name: body
+  /factom/identity/chains/{chainId}/entries:
+    get:
+      tags:
+        - FactomIdentity
+      summary: Get Factom Identity entries
+      operationId: getFactomIdentityEntries
+      parameters:
+        - name: chainId
+          in: path
+          description: Identity chain Id
+          required: true
+          schema:
+            type: string
+        - name: metadata
+          in: query
+          description: Include certain values in the response
+          required: false
+          style: form
+          explode: false
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - heights
+                - times
+      responses:
+        200:
+          description: Valid identity entries
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdentityEntries'
+        '404':
+          description: Identity chain not found
+          content: {}
+        '422':
+          description: Validation error
+          content: {}
+      security:
+        - {}
+        - ApiKeyAuth: []
+        - BearerAuth: []
+        - OAuth2:
+            - read
+            - write
+      x-codegen-request-body-name: body
+  /factom/identity/chains/{chainId}/attributes:
+    post:
+      tags:
+        - FactomIdentity
+      summary: Add a Factom Identity attribute
+      operationId: createFactomIdentityAttribute
+      parameters:
+        - name: chainId
+          in: path
+          description: target chain Id
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Identity chain attributes received
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateIdentityRequest'
+        '404':
+          description: Identity chain not found
+          content: {}
+        '422':
+          description: Validation error
+          content: {}
+      security:
+        - {}
+        - ApiKeyAuth: []
+        - BearerAuth: []
+        - OAuth2:
+            - read
+            - write
+      x-codegen-request-body-name: body
+    get:
+      tags:
+        - FactomIdentity
+      summary: Get Factom Identity attribute
+      operationId: getFactomIdentityAttributes
+      parameters:
+        - name: chainId
+          in: path
+          description: target chain Id
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Identity chain attributes received
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateIdentityRequest'
+        '404':
+          description: Identity chain not found
+          content: {}
+        '422':
+          description: Validation error
+          content: {}
+      security:
+        - {}
+        - ApiKeyAuth: []
+        - BearerAuth: []
+        - OAuth2:
+            - read
+            - write
+      x-codegen-request-body-name: body
+  /factom/identity/chains/{chainId}/endorsments:
+    post:
+      tags:
+        - FactomIdentity
+      summary: Add a Factom Identity endorsment
+      operationId: createFactomIdentityEndorsment
+      parameters:
+        - name: chainId
+          in: path
+          description: target chain Id
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Identity chain endorsment received
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateIdentityRequest'
+        '404':
+          description: Identity chain not found
+          content: {}
+        '422':
+          description: Validation error
+          content: {}
+      security:
+        - {}
+        - ApiKeyAuth: []
+        - BearerAuth: []
+        - OAuth2:
+            - read
+            - write
+      x-codegen-request-body-name: body
+    get:
+      tags:
+        - FactomIdentity
+      summary: Get Factom Identity endorsments
+      operationId: getFactomIdentityEndorsments
+      parameters:
+        - name: chainId
+          in: path
+          description: target chain Id
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Identity chain attributes received
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateIdentityRequest'
+        '404':
+          description: Identity chain not found
+          content: {}
+        '422':
+          description: Validation error
+          content: {}
+      security:
+        - {}
+        - ApiKeyAuth: []
+        - BearerAuth: []
+        - OAuth2:
+            - read
+            - write
+      x-codegen-request-body-name: body
   /factom/identity/dids:
     post:
       tags:
@@ -180,6 +488,161 @@ paths:
             - write
 components:
   schemas:
+    CreateIdentityRequest:
+      type: object
+      required:
+        - tags
+        - version
+        - keys
+      properties:
+        tags:
+          type: array
+          items:
+            type: string
+            minItems: 1
+        version:
+          type: integer
+          minimum: 1
+          maximum: 1
+        keys:
+          type: array
+          items:
+            $ref: '#/components/schemas/FactomKey'
+      example:
+        tags:
+          - "example"
+          - "id"
+        version: 1
+        keys:
+          - publicValue: "idpubTqmzmR1..."
+            type: "idpub"
+          - publicValue: "H3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPV"
+            type: "Ed25519VerificationKey"
+          - publicValue: "idpubYxURG77..."
+            type: "idpub"
+    IdentityResponse:
+      type: object
+      required:
+        - identity
+      properties:
+        identity:
+          $ref: '#/components/schemas/IdentityEntry'
+          readOnly: true
+        metadata:
+          $ref: '#/components/schemas/Metadata'
+          readOnly: true
+    IdentityEntry:
+      type: object
+      required:
+        - version
+        - keys
+      properties:
+        version:
+          type: integer
+          minimum: 1
+          maximum: 1
+        keys:
+          type: array
+          items:
+            type: string
+      example:
+        version: 1
+        keys:
+          - "idpubTqmzmR1..."
+          - "idpubYxURG77..."
+    Metadata:
+      type: object
+      properties:
+        creation:
+          $ref: '#/components/schemas/BlockInfo'
+          readOnly: true
+        update:
+          $ref: '#/components/schemas/BlockInfo'
+          readOnly: true
+    BlockInfo:
+      type: object
+      properties:
+        blockHeight:
+          type: integer
+          format: int64
+        entryTimestamp:
+          type: integer
+          format: int64
+        blockTimestamp:
+          type: integer
+          format: int64
+        entryHash:
+          type: string
+    IdentityEntries:
+      type: object
+      properties:
+        creation:
+          $ref: '#/components/schemas/IdentityEntry'
+        replacements:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReplaceKeyEntry'
+        metadata:
+          $ref: '#/components/schemas/Metadata'
+          readOnly: true
+    ReplaceKeyRequest:
+      type: object
+      required:
+        - oldKey
+        - newKey
+        - signature
+        - signerKey
+      properties:
+        oldKey:
+          $ref: '#/components/schemas/FactomKey'
+        newKey:
+          $ref: '#/components/schemas/FactomKey'
+        signature:
+          type: string
+          format: byte
+        signerKey:
+          $ref: '#/components/schemas/FactomKey'
+      example:
+        oldKey:
+          publicValue: "idpubTqmzmR1..."
+          type: "idpub"
+        newKey:
+          publicValue: "H3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPV"
+          type: "Ed25519VerificationKey"
+        signature: "b7a3c12dc0c8c748ab07525b701122b88bd78f600c76342d27f25e5f92444cde"
+        signerKey:
+          publicValue: idpubYxURG77...
+          type: idpub
+    ReplaceKeyEntry:
+      type: object
+      required:
+        - oldKey
+        - newKey
+        - signature
+        - signerKey
+      properties:
+        oldKey:
+          type: string
+        newKey:
+          type: string
+        signature:
+          type: string
+          format: byte
+        signerKey:
+          type: string
+      example:
+        oldKey: "idpubTqmzmR1..."
+        newKey: "idpubA4qmR50..."
+        signature: "b7a3c12dc0c8c748ab07525b701122b88bd78f600c76342d27f25e5f92444cde"
+        signerKey: idpubYxURG77...
+
+    FactomKey:
+      type: object
+      properties:
+        publicValue:
+          type: string
+        type:
+          $ref: '#/components/schemas/KeyType'
     Key:
       type: object
       required:
@@ -260,6 +723,7 @@ components:
         - Ed25519VerificationKey
         - ECDSASecp256k1VerificationKey
         - RSAVerificationKey
+        - idpub
     KeyPurpose:
       type: string
       enum:
@@ -350,6 +814,16 @@ components:
       type: string
       enum:
         - "0.2.0"
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+      required:
+        - code
+        - message
   securitySchemes:
     BearerAuth:
       type: http
