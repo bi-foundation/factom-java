@@ -2,6 +2,7 @@ package org.blockchain_innovation.factom.client.impl;
 
 import org.blockchain_innovation.factom.client.api.*;
 import org.blockchain_innovation.factom.client.api.errors.FactomException;
+import org.blockchain_innovation.factom.client.api.errors.FactomRuntimeException;
 import org.blockchain_innovation.factom.client.api.listeners.CommitAndRevealListener;
 import org.blockchain_innovation.factom.client.api.log.LogFactory;
 import org.blockchain_innovation.factom.client.api.log.Logger;
@@ -146,9 +147,21 @@ public class EntryApiImpl extends AbstractClient implements EntryApi {
         return entryBlocksEntriesUpTilKeyMR(factomdClient.chainHead(chainId).join().getResult().getChainHead());
     }
 
+
     @Override
     public CompletableFuture<List<EntryResponse>> allEntries(String chainId) {
-        return entriesUpTilKeyMR(factomdClient.chainHead(chainId).join().getResult().getChainHead());
+        return allEntries(chainId, Encoding.HEX);
+    }
+
+    @Override
+    public CompletableFuture<List<EntryResponse>> allEntries(String chainId, Encoding encoding) {
+        if (encoding != Encoding.HEX && encoding != Encoding.UTF_8) {
+            throw new FactomRuntimeException("Encoding needs to be UTF-8 or HEX. Value: " + encoding.name());
+        }
+        return entriesUpTilKeyMR(factomdClient.chainHead(chainId).join().getResult().getChainHead()).
+                thenApplyAsync(entryResponses -> entryResponses.stream().map(entryResponse ->
+                        encoding == Encoding.UTF_8 ? encodeOperations.decodeHex(entryResponse) : entryResponse).collect(Collectors.toList())
+                );
     }
 
     @Override
@@ -284,12 +297,19 @@ public class EntryApiImpl extends AbstractClient implements EntryApi {
     }
 
     private <T> FactomResponse<T> handleResponse(CommitAndRevealListener listener, Consumer<T> listenerCall, FactomResponse<T> response) {
+        assertResponse(response);
         if (response.hasErrors()) {
             listener.onError(response.getRpcErrorResponse());
         } else {
             listenerCall.accept(response.getResult());
         }
         return response;
+    }
+
+    private void assertResponse(FactomResponse<?> response) {
+        if (response == null) {
+            throw new FactomRuntimeException.AssertionException("Response was null, which was not expected");
+        }
     }
 
     private FactomResponse<ComposeResponse> notifyCompose(FactomResponse<ComposeResponse> response) {
@@ -303,21 +323,25 @@ public class EntryApiImpl extends AbstractClient implements EntryApi {
     }
 
     private FactomResponse<CommitChainResponse> notifyChainCommit(FactomResponse<CommitChainResponse> response) {
+        assertResponse(response);
         listeners.forEach(listener -> handleResponse(listener, listener::onCommit, response));
         return response;
     }
 
     private FactomResponse<RevealResponse> notifyReveal(FactomResponse<RevealResponse> response) {
+        assertResponse(response);
         listeners.forEach(listener -> handleResponse(listener, listener::onReveal, response));
         return response;
     }
 
     private FactomResponse<EntryTransactionResponse> notifyEntryTransaction(FactomResponse<EntryTransactionResponse> response) {
+        assertResponse(response);
         listeners.forEach(listener -> handleResponse(listener, listener::onTransactionAcknowledged, response));
         return response;
     }
 
     private FactomResponse<EntryTransactionResponse> notifyCommitConfirmed(FactomResponse<EntryTransactionResponse> response) {
+        assertResponse(response);
         listeners.forEach(listener -> handleResponse(listener, listener::onCommitConfirmed, response));
         return response;
     }
@@ -342,6 +366,9 @@ public class EntryApiImpl extends AbstractClient implements EntryApi {
     }
 
     private CompletionStage<FactomResponse<EntryTransactionResponse>> transactionAcknowledgeConfirmation(FactomResponse<RevealResponse> revealChainResponse) {
+        if (revealChainResponse == null || revealChainResponse.getResult() == null) {
+            throw new FactomRuntimeException.AssertionException("Reveal chain response was null in transaction acknowledge confirmation. " + (revealChainResponse == null ? "<no RPC response>" : revealChainResponse.getHTTPResponseMessage()));
+        }
         String entryHash = revealChainResponse.getResult().getEntryHash();
         String chainId = revealChainResponse.getResult().getChainId();
         List<EntryTransactionResponse.Status> desiredStatus = Arrays.asList(EntryTransactionResponse.Status.TransactionACK, EntryTransactionResponse.Status.DBlockConfirmed);

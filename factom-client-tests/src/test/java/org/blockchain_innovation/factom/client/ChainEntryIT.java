@@ -16,8 +16,8 @@
 
 package org.blockchain_innovation.factom.client;
 
-import org.blockchain_innovation.factom.client.api.errors.FactomException;
 import org.blockchain_innovation.factom.client.api.FactomResponse;
+import org.blockchain_innovation.factom.client.api.errors.FactomException;
 import org.blockchain_innovation.factom.client.api.model.Address;
 import org.blockchain_innovation.factom.client.api.model.Chain;
 import org.blockchain_innovation.factom.client.api.model.Entry;
@@ -28,7 +28,6 @@ import org.blockchain_innovation.factom.client.api.model.response.factomd.Reveal
 import org.blockchain_innovation.factom.client.api.model.response.walletd.ComposeResponse;
 import org.junit.Assert;
 import org.junit.FixMethodOrder;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
@@ -95,7 +94,7 @@ public class ChainEntryIT extends AbstractClientTest {
     public void _03_verifyCommitChain() throws FactomException.ClientException, InterruptedException {
         boolean confirmed = waitOnConfirmation(EntryTransactionResponse.Status.TransactionACK, 15);
         Assert.assertTrue(confirmed);
-//        Thread.sleep(1000);
+        Thread.sleep(1000);
     }
 
     @Test
