@@ -3,6 +3,7 @@ package org.blockchain_innovation.factom.client.api.ops;
 import org.blockchain_innovation.factom.client.api.errors.FactomRuntimeException;
 import org.blockchain_innovation.factom.client.api.model.Chain;
 import org.blockchain_innovation.factom.client.api.model.Entry;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.EntryResponse;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -91,6 +92,35 @@ public class EncodeOperations {
     }
 
     /**
+     * Encode an EntryResponse to HEX. The content and external ids are encoded from UTF-8 to HEX.
+     *
+     * @param entryResponse
+     * @return
+     */
+    public EntryResponse encodeHex(EntryResponse entryResponse) {
+        if (entryResponse == null || StringUtils.isEmpty(entryResponse.getChainId())) {
+            throw new FactomRuntimeException.AssertionException(String.format("Invalid entry response. Chain id is required in entry response '%s'", entryResponse));
+        }
+
+        EntryResponse encoded = new EntryResponse(entryResponse.getChainId(), encodeHex(entryResponse.getExtIds()), encodeHex(entryResponse.getContent()));
+        return encoded;
+    }
+
+    /**
+     * Decode an EntryResponse from HEX. The content and external ids are encoded from HEX to URF-8.
+     *
+     * @param entryResponse
+     * @return
+     */
+    public EntryResponse decodeHex(EntryResponse entryResponse) {
+        if (entryResponse == null || StringUtils.isEmpty(entryResponse.getChainId())) {
+            throw new FactomRuntimeException.AssertionException(String.format("Invalid entry response. Chain id is required in entry '%s'", entryResponse));
+        }
+        EntryResponse decoded = new EntryResponse(entryResponse.getChainId(), decodeHex(entryResponse.getExtIds()), entryResponse.getContent() == null ? null : decodeHex(entryResponse.getContent()));
+        return decoded;
+    }
+
+    /**
      * Encode each UTF-8 value in a list to HEX.
      *
      * @param utf8Values
@@ -117,7 +147,7 @@ public class EncodeOperations {
      * @return
      */
     public String encodeHex(String utf8Value) {
-        return Encoding.HEX.encode(Encoding.UTF_8.decode(utf8Value));
+        return StringUtils.isEmpty(utf8Value) ? utf8Value : Encoding.HEX.encode(Encoding.UTF_8.decode(utf8Value));
     }
 
     /**
@@ -127,6 +157,6 @@ public class EncodeOperations {
      * @return
      */
     public String decodeHex(String hexValue) {
-        return Encoding.UTF_8.encode(Encoding.HEX.decode(hexValue));
+        return StringUtils.isEmpty(hexValue) ? hexValue : Encoding.UTF_8.encode(Encoding.HEX.decode(hexValue));
     }
 }

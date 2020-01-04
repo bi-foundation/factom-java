@@ -10,17 +10,18 @@ import org.blockchain_innovation.factom.client.api.model.response.CommitAndRevea
 import org.blockchain_innovation.factom.client.api.model.response.CommitAndRevealEntryResponse;
 import org.blockchain_innovation.factom.client.api.model.response.factomd.EntryBlockResponse;
 import org.blockchain_innovation.factom.client.api.model.response.factomd.EntryResponse;
+import org.blockchain_innovation.factom.client.api.ops.Encoding;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public interface EntryApi {
 
-     EntryApi addListener(CommitAndRevealListener listener);
+    EntryApi addListener(CommitAndRevealListener listener);
 
-     EntryApi removeListener(CommitAndRevealListener listener);
+    EntryApi removeListener(CommitAndRevealListener listener);
 
-     EntryApi clearListeners();
+    EntryApi clearListeners();
 
     FactomdClient getFactomdClient() throws FactomException.ClientException;
 
@@ -30,23 +31,23 @@ public interface EntryApi {
 
     EntryApi setWalletdClient(WalletdClient walletdClient);
 
-     int getTransactionAcknowledgeTimeout();
+    int getTransactionAcknowledgeTimeout();
 
-     EntryApi setTransactionAcknowledgeTimeout(int transactionAcknowledgeTimeout);
+    EntryApi setTransactionAcknowledgeTimeout(int transactionAcknowledgeTimeout);
 
-     int getCommitConfirmedTimeout();
+    int getCommitConfirmedTimeout();
 
-     EntryApi setCommitConfirmedTimeout(int commitConfirmedTimeout);
+    EntryApi setCommitConfirmedTimeout(int commitConfirmedTimeout);
 
-    CompletableFuture<List<EntryBlockResponse>> allEntryBlocks (String chainId);
+    CompletableFuture<List<EntryBlockResponse>> allEntryBlocks(String chainId);
 
-        /**
-         * Compose, reveal and commit a chain.
-         *
-         * @param chain
-         * @param address
-         * @throws FactomException.ClientException
-         */
+    /**
+     * Compose, reveal and commit a chain.
+     *
+     * @param chain
+     * @param address
+     * @throws FactomException.ClientException
+     */
     CompletableFuture<CommitAndRevealChainResponse> commitAndRevealChain(Chain chain, Address address);
 
     /**
@@ -59,6 +60,8 @@ public interface EntryApi {
     CompletableFuture<List<EntryBlockResponse.Entry>> allEntryBlocksEntries(String chainId);
 
     CompletableFuture<List<EntryResponse>> allEntries(String chainId);
+
+    CompletableFuture<List<EntryResponse>> allEntries(String chainId, Encoding encoding);
 
     CompletableFuture<List<EntryResponse>> entriesUpTilKeyMR(String keyMR);
 

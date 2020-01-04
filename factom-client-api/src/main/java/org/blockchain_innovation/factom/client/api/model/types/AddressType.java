@@ -16,7 +16,9 @@ public enum AddressType {
     IDENTITY_PUBLIC1("id1", "3fbeba", Visibility.PUBLIC), IDENTITY_PRIVATE1("sk1", "4db6c9", Visibility.PRIVATE),
     IDENTITY_PUBLIC2("id2", "3fbed8", Visibility.PUBLIC), IDENTITY_PRIVATE2("sk2", "4db6e7", Visibility.PRIVATE),
     IDENTITY_PUBLIC3("id3", "3fbef6", Visibility.PUBLIC), IDENTITY_PRIVATE3("sk3", "4db705", Visibility.PRIVATE),
-    IDENTITY_PUBLIC4("id4", "3fbf14", Visibility.PUBLIC), IDENTITY_PRIVATE4("sk4", "4db723", Visibility.PRIVATE);
+    IDENTITY_PUBLIC4("id4", "3fbf14", Visibility.PUBLIC), IDENTITY_PRIVATE4("sk4", "4db723", Visibility.PRIVATE),
+    IDENTITY_IDPUB("idpub", "0345ef9de0", Visibility.PUBLIC), IDENTITY_IDSEC("idsec", "0345f3d0d6", Visibility.PRIVATE);
+
 
     private final String humanReadablePrefix;
     private final String addressPrefix;
@@ -46,22 +48,20 @@ public enum AddressType {
     }
 
     public static void assertValidAddress(String address) throws FactomRuntimeException.AssertionException {
-        if (StringUtils.isEmpty(address) || address.length() <= 2) {
+        if (StringUtils.isEmpty(address) || address.length() <= 10) {
             throw new FactomRuntimeException.AssertionException(String.format("Address '%s' is not a valid address", address));
-        } else if (!getValidPrefixes().contains(address.substring(0, 2)) && !getValidPrefixes().contains(address.substring(0, 3))) {
+        } else if (!getValidPrefixes().contains(address.substring(0, 2)) && !getValidPrefixes().contains(address.substring(0, 3)) && !getValidPrefixes().contains(address.substring(0, 5))) {
             throw new FactomRuntimeException.AssertionException(String.format("Address '%s' does not start with a valid humanReadablePrefix", address));
         }
         byte[] addressBytes = Encoding.BASE58.decode(address);
-        if (addressBytes.length == 38) {
-            byte[] sha256d = Digests.SHA_256.doubleDigest(Arrays.copyOf(addressBytes, 34));
+        int length = addressBytes.length;
+        if (length == 38 || length == 39 || length == 41) {
+            byte[] sha256d = Digests.SHA_256.doubleDigest(Arrays.copyOf(addressBytes, length - 4));
             byte[] checksum = Arrays.copyOf(sha256d, 4);
-            if (!Arrays.equals(checksum, Arrays.copyOfRange(addressBytes, 34, 38))) {
-                throw new FactomRuntimeException.AssertionException(String.format("Address '%s' checksum mismatch!", address));
-            }
-        } else if (addressBytes.length == 39) {
-            byte[] sha256d = Digests.SHA_256.doubleDigest(Arrays.copyOf(addressBytes, 35));
-            byte[] checksum = Arrays.copyOf(sha256d, 4);
-            if (!Arrays.equals(checksum, Arrays.copyOfRange(addressBytes, 35, 39))) {
+//            if (length == 41) {
+//                checksum = Arrays.copyOfRange(sha256d, 32 - 4, 32);
+//            }
+            if (!Arrays.equals(checksum, Arrays.copyOfRange(addressBytes, length - 4, length))) {
                 throw new FactomRuntimeException.AssertionException(String.format("Address '%s' checksum mismatch!", address));
             }
         } else {
@@ -90,7 +90,9 @@ public enum AddressType {
     public static String getPrefix(String address) {
         assertValidAddress(address);
         byte[] rawAddress = Encoding.BASE58.decode(address);
-        if (rawAddress.length == 39) {
+        if (rawAddress.length == 41) {
+            return address.substring(0, 5);
+        } else if (rawAddress.length == 39) {
             return address.substring(0, 3);
         } else {
             return address.substring(0, 2);
