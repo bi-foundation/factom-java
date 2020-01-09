@@ -14,19 +14,20 @@ import org.blockchain_innovation.factom.identiy.did.entry.DeactivateFactomDIDEnt
 import org.blockchain_innovation.factom.identiy.did.entry.UpdateFactomDIDEntry;
 
 import java.util.List;
+import java.util.Optional;
 
-public class LowLevelDIDClient {
+public class FactomDIDClient {
 
     private EntryApi entryApi;
 
-    public LowLevelDIDClient() {
+    public FactomDIDClient() {
     }
 
-    public LowLevelDIDClient(EntryApi entryApi) {
+    public FactomDIDClient(EntryApi entryApi) {
         setEntryApi(entryApi);
     }
 
-    public LowLevelDIDClient setEntryApi(EntryApi entryApi) {
+    public FactomDIDClient setEntryApi(EntryApi entryApi) {
         this.entryApi = entryApi;
         return this;
     }
@@ -66,7 +67,7 @@ public class LowLevelDIDClient {
      * @return
      */
     public CommitAndRevealChainResponse create(CreateFactomDIDEntry createDidEntry, Address ecAddress) {
-        Chain chain = new Chain().setFirstEntry(createDidEntry.toEntry());
+        Chain chain = new Chain().setFirstEntry(createDidEntry.toEntry(Optional.empty()));
         if (getEntryApi().chainExists(chain).join()) {
             throw new FactomRuntimeException.AssertionException(String.format("Factom DID chain for id '%s' already exists", createDidEntry.getChainId()));
         }
@@ -85,7 +86,7 @@ public class LowLevelDIDClient {
       /*  if (getEntryApi().allEntryBlocks(chainId).join().size() == 0) {
             throw new FactomRuntimeException.AssertionException(String.format("Factom DID chain for id '%s' did not exist", chainId));
         }*/
-        return getEntryApi().commitAndRevealEntry(updateEntry.toEntry(), ecAddress).join();
+        return getEntryApi().commitAndRevealEntry(updateEntry.toEntry(Optional.empty()), ecAddress).join();
     }
 
 
@@ -97,6 +98,6 @@ public class LowLevelDIDClient {
      * @return
      */
     public CommitAndRevealEntryResponse deactivate(DeactivateFactomDIDEntry deactivateEntry, Address ecAddress) {
-        return getEntryApi().commitAndRevealEntry(deactivateEntry.toEntry(), ecAddress).join();
+        return getEntryApi().commitAndRevealEntry(deactivateEntry.toEntry(Optional.empty()), ecAddress).join();
     }
 }

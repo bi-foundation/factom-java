@@ -4,15 +4,15 @@ import org.blockchain_innovation.factom.client.api.model.Entry;
 import org.blockchain_innovation.factom.client.api.ops.Encoding;
 import org.blockchain_innovation.factom.identiy.did.DIDVersion;
 import org.blockchain_innovation.factom.identiy.did.OperationValue;
+import org.factomprotocol.identity.did.model.BlockInfo;
 import org.factomprotocol.identity.did.model.UpdateRequest;
 
 import java.util.Arrays;
 
-public class UpdateFactomDIDEntry extends FactomDIDEntry<UpdateRequest> {
+public class UpdateFactomDIDEntry extends AbstractFactomIdentityEntry<UpdateRequest> {
 
     private final String fullKeyIdentifier;
     private final String signature;
-    private final String chainId;
 
     public UpdateFactomDIDEntry(DIDVersion didVersion, String chainId, String fullKeyIdentifier, byte[] signature, String... additionalTags) {
         super(OperationValue.DID_UPDATE, didVersion, null,
@@ -22,13 +22,14 @@ public class UpdateFactomDIDEntry extends FactomDIDEntry<UpdateRequest> {
         this.chainId = chainId;
         this.fullKeyIdentifier = fullKeyIdentifier;
         this.signature = Encoding.HEX.encode(signature);
+        initValidationRules();
     }
 
-    public UpdateFactomDIDEntry(Entry entry) {
-        super(entry, UpdateRequest.class);
-        this.chainId = entry.getChainId();
+    public UpdateFactomDIDEntry(Entry entry, BlockInfo blockInfo) {
+        super(entry, UpdateRequest.class, blockInfo);
         this.fullKeyIdentifier = entry.getExternalIds().get(2);
         this.signature = entry.getExternalIds().get(3);
+        initValidationRules();
     }
 
 
@@ -40,8 +41,8 @@ public class UpdateFactomDIDEntry extends FactomDIDEntry<UpdateRequest> {
         return signature;
     }
 
-    public String getChainId() {
-        return chainId;
+    @Override
+    public void initValidationRules() {
+        throw new RuntimeException("FIXME");
     }
-
 }

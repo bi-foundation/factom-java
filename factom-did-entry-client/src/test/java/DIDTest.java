@@ -1,42 +1,30 @@
-import com.google.gson.Gson;
+import did.DIDDocument;
 import org.blockchain_innovation.factom.client.api.model.Address;
-import org.blockchain_innovation.factom.client.api.model.Entry;
 import org.blockchain_innovation.factom.client.api.model.response.CommitAndRevealChainResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.EntryResponse;
-import org.blockchain_innovation.factom.client.api.settings.RpcSettings;
-import org.blockchain_innovation.factom.client.impl.EntryApiImpl;
-import org.blockchain_innovation.factom.client.impl.FactomdClientImpl;
-import org.blockchain_innovation.factom.client.impl.OfflineWalletdClientImpl;
-import org.blockchain_innovation.factom.client.impl.settings.RpcSettingsImpl;
-import org.blockchain_innovation.factom.identiy.did.entry.CreateFactomDIDEntry;
-import org.blockchain_innovation.factom.identiy.did.LowLevelDIDClient;
 import org.blockchain_innovation.factom.identiy.did.DIDVersion;
-import org.factomprotocol.identity.did.invoker.JSON;
+import org.blockchain_innovation.factom.identiy.did.entry.CreateFactomDIDEntry;
+import org.blockchain_innovation.factom.identiy.did.entry.EntryValidation;
+import org.blockchain_innovation.factom.identiy.did.entry.FactomIdentityEntry;
+import org.blockchain_innovation.factom.identiy.did.parse.RuleException;
 import org.factomprotocol.identity.did.model.FactomDidContent;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.factomprotocol.identity.did.model.IdentityResponse;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
-import java.util.Properties;
 
-public class FactomDIDTest {
-    protected static final Gson GSON = JSON.createGson().create();
-    protected final EntryApiImpl offlineEntryClient = new EntryApiImpl();
-    protected final OfflineWalletdClientImpl offlineWalletdClient = new OfflineWalletdClientImpl();
-    protected final FactomdClientImpl factomdClient = new FactomdClientImpl();
-    protected final LowLevelDIDClient lowLevelDidClient = new LowLevelDIDClient();
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+public class DIDTest extends AbstractIdentityTest {
 
-    protected static final String EC_SECRET_ADDRESS = System.getProperty("FACTOM_CLIENT_TEST_EC_SECRET_ADDRESS", "Es3Y6U6H1Pfg4wYag8VMtRZEGuEJnfkJ2ZuSyCVcQKweB6y4WvGH");
+    public static final String TEST_IDENTITY_CHAINID = "6aa7d4afe4932885b5b6e93accb5f4f6c14bd1827733e05e3324ae392c0b2764";
+
 
     @Test
-    public void test() throws IOException {
+    public void test() throws IOException, RuleException {
         String nonce = "test-" + System.currentTimeMillis();
         String chainId = new CreateFactomDIDEntry(DIDVersion.FACTOM_V1_JSON, null, nonce).getChainId();
-        Assert.assertNotNull(chainId);
+        assertNotNull(chainId);
 
         FactomDidContent factomDidContent = GSON.fromJson("{\n" +
                 " \"didMethodVersion\": \"0.2.0\",\n" +
@@ -88,16 +76,13 @@ public class FactomDIDTest {
 //        DIDDocument didDocument = DIDDocument.build(didReference, null, null, null);
 
 
-        CommitAndRevealChainResponse commitAndRevealChainResponse = lowLevelDidClient.create(createEntry, new Address(EC_SECRET_ADDRESS));
+        CommitAndRevealChainResponse commitAndRevealChainResponse = lowLevelIdentityClient.create(createEntry, new Address(EC_SECRET_ADDRESS));
 
         System.err.println(commitAndRevealChainResponse.getRevealResponse());
-        List<EntryResponse> entrieResponses = lowLevelDidClient.getAllEntriesByIdentifier("did:factom:e21f9aef1ed841a7d7d634c9dd0dc204c694b51ad7152a44c326113326283eeb");
-        Assert.assertNotNull(entrieResponses);
-        EntryResponse entryResponse = entrieResponses.get(0);
-        Entry entry = new Entry.Builder().setChainId(entryResponse.getChainId()).setExternalIds(entryResponse.getExtIds()).setContent(entryResponse.getContent()).build();
-        CreateFactomDIDEntry resolvedFactomDidEntry = new CreateFactomDIDEntry(entry);
-        Assert.assertEquals(entry.getChainId(), resolvedFactomDidEntry.toEntry().getChainId());
-
+        List<FactomIdentityEntry<?>> identityEntries = lowLevelIdentityClient.getAllEntriesByIdentifier("did:factom:e21f9aef1ed841a7d7d634c9dd0dc204c694b51ad7152a44c326113326283eeb", EntryValidation.THROW_ERROR);
+        assertNotNull(identityEntries);
+        FactomIdentityEntry<?> identityEntry = identityEntries.get(0);
+        assertNotNull(identityEntry);
         //        // todo This is not a proper update for now
 //        CommitAndRevealEntryResponse updateEntryResponse = lowLevelDidClient.update(didDocument, nonce, keyId, new Address(EC_SECRET_ADDRESS));
 //
@@ -106,21 +91,13 @@ public class FactomDIDTest {
 
     }
 
-
-    @Before
-    public void setup() throws IOException {
-
-        factomdClient.setSettings(new RpcSettingsImpl(RpcSettings.SubSystem.FACTOMD, getProperties()));
-        offlineEntryClient.setFactomdClient(factomdClient);
-        offlineEntryClient.setWalletdClient(offlineWalletdClient);
-        lowLevelDidClient.setEntryApi(offlineEntryClient);
+    @Test
+    public void getDidDocumentFromIdentityChain() throws RuleException {
+        IdentityResponse identityResponse = lowLevelIdentityClient.resolveIdentity("did:factom:" + TEST_IDENTITY_CHAINID);
+        DIDDocument didDocument = lowLevelIdentityClient.convertIdentityToDid("did:factom:" + TEST_IDENTITY_CHAINID, identityResponse);
+        assertNotNull(didDocument);
+        System.err.println(didDocument.toString());
     }
 
-    protected Properties getProperties() throws IOException {
-        Properties properties = new Properties();
-        InputStream is = getClass().getClassLoader().getResourceAsStream("settings.properties");
-        properties.load(is);
-        is.close();
-        return properties;
-    }
+
 }

@@ -1,7 +1,7 @@
 package org.blockchain_innovation.factom.identiy.did;
 
 public enum OperationValue {
-    DID_MANAGEMENT("DIDManagement"), DID_UPDATE("DIDUpdate"), DID_METHOD_VERSION_UPGRADE("DIDMethodVersionUpgrade"), DID_DEACTIVATION("DIDDeactivation");
+    DID_MANAGEMENT("DIDManagement"), DID_UPDATE("DIDUpdate"), DID_METHOD_VERSION_UPGRADE("DIDMethodVersionUpgrade"), DID_DEACTIVATION("DIDDeactivation"), IDENTITY_CHAIN_CREATION("IdentityChain"), IDENTITY_CHAIN_REPLACE_KEY("ReplaceKey");
 
     private final String operation;
 

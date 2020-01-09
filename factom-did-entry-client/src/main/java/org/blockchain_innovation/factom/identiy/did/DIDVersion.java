@@ -2,12 +2,14 @@ package org.blockchain_innovation.factom.identiy.did;
 
 import did.DID;
 import did.DIDURL;
-import org.blockchain_innovation.factom.client.api.ops.EntryOperations;
 
 public enum DIDVersion {
-    FACTOM_V1_JSON("factom", "1.0.0", "0.2.0");
+    // This is a wrapper around Factom chains denoted as "IdentityChain" in the 1st external Id.
+    // It does not allow full DID documents, nor DID management. It simply translates the IdentityChain into a DID
+    FACTOM_IDENTITY_CHAIN("factom", "1", null),
 
-    private static final EntryOperations ENTRY_OPS = new EntryOperations();
+    // 1.0.0 Factom DID specification
+    FACTOM_V1_JSON("factom", "1.0.0", "0.2.0");
 
     private final String method;
     private final String protocolVersion;
@@ -41,4 +43,9 @@ public enum DIDVersion {
     public String getProtocolVersion() {
         return protocolVersion;
     }
+
+    public String getSchemaVersion() {
+        return schemaVersion;
+    }
+
 }

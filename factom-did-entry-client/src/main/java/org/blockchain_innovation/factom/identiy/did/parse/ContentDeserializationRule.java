@@ -1,9 +1,10 @@
 package org.blockchain_innovation.factom.identiy.did.parse;
 
 import com.google.gson.JsonSyntaxException;
+import org.blockchain_innovation.factom.client.api.json.JsonConverter;
 import org.blockchain_innovation.factom.client.api.model.Entry;
 import org.blockchain_innovation.factom.client.api.ops.StringUtils;
-import org.factomprotocol.identity.did.invoker.JSON;
+import org.blockchain_innovation.factom.identiy.did.RegisterJsonMappings;
 
 /**
  * A rule that deserializes content from an entry using Gson and does some null/deserialization checks
@@ -12,6 +13,7 @@ import org.factomprotocol.identity.did.invoker.JSON;
  */
 public class ContentDeserializationRule<T> extends AbstractEntryRule<T> {
     private Class<T> tClass;
+    private static final JsonConverter JSON = RegisterJsonMappings.register(JsonConverter.Provider.newInstance());
 
     public ContentDeserializationRule(Entry entry, Class<T> tClass) {
         super(entry);
@@ -25,7 +27,7 @@ public class ContentDeserializationRule<T> extends AbstractEntryRule<T> {
             throw new RuleException("Entry needs content for: %s", tClass.getSimpleName());
         }
         try {
-            T result = JSON.createGson().create().fromJson(getEntry().getContent(), tClass);
+            T result = JSON.fromJson(getEntry().getContent(), tClass);
             if (result == null) {
                 throw new RuleException("Could not deserialize Entry content into a Factom Entry Content object of class %s", tClass.getSimpleName());
             }

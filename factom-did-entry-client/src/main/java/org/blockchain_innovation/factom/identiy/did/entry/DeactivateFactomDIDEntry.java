@@ -4,13 +4,14 @@ import org.blockchain_innovation.factom.client.api.model.Entry;
 import org.blockchain_innovation.factom.client.api.ops.Encoding;
 import org.blockchain_innovation.factom.identiy.did.DIDVersion;
 import org.blockchain_innovation.factom.identiy.did.OperationValue;
+import org.factomprotocol.identity.did.model.BlockInfo;
 
 import java.util.Arrays;
+import java.util.Optional;
 
-public class DeactivateFactomDIDEntry extends FactomDIDEntry<Void> {
+public class DeactivateFactomDIDEntry extends AbstractFactomIdentityEntry<Void> {
     private final String fullKeyIdentifier;
     private final String signature;
-    private final String chainId;
 
     public DeactivateFactomDIDEntry(DIDVersion didVersion, String chainId, String fullKeyIdentifier, byte[] signature, String... additionalTags) {
         super(OperationValue.DID_DEACTIVATION, didVersion, null,
@@ -20,13 +21,14 @@ public class DeactivateFactomDIDEntry extends FactomDIDEntry<Void> {
         this.chainId = chainId;
         this.fullKeyIdentifier = fullKeyIdentifier;
         this.signature = Encoding.HEX.encode(signature);
+        initValidationRules();
     }
 
-    public DeactivateFactomDIDEntry(Entry entry) {
-        super(entry, Void.class);
-        this.chainId = entry.getChainId();
+    public DeactivateFactomDIDEntry(Entry entry, BlockInfo blockInfo) {
+        super(entry, Void.class, blockInfo);
         this.fullKeyIdentifier = entry.getExternalIds().get(2);
         this.signature = entry.getExternalIds().get(3);
+        initValidationRules();
     }
 
 
@@ -38,12 +40,13 @@ public class DeactivateFactomDIDEntry extends FactomDIDEntry<Void> {
         return signature;
     }
 
-    public String getChainId() {
-        return chainId;
+    @Override
+    public Entry toEntry(Optional<String> chainId) {
+        return new Entry().setChainId(chainId.orElse(this.chainId)).setContent(null).setExternalIds(getExternalIds());
     }
 
     @Override
-    public Entry toEntry() {
-        return new Entry().setContent(null).setExternalIds(getExternalIds());
+    public void initValidationRules() {
+        throw new RuntimeException("FIXME");
     }
 }
