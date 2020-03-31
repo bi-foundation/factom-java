@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id "org.openapi.generator" version "4.0.3"
+    id "org.openapi.generator" version "4.2.3"
 }
 
 group 'org.factomprotocol.identity'
@@ -145,21 +145,20 @@ task buildJavaSpringServer(type: org.openapitools.generator.gradle.plugin.tasks.
             scmConnection: "$v.scmConnection".toString(),
             scmDeveloperConnection: "$v.scmDeveloperConnection".toString(),
             scmUrl: "$v.scmUrl".toString(),
-            booleanGetterPrefix: "is",
             developerEmail: "$v.developerEmail".toString(),
             developerName: "$v.developerName".toString(),
             developerOrganization: "$v.developerOrganization".toString(),
             developerOrganizationUrl: "$v.developerOrganizationUrl".toString(),
             licenseName: "$v.licenseName".toString(),
-            java8: true,
+            java8: "true",
             dateLibrary: "java8",
-            interfaceOnly: true,
-            delegatePattern: true,
-            useTags: true,
-            useOptional: true,
-            useBeanValidation: true,
-            skipDefaultInterface: true,
-            openapiDocketConfig: true,
+            interfaceOnly: "true",
+            delegatePattern: "true",
+            useTags: "true",
+            useOptional: "true",
+            useBeanValidation: "true",
+            skipDefaultInterface: "true",
+            openapiDocketConfig: "true"
 
     ]
     systemProperties = [

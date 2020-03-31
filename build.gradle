@@ -32,7 +32,7 @@ buildscript {
 
 plugins {
     id 'org.asciidoctor.convert' version '1.5.6' apply false
-    id 'org.springframework.boot' version '2.0.5.RELEASE' apply false
+    id 'org.springframework.boot' version '2.2.5.RELEASE' apply false
     id "com.athaydes.osgi-run" version "1.6.0" apply false
     id "org.dm.bundle" version "0.8.4" apply false
     id "biz.aQute.bnd.builder" version "5.0.0" apply false
@@ -51,7 +51,7 @@ ext {
                     jsonApi: "1.1.2"
             ],
             spring: [
-                    boot: "2.0.5.RELEASE"
+                    boot: "2.2.5.RELEASE"
             ]
     ]
     testVersions = [
@@ -71,7 +71,6 @@ ext {
             ":service-providers:json-converter-jee",
             ":frameworks:jee-support",
             ":frameworks:spring-boot-support",
-            ":factom-did-entry-client"
     ]
 
     // the password needs to be specified via command line
@@ -101,11 +100,12 @@ allprojects {
 }
 
 subprojects {
-    apply plugin: "checkstyle"
+//    apply plugin: "checkstyle"
 //    apply plugin: "findbugs"
-    apply plugin: "pmd"
+//    apply plugin: "pmd"
     apply plugin: "java"
     apply plugin: "maven-publish"
+    sourceCompatibility = 11
 
     buildscript {
         repositories {
@@ -256,6 +256,7 @@ project(':factom-client-api') {
     apply plugin: "java"
     dependencies {
         // Provided by JEE Environment
+        compile 'javax.xml.bind:jaxb-api:2.3.1'
         compileOnly "javax.enterprise:cdi-api:$libVersions.jee.cdiApi"
     }
 //    publishing {
@@ -273,6 +274,7 @@ project(':factom-client-impl') {
     apply plugin: "java"
     dependencies {
         compile project(':factom-client-api')
+
         // Provided by JEE Environment
         compileOnly "javax.enterprise:cdi-api:$libVersions.jee.cdiApi"
     }
@@ -395,15 +397,16 @@ project(':frameworks:osgi') {
     }
 }
 
-project(':factom-did-entry-client') {
-    apply plugin: "java"
-//    apply plugin: 'org.openapi.generator'
+//project(':factom-did-entry-client') {
+//    apply plugin: "java"
+////    apply plugin: 'org.openapi.generator'
+//
+//    dependencies {
+//        compile project(':factom-client-api')
+//
+//    }
+//}
 
-    dependencies {
-        compile project(':factom-client-api')
-
-    }
-}
 
 project(':factom-client-tests') {
     apply plugin: "java"
@@ -422,6 +425,7 @@ project(':factom-client-tests') {
 
     }
 }
+
 
 project(':docs') {
 
