@@ -8,8 +8,8 @@ import org.blockchain_innovation.factom.client.api.model.Entry;
 import org.blockchain_innovation.factom.client.api.model.response.walletd.ComposeResponse;
 import org.blockchain_innovation.factom.client.api.model.types.AddressType;
 import org.blockchain_innovation.factom.client.api.ops.ByteOperations;
-import org.blockchain_innovation.factom.client.api.ops.Encoding;
 import org.blockchain_innovation.factom.client.api.ops.Digests;
+import org.blockchain_innovation.factom.client.api.ops.Encoding;
 import org.blockchain_innovation.factom.client.api.ops.EntryOperations;
 import org.blockchain_innovation.factom.client.api.ops.SigningOperations;
 import org.blockchain_innovation.factom.client.api.rpc.RpcResponse;
@@ -36,10 +36,8 @@ public class OfflineWalletdClientImpl extends WalletdClientImpl {
 
             String message = composeChainCommit(chain, address);
             String entryReveal = composeChainReveal(chain);
-            FactomResponse<ComposeResponse> response = composeResponse("compose-chain", message, "reveal-chain", entryReveal);
-            return response;
+            return composeResponse("commit-chain", message, "reveal-chain", entryReveal);
         };
-
         return CompletableFuture.supplyAsync(supplier);
     }
 
@@ -50,8 +48,7 @@ public class OfflineWalletdClientImpl extends WalletdClientImpl {
 
             String message = composeEntryCommit(entry, address);
             String entryReveal = composeEntryReveal(entry);
-            FactomResponse<ComposeResponse> response = composeResponse("compose-entry", message, "reveal-entry", entryReveal);
-            return response;
+            return composeResponse("commit-entry", message, "reveal-entry", entryReveal);
         };
 
         return CompletableFuture.supplyAsync(supplier);

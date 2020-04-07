@@ -35,6 +35,7 @@ plugins {
     id 'org.springframework.boot' version '2.2.5.RELEASE' apply false
     id "com.athaydes.osgi-run" version "1.6.0" apply false
     id "org.dm.bundle" version "0.8.4" apply false
+    id 'nu.studer.credentials' version '1.0.7'
     id "biz.aQute.bnd.builder" version "5.0.0" apply false
 
 }
@@ -70,12 +71,12 @@ ext {
             ":service-providers:json-converter-gson",
             ":service-providers:json-converter-jee",
             ":frameworks:jee-support",
-            ":frameworks:spring-boot-support",
+            ":frameworks:spring-boot-support"
     ]
 
     // the password needs to be specified via command line
-    repoUser = project.hasProperty('repoUser') ? project.getProperty('repoUser') : ''
-    repoPass = project.hasProperty('repoPass') ? project.getProperty('repoPass') : ''
+    repoUser = project.hasProperty('repoUser') ? project.getProperty('repoUser') : credentials.nexusUser
+    repoPass = project.hasProperty('repoPass') ? project.getProperty('repoPass') : credentials.nexusPassword
 }
 
 
@@ -116,7 +117,6 @@ subprojects {
             mavenLocal()
         }
     }
-
     publishing {
         publications {
             mavenJava(MavenPublication) {
