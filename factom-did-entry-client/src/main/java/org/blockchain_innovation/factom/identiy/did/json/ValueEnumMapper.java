@@ -1,4 +1,4 @@
-package org.blockchain_innovation.factom.identiy.did;
+package org.blockchain_innovation.factom.identiy.did.json;
 
 import org.blockchain_innovation.factom.client.api.ops.StringUtils;
 

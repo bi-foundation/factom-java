@@ -7,7 +7,7 @@ plugins {
 group 'org.factomprotocol.identity'
 version '0.3.0-SNAPSHOT'
 
-sourceCompatibility = 11
+sourceCompatibility = 8
 repositories {
     mavenLocal()
     google()

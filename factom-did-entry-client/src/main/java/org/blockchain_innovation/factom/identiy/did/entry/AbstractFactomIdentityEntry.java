@@ -8,7 +8,7 @@ import org.blockchain_innovation.factom.client.api.ops.StringUtils;
 import org.blockchain_innovation.factom.identiy.did.DIDRuntimeException;
 import org.blockchain_innovation.factom.identiy.did.DIDVersion;
 import org.blockchain_innovation.factom.identiy.did.OperationValue;
-import org.blockchain_innovation.factom.identiy.did.RegisterJsonMappings;
+import org.blockchain_innovation.factom.identiy.did.json.RegisterJsonMappings;
 import org.blockchain_innovation.factom.identiy.did.parse.Rule;
 import org.blockchain_innovation.factom.identiy.did.parse.RuleException;
 import org.factomprotocol.identity.did.model.BlockInfo;

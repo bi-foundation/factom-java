@@ -1,6 +1,7 @@
-package org.blockchain_innovation.factom.identiy.did;
+package org.blockchain_innovation.factom.identiy.did.json;
 
 import org.blockchain_innovation.factom.client.api.json.JsonConverter;
+import org.blockchain_innovation.factom.identiy.did.DIDVersion;
 import org.factomprotocol.identity.did.model.DidMethodVersion;
 import org.factomprotocol.identity.did.model.KeyPurpose;
 import org.factomprotocol.identity.did.model.KeyType;
@@ -8,6 +9,7 @@ import org.factomprotocol.identity.did.model.KeyType;
 public class RegisterJsonMappings {
     public static JsonConverter register(JsonConverter converter) {
         if (!converter.getName().equalsIgnoreCase("JEE")) {
+            // Non JEE converters don't need this specialized handling
             return converter;
         }
 

@@ -106,7 +106,7 @@ subprojects {
 //    apply plugin: "pmd"
     apply plugin: "java"
     apply plugin: "maven-publish"
-    sourceCompatibility = 11
+    sourceCompatibility = 8
 
     buildscript {
         repositories {

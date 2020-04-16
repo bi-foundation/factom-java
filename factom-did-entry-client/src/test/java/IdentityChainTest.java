@@ -3,6 +3,7 @@ import org.blockchain_innovation.factom.client.api.model.response.CommitAndRevea
 import org.blockchain_innovation.factom.client.api.model.response.CommitAndRevealEntryResponse;
 import org.blockchain_innovation.factom.client.api.ops.Encoding;
 import org.blockchain_innovation.factom.identiy.did.DIDVersion;
+import org.blockchain_innovation.factom.identiy.did.IdentityFactory;
 import org.blockchain_innovation.factom.identiy.did.OperationValue;
 import org.blockchain_innovation.factom.identiy.did.entry.*;
 import org.blockchain_innovation.factom.identiy.did.parse.RuleException;
@@ -85,7 +86,11 @@ public class IdentityChainTest extends AbstractIdentityTest {
         assertEquals(5, secondEntry.getExternalIds().size());
         assertTrue(secondEntry.getBlockInfo().isPresent());
 
-        IdentityResponse identityResponse = lowLevelIdentityClient.resolveIdentity("did:factom:" + firstEntry.getChainId());
+        List<FactomIdentityEntry<?>> allEntries = lowLevelIdentityClient.getAllEntriesByIdentifier("did:factom:" + firstEntry.getChainId(), EntryValidation.THROW_ERROR);
+        assertNotNull(allEntries);
+        assertTrue(allEntries.size() > 1);
+        IdentityFactory identityFactory = new IdentityFactory();
+        IdentityResponse identityResponse = identityFactory.toIdentity("did:factom:" + firstEntry.getChainId(), allEntries);
         assertNotNull(identityResponse);
 
     }

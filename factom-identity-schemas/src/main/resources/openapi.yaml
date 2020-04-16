@@ -1,4 +1,4 @@
-openapi: 3.0.1
+openapi: 3.0.3
 info:
   title: Factom DIDs
   description: Decentralized Identifiers (DID) on Factom, provides models, APIs, clients and universal resolver integrations for DIDs on top of Factom.
@@ -57,7 +57,7 @@ paths:
             - write
       x-codegen-request-body-name: body
   /factom/identity/chains/{chainId}:
-    post:
+    put:
       tags:
         - FactomIdentity
       summary: Update a Factom Identity (replace keys)
@@ -390,7 +390,7 @@ paths:
         - OAuth2:
             - read
             - write
-    post:
+    put:
       tags:
         - FactomDID
       summary: Updates a DID

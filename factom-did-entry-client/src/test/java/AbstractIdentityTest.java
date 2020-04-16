@@ -11,6 +11,7 @@ import org.blockchain_innovation.factom.client.impl.FactomdClientImpl;
 import org.blockchain_innovation.factom.client.impl.OfflineWalletdClientImpl;
 import org.blockchain_innovation.factom.client.impl.settings.RpcSettingsImpl;
 import org.blockchain_innovation.factom.identiy.did.IdAddressKeyOps;
+import org.blockchain_innovation.factom.identiy.did.IdentityFactory;
 import org.blockchain_innovation.factom.identiy.did.LowLevelIdentityClient;
 import org.factomprotocol.identity.did.invoker.JSON;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,6 +24,7 @@ import java.security.SecureRandom;
 import java.util.Properties;
 
 public abstract class AbstractIdentityTest {
+    protected static final IdentityFactory IDENTITY_FACTORY = new IdentityFactory();
     public static final IdAddressKeyOps ID_ADDRESS_KEY_CONVERSIONS = new IdAddressKeyOps();
     protected static final Gson GSON = JSON.createGson().create();
     protected final EntryApiImpl offlineEntryClient = new EntryApiImpl();
@@ -64,12 +66,12 @@ public abstract class AbstractIdentityTest {
         return getKeyPairGenerator().generateKeyPair();
     }
 
-    protected EdDSAPrivateKey getPrivateKey (KeyPair keyPair) {
+    protected EdDSAPrivateKey getPrivateKey(KeyPair keyPair) {
         return (EdDSAPrivateKey) keyPair.getPrivate();
     }
 
 
-    protected EdDSAPublicKey getPublicKey (KeyPair keyPair) {
+    protected EdDSAPublicKey getPublicKey(KeyPair keyPair) {
         return (EdDSAPublicKey) keyPair.getPublic();
     }
 }

@@ -17,6 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class DIDTest extends AbstractIdentityTest {
 
+
     public static final String TEST_IDENTITY_CHAINID = "6aa7d4afe4932885b5b6e93accb5f4f6c14bd1827733e05e3324ae392c0b2764";
 
 
@@ -93,8 +94,12 @@ public class DIDTest extends AbstractIdentityTest {
 
     @Test
     public void getDidDocumentFromIdentityChain() throws RuleException {
-        IdentityResponse identityResponse = lowLevelIdentityClient.resolveIdentity("did:factom:" + TEST_IDENTITY_CHAINID);
-        DIDDocument didDocument = lowLevelIdentityClient.convertIdentityToDid("did:factom:" + TEST_IDENTITY_CHAINID, identityResponse);
+
+        List<FactomIdentityEntry<?>> allEntries = lowLevelIdentityClient.getAllEntriesByIdentifier("did:factom:" + TEST_IDENTITY_CHAINID, EntryValidation.THROW_ERROR);
+        assertNotNull(allEntries);
+
+        IdentityResponse identityResponse = IDENTITY_FACTORY.toIdentity("did:factom:" + TEST_IDENTITY_CHAINID, allEntries);
+        DIDDocument didDocument = IDENTITY_FACTORY.toDid("did:factom:" + TEST_IDENTITY_CHAINID, identityResponse);
         assertNotNull(didDocument);
         System.err.println(didDocument.toString());
     }
