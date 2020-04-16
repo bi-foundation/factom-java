@@ -80,7 +80,7 @@ public interface FactomDidApi {
         @ApiResponse(code = 405, message = "Invalid input") })
     @RequestMapping(value = "/factom/identity/dids/{did}",
         consumes = { "application/json" },
-        method = RequestMethod.POST)
+        method = RequestMethod.PUT)
     ResponseEntity<Void> _updateFactomDid(@ApiParam(value = "DID", required = true) @PathVariable("did") String did, @ApiParam(value = "", required = true) @Valid @RequestBody UpdateRequest updateRequest);
 
 }

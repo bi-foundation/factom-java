@@ -7,7 +7,7 @@ plugins {
 
 group = 'org.factomprotocol.identity'
 version = '0.3.0-SNAPSHOT'
-sourceCompatibility = '11'
+sourceCompatibility = '8'
 
 
 repositories {
@@ -23,6 +23,7 @@ dependencies {
     compile "io.springfox:springfox-swagger2:2.9.2"
     compile 'io.springfox:springfox-swagger-ui:2.9.2'
     compile 'org.blockchain-innovation.factom.client:factom-client-impl:0.3.0-SNAPSHOT'
+    compile 'org.blockchain-innovation.factom.client:spring-boot-support:0.3.0-SNAPSHOT'
     compile group: 'decentralized-identity', name: 'did-common-java', version: '0.2-SNAPSHOT'
     compile group: 'org.factomprotocol.identity', name: 'factom-did-models-java-gson', version: '0.3.0-SNAPSHOT'
     compile 'org.factomprotocol.identity:factom-identity-client:0.3.0-SNAPSHOT'
