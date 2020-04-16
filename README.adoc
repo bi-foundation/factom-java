@@ -1,6 +1,3 @@
-![Develop branch status](https://codebuild.eu-west-1.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoiM3M5em84bElqVEMwbFZORnN5SUgrbTd4TFV2RWxEUEFucXVncDEwM01KU0hIby9GbXNuelJ4cnF6NktBWnJ5TUsvVytudjA0RWgrZDUrTC90K2FQR3Y0PSIsIml2UGFyYW1ldGVyU3BlYyI6IitabTlJeHh6WDZFNWUzK2UiLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=master)
-
-
 = Factom Java
 
 A Factom Java enterprise client to interact with Factom. Please see the docs module for documentation.
@@ -19,7 +16,7 @@ The client consists of several modules to support the following use cases:
 ** Managed Threads
 ** Configuration
 
-== JSON plugins (SPI)
+=== JSON plugins (SPI)
 To minimize dependencies and allow the implementor to choose, it has plugable JSON (de)serialization support.
 This is handled as an SPI. That means you need to have one of the json-providers below on the classpath!
 
@@ -29,22 +26,22 @@ This is handled as an SPI. That means you need to have one of the json-providers
 
 Whenever one of the JSON plugins is on the classpath it will use that plugin to do the (de)serialization. Please note that at least one plugin is needed for this library to function.
 
-== Logging plugins (SPI)
+=== Logging plugins (SPI)
 There is pluggable support for logging as well. We will enhance that support in the future. Currently it needs the SLF4J SPI on the classpath.
 Without it, the library will not function. That will be fixed in future releases.
 
-== Offline signing
+=== Offline signing
 Instead of using walletd to sign transactions and commits it is also possible to do that offline using private keys directly.
 To enable this you will need to include the offline signing client on the classpath. This module also has an external dependency on an encryption library.
 
-== Android support
+=== Android support
 Since this project has no external dependencies besides a JSON library and optional logging, it is fully compatible with Android 7 and up.
 An example project can be found at https://github.com/bi-foundation/factom-java-examples/tree/develop/android/FactomApiDemo[Github].
 
 
-= Maven installation
+== Maven installation
 This is a gradle project but maven snapshots and releases are distributed on the Nexus installation of Sphereon at
-http://nexus.qa.sphereon.com/repository/bif/
+http://nexus.qa.sphereon.com/repository/sphereon-opensource-releases/
 
 You need at least the following dependencies in your application
 
@@ -53,13 +50,13 @@ You need at least the following dependencies in your application
 <dependency>
     groupId>org.blockchain-innovation.factom.client</groupId>
     <artifactId>factom-client-impl</artifactId>
-    <version>0.2.1</version>
+    <version>0.3.0</version>
     <scope>compile</scope>
 </dependency>
 <dependency>
     groupId>org.blockchain-innovation.factom.client</groupId>
     <artifactId>logger-slf4j</artifactId>
-    <version>0.2.1</version>
+    <version>0.3.0</version>
     <scope>compile</scope>
 </dependency>
 
@@ -67,13 +64,13 @@ You need at least the following dependencies in your application
 <dependency>
     groupId>org.blockchain-innovation.factom.client</groupId>
     <artifactId>json-converter-jee</artifactId>
-    <version>0.2.1</version>
+    <version>0.3.0</version>
     <scope>compile</scope>
 </dependency>
 <dependency>
     groupId>org.blockchain-innovation.factom.client</groupId>
     <artifactId>json-converter-gson</artifactId>
-    <version>0.2.1</version>
+    <version>0.3.0</version>
     <scope>compile</scope>
 </dependency>
 
@@ -81,7 +78,7 @@ You need at least the following dependencies in your application
 <dependency>
     groupId>org.blockchain-innovation.factom.client</groupId>
     <artifactId>factom-client-offline-signing</artifactId>
-    <version>0.2.1</version>
+    <version>0.3.0</version>
     <scope>compile</scope>
 </dependency>
 
@@ -90,7 +87,7 @@ You need at least the following dependencies in your application
 <dependency>
     groupId>org.blockchain-innovation.factom.client</groupId>
     <artifactId>jee-support</artifactId>
-    <version>0.2.1</version>
+    <version>0.3.0</version>
     <scope>compile</scope>
 </dependency>
 
@@ -98,7 +95,7 @@ You need at least the following dependencies in your application
 <dependency>
     groupId>org.blockchain-innovation.factom.client</groupId>
     <artifactId>spring-boot-support</artifactId>
-    <version>0.2.1</version>
+    <version>0.3.0</version>
     <scope>compile</scope>
 </dependency>
 

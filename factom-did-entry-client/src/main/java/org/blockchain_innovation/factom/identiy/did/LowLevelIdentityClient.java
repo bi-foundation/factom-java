@@ -1,7 +1,5 @@
 package org.blockchain_innovation.factom.identiy.did;
 
-import did.*;
-import did.parser.ParserException;
 import org.blockchain_innovation.factom.client.api.EntryApi;
 import org.blockchain_innovation.factom.client.api.errors.FactomRuntimeException;
 import org.blockchain_innovation.factom.client.api.model.Address;
@@ -12,20 +10,15 @@ import org.blockchain_innovation.factom.client.api.model.response.CommitAndRevea
 import org.blockchain_innovation.factom.client.api.model.response.factomd.EntryBlockResponse;
 import org.blockchain_innovation.factom.client.api.model.response.factomd.EntryResponse;
 import org.blockchain_innovation.factom.client.api.ops.EncodeOperations;
-import org.blockchain_innovation.factom.client.api.ops.Encoding;
 import org.blockchain_innovation.factom.identiy.did.entry.*;
 import org.blockchain_innovation.factom.identiy.did.parse.RuleException;
 import org.factomprotocol.identity.did.model.BlockInfo;
-import org.factomprotocol.identity.did.model.IdentityEntry;
-import org.factomprotocol.identity.did.model.IdentityResponse;
-import org.factomprotocol.identity.did.model.Metadata;
 
 import java.util.*;
 
 public class LowLevelIdentityClient {
     private static final IdentityEntryFactory ENTRY_FACTORY = new IdentityEntryFactory();
     private static final EncodeOperations ENCODE = new EncodeOperations();
-    IdAddressKeyOps idAddressOps = new IdAddressKeyOps();
 
     private EntryApi entryApi;
 
@@ -52,105 +45,25 @@ public class LowLevelIdentityClient {
     /**
      * Get all entries related to a FactomDID reference.
      *
-     * @param didReference The FactomDID reference
-     * @param validate     Validate the entries
+     * @param identifier The Factom identifier (DID or chainId)
+     * @param validate   Validate the entries
      * @return
      */
-    public List<FactomIdentityEntry<?>> getAllByDidReference(String didReference, EntryValidation validate) throws RuleException {
-        try {
-            return getAllEntriesByIdentifier(DID.fromString(didReference).getDidString(), validate);
-        } catch (ParserException e) {
-            throw new DIDRuntimeException.ParseException(e);
-        }
-    }
-
-    public DIDDocument convertIdentityToDid(String identifier, IdentityResponse identityResponse) throws RuleException {
-        String did = identifier;
-       if (!identifier.startsWith("did:")) {
-            did = "did:factom:" + identifier;
-        }
-        DIDURL didurl = DIDURL.fromString(did);
-        List<Map<String, Object>> publicKeys = new LinkedList<>();
-        List<String> authentications = new ArrayList<>();
-        List<String> idPubs = identityResponse.getIdentity().getKeys();
-
-
-        for (int i = 0; i < idPubs.size(); i++) {
-            var idPub = idPubs.get(i);
-            var controller = didurl.getDid().getDidString();
-            var id = String.format("%s#key-%d", controller, i);
-            var keyBytes = idAddressOps.toEd25519PublicKey(idPub).getAbyte();
-            var hexKey = Encoding.HEX.encode(keyBytes);
-            var b58Key = Encoding.BASE58.encode(keyBytes);
-            Map<String, Object> keyAttrs = new HashMap<>();
-            Map<String, Object> authAttrs = new HashMap<>();
-
-
-            keyAttrs.put(DIDDocument.JSONLD_TERM_TYPE, "Ed25519VerificationKey2018");
-
-            keyAttrs.put(DIDDocument.JSONLD_TERM_ID, id);
-            keyAttrs.put(DIDDocument.JSONLD_TERM_PUBLICKEYBASE58, b58Key);
-            keyAttrs.put(DIDDocument.JSONLD_TERM_PUBLICKEYHEX, hexKey);
-
-            keyAttrs.put("controller", controller);
-            authAttrs.put("controller", controller);
-            if (i > 0) {
-                authentications.add(id);
-            }
-            publicKeys.add(PublicKey.build(keyAttrs).getJsonLdObject());
-        }
-
-        // We build using the LdObjects ourselves as the convenience method does not do everything and ojects are not mutable anymore
-        DIDDocument didDocument = DIDDocument.build(didurl.getDid().getDidString(), null, null, null);
-        didDocument.setJsonLdObjectKeyValue(DIDDocument.JSONLD_TERM_AUTHENTICATION, authentications);
-        didDocument.setJsonLdObjectKeyValue(DIDDocument.JSONLD_TERM_PUBLICKEY, publicKeys);
-
-        return didDocument;
-    }
-
-    public IdentityResponse resolveIdentity(String identifier) throws RuleException {
-
-        List<FactomIdentityEntry<?>> entries = getAllEntriesByIdentifier(identifier, EntryValidation.THROW_ERROR);
-        if (entries == null || entries.size() == 0) {
-            throw new RuleException("Identity for %s could not be resolved", identifier);
-        }
-        Metadata metadata = new Metadata();
-        IdentityEntry identityEntry = null;
-        for (FactomIdentityEntry<?> entry : entries) {
-            if (identityEntry == null) {
-                if (entry.getOperationValue() != OperationValue.IDENTITY_CHAIN_CREATION) {
-                    throw new RuleException("Identity chain %s did not start with an Identity Creation entry", identifier);
-                }
-                identityEntry = ((CreateIdentityContentEntry) entry).getContent();
-                metadata.creation(entry.getBlockInfo().get());
-                metadata.update(entry.getBlockInfo().get());
-                continue;
-            } else if (entry.getOperationValue() != OperationValue.IDENTITY_CHAIN_REPLACE_KEY) {
-                continue;
-            }
-            ReplaceKeyIdentityChainEntry replaceKeyEntry = (ReplaceKeyIdentityChainEntry) entry;
-            if (!idAddressOps.verifyKeyReplacementSignature(replaceKeyEntry)) {
-                continue;
-            }
-            try {
-                List<String> newKeys = idAddressOps.createNewKeyReplacementList(identityEntry.getKeys(), replaceKeyEntry.getOldKey(), replaceKeyEntry.getNewKey(), replaceKeyEntry.getSignerKey());
-                identityEntry.setKeys(newKeys);
-                metadata.update(replaceKeyEntry.getBlockInfo().get());
-            } catch (FactomRuntimeException re) {
-
-            }
-        }
-        if (identityEntry == null) {
-            throw new RuleException("Identity chain %s did not start with an Identity Creation entry", identifier);
-        }
-        IdentityResponse identityResponse = new IdentityResponse();
-        identityResponse.setIdentity(identityEntry);
-        identityResponse.setMetadata(metadata);
-        return identityResponse;
-    }
-
-
     public List<FactomIdentityEntry<?>> getAllEntriesByIdentifier(String identifier, EntryValidation validate) throws RuleException {
+        return getAllEntriesByIdentifier(identifier, validate, Optional.empty(), Optional.empty());
+    }
+
+    /**
+     * Get all entries related to a Factom chainId or DID.
+     *
+     * @param identifier   The Factom identifier (DID or chainId)
+     * @param validate     Validate the entries
+     * @param maxHeight    Optional max height. Can be used to return the identity status at a certain height
+     * @param maxTimestamp Optional max timestamp. Can be used to return the identity status at a certain timestamp
+     * @return
+     * @throws RuleException
+     */
+    public List<FactomIdentityEntry<?>> getAllEntriesByIdentifier(String identifier, EntryValidation validate, Optional<Long> maxHeight, Optional<Long> maxTimestamp) throws RuleException {
         List<FactomIdentityEntry<?>> entries = new ArrayList<>();
         String chainId = identifier;
         if (identifier.startsWith("did:factom:")) {
@@ -162,6 +75,14 @@ public class LowLevelIdentityClient {
 
             int size = entryBlockResponse.getEntryList().size();
             for (int i = size - 1; i >= 0; i--) {
+                if (entryBlockResponse.getHeader().getDirectoryBlockHeight() > maxHeight.orElse(Long.MAX_VALUE)) {
+                    // blockheight is bigger than max supplied height
+                    continue;
+                }
+                if (entryBlockResponse.getHeader().getTimestamp() > maxTimestamp.orElse(Long.MAX_VALUE)) {
+                    // timestamp of entry is bigger than max supplied timestamp
+                    continue;
+                }
                 EntryBlockResponse.Entry entryBlockEntry = entryBlockResponse.getEntryList().get(i);
                 BlockInfo blockInfo = new BlockInfo()
                         .blockHeight(header.getDirectoryBlockHeight())
@@ -214,16 +135,7 @@ public class LowLevelIdentityClient {
      * @return
      */
     public CommitAndRevealChainResponse create(CreateIdentityRequestEntry identityChainEntry, Address ecAddress) {
-//        List<String> externalIds = new ArrayList<>();
-       /* externalIds.add(OperationValue.IDENTITY_CHAIN_CREATION.getOperation());
-
-        externalIds.add(identityChainEntry.getNonce());
-        if (identityChainEntry.getTags() != null) {
-            externalIds.addAll(identityChainEntry.getTags());
-        }*/
         Entry entry = identityChainEntry.toEntry(Optional.empty());
-//        entry.setExternalIds(externalIds);
-//        entry.setChainId(Encoding.HEX.encode(new EntryOperations().calculateChainId(externalIds)));
         Chain chain = new Chain().setFirstEntry(entry);
         if (getEntryApi().chainExists(chain).join()) {
             throw new FactomRuntimeException.AssertionException(String.format("Factom identity chain for id '%s' already exists", entry.getChainId()));

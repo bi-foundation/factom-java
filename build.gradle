@@ -124,7 +124,7 @@ subprojects {
 //                artifact sourceJar()
 //                artifact javadocJar()
 
-                /*  pom {
+                  pom {
 
 
                       licenses {
@@ -135,25 +135,25 @@ subprojects {
                       }
                       developers {
                           developer {
-                              id = 'bif'
+                              id = 'BIF'
                               name = 'Blockchain Innovation Foundation'
                               email = 'info@blockchain-innovation.org'
                           }
                       }
                       scm {
-                          connection = 'scm:git:git://example.com/my-library.git'
-                          developerConnection = 'scm:git:ssh://example.com/my-library.git'
-                          url = 'http://example.com/my-library/'
+                          connection = 'scm:git:https://github.com/bi-foundation/factom-java.git'
+                          developerConnection = 'scm:git:https://github.com/bi-foundation/factom-java.git'
+                          url = 'https://github.com/bi-foundation/factom-java/'
                       }
-                  }*/
+                  }
             }
         }
 
 
         repositories {
             maven {
-                def releasesRepoUrl = "http://nexus.qa.sphereon.com/repository/bif-releases"
-                def snapshotsRepoUrl = "http://nexus.qa.sphereon.com/repository/bif-snapshots"
+                def releasesRepoUrl = "http://nexus.qa.sphereon.com/repository/sphereon-opensource-releases"
+                def snapshotsRepoUrl = "http://nexus.qa.sphereon.com/repository/sphereon-opensource-snapshots"
                 url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
                 credentials {
                     username project.repoUser

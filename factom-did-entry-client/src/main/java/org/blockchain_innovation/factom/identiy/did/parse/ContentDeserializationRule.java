@@ -4,10 +4,10 @@ import com.google.gson.JsonSyntaxException;
 import org.blockchain_innovation.factom.client.api.json.JsonConverter;
 import org.blockchain_innovation.factom.client.api.model.Entry;
 import org.blockchain_innovation.factom.client.api.ops.StringUtils;
-import org.blockchain_innovation.factom.identiy.did.RegisterJsonMappings;
+import org.blockchain_innovation.factom.identiy.did.json.RegisterJsonMappings;
 
 /**
- * A rule that deserializes content from an entry using Gson and does some null/deserialization checks
+ * A rule that deserializes content from an entry using JsonConverter and does some null/deserialization checks
  *
  * @param <T>
  */
