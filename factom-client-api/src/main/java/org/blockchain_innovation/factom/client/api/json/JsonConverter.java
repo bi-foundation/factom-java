@@ -31,27 +31,27 @@ public interface JsonConverter {
     /**
      * Allows you to configure a JSON converter implementation. This is converter specific.
      *
-     * @param properties Properties the converter accepts
-     * @return
+     * @param properties Properties that the converter accepts.
+     * @return The Json converter.
      */
     JsonConverter configure(Properties properties);
 
     /**
      * Deserializes and RPC error string in json format from a factomd or walletd RPC server.
      *
-     * @param json The error json as String
-     * @return
+     * @param json The error json as String.
+     * @return The RPC Error response.
      */
     RpcErrorResponse errorFromJson(String json);
 
     /**
-     * Deserialized a response from factomd or walletd into a proper RCP Response object with an appropriate result
+     * Deserializes a response from factomd or walletd into a proper RCP Response object with an appropriate result
      * object as POJO.
      *
-     * @param json        The json response as String from factomd or walletd
-     * @param resultClass The target result class for the response
-     * @param <Result>    The target result type
-     * @return The RpcResponse
+     * @param json        The json response as String from factomd or walletd.
+     * @param resultClass The target result class for the response.
+     * @param <Result>    The target result type.
+     * @return The Rpc Response.
      */
     <Result> RpcResponse<Result> responseFromJson(String json, Class<Result> resultClass);
 
@@ -69,31 +69,50 @@ public interface JsonConverter {
     /**
      * Pretty prints the input JSON string if the Json Converter implementation supports it.
      *
-     * @param json The json string to prettyprint
-     * @return The prettyprinted json string
+     * @param json The json string to prettyprint.
+     * @return The prettyprinted json string.
      */
     String prettyPrint(String json);
 
     /**
      * Serializes the input object to a json string.
      *
-     * @param source The source object
-     * @return A json string result
+     * @param source The source object.
+     * @return A json string result.
      */
     String toRpcJson(Object source);
 
     String toGenericJson(Object object, Type runtimeType);
 
+    /**
+     * The name of the JSON converter implementation.
+     *
+     * @return The name of the implementation.
+     */
     String getName();
 
+    /**
+     * SPI specific details are contained in this class.
+     */
     class Provider {
 
+        /**
+         * Create a new JsonConverter instance.
+         *
+         * @return The Json Converter.
+         */
         public static JsonConverter newInstance() {
             assertRegistered();
             JsonConverter converter = serviceLoader(false).iterator().next();
             return converter;
         }
 
+        /**
+         * Create a new JsonConverter instance by name.
+         *
+         * @param converterName The name of the converter.
+         * @return The converter belonging to the supplied name.
+         */
         public static JsonConverter newInstance(String converterName) {
             assertRegistered();
             for (JsonConverter jsonConverter : serviceLoader(false)) {
@@ -105,6 +124,9 @@ public interface JsonConverter {
             throw new FactomRuntimeException(String.format("Could not find Json converter named %s. Please make sure a Factom json converter jar is on the classpath.", converterName));
         }
 
+        /**
+         * Checks whether there is at least one registered JSON converter.
+         */
         private static void assertRegistered() {
             ServiceLoader<JsonConverter> jsonConverters = serviceLoader(false);
             if (!jsonConverters.iterator().hasNext()) {
@@ -115,6 +137,12 @@ public interface JsonConverter {
             }
         }
 
+        /**
+         * Create JSON Converter service loader.
+         *
+         * @param reload Whether to reload the loader.
+         * @return The JSON converter service loader.
+         */
         private static ServiceLoader<JsonConverter> serviceLoader(boolean reload) {
             ServiceLoader<JsonConverter> loader = ServiceLoader.load(JsonConverter.class);
             if (reload) {
@@ -122,8 +150,5 @@ public interface JsonConverter {
             }
             return loader;
         }
-
-
     }
-
 }

@@ -8,7 +8,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 
 /**
- * The lowlevel client allows you to do direct exchanges (request, responses). This allows you to add additional request/response pairs. It also gives you access to settings and executor services.
+ * The lowlevel client allows you to do direct exchanges (request, responses).
+ * This allows you to add additional request/response pairs. It also gives you access to settings and executor services.
  */
 public interface LowLevelClient {
     /**
@@ -21,8 +22,8 @@ public interface LowLevelClient {
     /**
      * Sets the Rpc settings for this client. The settings allow you to set urls, usernames, passwords etc.
      *
-     * @param settings The Rpc settings
-     * @return This client
+     * @param settings The Rpc settings.
+     * @return This client.
      */
     LowLevelClient setSettings(RpcSettings settings);
 
@@ -44,30 +45,30 @@ public interface LowLevelClient {
     /**
      * Performs the exchange that happens when submitting a request to factomd/walletd. This returns a promise.
      *
-     * @param factomRequest  The request to send
+     * @param factomRequest  The request to send.
      * @param rpcResultClass The result class of the response.
      * @param <RpcResult>    The type of result to expect (response).
-     * @return The promise for the response
+     * @return The promise for the response.
      */
     <RpcResult> CompletableFuture<FactomResponse<RpcResult>> exchange(FactomRequest factomRequest, Class<RpcResult> rpcResultClass);
 
     /**
      * Performs the exchange that happens when submitting a request to factomd/walletd. This returns a promise.
      *
-     * @param rpcRequestBuilder The request builder that will be build into a request to send
+     * @param rpcRequestBuilder The request builder that will be build into a request to send.
      * @param rpcResultClass    The result class of the response.
      * @param <RpcResult>       The type of result to expect (response).
-     * @return The promise for the response
+     * @return The promise for the response.
      */
     <RpcResult> CompletableFuture<FactomResponse<RpcResult>> exchange(RpcRequest.Builder rpcRequestBuilder, Class<RpcResult> rpcResultClass);
 
     /**
      * Performs the exchange that happens when submitting a request to factomd/walletd. This returns a promise. This overload leaves out the FactomRequest wrapper object, since it only has one delegate currently.
      *
-     * @param rpcRequest     The Rpc request to send
+     * @param rpcRequest     The Rpc request to send.
      * @param rpcResultClass The result class of the response.
      * @param <RpcResult>    The type of result to expect (response).
-     * @return The promise for the response
+     * @return The promise for the response.
      */
     <RpcResult> CompletableFuture<FactomResponse<RpcResult>> exchange(RpcRequest rpcRequest, Class<RpcResult> rpcResultClass);
 
@@ -75,7 +76,7 @@ public interface LowLevelClient {
      * Set the executor service for the async parts. Allows you to use your own executor services, or use managed executor services in a JEE environment. If not provided a default executor service will be provided.
      *
      * @param executorService The executor service.
-     * @return This client/
+     * @return This client.
      */
     LowLevelClient setExecutorService(ExecutorService executorService);
 

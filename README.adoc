@@ -16,25 +16,29 @@ The client consists of several modules to support the following use cases:
 ** Managed Threads
 ** Configuration
 
-=== JSON plugins (SPI)
-To minimize dependencies and allow the implementor to choose, it has plugable JSON (de)serialization support.
-This is handled as an SPI. That means you need to have one of the json-providers below on the classpath!
+== JSON plugins (SPI)
+To minimize dependencies and allow the implementor to choose, Factom Java has plugable JSON (de)serialization support.
+This is handled as an SPI. That means you need to have one of the following json-providers below on the classpath together with the corresponding plugin project found in the sourcecode repository and releases!
 
-* GSON
-* JEE (javax.json)
+* GSON 2.8.X: json-converter-gson
+* JEE (javax.json) : json-converter-jee
 * Jackson (not implemented yet)
 
 Whenever one of the JSON plugins is on the classpath it will use that plugin to do the (de)serialization. Please note that at least one plugin is needed for this library to function.
 
-=== Logging plugins (SPI)
-There is pluggable support for logging as well. We will enhance that support in the future. Currently it needs the SLF4J SPI on the classpath.
+== Logging plugins (SPI)
+There is pluggable support for logging as well. We will enhance that support in the future. Currently it needs the SLF4J (logger-slf4j) SPI together with an SLF4J implementation on the classpath.
 Without it, the library will not function. That will be fixed in future releases.
 
-=== Offline signing
-Instead of using walletd to sign transactions and commits it is also possible to do that offline using private keys directly.
-To enable this you will need to include the offline signing client on the classpath. This module also has an external dependency on an encryption library.
+== Offline signing
+Instead of using walletd to sign transactions and commits it is also possible to do complete offline signing using private keys directly.
+To enable this you will need to include the offline signing (factom-client-offline-signing) on the classpath. This module also has an external dependency on an encryption library.
 
-=== Android support
+== IoT Signed at Source (SAS) support
+The IoT SAS module allows you to sign directly using integrated IoT chips integrated in hardware. The private key of the Factom Entry credit address is stored within the hardware protected portion of the device. Factom-java can use the IoT SAS integration to sign offline using the SAS device.
+An example project can be found at https://github.com/bi-foundation/factom-java-examples/tree/develop/IoT-SAS/IoT-SAS-Example[Github].
+
+== Android support
 Since this project has no external dependencies besides a JSON library and optional logging, it is fully compatible with Android 7 and up.
 An example project can be found at https://github.com/bi-foundation/factom-java-examples/tree/develop/android/FactomApiDemo[Github].
 
@@ -83,6 +87,14 @@ You need at least the following dependencies in your application
 </dependency>
 
 
+<!-- Optional IoT Signed at Source support -->
+<dependency>
+    groupId>org.blockchain-innovation.factom.client</groupId>
+    <artifactId>factom-client-offline-signing</artifactId>
+    <version>0.3.0</version>
+    <scope>compile</scope>
+</dependency>
+
 <!-- Optional JEE support (only in JEE environment) -->
 <dependency>
     groupId>org.blockchain-innovation.factom.client</groupId>
@@ -101,6 +113,16 @@ You need at least the following dependencies in your application
 
 ....
 
-= Active Development
+You will also need to specify Sphereon's maven repository if you would like to include releases in your project
+....
+<repositories>
+    <repository>
+        <id>BIF-releases</id>
+        <url>http://nexus.qa.sphereon.com/repository/bif/</url>
+    </repository>
+</repositories>
+....
+
+== Active Development
 IMPORTANT: This software still is in early development stage. As such you should expect breaking changes in APIs, we expect
 to keep that to a minimum though.

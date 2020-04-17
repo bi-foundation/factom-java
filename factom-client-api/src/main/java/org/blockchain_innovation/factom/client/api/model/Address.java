@@ -20,25 +20,75 @@ import org.blockchain_innovation.factom.client.api.model.types.AddressType;
 
 import java.io.Serializable;
 
+/**
+ * An address represents a Factom Factoid or Entry Credit address. Either a private (secret) or a public address.
+ */
 public class Address implements Serializable {
+
 
     private String secret;
 
-    public Address(String hexAddress) {
-        AddressType.assertValidAddress(hexAddress);
-        this.secret = hexAddress;
+    /**
+     * Create an address from bytes;
+     *
+     * @param hexAddress
+     * @return The address.
+     */
+    public static Address fromBytes(byte[] hexAddress) {
+        return new Address().setValue(String.valueOf(hexAddress));
     }
 
+    /**
+     * Create an address from a string.
+     *
+     * @param hexAddress The hex address string.
+     * @return The address.
+     */
+    public static Address fromString(String hexAddress) {
+        return new Address().setValue(hexAddress);
+    }
+
+    /**
+     * Either the static methods or string based constructor should be used.
+     */
+    private Address() {
+    }
+
+    /**
+     * Return a new address associated with the hex string.
+     *
+     * @param hexAddress The hex address string.
+     */
+    public Address(String hexAddress) {
+        setValue(hexAddress);
+    }
+
+    /**
+     * Get the address value.
+     *
+     * @return Address as string.
+     */
     public String getValue() {
         return secret;
     }
 
+    /**
+     * Set the address to the supplied value. Protected since this class should not be reused for multiple addresses.
+     *
+     * @param value The address value.
+     * @return The address object.
+     */
     protected Address setValue(String value) {
         AddressType.assertValidAddress(value);
         this.secret = value;
         return this;
     }
 
+    /**
+     * Get the address type. Factoid, Entry credit, Identity, Public or private.
+     *
+     * @return The address type.
+     */
     public AddressType getType() {
         return AddressType.getType(getValue());
     }

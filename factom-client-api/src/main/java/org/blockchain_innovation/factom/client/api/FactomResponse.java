@@ -21,36 +21,36 @@ import org.blockchain_innovation.factom.client.api.rpc.RpcResponse;
 
 /**
  * A composition class around the RpcResponse to get access to different values from a server response,
- * like http codes, errors, results.
+ * like http codes, errors, and the results.
  *
- * @param <Result> type of result in responses
+ * @param <Result> type of result in responses.
  */
 public interface FactomResponse<Result> {
     /**
      * Get the RPC response object that represents the result of a API call.
      *
-     * @return The Rpc Response
+     * @return The Rpc Response.
      */
     RpcResponse getRpcResponse();
 
     /**
      * The result object deserialized.
      *
-     * @return The result in the RpcResponse
+     * @return The result in the RpcResponse.
      */
     Result getResult();
 
     /**
      * The deserialized error response.
      *
-     * @return The error response
+     * @return The error response.
      */
     RpcErrorResponse getRpcErrorResponse();
 
     /**
      * Gets the status code from an HTTP response message.
      *
-     * @return the HTTP Response Status-Code, or -1 of the response is not from a HTTP request (rare)
+     * @return the HTTP Response Status-Code, or -1 of the response is not from a HTTP request (rare).
      */
     int getHTTPResponseCode();
 
@@ -64,14 +64,14 @@ public interface FactomResponse<Result> {
      * Extracts the Strings "OK" and "Not Found" respectively.
      * Returns null if none could be discerned from the responses (the result was not valid HTTP).
      *
-     * @return the HTTP response message, or {@code null}
+     * @return the HTTP response message, or {@code null}.
      */
     String getHTTPResponseMessage();
 
     /**
      * Checks if the Rpc response contains errors.
      *
-     * @return if the Response contains errors
+     * @return if the Response contains errors.
      */
     boolean hasErrors();
 }
