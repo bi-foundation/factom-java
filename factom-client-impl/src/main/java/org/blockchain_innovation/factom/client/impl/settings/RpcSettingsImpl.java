@@ -18,6 +18,8 @@ package org.blockchain_innovation.factom.client.impl.settings;
 
 
 import org.blockchain_innovation.factom.client.api.errors.FactomRuntimeException;
+import org.blockchain_innovation.factom.client.api.log.LogFactory;
+import org.blockchain_innovation.factom.client.api.log.Logger;
 import org.blockchain_innovation.factom.client.api.ops.StringUtils;
 import org.blockchain_innovation.factom.client.api.settings.RpcSettings;
 
@@ -30,6 +32,7 @@ import java.util.Properties;
 public class RpcSettingsImpl implements RpcSettings {
     private SubSystem subSystem;
     private Server server;
+    private static final Logger logger = LogFactory.getLogger(RpcSettings.class);
 
 
     public RpcSettingsImpl(SubSystem subSystem, Server server) {
@@ -101,7 +104,8 @@ public class RpcSettingsImpl implements RpcSettings {
         }
 
         private void initProperties(SubSystem subSystem, Properties properties) {
-            setURL(getFromPropertiesOrEnvironment(subSystem, "url", properties,"http://localhost:" + (subSystem == SubSystem.FACTOMD ? 8088 : 8089) + "/v2"));
+            // Defaults for URLs point to openAPI for factomd and a local walletd
+            setURL(getFromPropertiesOrEnvironment(subSystem, "url", properties, subSystem == SubSystem.FACTOMD ? "https://api.factomd.net/v2" : "http://localhost:8089/v2"));
 
             setTimeout(getFromPropertiesOrEnvironment(subSystem, "timeout", properties, "30"));
             setUsername(getFromPropertiesOrEnvironment(subSystem, "username", properties, null));
@@ -126,6 +130,7 @@ public class RpcSettingsImpl implements RpcSettings {
             if (StringUtils.isEmpty(value)) {
                 value = defaultValue;
             }
+            logger.info(subSystem.configKey() + " (config): " + key + "=" + (key.contains("pass") ? "xxxx" : value));
             return value;
         }
 
