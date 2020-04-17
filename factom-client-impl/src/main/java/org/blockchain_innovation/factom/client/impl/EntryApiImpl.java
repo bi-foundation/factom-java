@@ -4,6 +4,7 @@ import org.blockchain_innovation.factom.client.api.EntryApi;
 import org.blockchain_innovation.factom.client.api.FactomResponse;
 import org.blockchain_innovation.factom.client.api.FactomdClient;
 import org.blockchain_innovation.factom.client.api.LowLevelClient;
+import org.blockchain_innovation.factom.client.api.SignatureProdiver;
 import org.blockchain_innovation.factom.client.api.WalletdClient;
 import org.blockchain_innovation.factom.client.api.errors.FactomException;
 import org.blockchain_innovation.factom.client.api.errors.FactomRuntimeException;
@@ -116,16 +117,6 @@ public class EntryApiImpl extends AbstractClient implements EntryApi {
         return this;
     }
 
-    /**
-     * Compose, reveal and commit a chain.
-     *
-     * @param chain
-     * @param address
-     * @throws FactomException.ClientException
-     */
-    public CompletableFuture<CommitAndRevealChainResponse> commitAndRevealChain(Chain chain, Address address) throws FactomException.ClientException {
-        return commitAndRevealChain(chain, address, false);
-    }
 
     public CompletableFuture<Boolean> chainExists(Chain chain) {
         String chainId = Encoding.HEX.encode(entryOperations.calculateChainId(chain.getFirstEntry().getExternalIds()));

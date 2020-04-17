@@ -53,10 +53,10 @@ public class AddressTest extends AbstractClientTest {
         Assert.assertEquals(AddressType.ENTRY_CREDIT_PUBLIC, type);
         Assert.assertTrue(type.isPublic());
         Assert.assertFalse(type.isPrivate());
-        Assert.assertTrue(type.isValidTypeFor(EC_PUBLIC_ADDRESS));
+        Assert.assertTrue(type.isValid(EC_PUBLIC_ADDRESS));
         Assert.assertEquals(AddressType.Visibility.PUBLIC, type.getVisibility());
         Assert.assertEquals("EC", type.getHumanReadablePrefix());
-        Assert.assertEquals(type.getHumanReadablePrefix(), AddressType.getHumanReadablePrefix(EC_PUBLIC_ADDRESS));
+        Assert.assertEquals(type.getHumanReadablePrefix(), AddressType.getPrefix(EC_PUBLIC_ADDRESS));
     }
 
     @Test
@@ -68,7 +68,7 @@ public class AddressTest extends AbstractClientTest {
         Assert.assertTrue(type.isPrivate());
         Assert.assertEquals(AddressType.Visibility.PRIVATE, type.getVisibility());
         Assert.assertEquals("Es", type.getHumanReadablePrefix());
-        Assert.assertEquals(type.getHumanReadablePrefix(), AddressType.getHumanReadablePrefix(EC_SECRET_ADDRESS));
+        Assert.assertEquals(type.getHumanReadablePrefix(), AddressType.getPrefix(EC_SECRET_ADDRESS));
     }
 
 
@@ -81,7 +81,7 @@ public class AddressTest extends AbstractClientTest {
         Assert.assertFalse(type.isPrivate());
         Assert.assertEquals(AddressType.Visibility.PUBLIC, type.getVisibility());
         Assert.assertEquals("FA", type.getHumanReadablePrefix());
-        Assert.assertEquals(type.getHumanReadablePrefix(), AddressType.getHumanReadablePrefix(FCT_PUBLIC_ADDRESS));
+        Assert.assertEquals(type.getHumanReadablePrefix(), AddressType.getPrefix(FCT_PUBLIC_ADDRESS));
     }
 
 
@@ -94,7 +94,7 @@ public class AddressTest extends AbstractClientTest {
         Assert.assertTrue(type.isPrivate());
         Assert.assertEquals(AddressType.Visibility.PRIVATE, type.getVisibility());
         Assert.assertEquals("Fs", type.getHumanReadablePrefix());
-        Assert.assertEquals(type.getHumanReadablePrefix(), AddressType.getHumanReadablePrefix(FCT_SECRET_ADDRESS));
+        Assert.assertEquals(type.getHumanReadablePrefix(), AddressType.getPrefix(FCT_SECRET_ADDRESS));
     }
 
     @Test
@@ -106,7 +106,7 @@ public class AddressTest extends AbstractClientTest {
         Assert.assertFalse(type.isPrivate());
         Assert.assertEquals(AddressType.Visibility.PUBLIC, type.getVisibility());
         Assert.assertEquals("id1", type.getHumanReadablePrefix());
-        Assert.assertEquals(type.getHumanReadablePrefix(), AddressType.getHumanReadablePrefix(IDENTITY1_PUBLIC_ADDRESS));
+        Assert.assertEquals(type.getHumanReadablePrefix(), AddressType.getPrefix(IDENTITY1_PUBLIC_ADDRESS));
     }
 
 
@@ -119,7 +119,7 @@ public class AddressTest extends AbstractClientTest {
         Assert.assertTrue(type.isPrivate());
         Assert.assertEquals(AddressType.Visibility.PRIVATE, type.getVisibility());
         Assert.assertEquals("sk1", type.getHumanReadablePrefix());
-        Assert.assertEquals(type.getHumanReadablePrefix(), AddressType.getHumanReadablePrefix(IDENTITY1_SECRET_ADDRESS));
+        Assert.assertEquals(type.getHumanReadablePrefix(), AddressType.getPrefix(IDENTITY1_SECRET_ADDRESS));
     }
 
     @Test
@@ -197,7 +197,7 @@ public class AddressTest extends AbstractClientTest {
         OfflineAddressKeyConversions conversions = new OfflineAddressKeyConversions();
         String publicAddress = conversions.addressToPublicAddress(EC_SECRET_ADDRESS);
 
-        AddressType.ENTRY_CREDIT_PUBLIC.assertValidTypeFor(publicAddress);
+        AddressType.ENTRY_CREDIT_PUBLIC.assertValid(publicAddress);
         Assert.assertEquals(EC_PUBLIC_ADDRESS, publicAddress);
     }
 

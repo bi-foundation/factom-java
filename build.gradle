@@ -401,16 +401,6 @@ project(':frameworks:osgi') {
     }
 }
 
-//project(':factom-did-entry-client') {
-//    apply plugin: "java"
-////    apply plugin: 'org.openapi.generator'
-//
-//    dependencies {
-//        compile project(':factom-client-api')
-//
-//    }
-//}
-
 
 project(':factom-client-tests') {
     apply plugin: "java"

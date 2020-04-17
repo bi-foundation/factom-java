@@ -139,7 +139,7 @@ public class FactomdClientImpl extends AbstractClient implements FactomdClient {
 
     @Override
     public CompletableFuture<FactomResponse<EntryCreditBalanceResponse>> entryCreditBalance(Address entryCreditAddress) {
-        AddressType.ENTRY_CREDIT_PUBLIC.assertValidTypeFor(entryCreditAddress);
+        AddressType.ENTRY_CREDIT_PUBLIC.assertValid(entryCreditAddress);
         return exchange(RpcMethod.ENTRY_CREDIT_BALANCE.toRequestBuilder().param("address", entryCreditAddress.getValue()), EntryCreditBalanceResponse.class);
     }
 
@@ -155,7 +155,7 @@ public class FactomdClientImpl extends AbstractClient implements FactomdClient {
 
     @Override
     public CompletableFuture<FactomResponse<FactoidBalanceResponse>> factoidBalance(Address factoidAddress) {
-        AddressType.FACTOID_PUBLIC.assertValidTypeFor(factoidAddress);
+        AddressType.FACTOID_PUBLIC.assertValid(factoidAddress);
         return exchange(RpcMethod.FACTOID_BALANCE.toRequestBuilder().param("address", factoidAddress.getValue()), FactoidBalanceResponse.class);
     }
 
