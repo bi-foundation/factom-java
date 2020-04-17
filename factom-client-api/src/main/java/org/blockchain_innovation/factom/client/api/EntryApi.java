@@ -15,6 +15,8 @@ import org.blockchain_innovation.factom.client.api.ops.Encoding;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+
+@SuppressWarnings({"PMD.TooManyMethods"})
 public interface EntryApi {
 
     EntryApi addListener(CommitAndRevealListener listener);
@@ -78,6 +80,10 @@ public interface EntryApi {
      */
     CompletableFuture<CommitAndRevealChainResponse> commitAndRevealChain(Chain chain, Address address, boolean confirmCommit);
 
+    CompletableFuture<CommitAndRevealChainResponse> commitAndRevealChain(Chain chain, SignatureProdiver signatureProdiver) throws FactomException.ClientException;
+
+    CompletableFuture<CommitAndRevealChainResponse> commitAndRevealChain(Chain chain, SignatureProdiver signatureProdiver, boolean confirmCommit);
+
     /**
      * Compose, reveal and commit an entry.
      *
@@ -95,4 +101,8 @@ public interface EntryApi {
      * @throws FactomException.ClientException
      */
     CompletableFuture<CommitAndRevealEntryResponse> commitAndRevealEntry(Entry entry, Address address, boolean confirmCommit);
+
+    CompletableFuture<CommitAndRevealEntryResponse> commitAndRevealEntry(Entry entry, SignatureProdiver signatureProdiver) throws FactomException.ClientException;
+
+    CompletableFuture<CommitAndRevealEntryResponse> commitAndRevealEntry(Entry entry, SignatureProdiver signatureProdiver, boolean confirmCommit) throws FactomException.ClientException;
 }

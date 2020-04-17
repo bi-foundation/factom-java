@@ -286,7 +286,9 @@ project(':factom-client-offline-signing') {
 project(':iot-sas') {
     apply plugin: "java"
     dependencies {
+        compile project(':factom-client-impl')
         compile project(':factom-client-offline-signing')
+        compile project(':service-providers:logger-slf4j')
         compile 'com.fazecast:jSerialComm:[2.0.0,3.0.0)'
     }
 }
@@ -413,21 +415,18 @@ project(':frameworks:osgi') {
 project(':factom-client-tests') {
     apply plugin: "java"
     dependencies {
+        compile "org.slf4j:slf4j-simple:$libVersions.slf4j"
         testCompile project(':service-providers:logger-slf4j')
         testCompile project(':factom-client-impl')
         testCompile project(':factom-client-offline-signing')
         testCompile project(':service-providers:json-converter-gson')
-//        testCompile project(':service-providers:json-converter-jee')
+        testCompile project(':iot-sas')
         testCompile "org.mock-server:mockserver-netty:5.4.1"
         testCompile "org.mock-server:mockserver-client-java:5.4.1"
         testCompile "org.glassfish:javax.json:$testVersions.jee.javaxJson"
         testCompile "org.eclipse:yasson:$testVersions.jee.yasson"
         testCompile "junit:junit:$testVersions.junit4"
         testCompile 'com.fazecast:jSerialComm:[2.0.0,3.0.0)'
-
-//        testCompile "com.github.purejavacomm:purejavacomm:1.0.2.RELEASE"
-
-
     }
 }
 
