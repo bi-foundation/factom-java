@@ -18,17 +18,21 @@ package org.blockchain_innovation.factom.client.impl.settings;
 
 
 import org.blockchain_innovation.factom.client.api.errors.FactomRuntimeException;
+import org.blockchain_innovation.factom.client.api.log.LogFactory;
+import org.blockchain_innovation.factom.client.api.log.Logger;
 import org.blockchain_innovation.factom.client.api.ops.StringUtils;
 import org.blockchain_innovation.factom.client.api.settings.RpcSettings;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Properties;
 
 public class RpcSettingsImpl implements RpcSettings {
     private SubSystem subSystem;
     private Server server;
+    private static final Logger logger = LogFactory.getLogger(RpcSettings.class);
 
 
     public RpcSettingsImpl(SubSystem subSystem, Server server) {
@@ -39,6 +43,11 @@ public class RpcSettingsImpl implements RpcSettings {
     public RpcSettingsImpl(SubSystem subSystem, Properties properties) {
         this(subSystem, new ServerImpl(subSystem, properties));
     }
+
+    public RpcSettingsImpl(SubSystem subSystem, Map<String, String> properties) {
+        this(subSystem, new ServerImpl(subSystem, properties));
+    }
+
 
     protected static String constructKey(SubSystem subSystem, String key) {
         return (subSystem.configKey() + "." + key).toLowerCase(Locale.getDefault());
@@ -79,19 +88,50 @@ public class RpcSettingsImpl implements RpcSettings {
         private int timeout = 30;
 
         public ServerImpl(SubSystem subSystem) {
-            setURL("http://localhost:" + (subSystem == SubSystem.FACTOMD ? 8088 : 8089) + "/v2");
+            initProperties(subSystem, new Properties());
         }
 
         public ServerImpl(SubSystem subSystem, Properties properties) {
             initProperties(subSystem, properties);
         }
 
-        private void initProperties(SubSystem subSystem, Properties properties) {
-            setURL(properties.getProperty(constructKey(subSystem, "url"), "http://localhost:" + (subSystem == SubSystem.FACTOMD ? 8088 : 8089) + "/v2"));
+        public ServerImpl(SubSystem subSystem, Map<String, String> map) {
+            Properties properties = new Properties();
+            map.entrySet().forEach(entry ->
+                    properties.setProperty(entry.getKey().replaceAll("_", "."), entry.getValue())
+            );
+            initProperties(subSystem, properties);
+        }
 
-            setTimeout(properties.getProperty(constructKey(subSystem, "timeout"), "30"));
-            setUsername(properties.getProperty(constructKey(subSystem, "username"), null));
-            setPassword(properties.getProperty(constructKey(subSystem, "password"), null));
+        private void initProperties(SubSystem subSystem, Properties properties) {
+            // Defaults for URLs point to openAPI for factomd and a local walletd
+            setURL(getFromPropertiesOrEnvironment(subSystem, "url", properties, subSystem == SubSystem.FACTOMD ? "https://api.factomd.net/v2" : "http://localhost:8089/v2"));
+
+            setTimeout(getFromPropertiesOrEnvironment(subSystem, "timeout", properties, "30"));
+            setUsername(getFromPropertiesOrEnvironment(subSystem, "username", properties, null));
+            setPassword(getFromPropertiesOrEnvironment(subSystem, "password", properties, null));
+        }
+
+        private String getFromPropertiesOrEnvironment(SubSystem subSystem, String propertyKey, Properties properties, String defaultValue) {
+            String key = constructKey(subSystem, propertyKey);
+            String value = properties.getProperty(key);
+            if (StringUtils.isEmpty(value)) {
+                value = System.getProperty(key);
+                if (StringUtils.isEmpty(value)) {
+                    value = System.getProperty(key.replaceAll("\\.", "_"));
+                }
+            }
+            if (StringUtils.isEmpty(value)) {
+                value = System.getenv(key);
+                if (StringUtils.isEmpty(value)) {
+                    value = System.getenv(key.replaceAll("\\.", "_"));
+                }
+            }
+            if (StringUtils.isEmpty(value)) {
+                value = defaultValue;
+            }
+            logger.info(subSystem.configKey() + " (config): " + key + "=" + (key.contains("pass") ? "xxxx" : value));
+            return value;
         }
 
         @Override

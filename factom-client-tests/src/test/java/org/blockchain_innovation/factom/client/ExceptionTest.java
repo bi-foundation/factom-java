@@ -16,21 +16,23 @@
 
 package org.blockchain_innovation.factom.client;
 
-import org.blockchain_innovation.factom.client.api.errors.FactomException;
 import org.blockchain_innovation.factom.client.api.FactomResponse;
+import org.blockchain_innovation.factom.client.api.errors.FactomException;
 import org.blockchain_innovation.factom.client.api.errors.FactomRuntimeException;
 import org.blockchain_innovation.factom.client.api.model.Address;
 import org.blockchain_innovation.factom.client.api.model.Entry;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.CurrentMinuteResponse;
 import org.blockchain_innovation.factom.client.api.settings.RpcSettings;
 import org.blockchain_innovation.factom.client.impl.FactomdClientImpl;
 import org.blockchain_innovation.factom.client.impl.settings.RpcSettingsImpl;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
-import java.util.concurrent.CompletionException;
 
 public class ExceptionTest extends AbstractClientTest {
 
@@ -83,13 +85,14 @@ public class ExceptionTest extends AbstractClientTest {
         factomdClient.properties();
     }
 
-    @Test(expected = CompletionException.class)
-    public void testInvalidURLSettings() throws FactomException.ClientException {
-        Properties properties = new Properties();
+    @Ignore
+    @Test(expected = FactomException.ClientException.class)
+    public void testInvalidURLSettings() throws IOException {
+        Properties properties = getProperties();
         RpcSettings settings = new RpcSettingsImpl(RpcSettings.SubSystem.WALLETD, properties);
         FactomdClientImpl factomdClient = new FactomdClientImpl();
         factomdClient.setSettings(settings);
-        factomdClient.properties().join();
+        FactomResponse<CurrentMinuteResponse> currentMinuteResponseFactomResponse = factomdClient.currentMinute().join();
     }
 
 

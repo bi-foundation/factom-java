@@ -116,3 +116,4 @@ quality/reports/*
 /.idea/compiler.xml
 /.idea/misc.xml
 /.idea/vcs.xml
+/local.properties

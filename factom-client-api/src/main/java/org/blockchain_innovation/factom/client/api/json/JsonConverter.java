@@ -20,10 +20,13 @@ import org.blockchain_innovation.factom.client.api.errors.FactomRuntimeException
 import org.blockchain_innovation.factom.client.api.rpc.RpcErrorResponse;
 import org.blockchain_innovation.factom.client.api.rpc.RpcResponse;
 
+import java.lang.reflect.Type;
 import java.util.Properties;
 import java.util.ServiceLoader;
 
 public interface JsonConverter {
+
+    void addAdapter(Type type, Object adapter);
 
     /**
      * Allows you to configure a JSON converter implementation. This is converter specific.
@@ -50,7 +53,18 @@ public interface JsonConverter {
      * @param <Result>    The target result type
      * @return The RpcResponse
      */
-    <Result> RpcResponse<Result> fromJson(String json, Class<Result> resultClass);
+    <Result> RpcResponse<Result> responseFromJson(String json, Class<Result> resultClass);
+
+    /**
+     * Deserialized a json
+     * object as POJO.
+     *
+     * @param json        The json response as String from factomd or walletd
+     * @param resultClass The target result class for the response
+     * @param <T>    The target result type
+     * @return The Target
+     */
+    <T> T fromJson(String json, Class<T> resultClass);
 
     /**
      * Pretty prints the input JSON string if the Json Converter implementation supports it.
@@ -66,7 +80,9 @@ public interface JsonConverter {
      * @param source The source object
      * @return A json string result
      */
-    String toJson(Object source);
+    String toRpcJson(Object source);
+
+    String toGenericJson(Object object, Type runtimeType);
 
     String getName();
 

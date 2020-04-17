@@ -115,14 +115,14 @@ public class JsonConverterGSONTest {
 
     @Test
     public void testPropertiesReqToJson() {
-        String json = CONV.toJson(RpcMethod.PROPERTIES.toRequest());
+        String json = CONV.toRpcJson(RpcMethod.PROPERTIES.toRequest());
         Assert.assertEquals(PROPERTIES_REQ, json);
     }
 
     @Test
     public void testFactomChainHeadReqToJson() {
         RpcRequest rpcRequest = RpcMethod.CHAIN_HEAD.toRequestBuilder().id(5).param("chainid", "TEST").build();
-        String json = CONV.toJson(rpcRequest);
+        String json = CONV.toRpcJson(rpcRequest);
         Assert.assertEquals(CHAINHEAD_REQ, json);
     }
 
@@ -133,7 +133,7 @@ public class JsonConverterGSONTest {
         properties.setProperty("json.prettyprint", "false");
         properties.setProperty("json.lenient", "false");
         CONV.configure(properties);
-        String json = CONV.toJson(rpcRequest);
+        String json = CONV.toRpcJson(rpcRequest);
         properties.clear();
         Assert.assertNotEquals(CHAINHEAD_REQ, json);
         Assert.assertEquals("{\"jsonrpc\":\"2.0\",\"method\":\"chain-head\",\"id\":5,\"params\":{\"chainid\":\"TEST\"}}", json);
@@ -178,7 +178,7 @@ public class JsonConverterGSONTest {
 
     @Test
     public void testRespFromJson() {
-        RpcResponse<DirectoryBlockResponse> response = CONV.fromJson(DIRECTORY_BLOCK_RESP, DirectoryBlockResponse.class);
+        RpcResponse<DirectoryBlockResponse> response = CONV.responseFromJson(DIRECTORY_BLOCK_RESP, DirectoryBlockResponse.class);
         Assert.assertNotNull(response);
         Assert.assertEquals("2.0", response.getJsonrpc());
         Assert.assertEquals(3, response.getId());
@@ -200,7 +200,7 @@ public class JsonConverterGSONTest {
 
     @Test
     public void testReservedRespFromJson() {
-        RpcResponse<AddressResponse> response = CONV.fromJson(ADDRESS_RESP, AddressResponse.class);
+        RpcResponse<AddressResponse> response = CONV.responseFromJson(ADDRESS_RESP, AddressResponse.class);
         Assert.assertNotNull(response);
         Assert.assertEquals("2.0", response.getJsonrpc());
         Assert.assertEquals(6, response.getId());
@@ -209,7 +209,7 @@ public class JsonConverterGSONTest {
         Assert.assertEquals("FA2jK2HcLnRdS94dEcU27rF3meoJfpUcZPSinpb7AwQvPRY6RL1Q", response.getResult().getPublicAddress());
         Assert.assertEquals("Fs3E9gV6DXsYzf7Fqx1fVBQPQXV695eP3k5XbmHEZVRLkMdD9qCK", response.getResult().getSecret());
 
-        RpcResponse<WalletBackupResponse> backupResponse = CONV.fromJson(WALLET_BACKUP_RESP, WalletBackupResponse.class);
+        RpcResponse<WalletBackupResponse> backupResponse = CONV.responseFromJson(WALLET_BACKUP_RESP, WalletBackupResponse.class);
         Assert.assertNotNull(backupResponse);
         Assert.assertEquals("2.0", backupResponse.getJsonrpc());
         Assert.assertEquals(0, backupResponse.getId());

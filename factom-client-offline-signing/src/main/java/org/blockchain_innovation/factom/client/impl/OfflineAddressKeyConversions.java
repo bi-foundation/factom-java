@@ -3,6 +3,7 @@ package org.blockchain_innovation.factom.client.impl;
 import net.i2p.crypto.eddsa.math.GroupElement;
 import net.i2p.crypto.eddsa.spec.EdDSANamedCurveTable;
 import org.blockchain_innovation.factom.client.api.AddressKeyConversions;
+import org.blockchain_innovation.factom.client.api.errors.FactomRuntimeException;
 import org.blockchain_innovation.factom.client.api.model.Address;
 import org.blockchain_innovation.factom.client.api.model.types.AddressType;
 import org.blockchain_innovation.factom.client.api.ops.Digests;
@@ -62,6 +63,11 @@ public class OfflineAddressKeyConversions extends AddressKeyConversions {
     }
 
     public byte[] addressToPublicKey(String address) {
+        if (AddressType.getType(address) == AddressType.FACTOID_PUBLIC) {
+            throw new FactomRuntimeException.AssertionException(
+                    String.format("Provided address is a public Factoid address, which cannot be converted to a public key"));
+        }
+
         byte[] privateKey = addressToKey(address);
 
         // EdDSAPrivateKeySpec privateKeySpec = new EdDSAPrivateKeySpec(privateKey, EdDSANamedCurveTable.ED_25519_CURVE_SPEC);
