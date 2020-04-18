@@ -50,6 +50,11 @@ public class FactomException extends Exception {
 
         private final FactomResponse<?> factomErrorResponse;
 
+        public RpcErrorException(String msg, FactomResponse<?> factomResponse) {
+            super(msg);
+            this.factomErrorResponse = factomResponse;
+        }
+
         public RpcErrorException(Throwable cause, FactomResponse<?> factomResponse) {
             super(cause);
             this.factomErrorResponse = factomResponse;

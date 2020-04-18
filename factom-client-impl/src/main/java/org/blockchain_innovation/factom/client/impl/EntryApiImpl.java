@@ -134,8 +134,12 @@ public class EntryApiImpl extends AbstractClient implements EntryApi {
     @Override
     public CompletableFuture<List<EntryBlockResponse>> allEntryBlocks(String chainId) {
         return factomdClient.chainHead(chainId)
-                .thenComposeAsync(chainHeadResponse -> entryBlocksUpTilKeyMR(chainHeadResponse.getResult().getChainHead()), getExecutorService());
+                .thenCompose(chainHeadResponse -> {
+                    errorHandling(chainHeadResponse, "Could not get entry blocks for chain Id " + chainId);
+                    return entryBlocksUpTilKeyMR(chainHeadResponse.getResult().getChainHead());
+                });
     }
+
 
     /**
      * All entry blocks of a chain
@@ -146,7 +150,10 @@ public class EntryApiImpl extends AbstractClient implements EntryApi {
     @Override
     public CompletableFuture<List<EntryBlockResponse.Entry>> allEntryBlocksEntries(String chainId) {
         return getFactomdClient().chainHead(chainId)
-                .thenComposeAsync(chainHeadResponse -> entryBlocksEntriesUpTilKeyMR(chainHeadResponse.getResult().getChainHead()), getExecutorService());
+                .thenComposeAsync(chainHeadResponse -> {
+                    errorHandling(chainHeadResponse, "Could not get entry blocks for chain Id " + chainId);
+                    return entryBlocksEntriesUpTilKeyMR(chainHeadResponse.getResult().getChainHead());
+                }, getExecutorService());
     }
 
 
@@ -161,9 +168,14 @@ public class EntryApiImpl extends AbstractClient implements EntryApi {
             throw new FactomRuntimeException("Encoding needs to be UTF-8 or HEX. Value: " + encoding.name());
         }
         return getFactomdClient().chainHead(chainId)
-                .thenComposeAsync(chainHeadResponse -> entriesUpTilKeyMR(chainHeadResponse.getResult().getChainHead()), getExecutorService())
-                .thenApplyAsync(entryResponses -> entryResponses.stream().map(
-                        entryResponse -> encoding == Encoding.UTF_8 ? encodeOperations.decodeHex(entryResponse) : entryResponse).collect(Collectors.toList()), getExecutorService());
+                .thenComposeAsync(chainHeadResponse -> {
+                    errorHandling(chainHeadResponse, "Could not get chain head for chain Id " + chainId);
+                    return entriesUpTilKeyMR(chainHeadResponse.getResult().getChainHead());
+                }, getExecutorService())
+                .thenApplyAsync(entryResponses ->
+                                entryResponses.stream().map(
+                                        entryResponse -> encoding == Encoding.UTF_8 ? encodeOperations.decodeHex(entryResponse) : entryResponse).collect(Collectors.toList())
+                        , getExecutorService());
     }
 
     @Override
@@ -176,7 +188,10 @@ public class EntryApiImpl extends AbstractClient implements EntryApi {
                     return CompletableFuture.allOf(entryResponses.toArray(new CompletableFuture[entryResponses.size()]))
                             .thenApply(aVoid -> entryResponses.stream()
                                     .map(CompletableFuture::join)
-                                    .map(entryResponse -> entryResponse.getResult())
+                                    .map(entryResponse -> {
+                                        errorHandling(entryResponse, "Could not get entry block for keyMr " + keyMR);
+                                        return entryResponse.getResult();
+                                    })
                                     .collect(Collectors.toList())
                             );
                 }, getExecutorService());
@@ -190,9 +205,10 @@ public class EntryApiImpl extends AbstractClient implements EntryApi {
         String currentKeyMR = keyMR;
 
         while (!currentKeyMR.equals(NO_PREVIOUS_KEY_MERKLE_ROOT)) {
-            EntryBlockResponse currentBlock = factomdClient.entryBlockByKeyMerkleRoot(currentKeyMR).join().getResult();
-            currentKeyMR = currentBlock.getHeader().getPreviousKeyMR();
-            entryBlockResponseList.add(currentBlock);
+            FactomResponse<EntryBlockResponse> currentBlock = factomdClient.entryBlockByKeyMerkleRoot(currentKeyMR).join();
+            errorHandling(currentBlock, "Could not get entry block for keyMr " + currentKeyMR);
+            currentKeyMR = currentBlock.getResult().getHeader().getPreviousKeyMR();
+            entryBlockResponseList.add(currentBlock.getResult());
         }
         CompletableFuture<List<EntryBlockResponse>> completableFuture = new CompletableFuture<>();
         completableFuture.complete(entryBlockResponseList);
@@ -404,6 +420,13 @@ public class EntryApiImpl extends AbstractClient implements EntryApi {
             listenerCall.accept(response.getResult());
         }
         return response;
+    }
+
+    private void errorHandling(FactomResponse<?> response, String message) {
+        assertResponse(response);
+        if (response.hasErrors()) {
+            throw new FactomException.RpcErrorException(message, response);
+        }
     }
 
     private void assertResponse(FactomResponse<?> response) {
