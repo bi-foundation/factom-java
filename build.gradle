@@ -150,8 +150,8 @@ subprojects {
 
         repositories {
             maven {
-                def releasesRepoUrl = "http://nexus.qa.sphereon.com/repository/sphereon-opensource-releases"
-                def snapshotsRepoUrl = "http://nexus.qa.sphereon.com/repository/sphereon-opensource-snapshots"
+                def releasesRepoUrl = "https://nexus.qa.sphereon.com/repository/sphereon-opensource-releases"
+                def snapshotsRepoUrl = "https://nexus.qa.sphereon.com/repository/sphereon-opensource-snapshots"
                 url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
                 credentials {
                     username project.repoUser
