@@ -262,4 +262,11 @@ public interface WalletdClient {
      * @return The wallet seed response promise.
      */
     CompletableFuture<FactomResponse<WalletBackupResponse>> walletBackup();
+
+    /**
+     * Returns the signing mode (online walletd, offline) for transaction signing
+     *
+     * @return The signing mode for this walletd client
+     */
+    SigningMode signingMode();
 }

@@ -360,10 +360,12 @@ project(':frameworks:spring-boot-support') {
     apply plugin: "io.spring.dependency-management"
 
     dependencies {
+        annotationProcessor "org.springframework.boot:spring-boot-configuration-processor:$libVersions.spring.boot"
         compile project(':factom-client-impl')
-        // Explicit dep on CDI, since it might not be on classpath of spring boot application
+        // Explicit dep on CDI, since it might not be on classpath of the spring boot application
         compile "javax.enterprise:cdi-api:$libVersions.jee.cdiApi"
         compileOnly "org.springframework.boot:spring-boot-starter:$libVersions.spring.boot"
+        compileOnly project(":factom-client-offline-signing")
         testCompile project(":service-providers:logger-slf4j")
         testCompile project(":service-providers:json-converter-gson")
         testCompile "com.google.code.gson:gson:$libVersions.gson"

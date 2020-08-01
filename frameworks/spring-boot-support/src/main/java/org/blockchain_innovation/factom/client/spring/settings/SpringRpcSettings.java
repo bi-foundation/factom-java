@@ -1,5 +1,6 @@
 package org.blockchain_innovation.factom.client.spring.settings;
 
+import org.blockchain_innovation.factom.client.api.SigningMode;
 import org.blockchain_innovation.factom.client.api.errors.FactomException;
 import org.blockchain_innovation.factom.client.api.settings.RpcSettings;
 import org.blockchain_innovation.factom.client.impl.settings.RpcSettingsImpl;
@@ -37,6 +38,7 @@ public class SpringRpcSettings {
 
     public static class Walletd extends RpcSettingsImpl.ServerImpl implements RpcSettings.Server {
         private int threads = 5;
+        private SigningMode signingMode = SigningMode.ONLINE_WALLETD;
 
         public int getThreads() {
             return threads;
@@ -44,6 +46,18 @@ public class SpringRpcSettings {
 
         public void setThreads(int threads) {
             this.threads = threads;
+        }
+
+        public SigningMode getSigningMode() {
+            return signingMode;
+        }
+
+        public void setSigningMode(String signingMode) {
+            setSigningMode(SigningMode.fromModeString(signingMode));
+        }
+
+        public void setSigningMode(SigningMode signingMode) {
+            this.signingMode = signingMode;
         }
 
         public Walletd() {
@@ -61,14 +75,14 @@ public class SpringRpcSettings {
 
 
     public Factomd getFactomdServer() {
-        if(factomd == null){
+        if (factomd == null) {
             throw new FactomException.ClientException("Please configure Factomd settings");
         }
         return factomd;
     }
 
     public Walletd getWalletdServer() {
-        if(walletd == null){
+        if (walletd == null) {
             throw new FactomException.ClientException("Please configure Walletd settings");
         }
         return walletd;

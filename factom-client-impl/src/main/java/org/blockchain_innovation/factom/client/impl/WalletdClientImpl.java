@@ -18,6 +18,7 @@ package org.blockchain_innovation.factom.client.impl;
 
 import org.blockchain_innovation.factom.client.api.FactomResponse;
 import org.blockchain_innovation.factom.client.api.SignatureProdiver;
+import org.blockchain_innovation.factom.client.api.SigningMode;
 import org.blockchain_innovation.factom.client.api.WalletdClient;
 import org.blockchain_innovation.factom.client.api.errors.FactomException;
 import org.blockchain_innovation.factom.client.api.model.Address;
@@ -187,5 +188,10 @@ public class WalletdClientImpl extends AbstractClient implements WalletdClient {
     @Override
     public CompletableFuture<FactomResponse<WalletBackupResponse>> walletBackup() {
         return exchange(RpcMethod.WALLET_BACKUP.toRequestBuilder(), WalletBackupResponse.class);
+    }
+
+    @Override
+    public SigningMode signingMode() {
+        return SigningMode.ONLINE_WALLETD;
     }
 }

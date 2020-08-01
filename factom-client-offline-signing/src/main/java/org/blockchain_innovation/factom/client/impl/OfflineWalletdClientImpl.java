@@ -2,6 +2,7 @@ package org.blockchain_innovation.factom.client.impl;
 
 import org.blockchain_innovation.factom.client.api.FactomResponse;
 import org.blockchain_innovation.factom.client.api.SignatureProdiver;
+import org.blockchain_innovation.factom.client.api.SigningMode;
 import org.blockchain_innovation.factom.client.api.errors.FactomException;
 import org.blockchain_innovation.factom.client.api.model.Address;
 import org.blockchain_innovation.factom.client.api.model.Chain;
@@ -24,11 +25,10 @@ import java.util.function.Supplier;
 
 @SuppressWarnings("PMD.TooManyMethods")
 public class OfflineWalletdClientImpl extends WalletdClientImpl {
-
     private final OfflineAddressKeyConversions addressKeyConversions = new OfflineAddressKeyConversions();
+
     private final EntryOperations entryOperations = new EntryOperations();
     private final ByteOperations byteOperations = new ByteOperations();
-
     @Override
     public CompletableFuture<FactomResponse<ComposeResponse>> composeChain(Chain chain, SignatureProdiver signatureProdiver) throws FactomException.ClientException {
         Supplier<FactomResponse<ComposeResponse>> supplier = () -> {
@@ -239,5 +239,10 @@ public class OfflineWalletdClientImpl extends WalletdClientImpl {
         byte[] holder = buffer.array();
         byte[] resp = new byte[]{holder[2], holder[3], holder[4], holder[5], holder[6], holder[7]};
         return resp;
+    }
+
+    @Override
+    public SigningMode signingMode() {
+        return SigningMode.OFFLINE;
     }
 }
