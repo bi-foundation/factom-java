@@ -115,6 +115,10 @@ public class RpcSettingsImpl implements RpcSettings {
         return Optional.ofNullable(defaultECAddress);
     }
 
+    public RpcSettingsImpl setDefaultECAddress(String address) {
+        return StringUtils.isEmpty(address) ? this : setDefaultECAddress(Address.fromString(address));
+    }
+
     public RpcSettingsImpl setDefaultECAddress(Address address) {
         if (address != null && !(address.getType() == AddressType.ENTRY_CREDIT_SECRET || address.getType() == AddressType.ENTRY_CREDIT_PUBLIC)) {
             throw new FactomRuntimeException("Invalid address type supplied for the default EC address: " + address.getType());

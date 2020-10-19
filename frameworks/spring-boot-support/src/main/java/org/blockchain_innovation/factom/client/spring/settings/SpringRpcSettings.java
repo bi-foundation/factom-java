@@ -1,6 +1,7 @@
 package org.blockchain_innovation.factom.client.spring.settings;
 
 import org.blockchain_innovation.factom.client.api.SigningMode;
+import org.blockchain_innovation.factom.client.api.errors.FactomException;
 import org.blockchain_innovation.factom.client.api.errors.FactomRuntimeException;
 import org.blockchain_innovation.factom.client.api.settings.RpcSettings;
 import org.blockchain_innovation.factom.client.impl.Networks;
@@ -23,6 +24,8 @@ public class SpringRpcSettings {
     private Walletd walletd;
     private transient Optional<String> networkName = Optional.empty();
 
+    private String ecAddress;
+
     public Optional<String> getNetworkName() {
         return networkName;
     }
@@ -36,6 +39,14 @@ public class SpringRpcSettings {
         if (walletd != null) {
             syncNames(walletd);
         }
+    }
+
+    public String getEcAddress() {
+        return ecAddress;
+    }
+
+    public void setEcAddress(String ecAddress) {
+        this.ecAddress = ecAddress;
     }
 
     public static class Factomd extends RpcSettingsImpl.ServerImpl implements RpcSettings.Server {
@@ -90,6 +101,7 @@ public class SpringRpcSettings {
 
     public void setWalletd(Walletd walletd) {
         syncNames(walletd);
+
         this.walletd = walletd;
     }
 
@@ -107,14 +119,14 @@ public class SpringRpcSettings {
 
     public Factomd getFactomd() {
         if (factomd == null) {
-//            throw new FactomException.ClientException("Please configure Factomd settings");
+            throw new FactomException.ClientException("Please configure Factomd settings");
         }
         return factomd;
     }
 
     public Walletd getWalletd() {
         if (walletd == null) {
-//            throw new FactomException.ClientException("Please configure Walletd settings");
+            throw new FactomException.ClientException("Please configure Walletd settings");
         }
         return walletd;
     }

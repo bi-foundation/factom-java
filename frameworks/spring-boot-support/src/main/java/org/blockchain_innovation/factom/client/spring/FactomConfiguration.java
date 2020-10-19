@@ -32,7 +32,9 @@ public class FactomConfiguration {
     @Scope("prototype")
     public FactomdClient factomdClient(SpringRpcSettings specificSettings) {
         FactomdClientImpl factomdClient = new FactomdClientImpl();
-        factomdClient.setSettings(new RpcSettingsImpl(RpcSettings.SubSystem.FACTOMD, specificSettings.getFactomd()));
+        RpcSettingsImpl settings = new RpcSettingsImpl(RpcSettings.SubSystem.FACTOMD, specificSettings.getFactomd());
+        settings.setDefaultECAddress(specificSettings.getEcAddress());
+        factomdClient.setSettings(settings);
         factomdClient.setExecutorService(Executors.newFixedThreadPool(specificSettings.getFactomd().getThreads()));
         return factomdClient;
     }
@@ -50,7 +52,9 @@ public class FactomConfiguration {
     }
 
     private WalletdClient walletdClient(SpringRpcSettings specificSettings, WalletdClientImpl walletdClient) {
-        walletdClient.setSettings(new RpcSettingsImpl(RpcSettings.SubSystem.WALLETD, specificSettings.getWalletd()));
+        RpcSettingsImpl settings = new RpcSettingsImpl(RpcSettings.SubSystem.WALLETD, specificSettings.getFactomd());
+        settings.setDefaultECAddress(specificSettings.getEcAddress());
+        walletdClient.setSettings(settings);
         walletdClient.setExecutorService(Executors.newFixedThreadPool(specificSettings.getWalletd().getThreads()));
         return walletdClient;
     }
