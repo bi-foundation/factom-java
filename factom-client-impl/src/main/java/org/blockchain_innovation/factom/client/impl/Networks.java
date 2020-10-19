@@ -8,6 +8,7 @@ import org.blockchain_innovation.factom.client.api.errors.FactomException;
 import org.blockchain_innovation.factom.client.api.errors.FactomRuntimeException;
 import org.blockchain_innovation.factom.client.api.log.LogFactory;
 import org.blockchain_innovation.factom.client.api.log.Logger;
+import org.blockchain_innovation.factom.client.api.model.Address;
 import org.blockchain_innovation.factom.client.api.settings.RpcSettings;
 import org.blockchain_innovation.factom.client.impl.settings.RpcSettingsImpl;
 
@@ -94,6 +95,21 @@ public class Networks {
             throw new FactomRuntimeException.AssertionException("Cannot reinitialize networks with new properties");
         }
         Networks.properties = properties;
+    }
+
+    public static Optional<Address> getDefaultECAddress(Optional<String> networkName) {
+        RpcSettings settings = walletd(networkName).lowLevelClient().getSettings();
+        if (settings.getSigningMode() == SigningMode.OFFLINE) {
+            return settings.getDefaultECAddress();
+        }
+
+        return Optional.empty();
+    }
+
+    public static Address getECAddress(Optional<String> networkName, Optional<Address> optionalECAddressToUse) {
+        return optionalECAddressToUse.orElse(
+                getDefaultECAddress(networkName).orElseThrow(
+                        () -> new FactomRuntimeException.AssertionException("Need to either configure an EC address or supply an EC address")));
     }
 
 

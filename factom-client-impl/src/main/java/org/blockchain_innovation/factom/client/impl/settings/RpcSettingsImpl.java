@@ -21,6 +21,8 @@ import org.blockchain_innovation.factom.client.api.SigningMode;
 import org.blockchain_innovation.factom.client.api.errors.FactomRuntimeException;
 import org.blockchain_innovation.factom.client.api.log.LogFactory;
 import org.blockchain_innovation.factom.client.api.log.Logger;
+import org.blockchain_innovation.factom.client.api.model.Address;
+import org.blockchain_innovation.factom.client.api.model.types.AddressType;
 import org.blockchain_innovation.factom.client.api.ops.StringUtils;
 import org.blockchain_innovation.factom.client.api.settings.RpcSettings;
 
@@ -35,7 +37,8 @@ public class RpcSettingsImpl implements RpcSettings {
     private SubSystem subSystem;
     private Server server;
     private static final Logger logger = LogFactory.getLogger(RpcSettings.class);
-    private SigningMode signingMode = null;
+    private SigningMode signingMode;
+    private Address defaultECAddress;
 
     public RpcSettingsImpl(SubSystem subSystem, Server server) {
         this.subSystem = subSystem;
@@ -47,6 +50,7 @@ public class RpcSettingsImpl implements RpcSettings {
         this.subSystem = subSystem;
         this.server = server;
         this.signingMode = getSigningModeFromPropertiesOrEnvironment(properties, server.getNetworkName() == null ? Optional.empty() : server.getNetworkName());
+        this.defaultECAddress = getDefaultECAddressFromPropertiesOrEnvironment(properties, server.getNetworkName() == null ? Optional.empty() : server.getNetworkName());
     }
 
     public RpcSettingsImpl(SubSystem subSystem, Server server, SigningMode signingMode) {
@@ -80,8 +84,9 @@ public class RpcSettingsImpl implements RpcSettings {
         return server;
     }
 
-    public void setServer(Server server) {
+    public RpcSettingsImpl setServer(Server server) {
         this.server = server;
+        return this;
     }
 
     @Override
@@ -95,7 +100,7 @@ public class RpcSettingsImpl implements RpcSettings {
         return subSystem;
     }
 
-    public RpcSettings setSubSystem(SubSystem subSystem) {
+    public RpcSettingsImpl setSubSystem(SubSystem subSystem) {
         this.subSystem = subSystem;
         return this;
     }
@@ -105,7 +110,20 @@ public class RpcSettingsImpl implements RpcSettings {
         return signingMode;
     }
 
-    public RpcSettings setSigningMode(SigningMode signingMode) {
+    @Override
+    public Optional<Address> getDefaultECAddress() {
+        return Optional.ofNullable(defaultECAddress);
+    }
+
+    public RpcSettingsImpl setDefaultECAddress(Address address) {
+        if (address != null && !(address.getType() == AddressType.ENTRY_CREDIT_SECRET || address.getType() == AddressType.ENTRY_CREDIT_PUBLIC)) {
+            throw new FactomRuntimeException("Invalid address type supplied for the default EC address: " + address.getType());
+        }
+        this.defaultECAddress = address;
+        return this;
+    }
+
+    public RpcSettingsImpl setSigningMode(SigningMode signingMode) {
         this.signingMode = signingMode;
         return this;
     }
@@ -269,6 +287,14 @@ public class RpcSettingsImpl implements RpcSettings {
     protected static SigningMode getSigningModeFromPropertiesOrEnvironment(Properties properties, Optional<String> networkName) {
         return SigningMode.fromModeString(
                 getFromPropertiesOrEnvironment(SubSystem.WALLETD, "signing-mode", properties, SigningMode.ONLINE_WALLETD.name(), networkName));
+    }
+
+    protected static Address getDefaultECAddressFromPropertiesOrEnvironment(Properties properties, Optional<String> networkName) {
+        String address = getFromPropertiesOrEnvironment(SubSystem.WALLETD, "ec-address", properties, null, networkName);
+        if (address == null) {
+            address = getFromPropertiesOrEnvironment(SubSystem.WALLETD, "entry-credit-address", properties, null, networkName);
+        }
+        return address == null ? null : Address.fromString(address);
     }
 
     protected static String constructKey(SubSystem subSystem, String key, Optional<String> networkName) {
