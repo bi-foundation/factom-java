@@ -17,6 +17,7 @@
 package org.blockchain_innovation.factom.client.impl.settings;
 
 
+import org.blockchain_innovation.factom.client.api.SigningMode;
 import org.blockchain_innovation.factom.client.api.errors.FactomRuntimeException;
 import org.blockchain_innovation.factom.client.api.log.LogFactory;
 import org.blockchain_innovation.factom.client.api.log.Logger;
@@ -27,31 +28,52 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 
 public class RpcSettingsImpl implements RpcSettings {
     private SubSystem subSystem;
     private Server server;
     private static final Logger logger = LogFactory.getLogger(RpcSettings.class);
-
+    private SigningMode signingMode = null;
 
     public RpcSettingsImpl(SubSystem subSystem, Server server) {
         this.subSystem = subSystem;
         this.server = server;
+        this.signingMode = SigningMode.ONLINE_WALLETD;
     }
 
+    private RpcSettingsImpl(SubSystem subSystem, Server server, Properties properties) {
+        this.subSystem = subSystem;
+        this.server = server;
+        this.signingMode = getSigningModeFromPropertiesOrEnvironment(properties, server.getNetworkName() == null ? Optional.empty() : server.getNetworkName());
+    }
+
+    public RpcSettingsImpl(SubSystem subSystem, Server server, SigningMode signingMode) {
+        this.subSystem = subSystem;
+        this.server = server;
+        this.signingMode = signingMode;
+    }
+
+
+    @Deprecated
     public RpcSettingsImpl(SubSystem subSystem, Properties properties) {
-        this(subSystem, new ServerImpl(subSystem, properties));
+        this(subSystem, properties, Optional.empty());
     }
 
+    public RpcSettingsImpl(SubSystem subSystem, Properties properties, Optional<String> networkName) {
+        this(subSystem, new ServerImpl(subSystem, properties, networkName), properties);
+    }
+
+    @Deprecated
     public RpcSettingsImpl(SubSystem subSystem, Map<String, String> properties) {
-        this(subSystem, new ServerImpl(subSystem, properties));
+        this(subSystem, properties, Optional.empty());
     }
 
-
-    protected static String constructKey(SubSystem subSystem, String key) {
-        return (subSystem.configKey() + "." + key).toLowerCase(Locale.getDefault());
+    public RpcSettingsImpl(SubSystem subSystem, Map<String, String> properties, Optional<String> networkName) {
+        this(subSystem, new ServerImpl(subSystem, properties, networkName), mapToProperties(properties));
     }
+
 
     @Override
     public Server getServer() {
@@ -78,61 +100,71 @@ public class RpcSettingsImpl implements RpcSettings {
         return this;
     }
 
+    @Override
+    public SigningMode getSigningMode() {
+        return signingMode;
+    }
+
+    public RpcSettings setSigningMode(SigningMode signingMode) {
+        this.signingMode = signingMode;
+        return this;
+    }
+
 
     @SuppressWarnings("PMD.ConstructorCallsOverridableMethod")
     public static class ServerImpl implements Server {
+
+        private Properties properties;
 
         private URL url;
         private String username;
         private String password;
         private int timeout = 30;
+        private Optional<String> networkName;
 
+        @Deprecated
         public ServerImpl(SubSystem subSystem) {
-            initProperties(subSystem, new Properties());
+            this(subSystem, Optional.empty());
         }
 
+        public ServerImpl(SubSystem subSystem, Optional<String> networkName) {
+            initProperties(subSystem, new Properties(), networkName);
+        }
+
+        @Deprecated
         public ServerImpl(SubSystem subSystem, Properties properties) {
-            initProperties(subSystem, properties);
+            this(subSystem, properties, Optional.empty());
         }
 
+        public ServerImpl(SubSystem subSystem, Properties properties, Optional<String> networkName) {
+            initProperties(subSystem, properties, networkName);
+        }
+
+        @Deprecated
         public ServerImpl(SubSystem subSystem, Map<String, String> map) {
-            Properties properties = new Properties();
-            map.entrySet().forEach(entry ->
-                    properties.setProperty(entry.getKey().replaceAll("_", "."), entry.getValue())
-            );
-            initProperties(subSystem, properties);
+            this(subSystem, map, Optional.empty());
         }
 
-        private void initProperties(SubSystem subSystem, Properties properties) {
+        public ServerImpl(SubSystem subSystem, Map<String, String> map, Optional<String> networkName) {
+            Properties properties = mapToProperties(map);
+            initProperties(subSystem, properties, networkName);
+        }
+
+        private Properties initProperties(SubSystem subSystem, Properties properties, Optional<String> networkName) {
+            this.properties = properties;
             // Defaults for URLs point to openAPI for factomd and a local walletd
-            setURL(getFromPropertiesOrEnvironment(subSystem, "url", properties, subSystem == SubSystem.FACTOMD ? "https://api.factomd.net/v2" : "http://localhost:8089/v2"));
+            setURL(getFromPropertiesOrEnvironment(subSystem, "url", properties, subSystem == SubSystem.FACTOMD ? "https://api.factomd.net/v2" : "http://localhost:8089/v2", networkName));
 
-            setTimeout(getFromPropertiesOrEnvironment(subSystem, "timeout", properties, "30"));
-            setUsername(getFromPropertiesOrEnvironment(subSystem, "username", properties, null));
-            setPassword(getFromPropertiesOrEnvironment(subSystem, "password", properties, null));
+            setTimeout(getFromPropertiesOrEnvironment(subSystem, "timeout", properties, "30", networkName));
+            setUsername(getFromPropertiesOrEnvironment(subSystem, "username", properties, null, networkName));
+            setPassword(getFromPropertiesOrEnvironment(subSystem, "password", properties, null, networkName));
+            return properties;
         }
 
-        private String getFromPropertiesOrEnvironment(SubSystem subSystem, String propertyKey, Properties properties, String defaultValue) {
-            String key = constructKey(subSystem, propertyKey);
-            String value = properties.getProperty(key);
-            if (StringUtils.isEmpty(value)) {
-                value = System.getProperty(key);
-                if (StringUtils.isEmpty(value)) {
-                    value = System.getProperty(key.replaceAll("\\.", "_"));
-                }
-            }
-            if (StringUtils.isEmpty(value)) {
-                value = System.getenv(key);
-                if (StringUtils.isEmpty(value)) {
-                    value = System.getenv(key.replaceAll("\\.", "_"));
-                }
-            }
-            if (StringUtils.isEmpty(value)) {
-                value = defaultValue;
-            }
-            logger.info(subSystem.configKey() + " (config): " + key + "=" + (key.contains("pass") ? "xxxx" : value));
-            return value;
+        protected Properties getProperties() {
+            return properties;
         }
+
 
         @Override
         public URL getURL() {
@@ -184,5 +216,64 @@ public class RpcSettingsImpl implements RpcSettings {
             }
             return this;
         }
+
+        @Override
+        public Optional<String> getNetworkName() {
+            return networkName;
+        }
+
+        public Server setNetworkName(String networkName) {
+            this.networkName = Optional.ofNullable(networkName);
+            return this;
+        }
     }
+
+
+    @Deprecated
+    protected static String constructKey(SubSystem subSystem, String key) {
+        return constructKey(subSystem, key, Optional.empty());
+    }
+
+
+    protected static Properties mapToProperties(Map<String, String> map) {
+        Properties properties = new Properties();
+        map.entrySet().forEach(entry ->
+                properties.setProperty(entry.getKey().replaceAll("_", "."), entry.getValue())
+        );
+        return properties;
+    }
+
+
+    protected static String getFromPropertiesOrEnvironment(SubSystem subSystem, String propertyKey, Properties properties, String defaultValue, Optional<String> networkName) {
+        String key = constructKey(subSystem, propertyKey, networkName);
+        String value = properties.getProperty(key);
+        if (StringUtils.isEmpty(value)) {
+            value = System.getProperty(key);
+            if (StringUtils.isEmpty(value)) {
+                value = System.getProperty(key.replaceAll("\\.", "_"));
+            }
+        }
+        if (StringUtils.isEmpty(value)) {
+            value = System.getenv(key);
+            if (StringUtils.isEmpty(value)) {
+                value = System.getenv(key.replaceAll("\\.", "_"));
+            }
+        }
+        if (StringUtils.isEmpty(value)) {
+            value = defaultValue;
+        }
+        logger.info(subSystem.configKey() + " (config): " + key + "=" + (key.contains("pass") ? "xxxx" : value));
+        return value;
+    }
+
+    protected static SigningMode getSigningModeFromPropertiesOrEnvironment(Properties properties, Optional<String> networkName) {
+        return SigningMode.fromModeString(
+                getFromPropertiesOrEnvironment(SubSystem.WALLETD, "signing-mode", properties, SigningMode.ONLINE_WALLETD.name(), networkName));
+    }
+
+    protected static String constructKey(SubSystem subSystem, String key, Optional<String> networkName) {
+        return String.format("%s%s.%s", (networkName.isPresent() && !"".equals(networkName.get().trim())) ? networkName.get() + "." : "", subSystem.configKey(), key).toLowerCase(Locale.getDefault());
+    }
+
+
 }

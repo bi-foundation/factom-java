@@ -38,7 +38,7 @@ import java.util.ArrayList;
 public class RpcRequest implements Serializable {
     private static final String VERSION = "2.0";
     private final String jsonrpc = VERSION;
-    private RpcMethod method;
+    private final RpcMethod method;
     private int id;
     private Map<String, Object> params;
 

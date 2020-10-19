@@ -62,7 +62,7 @@ public class ResolvedParameterizedType implements ParameterizedType {
         if (resolvedTypeArgs != null && resolvedTypeArgs.length > 0) {
             sb.append(" resolved arguments: [");
             for (Type typeArg : resolvedTypeArgs) {
-                sb.append(String.valueOf(typeArg));
+                sb.append(typeArg);
             }
             sb.append(']');
         }

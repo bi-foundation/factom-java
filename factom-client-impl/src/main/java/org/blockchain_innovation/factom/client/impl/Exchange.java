@@ -44,7 +44,7 @@ public class Exchange<Result> {
     private final RpcSettings settings;
     private final FactomRequest factomRequest;
     private final Class<Result> rpcResultClass;
-    private static Logger logger = LogFactory.getLogger(Exchange.class);
+    private static final Logger logger = LogFactory.getLogger(Exchange.class);
     private final ExecutorService executorService;
     private HttpURLConnection connection;
     private FactomResponse<Result> factomResponse;

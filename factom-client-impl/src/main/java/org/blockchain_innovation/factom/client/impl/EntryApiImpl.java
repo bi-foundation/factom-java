@@ -44,7 +44,7 @@ public class EntryApiImpl extends AbstractClient implements EntryApi {
 
     public static final String NO_PREVIOUS_KEY_MERKLE_ROOT = "0000000000000000000000000000000000000000000000000000000000000000";
     private static final int ENTRY_REVEAL_WAIT = 2000;
-    private static Logger logger = LogFactory.getLogger(EntryApiImpl.class);
+    private static final Logger logger = LogFactory.getLogger(EntryApiImpl.class);
     private int transactionAcknowledgeTimeout = 10000; // 10 sec
     private int commitConfirmedTimeout = 15 * 60000; // 15 min
 
@@ -294,7 +294,7 @@ public class EntryApiImpl extends AbstractClient implements EntryApi {
      */
     protected CompletableFuture<CommitAndRevealChainResponse> commitAndRevealChainImpl(Chain chain, Address address, SignatureProdiver signatureProdiver, boolean confirmCommit) {
         // after compose chain combine commit and reveal chain
-        CompletableFuture<CommitAndRevealChainResponse> commitAndRevealChainFuture = (address == null ? composeChainFuture(chain, signatureProdiver) : composeChainFuture(chain, address))
+        return (address == null ? composeChainFuture(chain, signatureProdiver) : composeChainFuture(chain, address))
                 .thenApplyAsync(_composeChainResponse -> notifyCompose(_composeChainResponse), executorService())
                 // commit chain
                 .thenComposeAsync(_composeChainResponse -> commitChainFuture(_composeChainResponse)
@@ -316,7 +316,6 @@ public class EntryApiImpl extends AbstractClient implements EntryApi {
                                                             response.setRevealResponse(_revealChainResponse.getResult());
                                                             return response;
                                                         }, executorService()), executorService()), executorService()), executorService()), executorService()), executorService());
-        return commitAndRevealChainFuture;
     }
 
     /**
@@ -377,7 +376,8 @@ public class EntryApiImpl extends AbstractClient implements EntryApi {
      */
     protected CompletableFuture<CommitAndRevealEntryResponse> commitAndRevealEntryImpl(Entry entry, Address address, SignatureProdiver signatureProdiver, boolean confirmCommit) throws FactomException.ClientException {
         // after compose entry combine commit and reveal entry
-        CompletableFuture<CommitAndRevealEntryResponse> commitAndRevealEntryFuture = (address == null ? composeEntryFuture(entry, signatureProdiver) : composeEntryFuture(entry, address))
+
+        return (address == null ? composeEntryFuture(entry, signatureProdiver) : composeEntryFuture(entry, address))
                 .thenApplyAsync(_composeEntryResponse -> notifyCompose(_composeEntryResponse), executorService())
                 // commit chain
                 .thenComposeAsync(_composeEntryResponse -> commitEntryFuture(_composeEntryResponse)
@@ -408,8 +408,6 @@ public class EntryApiImpl extends AbstractClient implements EntryApi {
                                         executorService()),
                         executorService()
                 );
-
-        return commitAndRevealEntryFuture;
     }
 
     private <T> FactomResponse<T> handleResponse(CommitAndRevealListener listener, Consumer<T> listenerCall, FactomResponse<T> response) {

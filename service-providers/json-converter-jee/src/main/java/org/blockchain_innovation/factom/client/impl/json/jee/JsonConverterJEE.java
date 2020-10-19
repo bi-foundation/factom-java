@@ -52,7 +52,7 @@ public class JsonConverterJEE implements JsonConverter {
     protected static final String RPC_METHOD = "method";
     private Jsonb jsonb;
     private Jsonb genericJsonb;
-    private Map<Type, JsonbAdapter> adapters = new HashMap<>();
+    private final Map<Type, JsonbAdapter> adapters = new HashMap<>();
 
     @Override
     public void addAdapter(Type type, Object adapter) {
@@ -73,25 +73,23 @@ public class JsonConverterJEE implements JsonConverter {
     }
 
     private JsonbConfig rpcConfig() {
-        JsonbConfig config = new JsonbConfig().
+        return new JsonbConfig().
                 withFormatting(true).
                 withPropertyOrderStrategy(LEXICOGRAPHICAL).
                 withSerializers(new RpcMethodSerializer()).
                 withDeserializers(new PendingTransactionsResponseDeserializer()).
                 withPropertyVisibilityStrategy(propertyVisibilityStrategy()).
                 withPropertyNamingStrategy(propertyNamingStrategy());
-        return config;
     }
 
 
     private JsonbConfig genericConfig() {
 
-        JsonbConfig config = new JsonbConfig().
+        return new JsonbConfig().
                 withFormatting(false).
                 withAdapters(adapters.values().toArray(new JsonbAdapter[]{})).
                 withPropertyOrderStrategy(PropertyOrderStrategy.ANY).
-                withNullValues(false)/*.withPropertyNamingStrategy(PropertyNamingStrategy.CASE_INSENSITIVE)*/;
-        return config;
+                withNullValues(false);
     }
 
 
@@ -216,8 +214,7 @@ public class JsonConverterJEE implements JsonConverter {
 
             PendingTransactionsResponse response = new PendingTransactionsResponse();
             JsonArray transactionsArray = jsonParser.getArray();
-            for (int i = 0; i < transactionsArray.size(); i++) {
-                JsonValue transactionValue = transactionsArray.get(i);
+            for (JsonValue transactionValue : transactionsArray) {
                 String json = transactionValue.toString();
                 PendingTransactionsResponse.PendingTransaction pendingTransaction = jsonb.fromJson(json, PendingTransactionsResponse.PendingTransaction.class);
                 response.add(pendingTransaction);

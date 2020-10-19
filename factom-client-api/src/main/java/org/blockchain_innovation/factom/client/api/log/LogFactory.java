@@ -56,7 +56,7 @@ public interface LogFactory {
      * The SPI work is being done in this provider class.
      */
     class Provider {
-        private static LogFactory logFactory = serviceLoader(false).iterator().next();
+        private static final LogFactory logFactory = serviceLoader(false).iterator().next();
 
         static {
             assertRegistered(false);

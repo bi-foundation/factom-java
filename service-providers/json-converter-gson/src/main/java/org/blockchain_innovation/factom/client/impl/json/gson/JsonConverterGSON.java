@@ -19,6 +19,7 @@ package org.blockchain_innovation.factom.client.impl.json.gson;
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 import org.blockchain_innovation.factom.client.api.json.JsonConverter;
+import org.blockchain_innovation.factom.client.api.model.response.walletd.AddressResponse;
 import org.blockchain_innovation.factom.client.api.rpc.RpcErrorResponse;
 import org.blockchain_innovation.factom.client.api.rpc.RpcMethod;
 import org.blockchain_innovation.factom.client.api.rpc.RpcResponse;
@@ -34,7 +35,7 @@ public class JsonConverterGSON implements JsonConverter {
 
     public static final String NAME = "GSON";
     private Gson gson;
-    private Map<Type, Object> adapters = new HashMap<>();
+    private final Map<Type, Object> adapters = new HashMap<>();
 
     @Override
     public void addAdapter(Type type, Object adapter) {
@@ -100,7 +101,7 @@ public class JsonConverterGSON implements JsonConverter {
      * Examples are: TmpTransaction#Transaction tx-name and WalletBackupResponse wallet-seed
      *
      * @return custom FieldNamingStrategy
-     * @see org.blockchain_innovation.factom.client.api.model.response.walletd.AddressResponse#_public public member of AddressResponse
+     * @see AddressResponse#getPublicAddress()  public member of AddressResponse
      */
     private FieldNamingStrategy fieldNamingStrategy() {
 //        return FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES;
