@@ -12,8 +12,8 @@ import org.junit.Test;
 import java.util.Map;
 
 public class AddressTest extends AbstractClientTest {
-    private static AddressKeyConversions conversions = new AddressKeyConversions();
-    private static OfflineAddressKeyConversions offlineConversions = new OfflineAddressKeyConversions();
+    private static final AddressKeyConversions conversions = new AddressKeyConversions();
+    private static final OfflineAddressKeyConversions offlineConversions = new OfflineAddressKeyConversions();
 
 
     @Test

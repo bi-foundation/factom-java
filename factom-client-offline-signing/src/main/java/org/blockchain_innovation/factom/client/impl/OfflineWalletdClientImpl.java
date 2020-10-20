@@ -237,8 +237,7 @@ public class OfflineWalletdClientImpl extends WalletdClientImpl {
         ByteBuffer buffer = ByteBuffer.allocate(8);
         buffer.putLong(now);
         byte[] holder = buffer.array();
-        byte[] resp = new byte[]{holder[2], holder[3], holder[4], holder[5], holder[6], holder[7]};
-        return resp;
+        return new byte[]{holder[2], holder[3], holder[4], holder[5], holder[6], holder[7]};
     }
 
     @Override

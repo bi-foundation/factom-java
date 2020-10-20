@@ -20,11 +20,12 @@ It contains many small fixes and prepares for identity/DID client support
 Added::
 
 * TFA-Labs Signed at Source hardware signature integration. More info: https://iot-sas.tech/
+* Add idpub address support
+* Multiple Networks access using properties or a file
 
 Changed::
 
 * EntryAPI: Added new methods, removed non-async parts
-* Add idpub address support
 * Prepare for DID/Identity client support
 * Allow newer gradle versions to build this project
 

@@ -103,8 +103,7 @@ public interface JsonConverter {
          */
         public static JsonConverter newInstance() {
             assertRegistered();
-            JsonConverter converter = serviceLoader(false).iterator().next();
-            return converter;
+            return serviceLoader(false).iterator().next();
         }
 
         /**

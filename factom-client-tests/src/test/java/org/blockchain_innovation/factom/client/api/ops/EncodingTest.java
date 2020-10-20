@@ -74,9 +74,9 @@ public class EncodingTest {
     public void deepHexTest() {
         char[] chars = "0123456789abcdef".toCharArray();
 
-        for (int i = 0; i < chars.length; i++) {
+        for (char aChar : chars) {
             for (int j = 0; j < chars.length; j++) {
-                String hex = chars[i] + "" + chars[j];
+                String hex = aChar + "" + chars[j];
                 byte[] encoded = Encoding.HEX.decode(hex);
                 String hexEncoded = Encoding.HEX.encode(encoded);
                 Assert.assertEquals(hex, hexEncoded);

@@ -64,8 +64,7 @@ public class SigningOperations {
             Signature verifyInstance = new EdDSAEngine(MessageDigest.getInstance("SHA-512"));
             verifyInstance.initVerify(keyIn);
             verifyInstance.update(originalData);
-            boolean verified = verifyInstance.verify(signature);
-            return verified;
+            return verifyInstance.verify(signature);
         } catch (NoSuchAlgorithmException | SignatureException e) {
             throw new FactomException.ClientException("failed to sign message", e);
         } catch (InvalidKeyException e) {

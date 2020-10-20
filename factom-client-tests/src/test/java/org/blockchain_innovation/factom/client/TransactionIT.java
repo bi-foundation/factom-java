@@ -35,7 +35,6 @@ public class TransactionIT extends AbstractClientTest {
 
     private static final String TRANSACTION_NAME = "TransactionName" + System.currentTimeMillis();
     private static FactomResponse<EntryCreditRateResponse> entryCreditRateResponse;
-    private static FactomResponse<TransactionResponse> newTransactionResponse;
     private static FactomResponse<AddressResponse> toAddressResponse;
     private static FactomResponse<ComposeTransactionResponse> composeTransactionResponse;
 
@@ -50,7 +49,7 @@ public class TransactionIT extends AbstractClientTest {
 
     @Test
     public void _02_newTransaction() throws FactomException.ClientException {
-        newTransactionResponse = walletdClient.newTransaction(TRANSACTION_NAME).join();
+        FactomResponse<TransactionResponse> newTransactionResponse = walletdClient.newTransaction(TRANSACTION_NAME).join();
         assertValidResponse(newTransactionResponse);
 
         Assert.assertNotNull(newTransactionResponse.getResult().getTxId());

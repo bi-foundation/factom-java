@@ -1,8 +1,9 @@
 package org.blockchain_innovation.factom.client.spring.settings;
 
 import org.blockchain_innovation.factom.client.api.SigningMode;
-import org.blockchain_innovation.factom.client.api.errors.FactomException;
+import org.blockchain_innovation.factom.client.api.errors.FactomRuntimeException;
 import org.blockchain_innovation.factom.client.api.settings.RpcSettings;
+import org.blockchain_innovation.factom.client.impl.Networks;
 import org.blockchain_innovation.factom.client.impl.settings.RpcSettingsImpl;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
@@ -10,6 +11,7 @@ import org.springframework.context.annotation.Configuration;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 
 @Configuration
@@ -19,6 +21,32 @@ public class SpringRpcSettings {
 
     private Factomd factomd;
     private Walletd walletd;
+    private transient Optional<String> networkName = Optional.empty();
+
+    private String ecAddress;
+
+    public Optional<String> getNetworkName() {
+        return networkName;
+    }
+
+    public void setNetworkName(Optional<String> networkName) {
+        Networks.init(new Properties());
+        this.networkName = networkName;
+        if (factomd != null) {
+            syncNames(factomd);
+        }
+        if (walletd != null) {
+            syncNames(walletd);
+        }
+    }
+
+    public String getEcAddress() {
+        return ecAddress;
+    }
+
+    public void setEcAddress(String ecAddress) {
+        this.ecAddress = ecAddress;
+    }
 
     public static class Factomd extends RpcSettingsImpl.ServerImpl implements RpcSettings.Server {
         private int threads = 5;
@@ -66,24 +94,38 @@ public class SpringRpcSettings {
     }
 
     public void setFactomd(Factomd factomd) {
+        syncNames(factomd);
         this.factomd = factomd;
     }
 
     public void setWalletd(Walletd walletd) {
+        syncNames(walletd);
+
         this.walletd = walletd;
     }
 
+    private void syncNames(RpcSettingsImpl.ServerImpl server) {
+        if ((getNetworkName() == null || !getNetworkName().isPresent()) && server.getNetworkName() != null && server.getNetworkName().isPresent()) {
+            setNetworkName(server.getNetworkName());
+        } else if ((server.getNetworkName() == null || !server.getNetworkName().isPresent()) && getNetworkName() != null && getNetworkName().isPresent()) {
+            server.setNetworkName(getNetworkName().get());
+        }
+        if (server.getNetworkName() != null && server.getNetworkName().isPresent() && getNetworkName() != null && getNetworkName().isPresent() && !server.getNetworkName().get().equalsIgnoreCase(getNetworkName().get())) {
+            throw new FactomRuntimeException.AssertionException("Cannot use different network names for a walletd and factomd client that belong together");
+        }
+    }
 
-    public Factomd getFactomdServer() {
+
+    public Factomd getFactomd() {
         if (factomd == null) {
-            throw new FactomException.ClientException("Please configure Factomd settings");
+//            throw new FactomException.ClientException("Please configure Factomd settings");
         }
         return factomd;
     }
 
-    public Walletd getWalletdServer() {
+    public Walletd getWalletd() {
         if (walletd == null) {
-            throw new FactomException.ClientException("Please configure Walletd settings");
+//            throw new FactomException.ClientException("Please configure Walletd settings");
         }
         return walletd;
     }
@@ -96,7 +138,7 @@ public class SpringRpcSettings {
 //            addProperty(properties, subSystem, "password", password);
 //            addProperty(properties, subSystem, "timeout", timeout);
 
-            settings.put(subSystem, new RpcSettingsImpl(subSystem, properties));
+            settings.put(subSystem, new RpcSettingsImpl(subSystem, properties, networkName));
         }
 
         return settings.get(subSystem);

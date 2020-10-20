@@ -16,13 +16,20 @@
 
 package org.blockchain_innovation.factom.client.api.settings;
 
+import org.blockchain_innovation.factom.client.api.SigningMode;
+import org.blockchain_innovation.factom.client.api.model.Address;
+
 import java.net.URL;
 import java.util.Locale;
+import java.util.Optional;
 
 /**
  * The settings like URL, proxy for the factomd and walletd clients.
  */
 public interface RpcSettings {
+    SigningMode getSigningMode();
+    Optional<Address> getDefaultECAddress();
+
     /**
      * The subsystem to apply this configuration to.
      */
@@ -32,7 +39,7 @@ public interface RpcSettings {
         /**
          * Translates the sybsystem to a configuration value key.
          *
-         * @return
+         * @return configKey
          */
         public String configKey() {
             return name().toLowerCase(Locale.getDefault());
@@ -91,6 +98,8 @@ public interface RpcSettings {
          * @return The timeout for connections.
          */
         int getTimeout();
+
+        Optional<String> getNetworkName();
     }
 
     /**

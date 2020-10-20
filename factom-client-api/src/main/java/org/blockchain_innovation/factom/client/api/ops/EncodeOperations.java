@@ -102,8 +102,7 @@ public class EncodeOperations {
             throw new FactomRuntimeException.AssertionException(String.format("Invalid entry response. Chain id is required in entry response '%s'", entryResponse));
         }
 
-        EntryResponse encoded = new EntryResponse(entryResponse.getChainId(), encodeHex(entryResponse.getExtIds()), encodeHex(entryResponse.getContent()));
-        return encoded;
+        return new EntryResponse(entryResponse.getChainId(), encodeHex(entryResponse.getExtIds()), encodeHex(entryResponse.getContent()));
     }
 
     /**
@@ -116,8 +115,7 @@ public class EncodeOperations {
         if (entryResponse == null || StringUtils.isEmpty(entryResponse.getChainId())) {
             throw new FactomRuntimeException.AssertionException(String.format("Invalid entry response. Chain id is required in entry '%s'", entryResponse));
         }
-        EntryResponse decoded = new EntryResponse(entryResponse.getChainId(), decodeHex(entryResponse.getExtIds()), entryResponse.getContent() == null ? null : decodeHex(entryResponse.getContent()));
-        return decoded;
+        return new EntryResponse(entryResponse.getChainId(), decodeHex(entryResponse.getExtIds()), entryResponse.getContent() == null ? null : decodeHex(entryResponse.getContent()));
     }
 
     /**

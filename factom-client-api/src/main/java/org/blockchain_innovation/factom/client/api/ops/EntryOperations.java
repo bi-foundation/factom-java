@@ -51,8 +51,7 @@ public class EntryOperations {
                 bytes = byteOps.concat(bytes, Digests.SHA_256.digest(externalId));
             }
         }
-        byte[] chainId = Digests.SHA_256.digest(bytes);
-        return chainId;
+        return Digests.SHA_256.digest(bytes);
     }
 
     /**

@@ -20,7 +20,7 @@ import java.util.Arrays;
 @Named
 @Singleton
 public class AddressKeyConversions {
-    private static Logger logger = LogFactory.getLogger(AddressKeyConversions.class);
+    private static final Logger logger = LogFactory.getLogger(AddressKeyConversions.class);
 
     /**
      * Get the key from the address. This strips an identifiable prefix and a checksum from the address.

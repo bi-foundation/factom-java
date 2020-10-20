@@ -60,8 +60,7 @@ public class AddressSignatureProvider implements SignatureProdiver {
             instance.initSign(keyIn);
             instance.update(message);
 
-            byte[] signed = instance.sign();
-            return signed;
+            return instance.sign();
         } catch (InvalidKeyException e) {
             throw new FactomException.ClientException(String.format("invalid key: %s", e.getMessage()), e);
         } catch (SignatureException | NoSuchAlgorithmException e) {
