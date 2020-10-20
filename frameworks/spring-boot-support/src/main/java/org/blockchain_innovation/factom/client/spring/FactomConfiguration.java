@@ -52,7 +52,7 @@ public class FactomConfiguration {
     }
 
     private WalletdClient walletdClient(SpringRpcSettings specificSettings, WalletdClientImpl walletdClient) {
-        RpcSettingsImpl settings = new RpcSettingsImpl(RpcSettings.SubSystem.WALLETD, specificSettings.getFactomd());
+        RpcSettingsImpl settings = new RpcSettingsImpl(RpcSettings.SubSystem.WALLETD, specificSettings.getWalletd());
         settings.setDefaultECAddress(specificSettings.getEcAddress());
         walletdClient.setSettings(settings);
         walletdClient.setExecutorService(Executors.newFixedThreadPool(specificSettings.getWalletd().getThreads()));

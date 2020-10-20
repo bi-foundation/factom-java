@@ -91,10 +91,11 @@ public class Networks {
     }
 
     public static void init(Properties properties) {
-        if (Networks.properties != properties && Networks.properties != null && !Networks.properties.isEmpty()) {
-            throw new FactomRuntimeException.AssertionException("Cannot reinitialize networks with new properties");
+        if (Networks.properties != properties && Networks.properties != null) {
+            properties.forEach((key, value) -> Networks.properties.put(key, value));
+        } else {
+            Networks.properties = properties;
         }
-        Networks.properties = properties;
     }
 
     public static Optional<Address> getDefaultECAddress(Optional<String> networkName) {
@@ -117,10 +118,7 @@ public class Networks {
         String key = networkKey(networkName);
 
         if (!factomdClients.containsKey(key)) {
-            logger.info(String.format("Network: %s, factomd client not registered yet, starting registration.", key));
-            RpcSettings rpcSettings = new RpcSettingsImpl(RpcSettings.SubSystem.FACTOMD, properties, networkName);
-            FactomdClientImpl factomdClient = new FactomdClientImpl();
-            factomdClient.setSettings(rpcSettings);
+            FactomdClientImpl factomdClient = createFactomdClient(networkName, key);
             register(factomdClient);
         }
 
@@ -137,30 +135,44 @@ public class Networks {
         String key = networkKey(networkName);
 
         if (!walletdClients.containsKey(key)) {
-            logger.info(String.format("Network: %s, walletd client not registered yet, starting registration.", key));
-            RpcSettings rpcSettings = new RpcSettingsImpl(RpcSettings.SubSystem.WALLETD, properties, networkName);
-            SigningMode signingMode = explicitSigningMode.orElse(rpcSettings.getSigningMode());
-            WalletdClientImpl walletdClient;
-            if (signingMode != SigningMode.OFFLINE) {
-                walletdClient = new WalletdClientImpl();
-            } else {
-                try {
-                    walletdClient = (WalletdClientImpl) Class.forName("org.blockchain_innovation.factom.client.impl.OfflineWalletdClientImpl").newInstance();
-                } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
-                    throw new FactomRuntimeException("Could not find offline walletd client on classpath. " + e.getMessage(), e);
-                }
-            }
-            walletdClient.setSettings(rpcSettings);
+            WalletdClientImpl walletdClient = createWalletdClient(networkName, explicitSigningMode, key);
             register(walletdClient);
         }
 
         return walletdClients.get(key);
     }
 
+
     public static Set<String> getNetworkNames() {
         return Collections.unmodifiableSet(networkNames);
     }
 
+
+    private static FactomdClientImpl createFactomdClient(Optional<String> networkName, String key) {
+        logger.info(String.format("Network: %s, factomd client not registered yet, starting registration.", key));
+        RpcSettings rpcSettings = new RpcSettingsImpl(RpcSettings.SubSystem.FACTOMD, properties, networkName);
+        FactomdClientImpl factomdClient = new FactomdClientImpl();
+        factomdClient.setSettings(rpcSettings);
+        return factomdClient;
+    }
+
+    private static WalletdClientImpl createWalletdClient(Optional<String> networkName, Optional<SigningMode> explicitSigningMode, String key) {
+        logger.info(String.format("Network: %s, walletd client not registered yet, starting registration.", key));
+        RpcSettings rpcSettings = new RpcSettingsImpl(RpcSettings.SubSystem.WALLETD, properties, networkName);
+        SigningMode signingMode = explicitSigningMode.orElse(rpcSettings.getSigningMode());
+        WalletdClientImpl walletdClient;
+        if (signingMode != SigningMode.OFFLINE) {
+            walletdClient = new WalletdClientImpl();
+        } else {
+            try {
+                walletdClient = (WalletdClientImpl) Class.forName("org.blockchain_innovation.factom.client.impl.OfflineWalletdClientImpl").newInstance();
+            } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+                throw new FactomRuntimeException("Could not find offline walletd client on classpath. " + e.getMessage(), e);
+            }
+        }
+        walletdClient.setSettings(rpcSettings);
+        return walletdClient;
+    }
 
     private static String networkKey(Optional<String> networkName) {
         return networkName.orElse("").toLowerCase();

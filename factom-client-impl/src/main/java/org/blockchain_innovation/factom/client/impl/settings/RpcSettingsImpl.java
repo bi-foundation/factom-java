@@ -150,6 +150,7 @@ public class RpcSettingsImpl implements RpcSettings {
         }
 
         public ServerImpl(SubSystem subSystem, Optional<String> networkName) {
+            this.networkName = networkName;
             initProperties(subSystem, new Properties(), networkName);
         }
 
@@ -159,6 +160,7 @@ public class RpcSettingsImpl implements RpcSettings {
         }
 
         public ServerImpl(SubSystem subSystem, Properties properties, Optional<String> networkName) {
+            this.networkName = networkName;
             initProperties(subSystem, properties, networkName);
         }
 
@@ -168,6 +170,7 @@ public class RpcSettingsImpl implements RpcSettings {
         }
 
         public ServerImpl(SubSystem subSystem, Map<String, String> map, Optional<String> networkName) {
+            this.networkName = networkName;
             Properties properties = mapToProperties(map);
             initProperties(subSystem, properties, networkName);
         }
