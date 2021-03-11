@@ -47,7 +47,7 @@ An example project can be found at https://github.com/bi-foundation/factom-java-
 
 == Maven installation
 This is a gradle project but maven snapshots and releases are distributed on the Nexus installation of Sphereon at
-http://nexus.qa.sphereon.com/repository/sphereon-opensource-releases/
+https://nexus.qa.sphereon.com/repository/sphereon-opensource-releases/
 
 You need at least the following dependencies in your application
 
@@ -120,7 +120,7 @@ You will also need to specify Sphereon's maven repository if you would like to i
 <repositories>
     <repository>
         <id>BIF-releases</id>
-        <url>http://nexus.qa.sphereon.com/repository/bif/</url>
+        <url>https://nexus.qa.sphereon.com/repository/bif/</url>
     </repository>
 </repositories>
 ....
