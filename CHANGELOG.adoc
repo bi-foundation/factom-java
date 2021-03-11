@@ -12,10 +12,24 @@ endif::[]
 This document provides a high-level overview of the changes introduced in Factom-Java by release.
 For a detailed view of what has changed, refer to our {uri-repo}/commits/master[commit history] on GitHub.
 
-== 0.3.0 - not released
+== 0.3.1 - not released yet
+
+tbd
+
+Added::
+Changed::
+Deprecated::
+Removed::
+Fixed::
+Security::
+-
+
+
+== 0.3.0 - release date 20210311
 
 This release adds hardware signing support from TFA-Labs.
-It contains many small fixes and prepares for identity/DID client support
+Adds multiple network support either using configuration file or properties
+It contains many small fixes and prepares for separate identity/DID client support
 
 Added::
 
@@ -37,8 +51,7 @@ Fixed::
 * Address checks improved. Do not allow public key extraction from public address, as that is impossible
 * Commit chain was referencing compose chain incorrectly
 
-Security::
-
+*Security*
 
 == 0.2.1 - release date 20180926
 
@@ -59,7 +72,6 @@ Added::
  * Compatible with Android 7 and up
  * Initial OSGI support (not officially supported yet)
  * Javadocs and Asciidocs
-
 
 Changed::
 Deprecated::
