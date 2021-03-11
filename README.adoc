@@ -47,20 +47,20 @@ An example project can be found at https://github.com/bi-foundation/factom-java-
 
 == Maven installation
 This is a gradle project but maven snapshots and releases are distributed on the Nexus installation of Sphereon at
-http://nexus.qa.sphereon.com/repository/sphereon-opensource-releases/
+https://nexus.qa.sphereon.com/repository/sphereon-opensource-releases/
 
 You need at least the following dependencies in your application
 
 ....
 
 <dependency>
-    groupId>org.blockchain-innovation.factom.client</groupId>
+    <groupId>org.blockchain-innovation.factom.client</groupId>
     <artifactId>factom-client-impl</artifactId>
     <version>0.3.0</version>
     <scope>compile</scope>
 </dependency>
 <dependency>
-    groupId>org.blockchain-innovation.factom.client</groupId>
+    <groupId>org.blockchain-innovation.factom.client</groupId>
     <artifactId>logger-slf4j</artifactId>
     <version>0.3.0</version>
     <scope>compile</scope>
@@ -68,13 +68,13 @@ You need at least the following dependencies in your application
 
 <!-- At least one of the following dependencies -->
 <dependency>
-    groupId>org.blockchain-innovation.factom.client</groupId>
+    <groupId>org.blockchain-innovation.factom.client</groupId>
     <artifactId>json-converter-jee</artifactId>
     <version>0.3.0</version>
     <scope>compile</scope>
 </dependency>
 <dependency>
-    groupId>org.blockchain-innovation.factom.client</groupId>
+    <groupId>org.blockchain-innovation.factom.client</groupId>
     <artifactId>json-converter-gson</artifactId>
     <version>0.3.0</version>
     <scope>compile</scope>
@@ -82,7 +82,7 @@ You need at least the following dependencies in your application
 
 <!-- Offline signing support -->
 <dependency>
-    groupId>org.blockchain-innovation.factom.client</groupId>
+    <groupId>org.blockchain-innovation.factom.client</groupId>
     <artifactId>factom-client-offline-signing</artifactId>
     <version>0.3.0</version>
     <scope>compile</scope>
@@ -91,7 +91,7 @@ You need at least the following dependencies in your application
 
 <!-- Optional IoT Signed at Source support -->
 <dependency>
-    groupId>org.blockchain-innovation.factom.client</groupId>
+    <groupId>org.blockchain-innovation.factom.client</groupId>
     <artifactId>factom-client-offline-signing</artifactId>
     <version>0.3.0</version>
     <scope>compile</scope>
@@ -99,7 +99,7 @@ You need at least the following dependencies in your application
 
 <!-- Optional JEE support (only in JEE environment) -->
 <dependency>
-    groupId>org.blockchain-innovation.factom.client</groupId>
+    <groupId>org.blockchain-innovation.factom.client</groupId>
     <artifactId>jee-support</artifactId>
     <version>0.3.0</version>
     <scope>compile</scope>
@@ -107,7 +107,7 @@ You need at least the following dependencies in your application
 
 <!-- Optional Spring Boot support (only in Spring Boot environment) -->
 <dependency>
-    groupId>org.blockchain-innovation.factom.client</groupId>
+    <groupId>org.blockchain-innovation.factom.client</groupId>
     <artifactId>spring-boot-support</artifactId>
     <version>0.3.0</version>
     <scope>compile</scope>
@@ -120,7 +120,7 @@ You will also need to specify Sphereon's maven repository if you would like to i
 <repositories>
     <repository>
         <id>BIF-releases</id>
-        <url>http://nexus.qa.sphereon.com/repository/bif/</url>
+        <url>https://nexus.qa.sphereon.com/repository/bif/</url>
     </repository>
 </repositories>
 ....
