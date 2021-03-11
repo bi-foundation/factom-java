@@ -32,14 +32,14 @@ import org.blockchain_innovation.factom.client.api.model.response.factomd.Transa
 import java.util.concurrent.CompletableFuture;
 
 /**
- * This is the factomd client that allows you to access all Rpc Methods of factomd
+ * This is the factomd client that allows you to access all Rpc Methods of factomd.
  */
 @SuppressWarnings("PMD.TooManyMethods")
 public interface FactomdClient {
     /**
      * Retrieve the lowlevel client (this object). This allows you to directly interact with request/response exchanges and set settings, urls etc.
      *
-     * @return The lowlevel client
+     * @return The lowlevel client.
      */
     LowLevelClient lowLevelClient();
 
@@ -51,8 +51,8 @@ public interface FactomdClient {
      * A majority of the federated servers sign every directory block, meaning every block after m5 will contain 5 DBSigs in each admin block.
      * <p>
      *
-     * @param height The height at which you want to retrieve the adminblock by
-     * @return The adminblock response
+     * @param height The height at which you want to retrieve the adminblock by.
+     * @return The adminblock response promise.
      */
     CompletableFuture<FactomResponse<AdminBlockResponse>> adminBlockByHeight(long height);
 
@@ -65,8 +65,8 @@ public interface FactomdClient {
      * A majority of the federated servers sign every directory block, meaning every block after m5 will contain 5 DBSigs in each admin block.
      * <p>
      *
-     * @param keyMR the Merkle Root Key
-     * @return The adminblock response
+     * @param keyMR the Merkle Root Key.
+     * @return The adminblock response promise.
      */
     CompletableFuture<FactomResponse<AdminBlockResponse>> adminBlockByKeyMerkleRoot(String keyMR);
 
@@ -104,11 +104,11 @@ public interface FactomdClient {
      * entry credit block (assuming they are valid and are properly paid for)
      * </p>
      *
-     * @param hash           txid for factoid trans, entryhash in other cases
-     * @param chainId        f for factoid trans, c for entry credit trans, chain Id for reveal entry/chain
-     * @param rpcResultClass The result class depending on the transactiontype
-     * @param <T>
-     * @return The Transaction response
+     * @param hash           txid for factoid trans, entryhash in other cases.
+     * @param chainId        f for factoid trans, c for entry credit trans, chain Id for reveal entry/chain.
+     * @param rpcResultClass The result class depending on the transactiontype.
+     * @param <T>            The result class type.
+     * @return The Transaction response promise.
      */
     <T> CompletableFuture<FactomResponse<T>> ackTransactions(String hash, String chainId, Class<T> rpcResultClass);
 
@@ -125,8 +125,8 @@ public interface FactomdClient {
      * </p>
      * The responses vary based on the type
      *
-     * @param txId txid for factoid trans
-     * @return The Transaction response
+     * @param txId txid for factoid trans.
+     * @return The Transaction response promise.
      */
     CompletableFuture<FactomResponse<FactoidTransactionsResponse>> ackFactoidTransactions(String txId);
 
@@ -140,16 +140,16 @@ public interface FactomdClient {
      * Why c? It is short for 000000000000000000000000000000000000000000000000000000000000000c, which is the chainid for all entry credit blocks. All commits are placed in the
      * entry credit block (assuming they are valid and are properly paid for)
      *
-     * @param hash
-     * @return
+     * @param hash The hash (see remarks above).
+     * @return The Factoid Transaction response promise.
      */
     CompletableFuture<FactomResponse<EntryTransactionResponse>> ackEntryTransactions(String hash);
 
     /**
      * Return the keymr of the head of the chain for a chain ID (the unique hash created when the chain was created).
      *
-     * @param chainId
-     * @return The chain head response
+     * @param chainId The chain Id.
+     * @return The chain head response promise.
      */
     CompletableFuture<FactomResponse<ChainHeadResponse>> chainHead(String chainId);
 
@@ -166,8 +166,8 @@ public interface FactomdClient {
      * encounter this error, just skip to the reveal-chain. The error format can be found here: repeated-commit
      * </p>
      *
-     * @param message The Chain Commit Message
-     * @return
+     * @param message The Chain Commit Message.
+     * @return The Commit Chain response promise.
      */
     CompletableFuture<FactomResponse<CommitChainResponse>> commitChain(String message);
 
@@ -181,11 +181,11 @@ public interface FactomdClient {
      * <p>
      * Notes:
      * It is possible to be unable to send a commit, if the commit already exists (if you try to send it twice). This is a mechanism to prevent you from double spending. If you
-     * encounter this error, just skip to the reveal-entry. The error format can be found here: repeated-commit
+     * encounter this error, just skip to the reveal-entry. The error format can be found here: repeated-commit.
      * </p>
      *
-     * @param message The entry commit message
-     * @return
+     * @param message The entry commit message.
+     * @return The Commit Entry response promise.
      */
     CompletableFuture<FactomResponse<CommitEntryResponse>> commitEntry(String message);
 
@@ -203,7 +203,7 @@ public interface FactomdClient {
      * - faulttimeout returns the number of seconds before leader node is faulted for failing to provide a necessary message.
      * - roundtimeout returns the number of seconds between rounds of an election during a fault.
      *
-     * @return
+     * @return The current minute response promise.
      */
     CompletableFuture<FactomResponse<CurrentMinuteResponse>> currentMinute();
 
@@ -211,8 +211,8 @@ public interface FactomdClient {
      * Retrieve a directory block given only its height.
      * The header of the directory block will contain information regarding the previous directory block’s keyMR, directory block height, and the timestamp.
      *
-     * @param height The height of the blockchain to rertieve the directory block for
-     * @return
+     * @param height The height of the blockchain at which the the directory block should be retrieved.
+     * @return The directory block height response.
      */
     CompletableFuture<FactomResponse<DirectoryBlockHeightResponse>> directoryBlockByHeight(long height);
 
@@ -221,8 +221,8 @@ public interface FactomdClient {
      * transactions (entry and factoid) within that block.
      * The header of the directory block will contain information regarding the previous directory block’s keyMR, directory block height, and the timestamp.
      *
-     * @param keyMR Key Merkle Root
-     * @return
+     * @param keyMR Key Merkle Root.
+     * @return The directory block promise.
      */
     CompletableFuture<FactomResponse<DirectoryBlockResponse>> directoryBlockByKeyMerkleRoot(String keyMR);
 
@@ -230,7 +230,7 @@ public interface FactomdClient {
      * The directory block head is the last known directory block by factom, or in other words, the most recently recorded block. This can be used to grab the latest block and the
      * information required to traverse the entire blockchain.
      *
-     * @return
+     * @return The directory block head promise.
      */
     CompletableFuture<FactomResponse<DirectoryBlockHeadResponse>> directoryBlockHead();
 
@@ -238,39 +238,39 @@ public interface FactomdClient {
      * Retrieve the entry credit block for any given height. These blocks contain entry credit transaction information.
      *
      * @param height The blockchain height to retrieve the entry credit block for
-     * @return
+     * @return The entry credit block response promise.
      */
     CompletableFuture<FactomResponse<EntryCreditBlockResponse>> entryCreditBlockByHeight(int height);
 
     /**
      * Get an Entry from factomd specified by the Entry Hash.
      *
-     * @param entryHash The entry Hash
-     * @return
+     * @param entryHash The entry Hash.
+     * @return The Entry response promise.
      */
     CompletableFuture<FactomResponse<EntryResponse>> entry(String entryHash);
 
     /**
-     * Retrieve a specified entry block given its merkle root key. The entry block contains 0 to many entries
+     * Retrieve a specified entry block given its merkle root key. The entry block contains 0 to many entries.
      *
-     * @param keyMR Key Merkle Root
-     * @return
+     * @param keyMR Key Merkle Root.
+     * @return The Entry Block promise.
      */
     CompletableFuture<FactomResponse<EntryBlockResponse>> entryBlockByKeyMerkleRoot(String keyMR);
 
     /**
      * Return its current balance for a specific entry credit address.
      *
-     * @param entryCreditAddress The entry credit address
-     * @return
+     * @param entryCreditAddress The entry credit address.
+     * @return The Entry Credit balance promise.
      */
     CompletableFuture<FactomResponse<EntryCreditBalanceResponse>> entryCreditBalance(Address entryCreditAddress);
 
     /**
      * Retrieve a specified entrycredit block given its merkle root key. The numbers are minute markers.
      *
-     * @param keymr Key merkle root
-     * @return
+     * @param keymr Key merkle root.
+     * @return The Entry Credit Block promise.
      */
     CompletableFuture<FactomResponse<EntryCreditBlockResponse>> entryCreditBlock(String keymr);
 
@@ -278,23 +278,23 @@ public interface FactomdClient {
      * Returns the number of Factoshis (Factoids *10^-8) that purchase a single Entry Credit. The minimum factoid fees are also determined by this rate, along with how complex the
      * factoid transaction is.
      *
-     * @return
+     * @return The Entry Credit Rate promise.
      */
     CompletableFuture<FactomResponse<EntryCreditRateResponse>> entryCreditRate();
 
     /**
      * This call returns the number of Factoshis (Factoids *10^-8) that are currently available at the address specified.
      *
-     * @param factoidAddress The factoidAddress
-     * @return
+     * @param factoidAddress The factoidAddress.
+     * @return The Factoid Balance promise.
      */
     CompletableFuture<FactomResponse<FactoidBalanceResponse>> factoidBalance(Address factoidAddress);
 
     /**
      * Retrieve a specified factoid block given its merkle root key.
      *
-     * @param keymr key merkle root
-     * @return
+     * @param keymr key merkle root.
+     * @return The Factod Block promise.
      */
     CompletableFuture<FactomResponse<FactoidBlockResponse>> factoidBlock(String keymr);
 
@@ -303,8 +303,8 @@ public interface FactomdClient {
      * The factoid-submit API takes a specifically formatted message encoded in hex that includes signatures.
      * If you have a factom-walletd instance running, you can construct this factoid-submit API call with compose-transaction which takes easier to construct arguments.
      *
-     * @param factoidTransaction The factoid transaction
-     * @return
+     * @param factoidTransaction The factoid transaction.
+     * @return The Factoid Submit promise.
      */
     CompletableFuture<FactomResponse<FactoidSubmitResponse>> factoidSubmit(String factoidTransaction);
 
@@ -330,38 +330,38 @@ public interface FactomdClient {
      * A fully synced node should show the same number for all, (except between minute 0 and 1, when leaderheight will be 1 block ahead.)
      * </p>
      *
-     * @return
+     * @return The heights.
      */
     CompletableFuture<FactomResponse<HeightsResponse>> heights();
 
     /**
      * Returns an array of the entries that have been submitted but have not been recorded into the blockchain.
      *
-     * @param height The height to retrieve the pending entries at
-     * @return
+     * @param height The height to retrieve the pending entries at.
+     * @return The pending entries.
      */
     CompletableFuture<FactomResponse<PendingEntriesResponse>> pendingEntries(int height);
 
     /**
      * Returns an array of factoid transactions that have not yet been recorded in the blockchain, but are known to the system.
      *
-     * @param height The height to retrieve the pending entries at
-     * @return
+     * @param height The height to retrieve the pending entries at.
+     * @return The pending transactions.
      */
     CompletableFuture<FactomResponse<PendingTransactionsResponse>> pendingTransactions(int height);
 
     /**
      * Retrieve current properties of the Factom system, including the software and the API versions.
      *
-     * @return
+     * @return The properties of factomd.
      */
     CompletableFuture<FactomResponse<PropertiesResponse>> properties();
 
     /**
      * Retrieve an entry or transaction in raw format, the data is a hex encoded string.
      *
-     * @param hash
-     * @return
+     * @param hash The hash.
+     * @return Raw Entry or transaction data.
      */
     CompletableFuture<FactomResponse<RawDataResponse>> rawData(String hash);
 
@@ -369,8 +369,8 @@ public interface FactomdClient {
      * Retrieve a receipt providing cryptographically verifiable proof that information was recorded in the factom blockchain and that this was subsequently anchored in the bitcoin
      * blockchain.
      *
-     * @param hash
-     * @return
+     * @param hash The hash.
+     * @return A receipt (verifiable proof) of receipt and anchoring.
      */
     CompletableFuture<FactomResponse<ReceiptResponse>> receipt(String hash);
 
@@ -381,8 +381,8 @@ public interface FactomdClient {
      * The compose-chain api call has two api calls in its response: commit-chain and reveal-chain. To successfully create a chain, the reveal-chain must be called after the
      * commit-chain.
      *
-     * @param entry
-     * @return
+     * @param entry The first entry of the chain used to reveal the chain.
+     * @return Reveal promise.
      */
     CompletableFuture<FactomResponse<RevealResponse>> revealChain(String entry);
 
@@ -393,8 +393,8 @@ public interface FactomdClient {
      * The compose-entry api call has two api calls in it’s response: commit-entry and reveal-entry. To successfully create an entry, the reveal-entry must be called after the
      * commit-entry.
      *
-     * @param entry
-     * @return
+     * @param entry The entry to reveal.
+     * @return Reveal promise.
      */
     CompletableFuture<FactomResponse<RevealResponse>> revealEntry(String entry);
 
@@ -423,8 +423,8 @@ public interface FactomdClient {
      * }
      * Entry Hash : 23af5f7c05a89c0097eed7378c60b8bcc89a284094a81da85fb8faab7b297247
      *
-     * @param message
-     * @return
+     * @param message The raw message.
+     * @return Raw message response.
      */
     CompletableFuture<FactomResponse<SendRawMessageResponse>> sendRawMessage(String message);
 
@@ -447,8 +447,8 @@ public interface FactomdClient {
      * "includedindirectoryblock":""
      * "includedindirectoryblockheight":-1
      *
-     * @param hash
-     * @return
+     * @param hash The hash or id of a transaction.
+     * @return The transaction promise.
      */
     CompletableFuture<FactomResponse<TransactionResponse>> transaction(String hash);
 }

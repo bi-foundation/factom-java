@@ -28,12 +28,7 @@ import org.blockchain_innovation.factom.client.api.rpc.RpcRequest;
 import org.blockchain_innovation.factom.client.api.rpc.RpcResponse;
 import org.blockchain_innovation.factom.client.api.settings.RpcSettings;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
@@ -49,7 +44,7 @@ public class Exchange<Result> {
     private final RpcSettings settings;
     private final FactomRequest factomRequest;
     private final Class<Result> rpcResultClass;
-    private static Logger logger = LogFactory.getLogger(Exchange.class);
+    private static final Logger logger = LogFactory.getLogger(Exchange.class);
     private final ExecutorService executorService;
     private HttpURLConnection connection;
     private FactomResponse<Result> factomResponse;
@@ -71,7 +66,10 @@ public class Exchange<Result> {
             sendRequest();
             retrieveResponse(rpcResultClass);
             return getFactomResponse();
-        }, getExecutorService());
+        }, getExecutorService()).exceptionally(throwable -> {
+            logger.error(throwable.getMessage(), throwable);
+            return getFactomResponse();
+        });
     }
 
 
@@ -101,7 +99,7 @@ public class Exchange<Result> {
     protected void sendRequest() throws FactomException.ClientException {
         if (getFactomRequest().getRpcRequest() != null) {
             try (OutputStream outputStream = connection().getOutputStream(); OutputStreamWriter out = new OutputStreamWriter(outputStream, Charset.defaultCharset())) {
-                String json = JsonConverter.Provider.newInstance().toJson(getFactomRequest().getRpcRequest());
+                String json = JsonConverter.Provider.newInstance().toRpcJson(getFactomRequest().getRpcRequest());
                 logger.debug("request(%d): %s ", getFactomRequest().getRpcRequest().getId(), json);
                 out.write(json);
             } catch (IOException e) {
@@ -115,10 +113,19 @@ public class Exchange<Result> {
         try (InputStream is = connection().getInputStream();
              InputStreamReader streamReader = new InputStreamReader(is, Charset.defaultCharset());
              BufferedReader reader = new BufferedReader(streamReader)) {
+
             String json = reader.lines().collect(Collectors.joining());
             logger.debug("response(%d): %s", getFactomRequest().getRpcRequest().getId(), JsonConverter.Provider.newInstance().prettyPrint(json));
-            RpcResponse<Result> rpcResult = JsonConverter.Provider.newInstance().fromJson(json, rpcResultClass);
-            this.factomResponse = new FactomResponseImpl<>(this, rpcResult, connection().getResponseCode(), connection().getResponseMessage());
+            RpcResponse<Result> rpcResult = JsonConverter.Provider.newInstance().responseFromJson(json, rpcResultClass);
+            if (rpcResult.getResult() == null) {
+                RpcErrorResponse errorResponse = JsonConverter.Provider.newInstance().errorFromJson(json);
+                if (errorResponse.getError() != null) {
+                    this.factomResponse = new FactomResponseImpl<>(this, errorResponse, connection().getResponseCode(), connection().getResponseMessage());
+                }
+            }
+            if (factomResponse == null) {
+                this.factomResponse = new FactomResponseImpl<>(this, rpcResult, connection().getResponseCode(), connection().getResponseMessage());
+            }
             return factomResponse;
         } catch (IOException e) {
             String error = "<no error response>";
@@ -154,11 +161,11 @@ public class Exchange<Result> {
                 RpcSettings.Proxy proxySettings = settings.getProxy();
                 connection = (HttpURLConnection) url.openConnection(new Proxy(Proxy.Type.HTTP, new InetSocketAddress(proxySettings.getHost(), proxySettings.getPort())));
             }
-            connection.setConnectTimeout(settings.getServer().getTimeout() * 1000);
-            connection.setReadTimeout(settings.getServer().getTimeout() * 1000);
+            int timeout = Math.max(5000, settings.getServer().getTimeout() * 1000);
+            connection.setConnectTimeout(timeout);
+            connection.setReadTimeout(timeout);
             connection.setInstanceFollowRedirects(false);
             connection.setUseCaches(false);
-
             connection.setDoOutput(true);
 
             connection.setRequestProperty("Content-Type", "application/json");

@@ -1,10 +1,13 @@
 package org.blockchain_innovation.factom.client.impl;
 
+import org.blockchain_innovation.factom.client.api.EntryApi;
 import org.blockchain_innovation.factom.client.api.FactomResponse;
 import org.blockchain_innovation.factom.client.api.FactomdClient;
 import org.blockchain_innovation.factom.client.api.LowLevelClient;
+import org.blockchain_innovation.factom.client.api.SignatureProdiver;
 import org.blockchain_innovation.factom.client.api.WalletdClient;
 import org.blockchain_innovation.factom.client.api.errors.FactomException;
+import org.blockchain_innovation.factom.client.api.errors.FactomRuntimeException;
 import org.blockchain_innovation.factom.client.api.listeners.CommitAndRevealListener;
 import org.blockchain_innovation.factom.client.api.log.LogFactory;
 import org.blockchain_innovation.factom.client.api.log.Logger;
@@ -15,9 +18,14 @@ import org.blockchain_innovation.factom.client.api.model.response.CommitAndRevea
 import org.blockchain_innovation.factom.client.api.model.response.CommitAndRevealEntryResponse;
 import org.blockchain_innovation.factom.client.api.model.response.factomd.CommitChainResponse;
 import org.blockchain_innovation.factom.client.api.model.response.factomd.CommitEntryResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.EntryBlockResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.EntryResponse;
 import org.blockchain_innovation.factom.client.api.model.response.factomd.EntryTransactionResponse;
 import org.blockchain_innovation.factom.client.api.model.response.factomd.RevealResponse;
 import org.blockchain_innovation.factom.client.api.model.response.walletd.ComposeResponse;
+import org.blockchain_innovation.factom.client.api.ops.Encoding;
+import org.blockchain_innovation.factom.client.api.ops.EntryOperations;
+import org.blockchain_innovation.factom.client.api.ops.StringUtils;
 
 import javax.inject.Named;
 import java.util.ArrayList;
@@ -28,18 +36,21 @@ import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 @Named
 @SuppressWarnings({"PMD.GodClass", "PMD.TooManyMethods"})
-public class EntryApiImpl {
+public class EntryApiImpl extends AbstractClient implements EntryApi {
 
+    public static final String NO_PREVIOUS_KEY_MERKLE_ROOT = "0000000000000000000000000000000000000000000000000000000000000000";
     private static final int ENTRY_REVEAL_WAIT = 2000;
-    private static Logger logger = LogFactory.getLogger(EntryApiImpl.class);
+    private static final Logger logger = LogFactory.getLogger(EntryApiImpl.class);
     private int transactionAcknowledgeTimeout = 10000; // 10 sec
     private int commitConfirmedTimeout = 15 * 60000; // 15 min
 
     private FactomdClient factomdClient;
     private WalletdClient walletdClient;
+    private final EntryOperations entryOperations = new EntryOperations();
 
     private final List<CommitAndRevealListener> listeners = new ArrayList<>();
 
@@ -60,25 +71,29 @@ public class EntryApiImpl {
         return this;
     }
 
-    private FactomdClient getFactomdClient() throws FactomException.ClientException {
+    @Override
+    public FactomdClient getFactomdClient() throws FactomException.ClientException {
         if (factomdClient == null) {
             throw new FactomException.ClientException("factomd client not provided");
         }
         return factomdClient;
     }
 
+    @Override
     public EntryApiImpl setFactomdClient(FactomdClient factomdClient) {
         this.factomdClient = factomdClient;
         return this;
     }
 
-    private WalletdClient getWalletdClient() throws FactomException.ClientException {
+    @Override
+    public WalletdClient getWalletdClient() throws FactomException.ClientException {
         if (walletdClient == null) {
             throw new FactomException.ClientException("walletd client not provided");
         }
         return walletdClient;
     }
 
+    @Override
     public EntryApiImpl setWalletdClient(WalletdClient walletdClient) {
         this.walletdClient = walletdClient;
         return this;
@@ -102,15 +117,172 @@ public class EntryApiImpl {
         return this;
     }
 
+
+    public CompletableFuture<Boolean> chainExists(Chain chain) {
+        String chainId = Encoding.HEX.encode(entryOperations.calculateChainId(chain.getFirstEntry().getExternalIds()));
+        return factomdClient.chainHead(chainId)
+                .thenApplyAsync(response -> response.getResult() != null &&
+                        StringUtils.isNotEmpty(response.getResult().getChainHead()), getExecutorService())
+                .exceptionally(throwable -> false);
+
+    }
+
+    /**
+     * @param chainId
+     * @return list of all EntryBlocks within a certain chain up till genesis block
+     */
+    @Override
+    public CompletableFuture<List<EntryBlockResponse>> allEntryBlocks(String chainId) {
+        return factomdClient.chainHead(chainId)
+                .thenCompose(chainHeadResponse -> {
+                    errorHandling(chainHeadResponse, "Could not get entry blocks for chain Id " + chainId);
+                    return entryBlocksUpTilKeyMR(chainHeadResponse.getResult().getChainHead());
+                });
+    }
+
+
+    /**
+     * All entry blocks of a chain
+     *
+     * @param chainId
+     * @return
+     */
+    @Override
+    public CompletableFuture<List<EntryBlockResponse.Entry>> allEntryBlocksEntries(String chainId) {
+        return getFactomdClient().chainHead(chainId)
+                .thenComposeAsync(chainHeadResponse -> {
+                    errorHandling(chainHeadResponse, "Could not get entry blocks for chain Id " + chainId);
+                    return entryBlocksEntriesUpTilKeyMR(chainHeadResponse.getResult().getChainHead());
+                }, getExecutorService());
+    }
+
+
+    @Override
+    public CompletableFuture<List<EntryResponse>> allEntries(String chainId) {
+        return allEntries(chainId, Encoding.HEX);
+    }
+
+    @Override
+    public CompletableFuture<List<EntryResponse>> allEntries(String chainId, Encoding encoding) {
+        if (encoding != Encoding.HEX && encoding != Encoding.UTF_8) {
+            throw new FactomRuntimeException("Encoding needs to be UTF-8 or HEX. Value: " + encoding.name());
+        }
+        return getFactomdClient().chainHead(chainId)
+                .thenComposeAsync(chainHeadResponse -> {
+                    errorHandling(chainHeadResponse, "Could not get chain head for chain Id " + chainId);
+                    return entriesUpTilKeyMR(chainHeadResponse.getResult().getChainHead());
+                }, getExecutorService())
+                .thenApplyAsync(entryResponses ->
+                                entryResponses.stream().map(
+                                        entryResponse -> encoding == Encoding.UTF_8 ? encodeOperations.decodeHex(entryResponse) : entryResponse).collect(Collectors.toList())
+                        , getExecutorService());
+    }
+
+    @Override
+    public CompletableFuture<List<EntryResponse>> entriesUpTilKeyMR(String keyMR) {
+        return entryBlocksEntriesUpTilKeyMR(keyMR)
+                .thenComposeAsync(entryBlockResponses -> {
+                    List<CompletableFuture<FactomResponse<EntryResponse>>> entryResponses =
+                            entryBlockResponses.stream()
+                                    .map(entry -> factomdClient.entry(entry.getEntryHash())).collect(Collectors.toList());
+                    return CompletableFuture.allOf(entryResponses.toArray(new CompletableFuture[entryResponses.size()]))
+                            .thenApply(aVoid -> entryResponses.stream()
+                                    .map(CompletableFuture::join)
+                                    .map(entryResponse -> {
+                                        errorHandling(entryResponse, "Could not get entry block for keyMr " + keyMR);
+                                        return entryResponse.getResult();
+                                    })
+                                    .collect(Collectors.toList())
+                            );
+                }, getExecutorService());
+    }
+
+
+    @Override
+    public CompletableFuture<List<EntryBlockResponse>> entryBlocksUpTilKeyMR(String keyMR) {
+        List<EntryBlockResponse> entryBlockResponseList = new ArrayList<>();
+
+        String currentKeyMR = keyMR;
+
+        while (!currentKeyMR.equals(NO_PREVIOUS_KEY_MERKLE_ROOT)) {
+            FactomResponse<EntryBlockResponse> currentBlock = factomdClient.entryBlockByKeyMerkleRoot(currentKeyMR).join();
+            errorHandling(currentBlock, "Could not get entry block for keyMr " + currentKeyMR);
+            currentKeyMR = currentBlock.getResult().getHeader().getPreviousKeyMR();
+            entryBlockResponseList.add(currentBlock.getResult());
+        }
+        CompletableFuture<List<EntryBlockResponse>> completableFuture = new CompletableFuture<>();
+        completableFuture.complete(entryBlockResponseList);
+        return completableFuture;
+    }
+
+
+    /**
+     * List of all entry hashes and timestamps uptil a certain key merkle root.
+     *
+     * @param keyMR
+     * @return
+     */
+    @Override
+    public CompletableFuture<List<EntryBlockResponse.Entry>> entryBlocksEntriesUpTilKeyMR(String keyMR) {
+        List<EntryBlockResponse> entryBlocksUpTilKeyMR = entryBlocksUpTilKeyMR(keyMR).join();
+        List<EntryBlockResponse.Entry> entries = new ArrayList<>();
+        entryBlocksUpTilKeyMR.stream().map(EntryBlockResponse::getEntryList).forEach(entries::addAll);
+        CompletableFuture<List<EntryBlockResponse.Entry>> completableFuture = new CompletableFuture<>();
+        completableFuture.complete(entries);
+        return completableFuture;
+    }
+
+    /**
+     * Compose, reveal and commit a chain.
+     *
+     * @param chain   The chain to commit and reveal
+     * @param address The public or private address to sign/pay the transaction
+     * @throws FactomException.ClientException
+     */
+    @Override
+    public CompletableFuture<CommitAndRevealChainResponse> commitAndRevealChain(Chain chain, Address address) throws FactomException.ClientException {
+        return commitAndRevealChain(chain, address, false);
+    }
+
+
     /**
      * Compose, reveal and commit a chain.
      *
      * @param chain
      * @param address
+     * @param confirmCommit
+     * @return
+     */
+    @Override
+    public CompletableFuture<CommitAndRevealChainResponse> commitAndRevealChain(Chain chain, Address address, boolean confirmCommit) {
+        return commitAndRevealChainImpl(chain, address, null, confirmCommit);
+    }
+
+
+    /**
+     * Compose, reveal and commit a chain.
+     *
+     * @param chain             The chain to commit and reveal
+     * @param signatureProdiver The signature provider
      * @throws FactomException.ClientException
      */
-    public CompletableFuture<CommitAndRevealChainResponse> commitAndRevealChain(Chain chain, Address address) throws FactomException.ClientException {
-        return commitAndRevealChain(chain, address, false);
+    @Override
+    public CompletableFuture<CommitAndRevealChainResponse> commitAndRevealChain(Chain chain, SignatureProdiver signatureProdiver) throws FactomException.ClientException {
+        return commitAndRevealChain(chain, signatureProdiver, false);
+    }
+
+
+    /**
+     * Compose, reveal and commit a chain.
+     *
+     * @param chain
+     * @param signatureProdiver
+     * @param confirmCommit
+     * @return
+     */
+    @Override
+    public CompletableFuture<CommitAndRevealChainResponse> commitAndRevealChain(Chain chain, SignatureProdiver signatureProdiver, boolean confirmCommit) {
+        return commitAndRevealChainImpl(chain, null, signatureProdiver, confirmCommit);
     }
 
     /**
@@ -120,9 +292,9 @@ public class EntryApiImpl {
      * @param address
      * @return
      */
-    public CompletableFuture<CommitAndRevealChainResponse> commitAndRevealChain(Chain chain, Address address, boolean confirmCommit) {
+    protected CompletableFuture<CommitAndRevealChainResponse> commitAndRevealChainImpl(Chain chain, Address address, SignatureProdiver signatureProdiver, boolean confirmCommit) {
         // after compose chain combine commit and reveal chain
-        CompletableFuture<CommitAndRevealChainResponse> commitAndRevealChainFuture = composeChainFuture(chain, address)
+        return (address == null ? composeChainFuture(chain, signatureProdiver) : composeChainFuture(chain, address))
                 .thenApplyAsync(_composeChainResponse -> notifyCompose(_composeChainResponse), executorService())
                 // commit chain
                 .thenComposeAsync(_composeChainResponse -> commitChainFuture(_composeChainResponse)
@@ -144,7 +316,6 @@ public class EntryApiImpl {
                                                             response.setRevealResponse(_revealChainResponse.getResult());
                                                             return response;
                                                         }, executorService()), executorService()), executorService()), executorService()), executorService()), executorService());
-        return commitAndRevealChainFuture;
     }
 
     /**
@@ -154,6 +325,7 @@ public class EntryApiImpl {
      * @param address
      * @throws FactomException.ClientException
      */
+    @Override
     public CompletableFuture<CommitAndRevealEntryResponse> commitAndRevealEntry(Entry entry, Address address) throws FactomException.ClientException {
         return commitAndRevealEntry(entry, address, false);
     }
@@ -165,9 +337,47 @@ public class EntryApiImpl {
      * @param address
      * @throws FactomException.ClientException
      */
+    @Override
     public CompletableFuture<CommitAndRevealEntryResponse> commitAndRevealEntry(Entry entry, Address address, boolean confirmCommit) throws FactomException.ClientException {
+        return commitAndRevealEntryImpl(entry, address, null, confirmCommit);
+    }
+
+    /**
+     * Compose, reveal and commit an entry.
+     *
+     * @param entry
+     * @param signatureProdiver
+     * @throws FactomException.ClientException
+     */
+    @Override
+    public CompletableFuture<CommitAndRevealEntryResponse> commitAndRevealEntry(Entry entry, SignatureProdiver signatureProdiver) throws FactomException.ClientException {
+        return commitAndRevealEntry(entry, signatureProdiver, false);
+    }
+
+    /**
+     * Compose, reveal and commit an entry.
+     *
+     * @param entry
+     * @param signatureProdiver
+     * @throws FactomException.ClientException
+     */
+    @Override
+    public CompletableFuture<CommitAndRevealEntryResponse> commitAndRevealEntry(Entry entry, SignatureProdiver signatureProdiver, boolean confirmCommit) throws FactomException.ClientException {
+        return commitAndRevealEntryImpl(entry, null, signatureProdiver, confirmCommit);
+    }
+
+
+    /**
+     * Compose, reveal and commit an entry.
+     *
+     * @param entry
+     * @param address
+     * @throws FactomException.ClientException
+     */
+    protected CompletableFuture<CommitAndRevealEntryResponse> commitAndRevealEntryImpl(Entry entry, Address address, SignatureProdiver signatureProdiver, boolean confirmCommit) throws FactomException.ClientException {
         // after compose entry combine commit and reveal entry
-        CompletableFuture<CommitAndRevealEntryResponse> commitAndRevealEntryFuture = composeEntryFuture(entry, address)
+
+        return (address == null ? composeEntryFuture(entry, signatureProdiver) : composeEntryFuture(entry, address))
                 .thenApplyAsync(_composeEntryResponse -> notifyCompose(_composeEntryResponse), executorService())
                 // commit chain
                 .thenComposeAsync(_composeEntryResponse -> commitEntryFuture(_composeEntryResponse)
@@ -198,17 +408,29 @@ public class EntryApiImpl {
                                         executorService()),
                         executorService()
                 );
-
-        return commitAndRevealEntryFuture;
     }
 
     private <T> FactomResponse<T> handleResponse(CommitAndRevealListener listener, Consumer<T> listenerCall, FactomResponse<T> response) {
+        assertResponse(response);
         if (response.hasErrors()) {
             listener.onError(response.getRpcErrorResponse());
         } else {
             listenerCall.accept(response.getResult());
         }
         return response;
+    }
+
+    private void errorHandling(FactomResponse<?> response, String message) {
+        assertResponse(response);
+        if (response.hasErrors()) {
+            throw new FactomException.RpcErrorException(message, response);
+        }
+    }
+
+    private void assertResponse(FactomResponse<?> response) {
+        if (response == null) {
+            throw new FactomRuntimeException.AssertionException("Response was null, which was not expected");
+        }
     }
 
     private FactomResponse<ComposeResponse> notifyCompose(FactomResponse<ComposeResponse> response) {
@@ -222,21 +444,25 @@ public class EntryApiImpl {
     }
 
     private FactomResponse<CommitChainResponse> notifyChainCommit(FactomResponse<CommitChainResponse> response) {
+        assertResponse(response);
         listeners.forEach(listener -> handleResponse(listener, listener::onCommit, response));
         return response;
     }
 
     private FactomResponse<RevealResponse> notifyReveal(FactomResponse<RevealResponse> response) {
+        assertResponse(response);
         listeners.forEach(listener -> handleResponse(listener, listener::onReveal, response));
         return response;
     }
 
     private FactomResponse<EntryTransactionResponse> notifyEntryTransaction(FactomResponse<EntryTransactionResponse> response) {
+        assertResponse(response);
         listeners.forEach(listener -> handleResponse(listener, listener::onTransactionAcknowledged, response));
         return response;
     }
 
     private FactomResponse<EntryTransactionResponse> notifyCommitConfirmed(FactomResponse<EntryTransactionResponse> response) {
+        assertResponse(response);
         listeners.forEach(listener -> handleResponse(listener, listener::onCommitConfirmed, response));
         return response;
     }
@@ -261,6 +487,9 @@ public class EntryApiImpl {
     }
 
     private CompletionStage<FactomResponse<EntryTransactionResponse>> transactionAcknowledgeConfirmation(FactomResponse<RevealResponse> revealChainResponse) {
+        if (revealChainResponse == null || revealChainResponse.getResult() == null) {
+            throw new FactomRuntimeException.AssertionException("Reveal chain response was null in transaction acknowledge confirmation. " + (revealChainResponse == null ? "<no RPC response>" : revealChainResponse.getHTTPResponseMessage()));
+        }
         String entryHash = revealChainResponse.getResult().getEntryHash();
         String chainId = revealChainResponse.getResult().getChainId();
         List<EntryTransactionResponse.Status> desiredStatus = Arrays.asList(EntryTransactionResponse.Status.TransactionACK, EntryTransactionResponse.Status.DBlockConfirmed);
@@ -316,6 +545,10 @@ public class EntryApiImpl {
         }, executorService());
     }
 
+    private CompletableFuture<FactomResponse<ComposeResponse>> composeChainFuture(Chain chain, SignatureProdiver signatureProdiver) {
+        return getWalletdClient().composeChain(chain, signatureProdiver);
+    }
+
     private CompletableFuture<FactomResponse<ComposeResponse>> composeChainFuture(Chain chain, Address address) {
         return getWalletdClient().composeChain(chain, address);
     }
@@ -328,10 +561,16 @@ public class EntryApiImpl {
         return getFactomdClient().revealChain(composeChain.getResult().getReveal().getParams().getEntry());
     }
 
+    private CompletableFuture<FactomResponse<ComposeResponse>> composeEntryFuture(Entry entry, SignatureProdiver signatureProdiver) {
+        logger.info("commitEntryFuture");
+        return getWalletdClient().composeEntry(entry, signatureProdiver);
+    }
+
     private CompletableFuture<FactomResponse<ComposeResponse>> composeEntryFuture(Entry entry, Address address) {
         logger.info("commitEntryFuture");
         return getWalletdClient().composeEntry(entry, address);
     }
+
 
     private CompletableFuture<FactomResponse<CommitEntryResponse>> commitEntryFuture(FactomResponse<ComposeResponse> composeEntry) {
         logger.info("commitEntryFuture");

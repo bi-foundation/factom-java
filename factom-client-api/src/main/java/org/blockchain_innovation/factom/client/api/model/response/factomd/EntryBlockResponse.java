@@ -37,6 +37,11 @@ public class EntryBlockResponse implements Serializable {
         private String chainid;
         private String prevkeymr;
         private long dbheight;
+        private long timestamp;
+
+        public long getTimestamp() {
+            return timestamp;
+        }
 
         public long getBlockSequenceNumber() {
             return blocksequencenumber;
@@ -53,6 +58,8 @@ public class EntryBlockResponse implements Serializable {
         public long getDirectoryBlockHeight() {
             return dbheight;
         }
+
+
     }
 
     public static class Entry implements Serializable {

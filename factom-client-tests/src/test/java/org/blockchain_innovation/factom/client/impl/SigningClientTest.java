@@ -4,6 +4,7 @@ import org.blockchain_innovation.factom.client.AbstractClientTest;
 import org.blockchain_innovation.factom.client.api.model.Address;
 import org.blockchain_innovation.factom.client.api.model.Chain;
 import org.blockchain_innovation.factom.client.api.model.Entry;
+import org.blockchain_innovation.factom.client.api.ops.AddressSignatureProvider;
 import org.blockchain_innovation.factom.client.api.ops.Encoding;
 import org.blockchain_innovation.factom.client.api.ops.EntryOperations;
 import org.junit.Assert;
@@ -37,7 +38,7 @@ public class SigningClientTest extends AbstractClientTest {
         Address publicAddress = new Address(EC_PUBLIC_ADDRESS);
         Address secretAddress = new Address(EC_SECRET_ADDRESS);
 
-        String composeChainCommit = offlineWalletdClient.composeChainCommit(chain, secretAddress);
+        String composeChainCommit = offlineWalletdClient.composeChainCommit(chain, new AddressSignatureProvider(secretAddress));
         System.out.println("composeChainCommit = " + composeChainCommit);
         Assert.assertEquals(expectedChainCommit, composeChainCommit);
     }
@@ -60,7 +61,7 @@ public class SigningClientTest extends AbstractClientTest {
 
         Address secretAddress = new Address(EC_SECRET_ADDRESS);
 
-        String composeEntryCommit = offlineWalletdClient.composeEntryCommit(entry, secretAddress);
+        String composeEntryCommit = offlineWalletdClient.composeEntryCommit(entry, new AddressSignatureProvider(secretAddress));
         System.out.println("composeEntryCommit = " + composeEntryCommit);
         Assert.assertEquals(expectedEntryCommit, composeEntryCommit);
     }

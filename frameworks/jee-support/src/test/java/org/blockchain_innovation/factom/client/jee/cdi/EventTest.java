@@ -1,5 +1,6 @@
 package org.blockchain_innovation.factom.client.jee.cdi;
 
+import org.blockchain_innovation.factom.client.api.errors.FactomException;
 import org.blockchain_innovation.factom.client.api.model.Chain;
 import org.blockchain_innovation.factom.client.api.model.Entry;
 import org.blockchain_innovation.factom.client.api.model.response.CommitAndRevealChainResponse;
@@ -36,25 +37,30 @@ public class EventTest extends AbstractCDITest {
 
     @Test
     public void commitAndRevealEventTest() {
-        Assert.assertNotNull(entryApiProvider.get());
+        try {
+            Assert.assertNotNull(entryApiProvider.get());
 
-        Chain chain = chain();
+            Chain chain = chain();
 
-        EntryApiImpl entryClient = entryApiProvider.get();
+            EntryApiImpl entryClient = entryApiProvider.get();
 
-        CommitAndRevealChainResponse commitAndRevealChain = entryClient.commitAndRevealChain(chain, EC_PUBLIC_ADDRESS).join();
+            CommitAndRevealChainResponse commitAndRevealChain = entryClient.commitAndRevealChain(chain, EC_PUBLIC_ADDRESS).join();
 
-        Assert.assertEquals("Chain Commit Success", commitAndRevealChain.getCommitChainResponse().getMessage());
-        Assert.assertEquals("Entry Reveal Success", commitAndRevealChain.getRevealResponse().getMessage());
-        Assert.assertEquals(commitAndRevealChain.getCommitChainResponse().getEntryHash(), commitAndRevealChain.getRevealResponse().getEntryHash());
-        Assert.assertEquals("Chain Commit Success", commitChainResponseRef.get().getMessage());
-        Assert.assertEquals("Entry Reveal Success", revealChainResponseRef.get().getMessage());
-        Assert.assertEquals(commitChainResponseRef.get().getEntryHash(), revealChainResponseRef.get().getEntryHash());
+            Assert.assertEquals("Chain Commit Success", commitAndRevealChain.getCommitChainResponse().getMessage());
+            Assert.assertEquals("Entry Reveal Success", commitAndRevealChain.getRevealResponse().getMessage());
+            Assert.assertEquals(commitAndRevealChain.getCommitChainResponse().getEntryHash(), commitAndRevealChain.getRevealResponse().getEntryHash());
+            Assert.assertEquals("Chain Commit Success", commitChainResponseRef.get().getMessage());
+            Assert.assertEquals("Entry Reveal Success", revealChainResponseRef.get().getMessage());
+            Assert.assertEquals(commitChainResponseRef.get().getEntryHash(), revealChainResponseRef.get().getEntryHash());
 
-        Assert.assertNotNull(transactionAcknowledgedResponseRef.get());
-        Assert.assertNotNull(commitAndRevealChain.getCommitChainResponse().getEntryHash(), transactionAcknowledgedResponseRef.get().getEntryHash());
+            Assert.assertNotNull(transactionAcknowledgedResponseRef.get());
+            Assert.assertNotNull(commitAndRevealChain.getCommitChainResponse().getEntryHash(), transactionAcknowledgedResponseRef.get().getEntryHash());
 
-        System.out.println("commitAndRevealChain = " + commitAndRevealChain);
+            System.out.println("commitAndRevealChain = " + commitAndRevealChain);
+        } catch (FactomException.RpcErrorException ex) {
+            System.err.println(ex.getRpcErrorResponse().getError().getMessage());
+            throw ex;
+        }
     }
 
     public void testEvent(@Observes ComposeResponse composeResponse) {

@@ -4,6 +4,9 @@ import org.blockchain_innovation.factom.client.api.log.LogFactory;
 import org.blockchain_innovation.factom.client.api.log.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * SLF4J Log Factory.
+ */
 public class SLF4JLogFactoryImpl implements LogFactory {
 
     public static final String NAME = "SLF4J";

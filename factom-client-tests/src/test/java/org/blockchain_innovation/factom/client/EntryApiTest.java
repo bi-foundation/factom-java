@@ -6,10 +6,7 @@ import org.blockchain_innovation.factom.client.api.model.Chain;
 import org.blockchain_innovation.factom.client.api.model.Entry;
 import org.blockchain_innovation.factom.client.api.model.response.CommitAndRevealChainResponse;
 import org.blockchain_innovation.factom.client.api.model.response.CommitAndRevealEntryResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.CommitChainResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.CommitEntryResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.EntryTransactionResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.RevealResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.*;
 import org.blockchain_innovation.factom.client.api.model.response.walletd.ComposeResponse;
 import org.blockchain_innovation.factom.client.api.ops.Encoding;
 import org.blockchain_innovation.factom.client.api.rpc.RpcErrorResponse;
@@ -21,7 +18,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class EntryApiTest extends AbstractClientTest {
@@ -86,7 +82,6 @@ public class EntryApiTest extends AbstractClientTest {
         Assert.assertEquals("Chain Commit Success", commitChainResponse.get().getMessage());
         Assert.assertEquals("Entry Reveal Success", revealChainResponse.get().getMessage());
         Assert.assertEquals(commitChainResponse.get().getEntryHash(), revealChainResponse.get().getEntryHash());
-
         Assert.assertNotNull(transactionAcknowledgedResponse.get());
         Assert.assertNotNull(commitAndRevealChain.getCommitChainResponse().getEntryHash(), transactionAcknowledgedResponse.get().getEntryHash());
 
@@ -259,5 +254,12 @@ public class EntryApiTest extends AbstractClientTest {
 
         Assert.assertNotNull(transactionAcknowledgedResponse.get());
         Assert.assertNotNull(commitChainResponse.get().getEntryHash(), transactionAcknowledgedResponse.get().getEntryHash());
+    }
+
+    @Test
+    public void testGetAllEntryBlocks(){
+        CompletableFuture<List<EntryBlockResponse>> entryBlockResponses = entryClient.allEntryBlocks("3013a7505c90a957d93c5a54a46705e44fe6bf08de396496a61c9a5b65bc9fb7");
+        Assert.assertEquals(2, entryBlockResponses.join().size());
+        Assert.assertEquals("0be1ea15aca70381b57c34697cfe2105daa2c7fa8992a170876e864c954657e1", entryBlockResponses.join().get(0).getHeader().getPreviousKeyMR());
     }
 }

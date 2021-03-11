@@ -20,6 +20,14 @@ import java.io.Serializable;
 import java.util.List;
 
 public class EntryResponse implements Serializable {
+    public EntryResponse() {
+    }
+    public EntryResponse(String chainid, List<String>extids, String content) {
+        this.chainid = chainid;
+        this.extids = extids;
+        this.content = content;
+    }
+
     private String chainid;
     private String content;
     private List<String> extids;

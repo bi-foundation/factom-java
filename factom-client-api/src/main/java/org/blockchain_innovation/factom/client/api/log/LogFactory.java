@@ -13,7 +13,7 @@ public interface LogFactory {
      * Gets the logger by name. This is used internally and not called by the end user.
      *
      * @param name The logger name.
-     * @return The logger connected to the name
+     * @return The logger connected to the name.
      */
     Logger newInstance(String name);
 
@@ -28,7 +28,7 @@ public interface LogFactory {
     /**
      * Gets the engine name of the logger implementation.
      *
-     * @return
+     * @return The engine name.
      */
     String getEngine();
 
@@ -36,7 +36,7 @@ public interface LogFactory {
      * Allows the retrieval of the logger implemententation for the name. This is the logger name and not the SPI engine name! This is the method the end user calls.
      *
      * @param name The logger name.
-     * @return The logger from the SPI implementation connected to the logger name
+     * @return The logger from the SPI implementation connected to the logger name.
      */
     static Logger getLogger(String name) {
         return Provider.getFactory().newInstance(name);
@@ -46,36 +46,36 @@ public interface LogFactory {
      * Allows the retrieval of the logger implemententation for the name. This is the logger name and not the SPI engine name! This is the method the end user calls.
      *
      * @param clazz The logger class.
-     * @return The logger from the SPI implementation connected to the logger class
+     * @return The logger from the SPI implementation connected to the logger class.
      */
     static Logger getLogger(Class<?> clazz) {
         return Provider.getFactory().newInstance(clazz);
     }
 
     /**
-     * The SPI work is being done in the provider
+     * The SPI work is being done in this provider class.
      */
     class Provider {
-        static LogFactory logFactory = serviceLoader(false).iterator().next();
+        private static final LogFactory logFactory = serviceLoader(false).iterator().next();
 
         static {
             assertRegistered(false);
         }
 
         /**
-         * Get the correct LogFactory implementation from the SPI implementation on the classpath
+         * Get the correct LogFactory implementation from the SPI implementation on the classpath.
          *
-         * @return
+         * @return The log factory.
          */
         public static LogFactory getFactory() {
             return logFactory;
         }
 
         /**
-         * Gets the logfactory implementation by SPI enging name
+         * Gets the log factory implementation by SPI engine name.
          *
-         * @param engine The engine SPI name of the implementation. eg: SLF4J
-         * @return
+         * @param engine The engine SPI name of the implementation. eg: SLF4J.
+         * @return The log factory.
          */
         public static LogFactory getFactory(String engine) {
             for (LogFactory logFactory : serviceLoader(false)) {
@@ -111,8 +111,8 @@ public interface LogFactory {
         /**
          * Rertieve the service loader.
          *
-         * @param reload Refresh the loader
-         * @return
+         * @param reload Refresh the loader.
+         * @return The LogFactory Service Loader.
          */
         private static ServiceLoader<LogFactory> serviceLoader(boolean reload) {
             ServiceLoader<LogFactory> loader = ServiceLoader.load(LogFactory.class);
@@ -121,6 +121,5 @@ public interface LogFactory {
             }
             return loader;
         }
-
     }
 }

@@ -29,12 +29,14 @@ buildscript {
 }
 
 
-
 plugins {
     id 'org.asciidoctor.convert' version '1.5.6' apply false
-    id 'org.springframework.boot' version '2.0.5.RELEASE' apply false
+    id 'org.springframework.boot' version '2.2.5.RELEASE' apply false
     id "com.athaydes.osgi-run" version "1.6.0" apply false
     id "org.dm.bundle" version "0.8.4" apply false
+    id 'nu.studer.credentials' version '1.0.7'
+    id "biz.aQute.bnd.builder" version "5.0.0" apply false
+
 }
 apply plugin: 'io.github.robwin.jgitflow'
 
@@ -49,7 +51,7 @@ ext {
                     jsonApi: "1.1.2"
             ],
             spring: [
-                    boot: "2.0.5.RELEASE"
+                    boot: "2.2.5.RELEASE"
             ]
     ]
     testVersions = [
@@ -72,15 +74,13 @@ ext {
     ]
 
     // the password needs to be specified via command line
-    repoUser = project.hasProperty('repoUser') ? project.getProperty('repoUser') : ''
-    repoPass = project.hasProperty('repoPass') ? project.getProperty('repoPass') : ''
+    repoUser = project.hasProperty('repoUser') ? project.getProperty('repoUser') : credentials.nexusUser
+    repoPass = project.hasProperty('repoPass') ? project.getProperty('repoPass') : credentials.nexusPassword
 }
-
 
 
 allprojects {
     apply plugin: "maven"
-
 
 
     group = "org.blockchain-innovation.factom.client"
@@ -98,11 +98,12 @@ allprojects {
 }
 
 subprojects {
-    apply plugin: "checkstyle"
-    apply plugin: "findbugs"
-    apply plugin: "pmd"
+//    apply plugin: "checkstyle"
+//    apply plugin: "findbugs"
+//    apply plugin: "pmd"
     apply plugin: "java"
     apply plugin: "maven-publish"
+    sourceCompatibility = 8
 
     buildscript {
         repositories {
@@ -117,10 +118,11 @@ subprojects {
         publications {
             mavenJava(MavenPublication) {
                 from components.java
-                artifact sourceJar
-                artifact javadocJar
-
-                /*  pom {
+                afterEvaluate {
+                    artifact sourceJar
+                    artifact javadocJar
+                }
+                pom {
 
 
                       licenses {
@@ -131,25 +133,25 @@ subprojects {
                       }
                       developers {
                           developer {
-                              id = 'bif'
+                              id = 'BIF'
                               name = 'Blockchain Innovation Foundation'
                               email = 'info@blockchain-innovation.org'
                           }
                       }
                       scm {
-                          connection = 'scm:git:git://example.com/my-library.git'
-                          developerConnection = 'scm:git:ssh://example.com/my-library.git'
-                          url = 'http://example.com/my-library/'
+                          connection = 'scm:git:https://github.com/bi-foundation/factom-java.git'
+                          developerConnection = 'scm:git:https://github.com/bi-foundation/factom-java.git'
+                          url = 'https://github.com/bi-foundation/factom-java/'
                       }
-                  }*/
+                  }
             }
         }
 
 
         repositories {
             maven {
-                def releasesRepoUrl = "http://nexus.qa.sphereon.com/repository/bif-releases"
-                def snapshotsRepoUrl = "http://nexus.qa.sphereon.com/repository/bif-snapshots"
+                def releasesRepoUrl = "https://nexus.qa.sphereon.com/repository/sphereon-opensource-releases"
+                def snapshotsRepoUrl = "https://nexus.qa.sphereon.com/repository/sphereon-opensource-snapshots"
                 url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
                 credentials {
                     username project.repoUser
@@ -198,16 +200,16 @@ subprojects {
             html.destination file("${project(':').projectDir}/quality/reports/${project.name}-pmd.html")
         }
     }
-    tasks.withType(FindBugs) {
-        findbugs.sourceSets = [sourceSets.main]
-        ignoreFailures = false
-        excludeFilter = file("${project(':').projectDir}/quality/config/findbugs.exclude.xml")
-        reports {
-            xml.enabled = false
-            html.enabled = true
-            html.destination file("${project(':').projectDir}/quality/reports/${project.name}-findbugs.html")
-        }
-    }
+//    tasks.withType(FindBugs) {
+//        findbugs.sourceSets = [sourceSets.main]
+//        ignoreFailures = false
+//        excludeFilter = file("${project(':').projectDir}/quality/config/findbugs.exclude.xml")
+//        reports {
+//            xml.enabled = false
+//            html.enabled = true
+//            html.destination file("${project(':').projectDir}/quality/reports/${project.name}-findbugs.html")
+//        }
+//    }
     tasks.withType(Checkstyle) {
         checkstyle.sourceSets = [sourceSets.main]
         ignoreFailures = true
@@ -223,17 +225,14 @@ subprojects {
         dependsOn tasks.withType(Pmd).matching {
             !it.name.toLowerCase().contains("test")
         }
-        dependsOn tasks.withType(FindBugs).matching {
-            !it.name.toLowerCase().contains("test")
-        }
+//        dependsOn tasks.withType(FindBugs).matching {
+//            !it.name.toLowerCase().contains("test")
+//        }
         dependsOn tasks.withType(Checkstyle).matching {
             !it.name.toLowerCase().contains("test")
         }
     }
 }
-
-
-
 
 
 task cleanReports(type: Delete) {
@@ -252,6 +251,7 @@ project(':factom-client-api') {
     apply plugin: "java"
     dependencies {
         // Provided by JEE Environment
+        compile 'javax.xml.bind:jaxb-api:2.3.1'
         compileOnly "javax.enterprise:cdi-api:$libVersions.jee.cdiApi"
     }
 //    publishing {
@@ -269,6 +269,7 @@ project(':factom-client-impl') {
     apply plugin: "java"
     dependencies {
         compile project(':factom-client-api')
+
         // Provided by JEE Environment
         compileOnly "javax.enterprise:cdi-api:$libVersions.jee.cdiApi"
     }
@@ -279,6 +280,16 @@ project(':factom-client-offline-signing') {
     dependencies {
         compile project(':factom-client-impl')
         compile "net.i2p.crypto:eddsa:$libVersions.eddsa"
+        compileOnly "javax.enterprise:cdi-api:$libVersions.jee.cdiApi"
+      }
+}
+project(':iot-sas') {
+    apply plugin: "java"
+    dependencies {
+        compile project(':factom-client-impl')
+        compile project(':factom-client-offline-signing')
+        compile project(':service-providers:logger-slf4j')
+        compile 'com.fazecast:jSerialComm:[2.0.0,3.0.0)'
     }
 }
 
@@ -349,10 +360,12 @@ project(':frameworks:spring-boot-support') {
     apply plugin: "io.spring.dependency-management"
 
     dependencies {
+        annotationProcessor "org.springframework.boot:spring-boot-configuration-processor:$libVersions.spring.boot"
         compile project(':factom-client-impl')
-        // Explicit dep on CDI, since it might not be on classpath of spring boot application
+        // Explicit dep on CDI, since it might not be on classpath of the spring boot application
         compile "javax.enterprise:cdi-api:$libVersions.jee.cdiApi"
         compileOnly "org.springframework.boot:spring-boot-starter:$libVersions.spring.boot"
+        compile project(":factom-client-offline-signing")
         testCompile project(":service-providers:logger-slf4j")
         testCompile project(":service-providers:json-converter-gson")
         testCompile "com.google.code.gson:gson:$libVersions.gson"
@@ -370,7 +383,7 @@ project(':frameworks:osgi') {
 
     apply plugin: "java"
     apply plugin: "com.athaydes.osgi-run"
-    apply plugin: "org.dm.bundle"
+//    apply plugin: "org.dm.bundle"
 
     runOsgi {
         bundles += project
@@ -390,22 +403,25 @@ project(':frameworks:osgi') {
     }
 }
 
+
 project(':factom-client-tests') {
     apply plugin: "java"
     dependencies {
+        compile "org.slf4j:slf4j-simple:$libVersions.slf4j"
         testCompile project(':service-providers:logger-slf4j')
         testCompile project(':factom-client-impl')
         testCompile project(':factom-client-offline-signing')
-//        testCompile project(':service-providers:json-converter-gson')
-        testCompile project(':service-providers:json-converter-jee')
+        testCompile project(':service-providers:json-converter-gson')
+        testCompile project(':iot-sas')
         testCompile "org.mock-server:mockserver-netty:5.4.1"
         testCompile "org.mock-server:mockserver-client-java:5.4.1"
         testCompile "org.glassfish:javax.json:$testVersions.jee.javaxJson"
         testCompile "org.eclipse:yasson:$testVersions.jee.yasson"
         testCompile "junit:junit:$testVersions.junit4"
-
+        testCompile 'com.fazecast:jSerialComm:[2.0.0,3.0.0)'
     }
 }
+
 
 project(':docs') {
 
@@ -453,6 +469,7 @@ project(':docs') {
         classpath = files(exportedProjects.collect { project(it).sourceSets.main.compileClasspath })
         destinationDir = file("javadoc")
         options.encoding = "UTF-8"
+        title = "Factom Java Client v" + project.version
 
     }
 

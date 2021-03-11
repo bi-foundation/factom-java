@@ -24,7 +24,12 @@ import org.blockchain_innovation.factom.client.api.model.Range;
 import org.blockchain_innovation.factom.client.api.ops.StringUtils;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.Map;
+import java.util.List;
+import java.util.HashMap;
+import java.util.Collection;
+import java.util.Arrays;
+import java.util.ArrayList;
 
 /**
  * The Factom APIs use JSON-RPC, which is a remote procedure call protocol encoded in JSON.
@@ -33,7 +38,7 @@ import java.util.*;
 public class RpcRequest implements Serializable {
     private static final String VERSION = "2.0";
     private final String jsonrpc = VERSION;
-    private RpcMethod method;
+    private final RpcMethod method;
     private int id;
     private Map<String, Object> params;
 

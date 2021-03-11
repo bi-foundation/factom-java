@@ -12,6 +12,33 @@ endif::[]
 This document provides a high-level overview of the changes introduced in Factom-Java by release.
 For a detailed view of what has changed, refer to our {uri-repo}/commits/master[commit history] on GitHub.
 
+== 0.3.0 - not released
+
+This release adds hardware signing support from TFA-Labs.
+It contains many small fixes and prepares for identity/DID client support
+
+Added::
+
+* TFA-Labs Signed at Source hardware signature integration. More info: https://iot-sas.tech/
+* Add idpub address support
+* Multiple Networks access using properties or a file
+
+Changed::
+
+* EntryAPI: Added new methods, removed non-async parts
+* Prepare for DID/Identity client support
+* Allow newer gradle versions to build this project
+
+Deprecated::
+Removed::
+Fixed::
+
+* Fixed JsonB implementation support
+* Address checks improved. Do not allow public key extraction from public address, as that is impossible
+* Commit chain was referencing compose chain incorrectly
+
+Security::
+
 
 == 0.2.1 - release date 20180926
 

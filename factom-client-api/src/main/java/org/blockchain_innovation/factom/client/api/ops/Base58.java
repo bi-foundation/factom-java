@@ -31,8 +31,8 @@ public class Base58 {
     /**
      * Encode a byte input to bitcoin compatible Base58 String.
      *
-     * @param input
-     * @return
+     * @param input The input to encode
+     * @return The encoded Base58 value
      */
     public static String encode(byte[] input) {
         if (input.length == 0) {

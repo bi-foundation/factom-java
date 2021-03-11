@@ -19,12 +19,15 @@ package org.blockchain_innovation.factom.client.impl.json.gson;
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 import org.blockchain_innovation.factom.client.api.json.JsonConverter;
+import org.blockchain_innovation.factom.client.api.model.response.walletd.AddressResponse;
 import org.blockchain_innovation.factom.client.api.rpc.RpcErrorResponse;
 import org.blockchain_innovation.factom.client.api.rpc.RpcMethod;
 import org.blockchain_innovation.factom.client.api.rpc.RpcResponse;
 
 import javax.inject.Named;
 import java.lang.reflect.Type;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 @Named
@@ -32,6 +35,12 @@ public class JsonConverterGSON implements JsonConverter {
 
     public static final String NAME = "GSON";
     private Gson gson;
+    private final Map<Type, Object> adapters = new HashMap<>();
+
+    @Override
+    public void addAdapter(Type type, Object adapter) {
+        adapters.put(type, adapter);
+    }
 
     @Override
     public JsonConverterGSON configure(Properties properties) {
@@ -48,6 +57,7 @@ public class JsonConverterGSON implements JsonConverter {
         if (prettyprint) {
             builder.setPrettyPrinting();
         }
+        adapters.forEach((type, adapter) -> builder.registerTypeAdapter(type, adapter));
 
         this.gson = builder.create();
         return this;
@@ -60,8 +70,13 @@ public class JsonConverterGSON implements JsonConverter {
 
 
     @Override
-    public <T> RpcResponse<T> fromJson(String json, Class<T> resultClass) {
+    public <T> RpcResponse<T> responseFromJson(String json, Class<T> resultClass) {
         return gson().fromJson(json, TypeToken.getParameterized(RpcResponse.class, resultClass).getType());
+    }
+
+    @Override
+    public <T> T fromJson(String json, Class<T> resultClass) {
+        return gson().fromJson(json, resultClass);
     }
 
     @Override
@@ -71,8 +86,13 @@ public class JsonConverterGSON implements JsonConverter {
     }
 
     @Override
-    public String toJson(Object input) {
+    public String toRpcJson(Object input) {
         return gson().toJson(input);
+    }
+
+    @Override
+    public String toGenericJson(Object object, Type runtimeType) {
+        return gson().toJson(object, runtimeType);
     }
 
 
@@ -81,7 +101,7 @@ public class JsonConverterGSON implements JsonConverter {
      * Examples are: TmpTransaction#Transaction tx-name and WalletBackupResponse wallet-seed
      *
      * @return custom FieldNamingStrategy
-     * @see org.blockchain_innovation.factom.client.api.model.response.walletd.AddressResponse#_public public member of AddressResponse
+     * @see AddressResponse#getPublicAddress()  public member of AddressResponse
      */
     private FieldNamingStrategy fieldNamingStrategy() {
 //        return FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES;

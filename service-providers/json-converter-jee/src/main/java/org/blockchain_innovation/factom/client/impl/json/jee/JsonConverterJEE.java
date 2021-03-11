@@ -28,7 +28,9 @@ import javax.json.JsonValue;
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
 import javax.json.bind.JsonbConfig;
+import javax.json.bind.adapter.JsonbAdapter;
 import javax.json.bind.config.PropertyNamingStrategy;
+import javax.json.bind.config.PropertyOrderStrategy;
 import javax.json.bind.config.PropertyVisibilityStrategy;
 import javax.json.bind.serializer.DeserializationContext;
 import javax.json.bind.serializer.JsonbDeserializer;
@@ -38,8 +40,7 @@ import javax.json.stream.JsonGenerator;
 import javax.json.stream.JsonParser;
 import java.lang.reflect.*;
 import java.nio.CharBuffer;
-import java.util.Objects;
-import java.util.Properties;
+import java.util.*;
 
 import static javax.json.bind.config.PropertyOrderStrategy.LEXICOGRAPHICAL;
 
@@ -50,10 +51,18 @@ public class JsonConverterJEE implements JsonConverter {
     public static final String NAME = "JEE";
     protected static final String RPC_METHOD = "method";
     private Jsonb jsonb;
+    private Jsonb genericJsonb;
+    private final Map<Type, JsonbAdapter> adapters = new HashMap<>();
+
+    @Override
+    public void addAdapter(Type type, Object adapter) {
+        JsonbAdapter jsonbAdapter = (JsonbAdapter) adapter;
+        adapters.put(type, jsonbAdapter);
+    }
 
     @Override
     public JsonConverterJEE configure(Properties properties) {
-        final JsonbConfig jsonbConfig = config();
+        final JsonbConfig jsonbConfig = rpcConfig();
         // Init new properties so we get default values
         Properties props = new Properties(properties);
 
@@ -63,15 +72,24 @@ public class JsonConverterJEE implements JsonConverter {
         return this;
     }
 
-    private JsonbConfig config() {
-        JsonbConfig config = new JsonbConfig().
+    private JsonbConfig rpcConfig() {
+        return new JsonbConfig().
                 withFormatting(true).
                 withPropertyOrderStrategy(LEXICOGRAPHICAL).
                 withSerializers(new RpcMethodSerializer()).
                 withDeserializers(new PendingTransactionsResponseDeserializer()).
                 withPropertyVisibilityStrategy(propertyVisibilityStrategy()).
                 withPropertyNamingStrategy(propertyNamingStrategy());
-        return config;
+    }
+
+
+    private JsonbConfig genericConfig() {
+
+        return new JsonbConfig().
+                withFormatting(false).
+                withAdapters(adapters.values().toArray(new JsonbAdapter[]{})).
+                withPropertyOrderStrategy(PropertyOrderStrategy.ANY).
+                withNullValues(false);
     }
 
 
@@ -82,6 +100,13 @@ public class JsonConverterJEE implements JsonConverter {
         return jsonb;
     }
 
+    private Jsonb genericJsonb() {
+        if (genericJsonb == null) {
+            this.genericJsonb = JsonbBuilder.create(genericConfig());
+        }
+        return genericJsonb;
+    }
+
     @Override
     public RpcErrorResponse errorFromJson(String json) {
         return jsonb().fromJson(json, RpcErrorResponse.class);
@@ -89,19 +114,29 @@ public class JsonConverterJEE implements JsonConverter {
 
 
     @Override
-    public <T> RpcResponse<T> fromJson(String json, Class<T> resultClass) {
+    public <T> RpcResponse<T> responseFromJson(String json, Class<T> resultClass) {
         ParameterizedType parameterizedType = new ResolvedParameterizedType(RpcResponse.class, new Type[]{resultClass});
         return jsonb().fromJson(json, parameterizedType);
     }
 
     @Override
-    public String prettyPrint(String json) {
-        return toJson(json);
+    public <T> T fromJson(String json, Class<T> resultClass) {
+        return genericJsonb().fromJson(json, resultClass);
     }
 
     @Override
-    public String toJson(Object input) {
+    public String prettyPrint(String json) {
+        return toRpcJson(json);
+    }
+
+    @Override
+    public String toRpcJson(Object input) {
         return jsonb().toJson(input);
+    }
+
+    @Override
+    public String toGenericJson(Object object, Type runtimeType) {
+        return genericJsonb().toJson(object, runtimeType);
     }
 
     @Override
@@ -115,7 +150,7 @@ public class JsonConverterJEE implements JsonConverter {
      * Examples are: TmpTransaction#Transaction tx-name and WalletBackupResponse wallet-seed
      *
      * @return custom PropertyNamingStrategy
-     * @see org.blockchain_innovation.factom.client.api.model.response.walletd.AddressResponse#_public public member of AddressResponse
+     * @see org.blockchain_innovation.factom.client.api.model.response.walletd.AddressResponse
      */
     private PropertyNamingStrategy propertyNamingStrategy() {
         return propertyName -> {
@@ -179,8 +214,7 @@ public class JsonConverterJEE implements JsonConverter {
 
             PendingTransactionsResponse response = new PendingTransactionsResponse();
             JsonArray transactionsArray = jsonParser.getArray();
-            for (int i = 0; i < transactionsArray.size(); i++) {
-                JsonValue transactionValue = transactionsArray.get(i);
+            for (JsonValue transactionValue : transactionsArray) {
                 String json = transactionValue.toString();
                 PendingTransactionsResponse.PendingTransaction pendingTransaction = jsonb.fromJson(json, PendingTransactionsResponse.PendingTransaction.class);
                 response.add(pendingTransaction);
