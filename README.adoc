@@ -44,6 +44,9 @@ An example project can be found at https://github.com/bi-foundation/factom-java-
 Since this project has no external dependencies besides a JSON library and optional logging, it is fully compatible with Android 7 and up.
 An example project can be found at https://github.com/bi-foundation/factom-java-examples/tree/develop/android/FactomApiDemo[Github].
 
+== Javadocs
+Javadocs can be found at https://bi-foundation.github.io/factom-java/javadoc/
+
 
 == Maven installation
 This is a gradle project but maven snapshots and releases are distributed on the Nexus installation of Sphereon at
