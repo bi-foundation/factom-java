@@ -107,7 +107,7 @@ public interface WalletdClient {
      */
     CompletableFuture<FactomResponse<AddressesResponse>> allAddresses();
 
-    CompletableFuture<FactomResponse<ComposeResponse>> composeChain(Chain chain, SignatureProdiver signatureProdiver) throws FactomException.ClientException;
+    CompletableFuture<FactomResponse<ComposeResponse>> composeChain(Chain chain, SignatureProvider signatureProvider) throws FactomException.ClientException;
 
     /**
      * This method, compose-chain, will return the appropriate API calls to create a chain in factom. You must first call the commit-chain, then the reveal-chain API calls. To be
@@ -121,7 +121,7 @@ public interface WalletdClient {
      */
     CompletableFuture<FactomResponse<ComposeResponse>> composeChain(Chain chain, Address entryCreditAddress);
 
-    CompletableFuture<FactomResponse<ComposeResponse>> composeEntry(Entry entry, SignatureProdiver signatureProdiver) throws FactomException.ClientException;
+    CompletableFuture<FactomResponse<ComposeResponse>> composeEntry(Entry entry, SignatureProvider signatureProvider) throws FactomException.ClientException;
 
     /**
      * This method, compose-entry, will return the appropriate API calls to create an entry in factom. You must first call the commit-entry, then the reveal-entry API calls. To be

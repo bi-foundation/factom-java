@@ -16,42 +16,74 @@
 
 package org.blockchain_innovation.factom.client.api.model;
 
+import net.i2p.crypto.eddsa.EdDSAKey;
+import net.i2p.crypto.eddsa.EdDSAPrivateKey;
+import net.i2p.crypto.eddsa.EdDSASecurityProvider;
+import org.blockchain_innovation.factom.client.api.AddressKeyConversions;
+import org.blockchain_innovation.factom.client.api.errors.FactomRuntimeException;
 import org.blockchain_innovation.factom.client.api.model.types.AddressType;
 import org.blockchain_innovation.factom.client.api.ops.Encoding;
 
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.security.Security;
+import java.util.Objects;
 
 /**
  * An address represents a Factom Factoid or Entry Credit address. Either a private (secret) or a public address.
  */
 public class Address implements Serializable {
 
+    static {
+        // add eddsa to the security providers
+        Security.addProvider(new EdDSASecurityProvider());
+    }
+
     // Do not rename as it is used during serialization!
     private String secret;
+
+//    private String userAddress;
 
     /**
      * Create an address from bytes;
      *
-     * @param hexAddress
+     * @param address
      * @return The address.
      */
-    public static Address fromHexBytes(byte[] hexAddress) {
-        return new Address().setValue(new String(hexAddress, StandardCharsets.US_ASCII));
+    public static Address fromBytes(byte[] address) {
+        return new Address().setValue(new String(address, StandardCharsets.US_ASCII));
     }
 
-    public static Address fromBytes(byte[] address) {
+    public static Address fromHexBytes(byte[] address) {
         return new Address().setValue(Encoding.HEX.encode(address));
     }
 
     /**
      * Create an address from a string.
      *
-     * @param hexAddress The hex address string.
+     * @param humanReadableAddress The hex address string.
      * @return The address.
      */
-    public static Address fromString(String hexAddress) {
-        return new Address().setValue(hexAddress);
+    public static Address fromString(String humanReadableAddress) {
+        return new Address().setValue(humanReadableAddress);
+    }
+
+    public static Address randomPrivate(AddressType addressType) {
+        if (addressType == null || !addressType.isPrivate()) {
+            throw new FactomRuntimeException.AssertionException("A private address type is needed to generate a new random address");
+        }
+        try {
+            KeyPairGenerator kpGenerator = KeyPairGenerator.getInstance(EdDSAKey.KEY_ALGORITHM);
+            KeyPair keyPair = kpGenerator.generateKeyPair();
+            byte[] privateKey = ((EdDSAPrivateKey)keyPair.getPrivate()).getSeed();
+            return fromString(new AddressKeyConversions().keyToAddress(privateKey, addressType));
+
+        } catch (NoSuchAlgorithmException e) {
+            throw new FactomRuntimeException(e);
+        }
     }
 
     /**
@@ -63,10 +95,10 @@ public class Address implements Serializable {
     /**
      * Return a new address associated with the hex string.
      *
-     * @param hexAddress The hex address string.
+     * @param humanReadableAddress The human readable address string.
      */
-    public Address(String hexAddress) {
-        setValue(hexAddress);
+    public Address(String humanReadableAddress) {
+        setValue(humanReadableAddress);
     }
 
     /**
@@ -102,5 +134,23 @@ public class Address implements Serializable {
     @Override
     public String toString() {
         return "Address{" + secret + '}';
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Address address = (Address) o;
+        return secret.equals(address.secret);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(secret);
     }
 }

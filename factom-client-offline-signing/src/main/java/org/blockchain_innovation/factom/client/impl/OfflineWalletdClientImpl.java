@@ -1,7 +1,8 @@
 package org.blockchain_innovation.factom.client.impl;
 
+import org.blockchain_innovation.factom.client.api.AddressKeyConversions;
 import org.blockchain_innovation.factom.client.api.FactomResponse;
-import org.blockchain_innovation.factom.client.api.SignatureProdiver;
+import org.blockchain_innovation.factom.client.api.SignatureProvider;
 import org.blockchain_innovation.factom.client.api.SigningMode;
 import org.blockchain_innovation.factom.client.api.errors.FactomException;
 import org.blockchain_innovation.factom.client.api.model.Address;
@@ -25,15 +26,15 @@ import java.util.function.Supplier;
 
 @SuppressWarnings("PMD.TooManyMethods")
 public class OfflineWalletdClientImpl extends WalletdClientImpl {
-    private final OfflineAddressKeyConversions addressKeyConversions = new OfflineAddressKeyConversions();
+    private final AddressKeyConversions addressKeyConversions = new AddressKeyConversions();
 
     private final EntryOperations entryOperations = new EntryOperations();
     private final ByteOperations byteOperations = new ByteOperations();
     @Override
-    public CompletableFuture<FactomResponse<ComposeResponse>> composeChain(Chain chain, SignatureProdiver signatureProdiver) throws FactomException.ClientException {
+    public CompletableFuture<FactomResponse<ComposeResponse>> composeChain(Chain chain, SignatureProvider signatureProvider) throws FactomException.ClientException {
         Supplier<FactomResponse<ComposeResponse>> supplier = () -> {
 
-            String message = composeChainCommit(chain, signatureProdiver);
+            String message = composeChainCommit(chain, signatureProvider);
             String entryReveal = composeChainReveal(chain);
             return composeResponse("commit-chain", message, "reveal-chain", entryReveal);
         };
@@ -47,10 +48,10 @@ public class OfflineWalletdClientImpl extends WalletdClientImpl {
     }
 
     @Override
-    public CompletableFuture<FactomResponse<ComposeResponse>> composeEntry(Entry entry, SignatureProdiver signatureProdiver) throws FactomException.ClientException {
+    public CompletableFuture<FactomResponse<ComposeResponse>> composeEntry(Entry entry, SignatureProvider signatureProvider) throws FactomException.ClientException {
         Supplier<FactomResponse<ComposeResponse>> supplier = () -> {
 
-            String message = composeEntryCommit(entry, signatureProdiver);
+            String message = composeEntryCommit(entry, signatureProvider);
             String entryReveal = composeEntryReveal(entry);
             return composeResponse("commit-entry", message, "reveal-entry", entryReveal);
         };
@@ -77,7 +78,7 @@ public class OfflineWalletdClientImpl extends WalletdClientImpl {
         return new OfflineFactomResponseImpl<>(rpcResponse);
     }
 
-    protected String composeChainCommit(Chain chain, SignatureProdiver signatureProdiver) throws FactomException.ClientException {
+    protected String composeChainCommit(Chain chain, SignatureProvider signatureProvider) throws FactomException.ClientException {
         Entry firstEntry = chain.getFirstEntry();
         byte[] chainId = entryOperations.calculateChainId(firstEntry.getExternalIds());
         String chainIdHex = Encoding.HEX.encode(chainId);
@@ -106,18 +107,7 @@ public class OfflineWalletdClientImpl extends WalletdClientImpl {
 
             // 1 byte number of Entry Credits to pay
             byte cost = chainCost(firstEntry.getExternalIds(), firstEntry.getContent(), chainIdHex);
-            outputStream.write(cost);
-
-            // 32 byte Entry Credit Address Public Key + 64 byte Signature
-            byte[] message = outputStream.toByteArray();
-            byte[] signature = signatureProdiver.sign(message);
-            byte[] entryCreditKey = addressKeyConversions.addressToKey(signatureProdiver.getPublicECAddress());
-
-            outputStream.write(entryCreditKey);
-            outputStream.write(signature);
-
-            byte[] entryParams = outputStream.toByteArray();
-            return Encoding.HEX.encode(entryParams);
+            return signedCommitMessage(signatureProvider, outputStream, cost);
         } catch (IOException e) {
             throw new FactomException.ClientException("failed to compose chain commit message", e);
         }
@@ -127,11 +117,11 @@ public class OfflineWalletdClientImpl extends WalletdClientImpl {
      * Compose an entry commit message that is needed to commit the entry.
      *
      * @param entry
-     * @param signatureProdiver
+     * @param signatureProvider
      * @return
      * @throws FactomException.ClientException
      */
-    protected String composeEntryCommit(Entry entry, SignatureProdiver signatureProdiver) throws FactomException.ClientException {
+    protected String composeEntryCommit(Entry entry, SignatureProvider signatureProvider) throws FactomException.ClientException {
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
             // 1 byte version
             byte[] version = {0};
@@ -147,21 +137,25 @@ public class OfflineWalletdClientImpl extends WalletdClientImpl {
 
             // 1 byte number of entry credits to pay
             byte cost = entryCost(entry.getExternalIds(), entry.getContent(), entry.getChainId());
-            outputStream.write(cost);
-
-            // 32 byte Entry Credit Address Public Key + 64 byte Signature
-            byte[] message = outputStream.toByteArray();
-            byte[] signature = signatureProdiver.sign(message);
-            byte[] entryCreditKey = addressKeyConversions.addressToKey(signatureProdiver.getPublicECAddress());
-
-            outputStream.write(entryCreditKey);
-            outputStream.write(signature);
-
-            byte[] entryParams = outputStream.toByteArray();
-            return Encoding.HEX.encode(entryParams);
+            return signedCommitMessage(signatureProvider, outputStream, cost);
         } catch (IOException e) {
             throw new FactomException.ClientException("failed to compose entry commit message", e);
         }
+    }
+
+    private String signedCommitMessage(SignatureProvider signatureProvider, ByteArrayOutputStream outputStream, byte cost) throws IOException {
+        outputStream.write(cost);
+
+        // 32 byte Entry Credit Address Public Key + 64 byte Signature
+        byte[] message = outputStream.toByteArray();
+        byte[] signature = signatureProvider.sign(message);
+        byte[] entryCreditKey = addressKeyConversions.addressToKey(signatureProvider.getPublicAddress());
+
+        outputStream.write(entryCreditKey);
+        outputStream.write(signature);
+
+        byte[] entryParams = outputStream.toByteArray();
+        return Encoding.HEX.encode(entryParams);
     }
 
     /**

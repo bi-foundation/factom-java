@@ -32,6 +32,7 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
+import java.net.SocketException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.concurrent.CompletableFuture;
@@ -127,6 +128,8 @@ public class Exchange<Result> {
                 this.factomResponse = new FactomResponseImpl<>(this, rpcResult, connection().getResponseCode(), connection().getResponseMessage());
             }
             return factomResponse;
+        } catch (SocketException se) {
+            throw new FactomException.ClientException(se);
         } catch (IOException e) {
             String error = "<no error response>";
             try (BufferedReader br = new BufferedReader(new InputStreamReader(connection().getErrorStream(), Charset.defaultCharset()))) {

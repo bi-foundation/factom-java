@@ -2,12 +2,12 @@ package org.blockchain_innovation.factom.client.api;
 
 import org.blockchain_innovation.factom.client.api.model.Address;
 
-public interface SignatureProdiver {
+public interface SignatureProvider {
     /**
      * Get the public EC address belonging to the signature operation
      * @return
      */
-    Address getPublicECAddress();
+    Address getPublicAddress();
 
     /**
      * Signs the input (digest). Please note that this needs to provide an ed25519 signature as used by Factom

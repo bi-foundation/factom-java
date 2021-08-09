@@ -17,7 +17,7 @@
 package org.blockchain_innovation.factom.client.impl;
 
 import org.blockchain_innovation.factom.client.api.FactomResponse;
-import org.blockchain_innovation.factom.client.api.SignatureProdiver;
+import org.blockchain_innovation.factom.client.api.SignatureProvider;
 import org.blockchain_innovation.factom.client.api.SigningMode;
 import org.blockchain_innovation.factom.client.api.WalletdClient;
 import org.blockchain_innovation.factom.client.api.errors.FactomException;
@@ -83,8 +83,8 @@ public class WalletdClientImpl extends AbstractClient implements WalletdClient {
     }
 
     @Override
-    public CompletableFuture<FactomResponse<ComposeResponse>> composeChain(Chain chain, SignatureProdiver signatureProdiver) throws FactomException.ClientException {
-        return composeChain(chain, signatureProdiver.getPublicECAddress());
+    public CompletableFuture<FactomResponse<ComposeResponse>> composeChain(Chain chain, SignatureProvider signatureProvider) throws FactomException.ClientException {
+        return composeChain(chain, signatureProvider.getPublicAddress());
     }
 
     @Override
@@ -95,8 +95,8 @@ public class WalletdClientImpl extends AbstractClient implements WalletdClient {
     }
 
     @Override
-    public CompletableFuture<FactomResponse<ComposeResponse>> composeEntry(Entry entry, SignatureProdiver signatureProdiver) throws FactomException.ClientException {
-        return composeEntry(entry, signatureProdiver.getPublicECAddress());
+    public CompletableFuture<FactomResponse<ComposeResponse>> composeEntry(Entry entry, SignatureProvider signatureProvider) throws FactomException.ClientException {
+        return composeEntry(entry, signatureProvider.getPublicAddress());
     }
 
     @Override
