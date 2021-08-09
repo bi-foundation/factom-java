@@ -69,7 +69,6 @@ fabric.properties
 .idea/httpRequests
 ### Gradle template
 .gradle
-gradle/
 /build/
 **/build/
 
