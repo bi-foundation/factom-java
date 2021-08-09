@@ -12,12 +12,14 @@ endif::[]
 This document provides a high-level overview of the changes introduced in Factom-Java by release.
 For a detailed view of what has changed, refer to our {uri-repo}/commits/master[commit history] on GitHub.
 
-== 0.3.1 - not released yet
+== 0.4.0 - not released yet
 
-tbd
+This release adds offline transaction composition support for factoid (multi input and multi output)
 
 Added::
+* Offline Transaction Composition support
 Changed::
+* Add dependency on i2p crypto library from API module.
 Deprecated::
 Removed::
 Fixed::

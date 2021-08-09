@@ -39,8 +39,8 @@ public class OfflineTransactionTest extends AbstractClientTest {
                 .timestamp(Instant.ofEpochMilli(123))
                 .build();
 
-        Assert.assertEquals("59b4bfd20dc3e06b5a336ba279c5b199544bd08e2474a779f3151c558f3a6cd1", transaction.getId());
-        Assert.assertEquals("8f90ba56dc3ddc3b9feca9aceb1cea46c63b9f46fe6051ce8808b61d38485252", transaction.getHash());
+        Assert.assertEquals("169efc0781241a794d8474ac55857acacc7fd9b614cd9abdffa240a35da9a43e", transaction.getId());
+        Assert.assertEquals("9336f2c9d1069ca897337a2d2d730e3f2cb1222ef7450f472d69bd69a7801ebc", transaction.getHash());
         Assert.assertEquals(123, transaction.getTimestamp());
 
         Assert.assertEquals(1, transaction.getInputs().size());
@@ -54,11 +54,11 @@ public class OfflineTransactionTest extends AbstractClientTest {
 
         final byte[] marshalled = transaction.marshal();
         // Didn't want to include the whole bytearray, so lets test a few bytes
-        Assert.assertEquals(245, marshalled.length);
+        Assert.assertEquals(206, marshalled.length);
         Assert.assertEquals(2, marshalled[0]);
         Assert.assertEquals(123, marshalled[6]);
         Assert.assertEquals(-75, marshalled[16]);
-        Assert.assertEquals(11, marshalled[244]);
+        Assert.assertEquals(-67, marshalled[199]);
 
     }
 
