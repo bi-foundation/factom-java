@@ -1,8 +1,8 @@
 package org.blockchain_innovation.factom.client.api.ops;
 
 import org.blockchain_innovation.factom.client.AbstractClientTest;
+import org.blockchain_innovation.factom.client.api.AddressKeyConversions;
 import org.blockchain_innovation.factom.client.api.model.Address;
-import org.blockchain_innovation.factom.client.impl.OfflineAddressKeyConversions;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -11,7 +11,7 @@ import java.security.SecureRandom;
 
 public class SigningOperationsTest extends AbstractClientTest {
     private static final SigningOperations signingOperations = new SigningOperations();
-    private static final OfflineAddressKeyConversions keyConversions = new OfflineAddressKeyConversions();
+    private static final AddressKeyConversions keyConversions = new AddressKeyConversions();
 
     @Test
     public void testSignAndVerify() {

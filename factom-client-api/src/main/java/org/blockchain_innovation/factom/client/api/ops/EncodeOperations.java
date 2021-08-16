@@ -7,6 +7,9 @@ import org.blockchain_innovation.factom.client.api.model.response.factomd.EntryR
 
 import javax.inject.Named;
 import javax.inject.Singleton;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -16,6 +19,8 @@ import java.util.stream.Collectors;
  * Allows Hex encoding of commonly used values
  */
 public class EncodeOperations {
+
+    private static final long MSB = 0x8000_0000_0000_0000L;
 
     /**
      * Encode a Chain. The content and external ids from the first entry will be encoded from UFT-8 to HEX.
@@ -157,4 +162,43 @@ public class EncodeOperations {
     public String decodeHex(String hexValue) {
         return StringUtils.isEmpty(hexValue) ? hexValue : Encoding.UTF_8.encode(Encoding.HEX.decode(hexValue));
     }
+
+    // See https://github.com/FactomProject/factomd/blob/master/common/primitives/varint.go#L81 for original implementation
+    // encodeVarInt encodes an integer/long as a variable int into the given data buffer.
+    public byte[] encodeVarInt(long input) {
+        try (final ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
+            long value = input;
+            boolean start = false;
+
+            if (input == 0) {
+                bos.write(0);
+            }
+            if ((input & MSB) != 0) {
+                bos.write(0x81);
+                start = true;
+            }
+
+            for (int i = 0; i < 9; i++) {
+                int b = (int) (value >> 56);
+                if (b != 0 || start) {
+                    start = true;
+                    if (i != 8) {
+                        b = b | 0x80;
+                    } else {
+                        b = b & 0x07f;
+                    }
+                    bos.write(b);
+                }
+                value = value << 7;
+            }
+            return bos.toByteArray();
+        } catch (IOException e) {
+            throw new FactomRuntimeException.AssertionException(e);
+        }
+    }
+
+    public byte[] decodeAddress(String humanReadable) {
+        return Arrays.copyOfRange(Encoding.BASE58.decode(humanReadable), 2, 34);
+    }
+
 }

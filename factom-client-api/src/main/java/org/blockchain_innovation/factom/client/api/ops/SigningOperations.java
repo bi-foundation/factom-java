@@ -5,7 +5,7 @@ import net.i2p.crypto.eddsa.EdDSAPublicKey;
 import net.i2p.crypto.eddsa.spec.EdDSANamedCurveTable;
 import net.i2p.crypto.eddsa.spec.EdDSAPublicKeySpec;
 import org.blockchain_innovation.factom.client.api.AddressKeyConversions;
-import org.blockchain_innovation.factom.client.api.SignatureProdiver;
+import org.blockchain_innovation.factom.client.api.SignatureProvider;
 import org.blockchain_innovation.factom.client.api.errors.FactomException;
 import org.blockchain_innovation.factom.client.api.model.Address;
 
@@ -19,16 +19,16 @@ public class SigningOperations {
 
     private final AddressKeyConversions addressKeyConversions = new AddressKeyConversions();
 
-    public byte[] sign(byte[] message, SignatureProdiver signatureProdiver) {
-        return signatureProdiver.sign(message);
+    public byte[] sign(byte[] message, SignatureProvider signatureProvider) {
+        return signatureProvider.sign(message);
     }
 
     /**
-     * sign message. We delegate to teh Address Signature Provider.
+     * sign message. We delegate to the Address Signature Provider.
      *
      * @param message The input message (digest)
-     * @param address The address to sign (public or private)
-     * @return Teh signature using ed25519
+     * @param address The address to sign (private)
+     * @return The signature using ed25519
      * @throws FactomException.ClientException
      */
     public byte[] sign(byte[] message, Address address) throws FactomException.ClientException {
@@ -42,7 +42,7 @@ public class SigningOperations {
      * @param signature    The signature
      * @param originalData The original message
      * @param address      The address used
-     * @return A boolean whether the signatre matches the address and original data
+     * @return A boolean whether the signature matches the address and original data
      */
     public boolean verifySign(byte[] signature, byte[] originalData, Address address) {
         byte[] publicKey = addressKeyConversions.addressToKey(address);

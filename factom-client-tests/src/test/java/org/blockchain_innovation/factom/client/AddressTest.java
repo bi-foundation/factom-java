@@ -5,7 +5,6 @@ import org.blockchain_innovation.factom.client.api.errors.FactomRuntimeException
 import org.blockchain_innovation.factom.client.api.model.Address;
 import org.blockchain_innovation.factom.client.api.model.types.AddressType;
 import org.blockchain_innovation.factom.client.api.ops.Encoding;
-import org.blockchain_innovation.factom.client.impl.OfflineAddressKeyConversions;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -13,7 +12,6 @@ import java.util.Map;
 
 public class AddressTest extends AbstractClientTest {
     private static final AddressKeyConversions conversions = new AddressKeyConversions();
-    private static final OfflineAddressKeyConversions offlineConversions = new OfflineAddressKeyConversions();
 
 
     @Test
@@ -194,7 +192,6 @@ public class AddressTest extends AbstractClientTest {
 
     @Test
     public void testEntryCreditAddressToPublic() {
-        OfflineAddressKeyConversions conversions = new OfflineAddressKeyConversions();
         String publicAddress = conversions.addressToPublicAddress(EC_SECRET_ADDRESS);
 
         AddressType.ENTRY_CREDIT_PUBLIC.assertValid(publicAddress);
@@ -204,7 +201,7 @@ public class AddressTest extends AbstractClientTest {
     @Test
     public void testKeyToPublicAddress() {
         for (Map.Entry<String, String> entry : publicPrivateKeyMap.entrySet()) {
-            String publicAddress = offlineConversions.addressToPublicAddress(entry.getValue());
+            String publicAddress = conversions.addressToPublicAddress(entry.getValue());
             Assert.assertEquals(entry.getKey(), publicAddress);
         }
     }

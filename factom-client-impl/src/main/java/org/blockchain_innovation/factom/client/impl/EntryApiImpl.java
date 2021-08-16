@@ -4,7 +4,7 @@ import org.blockchain_innovation.factom.client.api.EntryApi;
 import org.blockchain_innovation.factom.client.api.FactomResponse;
 import org.blockchain_innovation.factom.client.api.FactomdClient;
 import org.blockchain_innovation.factom.client.api.LowLevelClient;
-import org.blockchain_innovation.factom.client.api.SignatureProdiver;
+import org.blockchain_innovation.factom.client.api.SignatureProvider;
 import org.blockchain_innovation.factom.client.api.WalletdClient;
 import org.blockchain_innovation.factom.client.api.errors.FactomException;
 import org.blockchain_innovation.factom.client.api.errors.FactomRuntimeException;
@@ -30,6 +30,7 @@ import org.blockchain_innovation.factom.client.api.ops.StringUtils;
 import javax.inject.Named;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
@@ -120,7 +121,7 @@ public class EntryApiImpl extends AbstractClient implements EntryApi {
 
     public CompletableFuture<Boolean> chainExists(Chain chain) {
         String chainId = Encoding.HEX.encode(entryOperations.calculateChainId(chain.getFirstEntry().getExternalIds()));
-        return factomdClient.chainHead(chainId)
+        return factomdClient.chainHead(chainId, false)
                 .thenApplyAsync(response -> response.getResult() != null &&
                         StringUtils.isNotEmpty(response.getResult().getChainHead()), getExecutorService())
                 .exceptionally(throwable -> false);
@@ -133,9 +134,15 @@ public class EntryApiImpl extends AbstractClient implements EntryApi {
      */
     @Override
     public CompletableFuture<List<EntryBlockResponse>> allEntryBlocks(String chainId) {
-        return factomdClient.chainHead(chainId)
+        return factomdClient.chainHead(chainId, false)
                 .thenCompose(chainHeadResponse -> {
                     errorHandling(chainHeadResponse, "Could not get entry blocks for chain Id " + chainId);
+                    if (StringUtils.isEmpty(chainHeadResponse.getResult().getChainHead())) {
+                        // The factom RPC api returns an empty string when the chain has not been anchored yet.
+                        // That means there is no entry block yet, so return an empty list
+                        logger.warn("We did not receive a chainhead for the chain, but also no error. Probably chain {} is not anchored yet", chainId);
+                        return CompletableFuture.completedFuture(Collections.EMPTY_LIST);
+                    }
                     return entryBlocksUpTilKeyMR(chainHeadResponse.getResult().getChainHead());
                 });
     }
@@ -200,11 +207,14 @@ public class EntryApiImpl extends AbstractClient implements EntryApi {
 
     @Override
     public CompletableFuture<List<EntryBlockResponse>> entryBlocksUpTilKeyMR(String keyMR) {
+        if (StringUtils.isEmpty(keyMR)) {
+            throw new FactomRuntimeException.AssertionException("Cannot get blocks for null or empty keyMR");
+        }
         List<EntryBlockResponse> entryBlockResponseList = new ArrayList<>();
 
         String currentKeyMR = keyMR;
 
-        while (!currentKeyMR.equals(NO_PREVIOUS_KEY_MERKLE_ROOT)) {
+        while (StringUtils.isNotEmpty(currentKeyMR) && !NO_PREVIOUS_KEY_MERKLE_ROOT.equals(currentKeyMR)) {
             FactomResponse<EntryBlockResponse> currentBlock = factomdClient.entryBlockByKeyMerkleRoot(currentKeyMR).join();
             errorHandling(currentBlock, "Could not get entry block for keyMr " + currentKeyMR);
             currentKeyMR = currentBlock.getResult().getHeader().getPreviousKeyMR();
@@ -263,12 +273,12 @@ public class EntryApiImpl extends AbstractClient implements EntryApi {
      * Compose, reveal and commit a chain.
      *
      * @param chain             The chain to commit and reveal
-     * @param signatureProdiver The signature provider
+     * @param signatureProvider The signature provider
      * @throws FactomException.ClientException
      */
     @Override
-    public CompletableFuture<CommitAndRevealChainResponse> commitAndRevealChain(Chain chain, SignatureProdiver signatureProdiver) throws FactomException.ClientException {
-        return commitAndRevealChain(chain, signatureProdiver, false);
+    public CompletableFuture<CommitAndRevealChainResponse> commitAndRevealChain(Chain chain, SignatureProvider signatureProvider) throws FactomException.ClientException {
+        return commitAndRevealChain(chain, signatureProvider, false);
     }
 
 
@@ -276,13 +286,13 @@ public class EntryApiImpl extends AbstractClient implements EntryApi {
      * Compose, reveal and commit a chain.
      *
      * @param chain
-     * @param signatureProdiver
+     * @param signatureProvider
      * @param confirmCommit
      * @return
      */
     @Override
-    public CompletableFuture<CommitAndRevealChainResponse> commitAndRevealChain(Chain chain, SignatureProdiver signatureProdiver, boolean confirmCommit) {
-        return commitAndRevealChainImpl(chain, null, signatureProdiver, confirmCommit);
+    public CompletableFuture<CommitAndRevealChainResponse> commitAndRevealChain(Chain chain, SignatureProvider signatureProvider, boolean confirmCommit) {
+        return commitAndRevealChainImpl(chain, null, signatureProvider, confirmCommit);
     }
 
     /**
@@ -292,9 +302,9 @@ public class EntryApiImpl extends AbstractClient implements EntryApi {
      * @param address
      * @return
      */
-    protected CompletableFuture<CommitAndRevealChainResponse> commitAndRevealChainImpl(Chain chain, Address address, SignatureProdiver signatureProdiver, boolean confirmCommit) {
+    protected CompletableFuture<CommitAndRevealChainResponse> commitAndRevealChainImpl(Chain chain, Address address, SignatureProvider signatureProvider, boolean confirmCommit) {
         // after compose chain combine commit and reveal chain
-        return (address == null ? composeChainFuture(chain, signatureProdiver) : composeChainFuture(chain, address))
+        return (address == null ? composeChainFuture(chain, signatureProvider) : composeChainFuture(chain, address))
                 .thenApplyAsync(_composeChainResponse -> notifyCompose(_composeChainResponse), executorService())
                 // commit chain
                 .thenComposeAsync(_composeChainResponse -> commitChainFuture(_composeChainResponse)
@@ -346,24 +356,24 @@ public class EntryApiImpl extends AbstractClient implements EntryApi {
      * Compose, reveal and commit an entry.
      *
      * @param entry
-     * @param signatureProdiver
+     * @param signatureProvider
      * @throws FactomException.ClientException
      */
     @Override
-    public CompletableFuture<CommitAndRevealEntryResponse> commitAndRevealEntry(Entry entry, SignatureProdiver signatureProdiver) throws FactomException.ClientException {
-        return commitAndRevealEntry(entry, signatureProdiver, false);
+    public CompletableFuture<CommitAndRevealEntryResponse> commitAndRevealEntry(Entry entry, SignatureProvider signatureProvider) throws FactomException.ClientException {
+        return commitAndRevealEntry(entry, signatureProvider, false);
     }
 
     /**
      * Compose, reveal and commit an entry.
      *
      * @param entry
-     * @param signatureProdiver
+     * @param signatureProvider
      * @throws FactomException.ClientException
      */
     @Override
-    public CompletableFuture<CommitAndRevealEntryResponse> commitAndRevealEntry(Entry entry, SignatureProdiver signatureProdiver, boolean confirmCommit) throws FactomException.ClientException {
-        return commitAndRevealEntryImpl(entry, null, signatureProdiver, confirmCommit);
+    public CompletableFuture<CommitAndRevealEntryResponse> commitAndRevealEntry(Entry entry, SignatureProvider signatureProvider, boolean confirmCommit) throws FactomException.ClientException {
+        return commitAndRevealEntryImpl(entry, null, signatureProvider, confirmCommit);
     }
 
 
@@ -374,10 +384,10 @@ public class EntryApiImpl extends AbstractClient implements EntryApi {
      * @param address
      * @throws FactomException.ClientException
      */
-    protected CompletableFuture<CommitAndRevealEntryResponse> commitAndRevealEntryImpl(Entry entry, Address address, SignatureProdiver signatureProdiver, boolean confirmCommit) throws FactomException.ClientException {
+    protected CompletableFuture<CommitAndRevealEntryResponse> commitAndRevealEntryImpl(Entry entry, Address address, SignatureProvider signatureProvider, boolean confirmCommit) throws FactomException.ClientException {
         // after compose entry combine commit and reveal entry
 
-        return (address == null ? composeEntryFuture(entry, signatureProdiver) : composeEntryFuture(entry, address))
+        return (address == null ? composeEntryFuture(entry, signatureProvider) : composeEntryFuture(entry, address))
                 .thenApplyAsync(_composeEntryResponse -> notifyCompose(_composeEntryResponse), executorService())
                 // commit chain
                 .thenComposeAsync(_composeEntryResponse -> commitEntryFuture(_composeEntryResponse)
@@ -545,8 +555,8 @@ public class EntryApiImpl extends AbstractClient implements EntryApi {
         }, executorService());
     }
 
-    private CompletableFuture<FactomResponse<ComposeResponse>> composeChainFuture(Chain chain, SignatureProdiver signatureProdiver) {
-        return getWalletdClient().composeChain(chain, signatureProdiver);
+    private CompletableFuture<FactomResponse<ComposeResponse>> composeChainFuture(Chain chain, SignatureProvider signatureProvider) {
+        return getWalletdClient().composeChain(chain, signatureProvider);
     }
 
     private CompletableFuture<FactomResponse<ComposeResponse>> composeChainFuture(Chain chain, Address address) {
@@ -561,9 +571,9 @@ public class EntryApiImpl extends AbstractClient implements EntryApi {
         return getFactomdClient().revealChain(composeChain.getResult().getReveal().getParams().getEntry());
     }
 
-    private CompletableFuture<FactomResponse<ComposeResponse>> composeEntryFuture(Entry entry, SignatureProdiver signatureProdiver) {
+    private CompletableFuture<FactomResponse<ComposeResponse>> composeEntryFuture(Entry entry, SignatureProvider signatureProvider) {
         logger.info("commitEntryFuture");
-        return getWalletdClient().composeEntry(entry, signatureProdiver);
+        return getWalletdClient().composeEntry(entry, signatureProvider);
     }
 
     private CompletableFuture<FactomResponse<ComposeResponse>> composeEntryFuture(Entry entry, Address address) {

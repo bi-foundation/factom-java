@@ -252,6 +252,7 @@ project(':factom-client-api') {
     dependencies {
         // Provided by JEE Environment
         compile 'javax.xml.bind:jaxb-api:2.3.1'
+        compile "net.i2p.crypto:eddsa:$libVersions.eddsa"
         compileOnly "javax.enterprise:cdi-api:$libVersions.jee.cdiApi"
     }
 //    publishing {
@@ -279,7 +280,6 @@ project(':factom-client-offline-signing') {
     apply plugin: "java"
     dependencies {
         compile project(':factom-client-impl')
-        compile "net.i2p.crypto:eddsa:$libVersions.eddsa"
         compileOnly "javax.enterprise:cdi-api:$libVersions.jee.cdiApi"
       }
 }

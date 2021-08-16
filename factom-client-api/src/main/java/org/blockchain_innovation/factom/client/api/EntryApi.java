@@ -80,9 +80,9 @@ public interface EntryApi {
      */
     CompletableFuture<CommitAndRevealChainResponse> commitAndRevealChain(Chain chain, Address address, boolean confirmCommit);
 
-    CompletableFuture<CommitAndRevealChainResponse> commitAndRevealChain(Chain chain, SignatureProdiver signatureProdiver) throws FactomException.ClientException;
+    CompletableFuture<CommitAndRevealChainResponse> commitAndRevealChain(Chain chain, SignatureProvider signatureProvider) throws FactomException.ClientException;
 
-    CompletableFuture<CommitAndRevealChainResponse> commitAndRevealChain(Chain chain, SignatureProdiver signatureProdiver, boolean confirmCommit);
+    CompletableFuture<CommitAndRevealChainResponse> commitAndRevealChain(Chain chain, SignatureProvider signatureProvider, boolean confirmCommit);
 
     /**
      * Compose, reveal and commit an entry.
@@ -102,7 +102,7 @@ public interface EntryApi {
      */
     CompletableFuture<CommitAndRevealEntryResponse> commitAndRevealEntry(Entry entry, Address address, boolean confirmCommit);
 
-    CompletableFuture<CommitAndRevealEntryResponse> commitAndRevealEntry(Entry entry, SignatureProdiver signatureProdiver) throws FactomException.ClientException;
+    CompletableFuture<CommitAndRevealEntryResponse> commitAndRevealEntry(Entry entry, SignatureProvider signatureProvider) throws FactomException.ClientException;
 
-    CompletableFuture<CommitAndRevealEntryResponse> commitAndRevealEntry(Entry entry, SignatureProdiver signatureProdiver, boolean confirmCommit) throws FactomException.ClientException;
+    CompletableFuture<CommitAndRevealEntryResponse> commitAndRevealEntry(Entry entry, SignatureProvider signatureProvider, boolean confirmCommit) throws FactomException.ClientException;
 }

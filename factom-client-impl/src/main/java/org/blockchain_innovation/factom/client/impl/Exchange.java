@@ -28,13 +28,20 @@ import org.blockchain_innovation.factom.client.api.rpc.RpcRequest;
 import org.blockchain_innovation.factom.client.api.rpc.RpcResponse;
 import org.blockchain_innovation.factom.client.api.settings.RpcSettings;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
+import java.net.SocketException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
 
@@ -42,6 +49,7 @@ public class Exchange<Result> {
 
     private final URL url;
     private final RpcSettings settings;
+    private final boolean logErrors;
     private final FactomRequest factomRequest;
     private final Class<Result> rpcResultClass;
     private static final Logger logger = LogFactory.getLogger(Exchange.class);
@@ -50,9 +58,10 @@ public class Exchange<Result> {
     private FactomResponse<Result> factomResponse;
 
 
-    protected Exchange(LowLevelClient client, RpcRequest rpcRequest, Class<Result> rpcResultClass) {
+    protected Exchange(LowLevelClient client, RpcRequest rpcRequest, Class<Result> rpcResultClass, boolean logErrors) {
         this.executorService = client.getExecutorService();
         this.settings = client.getSettings();
+        this.logErrors = logErrors;
         this.url = settings.getServer().getURL();
         this.factomRequest = new FactomRequestImpl(rpcRequest);
         this.rpcResultClass = rpcResultClass;
@@ -67,7 +76,14 @@ public class Exchange<Result> {
             retrieveResponse(rpcResultClass);
             return getFactomResponse();
         }, getExecutorService()).exceptionally(throwable -> {
-            logger.error(throwable.getMessage(), throwable);
+            if (logErrors) {
+                if (throwable instanceof CompletionException && throwable.getCause() instanceof FactomException.RpcErrorException) {
+                    RpcErrorResponse errorResponse = ((FactomException.RpcErrorException) throwable.getCause()).getRpcErrorResponse();
+                    logger.error(errorResponse.toString());
+                }
+                logger.error(throwable.getMessage(), throwable);
+            }
+
             return getFactomResponse();
         });
     }
@@ -127,6 +143,8 @@ public class Exchange<Result> {
                 this.factomResponse = new FactomResponseImpl<>(this, rpcResult, connection().getResponseCode(), connection().getResponseMessage());
             }
             return factomResponse;
+        } catch (SocketException se) {
+            throw new FactomException.ClientException(se);
         } catch (IOException e) {
             String error = "<no error response>";
             try (BufferedReader br = new BufferedReader(new InputStreamReader(connection().getErrorStream(), Charset.defaultCharset()))) {

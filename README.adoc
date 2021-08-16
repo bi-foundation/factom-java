@@ -33,8 +33,8 @@ There is pluggable support for logging as well. We will enhance that support in 
 Without it, the library will not function. That will be fixed in future releases.
 
 == Offline signing
-Instead of using walletd to sign transactions and commits it is also possible to do complete offline signing using private keys directly.
-To enable this you will need to include the offline signing (factom-client-offline-signing) on the classpath. This module also has an external dependency on an encryption library.
+Instead of using walletd to sign transactions and entry commits it is also possible to do complete offline signing using private keys directly.
+To enable this you will need to include the offline signing (factom-client-offline-signing) on the classpath. For FCT/EC transactions you can use the transaction class together with the commit method on the client.
 
 == IoT Signed at Source (SAS) support
 The IoT SAS module allows you to sign directly using integrated IoT chips integrated in hardware. The private key of the Factom Entry credit address is stored within the hardware protected portion of the device. Factom-java can use the IoT SAS integration to sign offline using the SAS device.
@@ -50,69 +50,69 @@ Javadocs can be found at https://bi-foundation.github.io/factom-java/javadoc/
 
 == Maven installation
 This is a gradle project but maven snapshots and releases are distributed on the Nexus installation of Sphereon at
-http://nexus.qa.sphereon.com/repository/sphereon-opensource-releases/
+https://nexus.qa.sphereon.com/repository/sphereon-opensource-releases/
 
 You need at least the following dependencies in your application
 
 ....
 
 <dependency>
-    groupId>org.blockchain-innovation.factom.client</groupId>
+    <groupId>org.blockchain-innovation.factom.client</groupId>
     <artifactId>factom-client-impl</artifactId>
-    <version>0.3.0</version>
+    <version>0.4.0</version>
     <scope>compile</scope>
 </dependency>
 <dependency>
-    groupId>org.blockchain-innovation.factom.client</groupId>
+    <groupId>org.blockchain-innovation.factom.client</groupId>
     <artifactId>logger-slf4j</artifactId>
-    <version>0.3.0</version>
+    <version>0.4.0</version>
     <scope>compile</scope>
 </dependency>
 
 <!-- At least one of the following dependencies -->
 <dependency>
-    groupId>org.blockchain-innovation.factom.client</groupId>
+    <groupId>org.blockchain-innovation.factom.client</groupId>
     <artifactId>json-converter-jee</artifactId>
-    <version>0.3.0</version>
+    <version>0.4.0</version>
     <scope>compile</scope>
 </dependency>
 <dependency>
-    groupId>org.blockchain-innovation.factom.client</groupId>
+    <groupId>org.blockchain-innovation.factom.client</groupId>
     <artifactId>json-converter-gson</artifactId>
-    <version>0.3.0</version>
+    <version>0.4.0</version>
     <scope>compile</scope>
 </dependency>
 
 <!-- Offline signing support -->
 <dependency>
-    groupId>org.blockchain-innovation.factom.client</groupId>
+    <groupId>org.blockchain-innovation.factom.client</groupId>
     <artifactId>factom-client-offline-signing</artifactId>
-    <version>0.3.0</version>
+    <version>0.4.0</version>
     <scope>compile</scope>
 </dependency>
 
 
 <!-- Optional IoT Signed at Source support -->
 <dependency>
-    groupId>org.blockchain-innovation.factom.client</groupId>
+    <groupId>org.blockchain-innovation.factom.client</groupId>
     <artifactId>factom-client-offline-signing</artifactId>
-    <version>0.3.0</version>
+    <version>0.4.0</version>
     <scope>compile</scope>
 </dependency>
 
 <!-- Optional JEE support (only in JEE environment) -->
 <dependency>
-    groupId>org.blockchain-innovation.factom.client</groupId>
+    <groupId>org.blockchain-innovation.factom.client</groupId>
     <artifactId>jee-support</artifactId>
-    <version>0.3.0</version>
+    <version>0.4.0</version>
     <scope>compile</scope>
 </dependency>
 
 <!-- Optional Spring Boot support (only in Spring Boot environment) -->
 <dependency>
-    groupId>org.blockchain-innovation.factom.client</groupId>
+    <groupId>org.blockchain-innovation.factom.client</groupId>
     <artifactId>spring-boot-support</artifactId>
-    <version>0.3.0</version>
+    <version>0.4.0</version>
     <scope>compile</scope>
 </dependency>
 
@@ -123,7 +123,7 @@ You will also need to specify Sphereon's maven repository if you would like to i
 <repositories>
     <repository>
         <id>BIF-releases</id>
-        <url>http://nexus.qa.sphereon.com/repository/bif/</url>
+        <url>https://nexus.qa.sphereon.com/repository/bif/</url>
     </repository>
 </repositories>
 ....

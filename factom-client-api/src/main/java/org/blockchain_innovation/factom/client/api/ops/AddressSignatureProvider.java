@@ -4,15 +4,20 @@ import net.i2p.crypto.eddsa.EdDSAEngine;
 import net.i2p.crypto.eddsa.EdDSAPrivateKey;
 import net.i2p.crypto.eddsa.spec.EdDSANamedCurveTable;
 import net.i2p.crypto.eddsa.spec.EdDSAPrivateKeySpec;
-import org.blockchain_innovation.factom.client.api.SignatureProdiver;
+import org.blockchain_innovation.factom.client.api.AddressKeyConversions;
+import org.blockchain_innovation.factom.client.api.SignatureProvider;
 import org.blockchain_innovation.factom.client.api.errors.FactomException;
 import org.blockchain_innovation.factom.client.api.model.Address;
-import org.blockchain_innovation.factom.client.impl.OfflineAddressKeyConversions;
+import org.blockchain_innovation.factom.client.api.model.types.AddressType;
 
-import java.security.*;
+import java.security.InvalidKeyException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.Signature;
+import java.security.SignatureException;
 
-public class AddressSignatureProvider implements SignatureProdiver {
-    private static final OfflineAddressKeyConversions CONVERSIONS = new OfflineAddressKeyConversions();
+public class AddressSignatureProvider implements SignatureProvider {
+    private static final AddressKeyConversions CONVERSIONS = new AddressKeyConversions();
 
     private Address address;
 
@@ -40,12 +45,13 @@ public class AddressSignatureProvider implements SignatureProdiver {
      * @param address The address
      */
     public void setAddress(Address address) {
+        AddressType.assertVisibility(address.getValue(), AddressType.Visibility.PRIVATE);
         this.address = address;
     }
 
 
     @Override
-    public Address getPublicECAddress() {
+    public Address getPublicAddress() {
         return CONVERSIONS.addressToPublicAddress(getAddress());
     }
 

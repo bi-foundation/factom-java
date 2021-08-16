@@ -1,6 +1,6 @@
 package org.blockchain_innovation.factom.iot_sas;
 
-import org.blockchain_innovation.factom.client.api.SignatureProdiver;
+import org.blockchain_innovation.factom.client.api.SignatureProvider;
 import org.blockchain_innovation.factom.client.api.errors.FactomRuntimeException;
 import org.blockchain_innovation.factom.client.api.log.LogFactory;
 import org.blockchain_innovation.factom.client.api.log.Logger;
@@ -10,7 +10,7 @@ import org.blockchain_innovation.factom.client.api.ops.Encoding;
 
 import java.nio.charset.StandardCharsets;
 
-public class IoTSASClientImpl implements SignatureProdiver {
+public class IoTSASClientImpl implements SignatureProvider {
 
     protected static final String EC_ADDRESS_HEADER = "FA010100000000";
     protected static final String ED25519_SIGN_HEADER = "FA020200";
@@ -39,7 +39,7 @@ public class IoTSASClientImpl implements SignatureProdiver {
     }
 
     @Override
-    public Address getPublicECAddress() {
+    public Address getPublicAddress() {
         port().clearInBuffer();
         logger.info(String.format("Getting public EC address from %s", port()));
 
@@ -63,7 +63,7 @@ public class IoTSASClientImpl implements SignatureProdiver {
             throw new IoTSASPort.IoTSASPortException(String.format("Could not read public EC address. Only %d bytes returned instead of 52. Result: %s", count, new String(key, StandardCharsets.UTF_8)));
         }
 
-        Address address = Address.fromHexBytes(key);
+        Address address = Address.fromBytes(key);
         logger.info(String.format("Retrieved public EC address %s from %s", address, port()));
         return address;
 
