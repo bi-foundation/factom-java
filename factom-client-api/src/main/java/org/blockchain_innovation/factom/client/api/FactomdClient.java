@@ -152,6 +152,7 @@ public interface FactomdClient {
      * @return The chain head response promise.
      */
     CompletableFuture<FactomResponse<ChainHeadResponse>> chainHead(String chainId);
+    CompletableFuture<FactomResponse<ChainHeadResponse>> chainHead(String chainId, boolean throwErrorOnChainNotFound);
 
     /**
      * Send a Chain Commit Message to factomd to create a new Chain. The commit chain hex encoded string is documented here: <a
