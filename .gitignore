@@ -117,3 +117,4 @@ quality/reports/*
 /.idea/misc.xml
 /.idea/vcs.xml
 /local.properties
+/.idea/jarRepositories.xml
