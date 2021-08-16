@@ -89,7 +89,12 @@ public class FactomdClientImpl extends AbstractClient implements FactomdClient {
 
     @Override
     public CompletableFuture<FactomResponse<ChainHeadResponse>> chainHead(String chainId) {
-        return exchange(RpcMethod.CHAIN_HEAD.toRequestBuilder().param("chainid", chainId), ChainHeadResponse.class);
+        return chainHead(chainId, true);
+    }
+
+    @Override
+    public CompletableFuture<FactomResponse<ChainHeadResponse>> chainHead(String chainId, boolean throwErrorOnChainNotFound) {
+        return exchange(RpcMethod.CHAIN_HEAD.toRequestBuilder().param("chainid", chainId), ChainHeadResponse.class, throwErrorOnChainNotFound);
     }
 
     @Override

@@ -1,7 +1,6 @@
 package org.blockchain_innovation.factom.client;
 
 import org.blockchain_innovation.factom.client.api.AddressKeyConversions;
-import org.blockchain_innovation.factom.client.api.FactomResponse;
 import org.blockchain_innovation.factom.client.api.model.Address;
 import org.blockchain_innovation.factom.client.api.model.RCD;
 import org.blockchain_innovation.factom.client.api.model.Transaction;
@@ -14,16 +13,14 @@ import org.junit.Test;
 
 import java.time.Instant;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import java.util.stream.Collectors;
 
 public class OfflineTransactionTest extends AbstractClientTest {
     private static final AddressKeyConversions CONVERSIONS = new AddressKeyConversions();
 
 
     @Test
-    public void testPredefinedTransaction() {
+    public void testTransactionMarshalling() {
         final Address secretInputFctAddress = Address.fromString(FCT_SECRET_ADDRESS);
         final Address secretOutputFctAddress1 = Address.fromString("Fs1eDBmMknhc2kJZwCjQrgWeWWkjqBWGfDsLcLfUesxVEHv6PxmU");
         final Address secretOutputFctAddress2 = Address.fromString("Fs1xBWD9ocnxNu3ssPF8NEU9PV8HQ83UMth5zr9cD7WEFoBj4qdb");
@@ -48,9 +45,9 @@ public class OfflineTransactionTest extends AbstractClientTest {
         Assert.assertNotNull(rcd);
         Assert.assertEquals(RCDType.TYPE_1, rcd.getType());
         Assert.assertEquals(CONVERSIONS.addressToPublicAddress(secretInputFctAddress), rcd.getAddress());
+        Assert.assertEquals(CONVERSIONS.addressToPublicAddress(secretInputFctAddress).getValue(), CONVERSIONS.keyToAddress(rcd.getPublicKey(), AddressType.FACTOID_PUBLIC));
         Assert.assertArrayEquals(new byte[]{8, 17, 95, -106, -21, -75, -29, 90, -100, -128, 109, -23, -49, -2, 76, -103, 69, 90, 12, 90, 28, 68, -118, 29, 46, -74, -44, 106, -69, 126, -88, -26}, rcd.hash());
         Assert.assertArrayEquals(new byte[]{68, 41, -73, -111, 97, -30, 46, -109, -110, -54, -16, 58, -105, -112, -57, -55, -99, 73, -59, -11, 55, 117, 89, -37, 83, 22, -83, -108, -113, -92, 38, 10}, rcd.getPublicKey());
-        Assert.assertEquals(CONVERSIONS.addressToPublicAddress(secretInputFctAddress).getValue(), CONVERSIONS.keyToAddress(rcd.getPublicKey(), AddressType.FACTOID_PUBLIC));
 
         final byte[] marshalled = transaction.marshal();
         // Didn't want to include the whole bytearray, so lets test a few bytes
@@ -63,15 +60,16 @@ public class OfflineTransactionTest extends AbstractClientTest {
     }
 
 
+    // TODO: 13/08/2021 This is an IT, move to separate class
     @Test
-    public void testTransactions() throws ExecutionException, InterruptedException, TimeoutException {
+    public void testSubmittingBackAndForthTransactions() {
         final Address secretInputFctAddress = Address.fromString(FCT_SECRET_ADDRESS);
         final Address secretOutputFctAddress1 = Address.fromString("Fs1eDBmMknhc2kJZwCjQrgWeWWkjqBWGfDsLcLfUesxVEHv6PxmU");
         final Address secretOutputFctAddress2 = Address.fromString("Fs1xBWD9ocnxNu3ssPF8NEU9PV8HQ83UMth5zr9cD7WEFoBj4qdb");
         final Address publicOutputFctAddress1 = CONVERSIONS.addressToPublicAddress(secretOutputFctAddress1);
         final Address publicOutputFctAddress2 = CONVERSIONS.addressToPublicAddress(secretOutputFctAddress2);
-        Assert.assertNotNull(publicOutputFctAddress1);
-        Assert.assertNotNull(publicOutputFctAddress2);
+        System.out.println(String.format("Public Address1: %s", publicOutputFctAddress1));
+        System.out.println(String.format("Public Address2: %s", publicOutputFctAddress2));
 
         final Transaction transaction1 = new Transaction.Builder()
                 .addInput(15200000, secretInputFctAddress)
@@ -84,30 +82,40 @@ public class OfflineTransactionTest extends AbstractClientTest {
                 .build();
 
 
-        final CompletableFuture<FactomResponse<FactoidSubmitResponse>> submitResponse = factomdClient.factoidSubmit(Encoding.HEX.encode(transaction1.marshal())).handle(
-                (submitResponse1, throwable) -> {
-                    if (throwable != null) {
-                        throwable.printStackTrace();
-                        Assert.fail(throwable.getMessage());
-                    }
-                    final String txIdFromResponse1 = submitResponse1.getResult().getTxId();
-                    Assert.assertEquals(txIdFromResponse1, transaction1.getId());
+        final CompletableFuture<FactoidSubmitResponse> responseFuture1 = submitTransaction(transaction1);
+        final CompletableFuture<FactoidSubmitResponse> responseFuture2 = submitTransaction(transaction2);
 
-                    final CompletableFuture<FactomResponse<FactoidSubmitResponse>> responseFuture2 = factomdClient.factoidSubmit(Encoding.HEX.encode(transaction2.marshal()));
-                    responseFuture2.thenAccept(submitResponse2 -> {
-                        final String txIdFromResponse2 = submitResponse2.getResult().getTxId();
-                        Assert.assertEquals(txIdFromResponse2, transaction2.getId());
-                    });
-                    try {
-                        responseFuture2.get();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        Assert.fail(e.getMessage());
-                    }
-                    return submitResponse1;
+        try {
+            CompletableFuture<Void> combined = CompletableFuture.allOf(responseFuture1, responseFuture2);
+            combined.get();
+        } catch (Exception e) {
+            failOnException(e);
+        }
+        Assert.assertTrue(responseFuture1.isDone());
+        Assert.assertTrue(responseFuture2.isDone());
+    }
+
+    private CompletableFuture<FactoidSubmitResponse> submitTransaction(Transaction transaction) {
+        return factomdClient.factoidSubmit(Encoding.HEX.encode(transaction.marshal()))
+                .handle((submitResponse2, throwable) -> {
+                    failOnException(throwable);
+
+                    final String txIdFromResponse2 = submitResponse2.getResult().getTxId();
+                    Assert.assertEquals(txIdFromResponse2, transaction.getId());
+                    System.out.println(String.format("Transaction id : %s, inputs(%s), outputs(%s)", txIdFromResponse2,
+                            transaction.getInputs().stream().map(input ->
+                                    input.getAddress().getValue()).collect(Collectors.joining(",")),
+                            transaction.getFctOutputs().stream().map(output ->
+                                    output.getAddress().getValue()).collect(Collectors.joining(","))
+                    ));
+                    return submitResponse2.getResult();
                 });
-        final FactomResponse<FactoidSubmitResponse> factoidSubmitResponseFactomResponse = submitResponse.get(10, TimeUnit.SECONDS);
+    }
 
-
+    private void failOnException(Throwable throwable) {
+        if (throwable != null) {
+            throwable.printStackTrace();
+            Assert.fail(throwable.getMessage());
+        }
     }
 }

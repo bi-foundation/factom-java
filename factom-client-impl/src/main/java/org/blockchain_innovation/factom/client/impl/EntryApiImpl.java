@@ -30,6 +30,7 @@ import org.blockchain_innovation.factom.client.api.ops.StringUtils;
 import javax.inject.Named;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
@@ -120,7 +121,7 @@ public class EntryApiImpl extends AbstractClient implements EntryApi {
 
     public CompletableFuture<Boolean> chainExists(Chain chain) {
         String chainId = Encoding.HEX.encode(entryOperations.calculateChainId(chain.getFirstEntry().getExternalIds()));
-        return factomdClient.chainHead(chainId)
+        return factomdClient.chainHead(chainId, false)
                 .thenApplyAsync(response -> response.getResult() != null &&
                         StringUtils.isNotEmpty(response.getResult().getChainHead()), getExecutorService())
                 .exceptionally(throwable -> false);
@@ -133,9 +134,15 @@ public class EntryApiImpl extends AbstractClient implements EntryApi {
      */
     @Override
     public CompletableFuture<List<EntryBlockResponse>> allEntryBlocks(String chainId) {
-        return factomdClient.chainHead(chainId)
+        return factomdClient.chainHead(chainId, false)
                 .thenCompose(chainHeadResponse -> {
                     errorHandling(chainHeadResponse, "Could not get entry blocks for chain Id " + chainId);
+                    if (StringUtils.isEmpty(chainHeadResponse.getResult().getChainHead())) {
+                        // The factom RPC api returns an empty string when the chain has not been anchored yet.
+                        // That means there is no entry block yet, so return an empty list
+                        logger.warn("We did not receive a chainhead for the chain, but also no error. Probably chain {} is not anchored yet", chainId);
+                        return CompletableFuture.completedFuture(Collections.EMPTY_LIST);
+                    }
                     return entryBlocksUpTilKeyMR(chainHeadResponse.getResult().getChainHead());
                 });
     }
@@ -200,11 +207,14 @@ public class EntryApiImpl extends AbstractClient implements EntryApi {
 
     @Override
     public CompletableFuture<List<EntryBlockResponse>> entryBlocksUpTilKeyMR(String keyMR) {
+        if (StringUtils.isEmpty(keyMR)) {
+            throw new FactomRuntimeException.AssertionException("Cannot get blocks for null or empty keyMR");
+        }
         List<EntryBlockResponse> entryBlockResponseList = new ArrayList<>();
 
         String currentKeyMR = keyMR;
 
-        while (!currentKeyMR.equals(NO_PREVIOUS_KEY_MERKLE_ROOT)) {
+        while (StringUtils.isNotEmpty(currentKeyMR) && !NO_PREVIOUS_KEY_MERKLE_ROOT.equals(currentKeyMR)) {
             FactomResponse<EntryBlockResponse> currentBlock = factomdClient.entryBlockByKeyMerkleRoot(currentKeyMR).join();
             errorHandling(currentBlock, "Could not get entry block for keyMr " + currentKeyMR);
             currentKeyMR = currentBlock.getResult().getHeader().getPreviousKeyMR();

@@ -52,6 +52,8 @@ public interface LowLevelClient {
      */
     <RpcResult> CompletableFuture<FactomResponse<RpcResult>> exchange(FactomRequest factomRequest, Class<RpcResult> rpcResultClass);
 
+    <RpcResult> CompletableFuture<FactomResponse<RpcResult>> exchange(FactomRequest factomRequest, Class<RpcResult> rpcResultClass, boolean logErrors);
+
     /**
      * Performs the exchange that happens when submitting a request to factomd/walletd. This returns a promise.
      *
@@ -62,6 +64,8 @@ public interface LowLevelClient {
      */
     <RpcResult> CompletableFuture<FactomResponse<RpcResult>> exchange(RpcRequest.Builder rpcRequestBuilder, Class<RpcResult> rpcResultClass);
 
+    <RpcResult> CompletableFuture<FactomResponse<RpcResult>> exchange(RpcRequest.Builder rpcRequestBuilder, Class<RpcResult> rpcResultClass, boolean logErrors);
+
     /**
      * Performs the exchange that happens when submitting a request to factomd/walletd. This returns a promise. This overload leaves out the FactomRequest wrapper object, since it only has one delegate currently.
      *
@@ -71,6 +75,8 @@ public interface LowLevelClient {
      * @return The promise for the response.
      */
     <RpcResult> CompletableFuture<FactomResponse<RpcResult>> exchange(RpcRequest rpcRequest, Class<RpcResult> rpcResultClass);
+
+    <RpcResult> CompletableFuture<FactomResponse<RpcResult>> exchange(RpcRequest rpcRequest, Class<RpcResult> rpcResultClass, boolean logErrors);
 
     /**
      * Set the executor service for the async parts. Allows you to use your own executor services, or use managed executor services in a JEE environment. If not provided a default executor service will be provided.

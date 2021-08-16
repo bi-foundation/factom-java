@@ -83,17 +83,32 @@ public abstract class AbstractClient implements LowLevelClient {
 
     @Override
     public <RpcResult> CompletableFuture<FactomResponse<RpcResult>> exchange(FactomRequest factomRequest, Class<RpcResult> rpcResultClass) {
-        return exchange(factomRequest.getRpcRequest(), rpcResultClass);
+        return exchange(factomRequest.getRpcRequest(), rpcResultClass, true);
+    }
+
+    @Override
+    public <RpcResult> CompletableFuture<FactomResponse<RpcResult>> exchange(FactomRequest factomRequest, Class<RpcResult> rpcResultClass, boolean logErrors) {
+        return exchange(factomRequest.getRpcRequest(), rpcResultClass, logErrors);
     }
 
     @Override
     public <RpcResult> CompletableFuture<FactomResponse<RpcResult>> exchange(RpcRequest.Builder rpcRequestBuilder, Class<RpcResult> rpcResultClass) {
-        return exchange(rpcRequestBuilder.build(), rpcResultClass);
+        return exchange(rpcRequestBuilder.build(), rpcResultClass, true);
+    }
+
+    @Override
+    public <RpcResult> CompletableFuture<FactomResponse<RpcResult>> exchange(RpcRequest.Builder rpcRequestBuilder, Class<RpcResult> rpcResultClass, boolean logErrors) {
+        return exchange(rpcRequestBuilder.build(), rpcResultClass, logErrors);
     }
 
     @Override
     public <RpcResult> CompletableFuture<FactomResponse<RpcResult>> exchange(RpcRequest rpcRequest, Class<RpcResult> rpcResultClass) {
-        Exchange<RpcResult> exchange = new Exchange<>(this, rpcRequest, rpcResultClass);
+        return exchange(rpcRequest, rpcResultClass, true);
+    }
+
+    @Override
+    public <RpcResult> CompletableFuture<FactomResponse<RpcResult>> exchange(RpcRequest rpcRequest, Class<RpcResult> rpcResultClass, boolean logErrors) {
+        Exchange<RpcResult> exchange = new Exchange<>(this, rpcRequest, rpcResultClass, logErrors);
         return exchange.execute();
 
     }
