@@ -12,7 +12,15 @@ endif::[]
 This document provides a high-level overview of the changes introduced in Factom-Java by release.
 For a detailed view of what has changed, refer to our {uri-repo}/commits/master[commit history] on GitHub.
 
-== 0.4.1 - not released yet
+== 0.4.2 - not released yet
+
+== 0.4.1 - release date 20210819
+
+Fix for potential error on looking up default EC addresses when the user specifies an EC address.
+
+Fixed::
+* Do not lookup default EC address when user specifies explicit EC address
+
 
 == 0.4.0 - release date 20210817
 
