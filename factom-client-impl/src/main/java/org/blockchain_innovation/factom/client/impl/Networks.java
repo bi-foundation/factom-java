@@ -108,7 +108,7 @@ public class Networks {
     }
 
     public static Address getECAddress(Optional<String> networkName, Optional<Address> optionalECAddressToUse) {
-        return optionalECAddressToUse.orElse(
+        return optionalECAddressToUse.orElseGet(() ->
                 getDefaultECAddress(networkName).orElseThrow(
                         () -> new FactomRuntimeException.AssertionException("Need to either configure an EC address or supply an EC address")));
     }
