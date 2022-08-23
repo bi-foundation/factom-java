@@ -13,10 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*
-// To declare projects as part of a multi-project build use the 'include' method
-*/
-include ':factom-client-api', ':factom-client-impl', ':factom-client-offline-signing', ':service-providers:logger-slf4j', ':service-providers:json-converter-gson', ':service-providers:json-converter-jee', ':factom-client-tests', ':frameworks:jee-support', ':frameworks:spring-boot-support', 'frameworks:osgi', ':iot-sas', ':docs'
-rootProject.name = 'factom-java'
-include 'factom-client-impl-accumulate'
 
+package org.blockchain_innovation.accumulate.factombridge.impl;
+
+import org.blockchain_innovation.factom.client.api.FactomRequest;
+import org.blockchain_innovation.factom.client.api.rpc.RpcRequest;
+
+public class FactomRequestImpl implements FactomRequest {
+    private final RpcRequest rpcRequest;
+
+    public FactomRequestImpl(RpcRequest rpcRequest) {
+        this.rpcRequest = rpcRequest;
+    }
+
+    @Override
+    public RpcRequest getRpcRequest() {
+        return rpcRequest;
+    }
+
+    @Override
+    public String toString() {
+        if (rpcRequest == null) {
+            return "null";
+        }
+        return rpcRequest.toString();
+    }
+}

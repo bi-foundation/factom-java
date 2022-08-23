@@ -65,6 +65,7 @@ ext {
     exportedProjects = [
             ":factom-client-api",
             ":factom-client-impl",
+            ":factom-client-impl-accumulate",
             ":factom-client-offline-signing",
             ":service-providers:logger-slf4j",
             ":service-providers:json-converter-gson",
@@ -125,25 +126,25 @@ subprojects {
                 pom {
 
 
-                      licenses {
-                          license {
-                              name = 'The Apache License, Version 2.0'
-                              url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                          }
-                      }
-                      developers {
-                          developer {
-                              id = 'BIF'
-                              name = 'Blockchain Innovation Foundation'
-                              email = 'info@blockchain-innovation.org'
-                          }
-                      }
-                      scm {
-                          connection = 'scm:git:https://github.com/bi-foundation/factom-java.git'
-                          developerConnection = 'scm:git:https://github.com/bi-foundation/factom-java.git'
-                          url = 'https://github.com/bi-foundation/factom-java/'
-                      }
-                  }
+                    licenses {
+                        license {
+                            name = 'The Apache License, Version 2.0'
+                            url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        }
+                    }
+                    developers {
+                        developer {
+                            id = 'BIF'
+                            name = 'Blockchain Innovation Foundation'
+                            email = 'info@blockchain-innovation.org'
+                        }
+                    }
+                    scm {
+                        connection = 'scm:git:https://github.com/bi-foundation/factom-java.git'
+                        developerConnection = 'scm:git:https://github.com/bi-foundation/factom-java.git'
+                        url = 'https://github.com/bi-foundation/factom-java/'
+                    }
+                }
             }
         }
 
@@ -276,12 +277,23 @@ project(':factom-client-impl') {
     }
 }
 
+project(':factom-client-impl-accumulate') {
+    apply plugin: "java"
+    dependencies {
+        compile project(':factom-client-api')
+        compile 'io.accumulatenetwork:accumulate-java-sdk:1.0-SNAPSHOT'
+
+        // Provided by JEE Environment
+        compileOnly "javax.enterprise:cdi-api:$libVersions.jee.cdiApi"
+    }
+}
+
 project(':factom-client-offline-signing') {
     apply plugin: "java"
     dependencies {
         compile project(':factom-client-impl')
         compileOnly "javax.enterprise:cdi-api:$libVersions.jee.cdiApi"
-      }
+    }
 }
 project(':iot-sas') {
     apply plugin: "java"
