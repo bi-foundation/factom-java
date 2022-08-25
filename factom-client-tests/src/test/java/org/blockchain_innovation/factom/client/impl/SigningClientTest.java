@@ -3,6 +3,7 @@ package org.blockchain_innovation.factom.client.impl;
 import org.blockchain_innovation.factom.client.AbstractClientTest;
 import org.blockchain_innovation.factom.client.api.model.Address;
 import org.blockchain_innovation.factom.client.api.model.Chain;
+import org.blockchain_innovation.factom.client.api.model.ECAddress;
 import org.blockchain_innovation.factom.client.api.model.Entry;
 import org.blockchain_innovation.factom.client.api.ops.AddressSignatureProvider;
 import org.blockchain_innovation.factom.client.api.ops.Encoding;
@@ -35,8 +36,8 @@ public class SigningClientTest extends AbstractClientTest {
     public void testChainCommit() {
         String expectedChainCommit = "000160ddcd307eb8a99a8a770edcd78b3490d70d746b4dad76e966319a6a8bcb4d47fad2b89595c9e3fbe05ac8286a417719e76282b6b97123e183e79dfed97e2bdbd24645b0d0523b9c0a06ce1ce6a33925b8a22d2c35dcc214af965977fe8cb7a4ad906b3b170bf48167f7f868d6163b4afb49a357829d9bdb2de092374d357424e2318c6f894afff4cf749867b5df9046525b6d0ca0b691e04efc5f0cd76e09a268ec59958cde063bd7f7d2c2cd563d46615ab3f87f2b5b8b201c2791286cf8dde74958904b00";
         Chain chain = chain();
-        Address publicAddress = new Address(EC_PUBLIC_ADDRESS);
-        Address secretAddress = new Address(EC_SECRET_ADDRESS);
+        Address publicAddress = new ECAddress(EC_PUBLIC_ADDRESS);
+        Address secretAddress = new ECAddress(EC_SECRET_ADDRESS);
 
         String composeChainCommit = offlineWalletdClient.composeChainCommit(chain, new AddressSignatureProvider(secretAddress));
         System.out.println("composeChainCommit = " + composeChainCommit);
@@ -59,7 +60,7 @@ public class SigningClientTest extends AbstractClientTest {
         String expectedEntryCommit = "000160ddcd307ebb97838651bd9d3428b77f22c99138a05f15ed3716fa776a148e054213a09f6701f48167f7f868d6163b4afb49a357829d9bdb2de092374d357424e2318c6f894a004b1623c13aaafb421ae949e1c78291233fb9e28c505a3f0ec6e37d7e1f199a0e8762e09f3e479fea3ac097db0e7064dd38c5d53fd538d3d2b8259128dcbf09";
         Entry entry = entry("be27b8476ed4840cca115c8f0a1e3783d9f9b35fd008470a55f2db9097a4073e");
 
-        Address secretAddress = new Address(EC_SECRET_ADDRESS);
+        Address secretAddress = new ECAddress(EC_SECRET_ADDRESS);
 
         String composeEntryCommit = offlineWalletdClient.composeEntryCommit(entry, new AddressSignatureProvider(secretAddress));
         System.out.println("composeEntryCommit = " + composeEntryCommit);

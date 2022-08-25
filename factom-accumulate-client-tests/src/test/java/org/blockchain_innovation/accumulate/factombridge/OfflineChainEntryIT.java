@@ -14,13 +14,11 @@
  * limitations under the License.
  */
 
-package org.blockchain_innovation.factom.client;
+package org.blockchain_innovation.accumulate.factombridge;
 
 import org.blockchain_innovation.factom.client.api.FactomResponse;
 import org.blockchain_innovation.factom.client.api.errors.FactomException;
-import org.blockchain_innovation.factom.client.api.model.Address;
 import org.blockchain_innovation.factom.client.api.model.Chain;
-import org.blockchain_innovation.factom.client.api.model.ECAddress;
 import org.blockchain_innovation.factom.client.api.model.Entry;
 import org.blockchain_innovation.factom.client.api.model.response.factomd.CommitChainResponse;
 import org.blockchain_innovation.factom.client.api.model.response.factomd.CommitEntryResponse;
@@ -35,29 +33,27 @@ import org.junit.runners.MethodSorters;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class ChainEntryIT extends AbstractClientTest {
+public class OfflineChainEntryIT extends AbstractClientTest {
 
-    protected static String chainId /*= "23fc40b5d301f8c40513cb1363439bc23e6c21856073abefdb1a2a2e49baba3b"*/;
-    protected static String entryHash;
-    protected static ComposeResponse composeChain;
-    protected static ComposeResponse composeEntry;
+    private static ComposeResponse composeChain;
+    private static String chainId;
+    private static String entryHash;
+    private static ComposeResponse composeEntry;
 
     @Test
-    public void _01_composeChain() throws FactomException.ClientException, ExecutionException, InterruptedException {
+    public void _01_composeChain() throws FactomException.ClientException {
         Chain chain = chain();
 
-        Address address = new ECAddress(EC_PUBLIC_ADDRESS);
-        FactomResponse<ComposeResponse> composeResponse = walletdClient.composeChain(chain, address).join();
-        assertValidResponse(composeResponse);
+        FactomResponse<ComposeResponse> composeResponse = offlineWalletdClient.composeChain(chain, liteAccount).join();
 
         composeChain = composeResponse.getResult();
-        Assert.assertNotNull(composeChain.getCommit());
-        Assert.assertNotNull(composeChain.getCommit().getId());
-        Assert.assertNotNull(composeChain.getCommit().getParams());
+        Assert.assertNotNull(composeResponse.getResult().getCommit());
+        Assert.assertNotNull(composeResponse.getResult().getCommit().getId());
+        Assert.assertNotNull(composeResponse.getResult().getCommit().getParams());
     }
+
 
     @Test
     public void _02_commitChain() throws FactomException.ClientException {
@@ -101,9 +97,7 @@ public class ChainEntryIT extends AbstractClientTest {
     @Test
     public void _04_composeEntry() throws FactomException.ClientException {
         Entry entry = entry(chainId);
-        Address address = new ECAddress(EC_PUBLIC_ADDRESS);
-
-        FactomResponse<ComposeResponse> composeResponse = walletdClient.composeEntry(entry, address).join();
+        FactomResponse<ComposeResponse> composeResponse = walletdClient.composeEntry(entry, liteAccount).join();
         assertValidResponse(composeResponse);
 
         composeEntry = composeResponse.getResult();

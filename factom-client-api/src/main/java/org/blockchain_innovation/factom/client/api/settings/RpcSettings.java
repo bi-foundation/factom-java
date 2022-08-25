@@ -17,7 +17,7 @@
 package org.blockchain_innovation.factom.client.api.settings;
 
 import org.blockchain_innovation.factom.client.api.SigningMode;
-import org.blockchain_innovation.factom.client.api.model.Address;
+import org.blockchain_innovation.factom.client.api.model.ECAddress;
 
 import java.net.URL;
 import java.util.Locale;
@@ -28,7 +28,7 @@ import java.util.Optional;
  */
 public interface RpcSettings {
     SigningMode getSigningMode();
-    Optional<Address> getDefaultECAddress();
+    Optional<ECAddress> getDefaultECAddress();
 
     /**
      * The subsystem to apply this configuration to.

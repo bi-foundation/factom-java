@@ -110,48 +110,28 @@ public abstract class AbstractClient implements LowLevelClient {
         switch (rpcRequest.getMethod()) {
             case HEIGHTS:
                 throw new NotImplementedException(); // TODO
-            case ADMIN_BLOCK_BY_HEIGHT:
-                throw new NotImplementedException(); // TODO
-            case ADMIN_BLOCK_BY_KEYMR:
-                throw new NotImplementedException(); // TODO
             case ACK_TRANSACTION:
                 throw new NotImplementedException(); // TODO
             case CHAIN_HEAD:
                 throw new NotImplementedException(); // TODO
             case COMMIT_CHAIN:
-                throw new NotImplementedException(); // TODO
+                return bridge.commitChain((String) rpcRequest.getParams().get("message"));
             case COMMIT_ENTRY:
                 throw new NotImplementedException(); // TODO
             case CURRENT_MINUTE:
                 throw new NotImplementedException(); // TODO
-            case DIRECTORY_BLOCK_BY_HEIGHT:
-                throw new NotImplementedException(); // TODO
-            case DIRECTORY_BLOCK_BY_KEYMR:
-                throw new NotImplementedException(); // TODO
-            case DIRECTORY_BLOCK_HEAD:
-                throw new NotImplementedException(); // TODO
             case ENTRY:
                 throw new NotImplementedException(); // TODO
-            case ENTRY_BLOCK_BY_KEYMR:
-                throw new NotImplementedException(); // TODO
-            case ENTRY_CREDIT_BLOCK_BY_HEIGH:
-                throw new NotImplementedException(); // TODO
             case ENTRY_CREDIT_BALANCE:
-                throw new NotImplementedException(); // TODO
-            case ENTRY_CREDIT_BLOCK:
                 throw new NotImplementedException(); // TODO
             case ENTRY_CREDIT_RATE:
                 throw new NotImplementedException(); // TODO
             case FACTOID_BALANCE:
                 throw new NotImplementedException(); // TODO
-            case FACTOID_BLOCK:
-                throw new NotImplementedException(); // TODO
             case FACTOID_SUBMIT:
                 throw new NotImplementedException(); // TODO
-            case FACTOID_BLOCK_BY_HEIGHT:
-                throw new NotImplementedException(); // TODO
             case PENDING_ENTRIES:
-                throw new NotImplementedException(); // TODO
+                throw new NotImplementedException(); // TODO return 0
             case PENDING_TRANSACTONS:
                 throw new NotImplementedException(); // TODO
             case PROPERTIES:
@@ -169,10 +149,8 @@ public abstract class AbstractClient implements LowLevelClient {
                 throw new NotImplementedException(); // TODO
             case TRANSACTION:
                 throw new NotImplementedException(); // TODO
-            case ADD_ENTRY_CREDIT_OUTPUT:
-                throw new NotImplementedException(); // TODO
             case ADD_FEE:
-                throw new NotImplementedException(); // TODO
+                throw new NotImplementedException(); // TODO NOOP
             case ADD_INPUT:
                 throw new NotImplementedException(); // TODO
             case ADD_OUTPUT:
@@ -181,19 +159,11 @@ public abstract class AbstractClient implements LowLevelClient {
                 throw new NotImplementedException(); // TODO
             case ALL_ADDRESSES:
                 throw new NotImplementedException(); // TODO
-            case COMPOSE_CHAIN:
-                throw new NotImplementedException(); // TODO
-            case COMPOSE_ENTRY:
-                throw new NotImplementedException(); // TODO
             case COMPOSE_TRANSACTION:
                 throw new NotImplementedException(); // TODO
             case DELETE_TRANSACTION:
                 throw new NotImplementedException(); // TODO
-            case GENERATE_ENTRY_CREDIT_ADDRESS:
-                throw new NotImplementedException(); // TODO
             case GENERATE_FACTOID_ADDRESS:
-                throw new NotImplementedException(); // TODO
-            case GET_HEIGHT:
                 throw new NotImplementedException(); // TODO
             case IMPORT_ADDRESSES:
                 throw new NotImplementedException(); // TODO
@@ -204,15 +174,16 @@ public abstract class AbstractClient implements LowLevelClient {
             case SIGN_TRANSACTION:
                 throw new NotImplementedException(); // TODO
             case SUB_FEE:
-                throw new NotImplementedException(); // TODO
+                throw new NotImplementedException(); // TODO NOOP
             case TMP_TRANSACTIONS:
                 throw new NotImplementedException(); // TODO
             case TRANSACTIONS:
                 throw new NotImplementedException(); // TODO
             case WALLET_BACKUP:
                 throw new NotImplementedException(); // TODO
+            default:
+                throw new NotSupportedInAccumulateException(rpcRequest.getMethod());
         }
-        return null; // TODO
     }
 
     @Override

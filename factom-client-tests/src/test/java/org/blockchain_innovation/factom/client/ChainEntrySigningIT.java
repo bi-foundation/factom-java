@@ -18,6 +18,7 @@ package org.blockchain_innovation.factom.client;
 
 import org.blockchain_innovation.factom.client.api.model.Address;
 import org.blockchain_innovation.factom.client.api.model.Chain;
+import org.blockchain_innovation.factom.client.api.model.ECAddress;
 import org.blockchain_innovation.factom.client.api.model.Entry;
 import org.blockchain_innovation.factom.client.api.model.response.CommitAndRevealChainResponse;
 import org.blockchain_innovation.factom.client.api.model.response.CommitAndRevealEntryResponse;
@@ -38,7 +39,7 @@ public class ChainEntrySigningIT extends AbstractClientTest {
     @Test
     public void _01_commitChain() {
         Chain chain = chain();
-        Address secretAddress = new Address(EC_SECRET_ADDRESS);
+        Address secretAddress = new ECAddress(EC_SECRET_ADDRESS);
 
         CommitAndRevealChainResponse response = offlineEntryClient.commitAndRevealChain(chain(), secretAddress).join();
 
@@ -59,7 +60,7 @@ public class ChainEntrySigningIT extends AbstractClientTest {
     @Test
     public void _02_commitEntry() {
         Assert.assertNotNull(chainId);
-        Address secretAddress = new Address(EC_SECRET_ADDRESS);
+        Address secretAddress = new ECAddress(EC_SECRET_ADDRESS);
 
         Entry entry = entry(chainId);
         CommitAndRevealEntryResponse response = offlineEntryClient.commitAndRevealEntry(entry, secretAddress).join();

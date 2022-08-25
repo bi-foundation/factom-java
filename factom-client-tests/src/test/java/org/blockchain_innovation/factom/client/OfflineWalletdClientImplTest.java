@@ -23,19 +23,7 @@ import org.blockchain_innovation.factom.client.api.model.Address;
 import org.blockchain_innovation.factom.client.api.model.Chain;
 import org.blockchain_innovation.factom.client.api.model.Entry;
 import org.blockchain_innovation.factom.client.api.model.Range;
-import org.blockchain_innovation.factom.client.api.model.response.walletd.AddressResponse;
-import org.blockchain_innovation.factom.client.api.model.response.walletd.AddressesResponse;
-import org.blockchain_innovation.factom.client.api.model.response.walletd.BlockHeightTransactionResponse;
-import org.blockchain_innovation.factom.client.api.model.response.walletd.BlockHeightTransactionsResponse;
-import org.blockchain_innovation.factom.client.api.model.response.walletd.ComposeResponse;
-import org.blockchain_innovation.factom.client.api.model.response.walletd.ComposeTransactionResponse;
-import org.blockchain_innovation.factom.client.api.model.response.walletd.DeleteTransactionResponse;
-import org.blockchain_innovation.factom.client.api.model.response.walletd.ExecutedTransactionResponse;
-import org.blockchain_innovation.factom.client.api.model.response.walletd.GetHeightResponse;
-import org.blockchain_innovation.factom.client.api.model.response.walletd.PropertiesResponse;
-import org.blockchain_innovation.factom.client.api.model.response.walletd.TransactionResponse;
-import org.blockchain_innovation.factom.client.api.model.response.walletd.TransactionsResponse;
-import org.blockchain_innovation.factom.client.api.model.response.walletd.WalletBackupResponse;
+import org.blockchain_innovation.factom.client.api.model.response.walletd.*;
 import org.junit.Assert;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -85,7 +73,7 @@ public class OfflineWalletdClientImplTest extends AbstractClientTest {
 
         AddressResponse address = response.getResult();
         Assert.assertNotNull(address);
-        entryCreditAddress = new Address(address.getPublicAddress());
+        entryCreditAddress = new ECAddress(address.getPublicAddress());
         Assert.assertNotNull(entryCreditAddress);
         Assert.assertNotNull(address.getSecret());
     }
@@ -103,7 +91,7 @@ public class OfflineWalletdClientImplTest extends AbstractClientTest {
 
     @Test
     public void _11_importAddresses() throws FactomException.ClientException {
-        Address address = new Address(FCT_SECRET_ADDRESS);
+        Address address = new ECAddress(FCT_SECRET_ADDRESS);
         List<Address> addresses = Collections.singletonList(address);
 
         FactomResponse<AddressesResponse> response = walletdClient.importAddresses(addresses).join();
@@ -169,7 +157,7 @@ public class OfflineWalletdClientImplTest extends AbstractClientTest {
 
     @Test
     public void _15_transactionsByAddress() throws FactomException.ClientException {
-        Address address = new Address(FCT_PUBLIC_ADDRESS);
+        Address address = new ECAddress(FCT_PUBLIC_ADDRESS);
         FactomResponse<BlockHeightTransactionsResponse> response = walletdClient.transactionsByAddress(address).join();
         assertValidResponse(response);
 
@@ -209,7 +197,7 @@ public class OfflineWalletdClientImplTest extends AbstractClientTest {
     @Test
     public void _22_addInput() throws FactomException.ClientException {
         int amount = 10;
-        Address address = new Address(FCT_PUBLIC_ADDRESS);
+        Address address = new ECAddress(FCT_PUBLIC_ADDRESS);
         FactomResponse<ExecutedTransactionResponse> response = walletdClient.addInput(transactionName, address, amount).join();
         assertValidResponse(response);
 
@@ -225,7 +213,7 @@ public class OfflineWalletdClientImplTest extends AbstractClientTest {
     @Test
     public void _22_addOutput() throws FactomException.ClientException {
         int amount = 2;
-        Address address = new Address(FCT_PUBLIC_ADDRESS);
+        Address address = new ECAddress(FCT_PUBLIC_ADDRESS);
         FactomResponse<ExecutedTransactionResponse> response = walletdClient.addOutput(transactionName, address, amount).join();
         assertValidResponse(response);
 
@@ -240,7 +228,7 @@ public class OfflineWalletdClientImplTest extends AbstractClientTest {
 
     @Test
     public void _23_addFee() throws FactomException.ClientException {
-        Address address = new Address(FCT_PUBLIC_ADDRESS);
+        Address address = new ECAddress(FCT_PUBLIC_ADDRESS);
         addFeeResponse = walletdClient.addFee(transactionName, address).join();
         assertValidResponse(addFeeResponse);
 
@@ -250,7 +238,7 @@ public class OfflineWalletdClientImplTest extends AbstractClientTest {
 
     // @Test
     public void _24_subFee() throws FactomException.ClientException {
-        Address address = new Address(FCT_PUBLIC_ADDRESS);
+        Address address = new ECAddress(FCT_PUBLIC_ADDRESS);
         // make output + ec equal to input after the fee is subtracted
         long amount = addFeeResponse.getResult().getTotalInputs() + addFeeResponse.getResult().getFeesRequired() - addFeeResponse.getResult().getTotalEntryCreditOutputs();
         FactomResponse<ExecutedTransactionResponse> addOutputResponse = walletdClient.addOutput(transactionName, address, amount).join();
@@ -306,7 +294,7 @@ public class OfflineWalletdClientImplTest extends AbstractClientTest {
         Chain chain = new Chain();
         chain.setFirstEntry(firstEntry);
 
-        Address address = new Address(EC_PUBLIC_ADDRESS);
+        Address address = new ECAddress(EC_PUBLIC_ADDRESS);
         FactomResponse<ComposeResponse> response = walletdClient.composeChain(chain, address).join();
         assertValidResponse(response);
 
@@ -331,7 +319,7 @@ public class OfflineWalletdClientImplTest extends AbstractClientTest {
         entry.setContent("abcdef");
         entry.setExternalIds(externalIds);
 
-        Address address = new Address(EC_PUBLIC_ADDRESS);
+        Address address = new ECAddress(EC_PUBLIC_ADDRESS);
         FactomResponse<ComposeResponse> response = walletdClient.composeEntry(entry, address).join();
         assertValidResponse(response);
 

@@ -22,31 +22,23 @@ import org.blockchain_innovation.factom.client.api.rpc.RpcErrorResponse;
 import org.blockchain_innovation.factom.client.api.rpc.RpcResponse;
 
 public class FactomResponseImpl<Result> implements FactomResponse<Result> {
-    private final Exchange exchange;
     private final RpcResponse<Result> rpcResponse;
     private final int responseCode;
     private final String responseMessage;
     private final RpcErrorResponse errorResponse;
 
-    protected FactomResponseImpl(Exchange exchange, RpcResponse<Result> rpcResponse, int responseCode, String responseMessage) {
-        this.exchange = exchange;
+    protected FactomResponseImpl(RpcResponse<Result> rpcResponse, int responseCode, String responseMessage) {
         this.rpcResponse = rpcResponse;
         this.responseCode = responseCode;
         this.responseMessage = responseMessage;
         this.errorResponse = null;
     }
 
-    protected FactomResponseImpl(Exchange exchange, RpcErrorResponse rpcErrorResponse, int responseCode, String responseMessage) {
-        this.exchange = exchange;
+    protected FactomResponseImpl(RpcErrorResponse rpcErrorResponse, int responseCode, String responseMessage) {
         this.responseCode = responseCode;
         this.responseMessage = responseMessage;
         this.errorResponse = rpcErrorResponse;
         this.rpcResponse = null;
-    }
-
-
-    protected Exchange getExchange() {
-        return exchange;
     }
 
     @Override

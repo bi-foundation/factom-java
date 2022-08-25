@@ -3,6 +3,7 @@ package org.blockchain_innovation.factom.client;
 import org.blockchain_innovation.factom.client.api.listeners.CommitAndRevealListener;
 import org.blockchain_innovation.factom.client.api.model.Address;
 import org.blockchain_innovation.factom.client.api.model.Chain;
+import org.blockchain_innovation.factom.client.api.model.ECAddress;
 import org.blockchain_innovation.factom.client.api.model.Entry;
 import org.blockchain_innovation.factom.client.api.model.response.CommitAndRevealChainResponse;
 import org.blockchain_innovation.factom.client.api.model.response.CommitAndRevealEntryResponse;
@@ -72,7 +73,7 @@ public class EntryApiTest extends AbstractClientTest {
         };
 
         entryClient.clearListeners().addListener(listener);
-        Address address = new Address(EC_PUBLIC_ADDRESS);
+        Address address = new ECAddress(EC_PUBLIC_ADDRESS);
 
         CommitAndRevealChainResponse commitAndRevealChain = entryClient.commitAndRevealChain(chain, address).join();
 
@@ -140,7 +141,7 @@ public class EntryApiTest extends AbstractClientTest {
         };
 
         entryClient.clearListeners().addListener(listener);
-        Address address = new Address(EC_PUBLIC_ADDRESS);
+        Address address = new ECAddress(EC_PUBLIC_ADDRESS);
         CompletableFuture<CommitAndRevealEntryResponse> commitFuture = entryClient.commitAndRevealEntry(entry, address);
         CommitAndRevealEntryResponse commitAndRevealEntry = commitFuture.join();
 
@@ -235,7 +236,7 @@ public class EntryApiTest extends AbstractClientTest {
         };
 
         entryClient.clearListeners().addListener(listener);
-        Address address = new Address(EC_PUBLIC_ADDRESS);
+        Address address = new ECAddress(EC_PUBLIC_ADDRESS);
         CompletableFuture<CommitAndRevealChainResponse> future = entryClient.commitAndRevealChain(chain, address, true);
 
         int count = 0;

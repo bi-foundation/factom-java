@@ -10,11 +10,8 @@ import org.blockchain_innovation.factom.client.api.errors.FactomException;
 import org.blockchain_innovation.factom.client.api.model.Address;
 import org.blockchain_innovation.factom.client.api.model.types.AddressType;
 
-import java.security.InvalidKeyException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.Signature;
-import java.security.SignatureException;
+import java.nio.charset.StandardCharsets;
+import java.security.*;
 
 public class AddressSignatureProvider implements SignatureProvider {
     private static final AddressKeyConversions CONVERSIONS = new AddressKeyConversions();
@@ -56,21 +53,32 @@ public class AddressSignatureProvider implements SignatureProvider {
     }
 
     @Override
+    public AddressType getAddressType() {
+        return address.getType();
+    }
+
+    @Override
     public byte[] sign(byte[] message) {
-        byte[] privateKey = CONVERSIONS.addressToKey(getAddress());
-        EdDSAPrivateKeySpec privateKeySpec = new EdDSAPrivateKeySpec(privateKey, EdDSANamedCurveTable.ED_25519_CURVE_SPEC);
-        EdDSAPrivateKey keyIn = new EdDSAPrivateKey(privateKeySpec);
 
-        try {
-            Signature instance = new EdDSAEngine(MessageDigest.getInstance("SHA-512"));
-            instance.initSign(keyIn);
-            instance.update(message);
+        final Address address = getAddress();
+        if(address.getType() == AddressType.LITE_ACCOUNT) {
+            return getAddress().getValue().getBytes(StandardCharsets.UTF_8);
+        } else {
+            byte[] privateKey = CONVERSIONS.addressToKey(address);
+            EdDSAPrivateKeySpec privateKeySpec = new EdDSAPrivateKeySpec(privateKey, EdDSANamedCurveTable.ED_25519_CURVE_SPEC);
+            EdDSAPrivateKey keyIn = new EdDSAPrivateKey(privateKeySpec);
 
-            return instance.sign();
-        } catch (InvalidKeyException e) {
-            throw new FactomException.ClientException(String.format("invalid key: %s", e.getMessage()), e);
-        } catch (SignatureException | NoSuchAlgorithmException e) {
-            throw new FactomException.ClientException("failed to sign message", e);
+            try {
+                Signature instance = new EdDSAEngine(MessageDigest.getInstance("SHA-512"));
+                instance.initSign(keyIn);
+                instance.update(message);
+
+                return instance.sign();
+            } catch (InvalidKeyException e) {
+                throw new FactomException.ClientException(String.format("invalid key: %s", e.getMessage()), e);
+            } catch (SignatureException | NoSuchAlgorithmException e) {
+                throw new FactomException.ClientException("failed to sign message", e);
+            }
         }
     }
 }

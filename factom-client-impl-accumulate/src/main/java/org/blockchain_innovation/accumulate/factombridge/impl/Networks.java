@@ -9,7 +9,7 @@ import org.blockchain_innovation.factom.client.api.errors.FactomException;
 import org.blockchain_innovation.factom.client.api.errors.FactomRuntimeException;
 import org.blockchain_innovation.factom.client.api.log.LogFactory;
 import org.blockchain_innovation.factom.client.api.log.Logger;
-import org.blockchain_innovation.factom.client.api.model.Address;
+import org.blockchain_innovation.factom.client.api.model.ECAddress;
 import org.blockchain_innovation.factom.client.api.settings.RpcSettings;
 
 import java.io.File;
@@ -92,7 +92,7 @@ public class Networks {
         }
     }
 
-    public static Optional<Address> getDefaultECAddress(Optional<String> networkName) {
+    public static Optional<ECAddress> getDefaultECAddress(Optional<String> networkName) {
         RpcSettings settings = walletd(networkName).lowLevelClient().getSettings();
         if (settings.getSigningMode() == SigningMode.OFFLINE) {
             return settings.getDefaultECAddress();
@@ -101,7 +101,7 @@ public class Networks {
         return Optional.empty();
     }
 
-    public static Address getECAddress(Optional<String> networkName, Optional<Address> optionalECAddressToUse) {
+    public static ECAddress getECAddress(Optional<String> networkName, Optional<ECAddress> optionalECAddressToUse) {
         return optionalECAddressToUse.orElseGet(() ->
                 getDefaultECAddress(networkName).orElseThrow(
                         () -> new FactomRuntimeException.AssertionException("Need to either configure an EC address or supply an EC address")));

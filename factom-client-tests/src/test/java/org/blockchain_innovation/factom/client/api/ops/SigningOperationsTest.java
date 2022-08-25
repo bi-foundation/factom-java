@@ -2,7 +2,7 @@ package org.blockchain_innovation.factom.client.api.ops;
 
 import org.blockchain_innovation.factom.client.AbstractClientTest;
 import org.blockchain_innovation.factom.client.api.AddressKeyConversions;
-import org.blockchain_innovation.factom.client.api.model.Address;
+import org.blockchain_innovation.factom.client.api.model.ECAddress;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -27,7 +27,7 @@ public class SigningOperationsTest extends AbstractClientTest {
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
-        byte[] signature = signingOperations.sign(bytesToSign, new Address(privateAddress));
+        byte[] signature = signingOperations.sign(bytesToSign, new ECAddress(privateAddress));
         Assert.assertNotNull(signature);
         byte[] publicKey = keyConversions.addressToPublicKey(privateAddress);
 

@@ -24,12 +24,7 @@ import org.blockchain_innovation.factom.client.api.model.Range;
 import org.blockchain_innovation.factom.client.api.ops.StringUtils;
 
 import java.io.Serializable;
-import java.util.Map;
-import java.util.List;
-import java.util.HashMap;
-import java.util.Collection;
-import java.util.Arrays;
-import java.util.ArrayList;
+import java.util.*;
 
 /**
  * The Factom APIs use JSON-RPC, which is a remote procedure call protocol encoded in JSON.
@@ -315,8 +310,8 @@ public class RpcRequest implements Serializable {
     /**
      * Address list implementation of Param.
      */
-    public static class AddressListParam extends Param<List<Address>> {
-        public AddressListParam(String key, List<Address> value) {
+    public static class AddressListParam extends Param<List<? extends Address>> {
+        public AddressListParam(String key, List<? extends Address> value) {
             super(key, value);
         }
     }
@@ -427,7 +422,7 @@ public class RpcRequest implements Serializable {
          * @param paramValue The param address list value.
          * @return This builder.
          */
-        public Builder param(String paramKey, List<Address> paramValue) {
+        public Builder param(String paramKey, List<? extends Address> paramValue) {
             param(new AddressListParam(paramKey, paramValue));
             return this;
         }

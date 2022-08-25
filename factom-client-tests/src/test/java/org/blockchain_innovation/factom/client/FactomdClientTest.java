@@ -18,30 +18,8 @@ package org.blockchain_innovation.factom.client;
 
 import org.blockchain_innovation.factom.client.api.FactomResponse;
 import org.blockchain_innovation.factom.client.api.errors.FactomException;
-import org.blockchain_innovation.factom.client.api.model.Address;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.AdminBlockResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.ChainHeadResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.CurrentMinuteResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.DirectoryBlockHeadResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.DirectoryBlockHeightResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.DirectoryBlockResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.EntryBlockResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.EntryCreditBalanceResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.EntryCreditBlockResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.EntryCreditRateResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.EntryTransactionResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.FactoidBalanceResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.FactoidBlockResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.FactoidSubmitResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.FactoidTransactionsResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.HeightsResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.PendingEntriesResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.PendingTransactionsResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.PropertiesResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.RawDataResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.ReceiptResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.RevealResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.TransactionResponse;
+import org.blockchain_innovation.factom.client.api.model.ECAddress;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.*;
 import org.blockchain_innovation.factom.client.api.rpc.RpcMethod;
 import org.blockchain_innovation.factom.client.impl.FactomRequestImpl;
 import org.junit.Assert;
@@ -320,12 +298,12 @@ public class FactomdClientTest extends AbstractClientTest {
 
     @Test
     public void testEntryCreditBalance() throws FactomException.ClientException {
-        FactomResponse<EntryCreditBalanceResponse> response = factomdClient.entryCreditBalance(new Address(EC_PUBLIC_ADDRESS)).join();
+        FactomResponse<EntryCreditBalanceResponse> response = factomdClient.entryCreditBalance(new ECAddress(EC_PUBLIC_ADDRESS)).join();
         assertValidResponse(response);
         EntryCreditBalanceResponse entryCreditBalance = response.getResult();
         Assert.assertNotNull(entryCreditBalance);
         if (entryCreditBalance.getBalance() < 30) {
-            fail(String.format("EC balance (%d) of %s is too low for other tests to run properly. Please go to %s to top up the balance", entryCreditBalance.getBalance(), new Address(EC_PUBLIC_ADDRESS), "https://faucet.factoid.org/"));
+            fail(String.format("EC balance (%d) of %s is too low for other tests to run properly. Please go to %s to top up the balance", entryCreditBalance.getBalance(), new ECAddress(EC_PUBLIC_ADDRESS), "https://faucet.factoid.org/"));
         }
     }
 
@@ -367,13 +345,13 @@ public class FactomdClientTest extends AbstractClientTest {
 
     @Test
     public void testFactoidBalance() throws FactomException.ClientException {
-        FactomResponse<FactoidBalanceResponse> response = factomdClient.factoidBalance(new Address(FCT_PUBLIC_ADDRESS)).join();
+        FactomResponse<FactoidBalanceResponse> response = factomdClient.factoidBalance(new ECAddress(FCT_PUBLIC_ADDRESS)).join();
         assertValidResponse(response);
 
         FactoidBalanceResponse factoidBalance = response.getResult();
         Assert.assertNotNull(factoidBalance);
         if (factoidBalance.getBalance() < 30) {
-            fail(String.format("Factoid balance (%d) of %s is too low for other tests to run properly. Please go to %s to top up the balance", factoidBalance.getBalance(), new Address(FCT_PUBLIC_ADDRESS), "https://faucet.factoid.org/"));
+            fail(String.format("Factoid balance (%d) of %s is too low for other tests to run properly. Please go to %s to top up the balance", factoidBalance.getBalance(), new ECAddress(FCT_PUBLIC_ADDRESS), "https://faucet.factoid.org/"));
         }
     }
 

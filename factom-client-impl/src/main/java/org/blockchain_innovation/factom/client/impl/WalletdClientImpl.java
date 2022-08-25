@@ -25,18 +25,7 @@ import org.blockchain_innovation.factom.client.api.model.Address;
 import org.blockchain_innovation.factom.client.api.model.Chain;
 import org.blockchain_innovation.factom.client.api.model.Entry;
 import org.blockchain_innovation.factom.client.api.model.Range;
-import org.blockchain_innovation.factom.client.api.model.response.walletd.AddressResponse;
-import org.blockchain_innovation.factom.client.api.model.response.walletd.AddressesResponse;
-import org.blockchain_innovation.factom.client.api.model.response.walletd.BlockHeightTransactionsResponse;
-import org.blockchain_innovation.factom.client.api.model.response.walletd.ComposeResponse;
-import org.blockchain_innovation.factom.client.api.model.response.walletd.ComposeTransactionResponse;
-import org.blockchain_innovation.factom.client.api.model.response.walletd.DeleteTransactionResponse;
-import org.blockchain_innovation.factom.client.api.model.response.walletd.ExecutedTransactionResponse;
-import org.blockchain_innovation.factom.client.api.model.response.walletd.GetHeightResponse;
-import org.blockchain_innovation.factom.client.api.model.response.walletd.PropertiesResponse;
-import org.blockchain_innovation.factom.client.api.model.response.walletd.TransactionResponse;
-import org.blockchain_innovation.factom.client.api.model.response.walletd.TransactionsResponse;
-import org.blockchain_innovation.factom.client.api.model.response.walletd.WalletBackupResponse;
+import org.blockchain_innovation.factom.client.api.model.response.walletd.*;
 import org.blockchain_innovation.factom.client.api.model.types.AddressType;
 import org.blockchain_innovation.factom.client.api.rpc.RpcMethod;
 
@@ -101,7 +90,6 @@ public class WalletdClientImpl extends AbstractClient implements WalletdClient {
 
     @Override
     public CompletableFuture<FactomResponse<ComposeResponse>> composeEntry(Entry entry, Address entryCreditAddress) {
-        AddressType.ENTRY_CREDIT_PUBLIC.assertValid(entryCreditAddress);
         Entry encodedEntry = encodeOperations.encodeHex(entry);
         return exchange(RpcMethod.COMPOSE_ENTRY.toRequestBuilder().param("entry", encodedEntry).param("ecpub", entryCreditAddress.getValue()), ComposeResponse.class);
     }
@@ -132,7 +120,7 @@ public class WalletdClientImpl extends AbstractClient implements WalletdClient {
     }
 
     @Override
-    public CompletableFuture<FactomResponse<AddressesResponse>> importAddresses(List<Address> addresses) {
+    public CompletableFuture<FactomResponse<AddressesResponse>> importAddresses(List<? extends Address> addresses) {
         for (Address address : addresses) {
             AddressType.assertVisibility(address.getValue(), AddressType.Visibility.PRIVATE);
         }

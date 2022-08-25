@@ -16,9 +16,10 @@
 
 package org.blockchain_innovation.factom.client;
 
-import org.blockchain_innovation.factom.client.api.errors.FactomException;
 import org.blockchain_innovation.factom.client.api.FactomResponse;
+import org.blockchain_innovation.factom.client.api.errors.FactomException;
 import org.blockchain_innovation.factom.client.api.model.Address;
+import org.blockchain_innovation.factom.client.api.model.ECAddress;
 import org.blockchain_innovation.factom.client.api.model.response.factomd.EntryCreditRateResponse;
 import org.blockchain_innovation.factom.client.api.model.response.factomd.FactoidSubmitResponse;
 import org.blockchain_innovation.factom.client.api.model.response.walletd.AddressResponse;
@@ -75,7 +76,7 @@ public class TransactionIT extends AbstractClientTest {
     public void _04_addInput() throws FactomException.ClientException {
         long fctCost = calculateCost();
 
-        Address address = new Address(FCT_PUBLIC_ADDRESS);
+        Address address = new ECAddress(FCT_PUBLIC_ADDRESS);
         FactomResponse<ExecutedTransactionResponse> response = walletdClient.addInput(TRANSACTION_NAME, address, fctCost).join();
         assertValidResponse(response);
 
@@ -87,7 +88,7 @@ public class TransactionIT extends AbstractClientTest {
     @Test
     public void _05_addEntryCreditOutput() throws FactomException.ClientException {
         String toAddress = toAddressResponse.getResult().getPublicAddress();
-        Address address = new Address(toAddress);
+        Address address = new ECAddress(toAddress);
         long fctCost = calculateCost();
 
         FactomResponse<TransactionResponse> response = walletdClient.addEntryCreditOutput(TRANSACTION_NAME, address, fctCost).join();
@@ -100,7 +101,7 @@ public class TransactionIT extends AbstractClientTest {
 
     @Test
     public void _06_addFee() throws FactomException.ClientException {
-        Address address = new Address(FCT_PUBLIC_ADDRESS);
+        Address address = new ECAddress(FCT_PUBLIC_ADDRESS);
         FactomResponse<ExecutedTransactionResponse> response = walletdClient.addFee(TRANSACTION_NAME, address).join();
         assertValidResponse(response);
 

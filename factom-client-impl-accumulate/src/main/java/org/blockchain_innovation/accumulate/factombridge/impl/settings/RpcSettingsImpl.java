@@ -21,7 +21,7 @@ import org.blockchain_innovation.factom.client.api.SigningMode;
 import org.blockchain_innovation.factom.client.api.errors.FactomRuntimeException;
 import org.blockchain_innovation.factom.client.api.log.LogFactory;
 import org.blockchain_innovation.factom.client.api.log.Logger;
-import org.blockchain_innovation.factom.client.api.model.Address;
+import org.blockchain_innovation.factom.client.api.model.ECAddress;
 import org.blockchain_innovation.factom.client.api.model.types.AddressType;
 import org.blockchain_innovation.factom.client.api.ops.StringUtils;
 import org.blockchain_innovation.factom.client.api.settings.RpcSettings;
@@ -38,7 +38,7 @@ public class RpcSettingsImpl implements RpcSettings {
     private Server server;
     private static final Logger logger = LogFactory.getLogger(RpcSettings.class);
     private SigningMode signingMode;
-    private Address defaultECAddress;
+    private ECAddress defaultECAddress;
 
     public RpcSettingsImpl(SubSystem subSystem, Server server) {
         this.subSystem = subSystem;
@@ -111,15 +111,15 @@ public class RpcSettingsImpl implements RpcSettings {
     }
 
     @Override
-    public Optional<Address> getDefaultECAddress() {
+    public Optional<ECAddress> getDefaultECAddress() {
         return Optional.ofNullable(defaultECAddress);
     }
 
     public RpcSettingsImpl setDefaultECAddress(String address) {
-        return StringUtils.isEmpty(address) ? this : setDefaultECAddress(Address.fromString(address));
+        return StringUtils.isEmpty(address) ? this : setDefaultECAddress(ECAddress.fromString(address));
     }
 
-    public RpcSettingsImpl setDefaultECAddress(Address address) {
+    public RpcSettingsImpl setDefaultECAddress(ECAddress address) {
         if (address != null && !(address.getType() == AddressType.ENTRY_CREDIT_SECRET || address.getType() == AddressType.ENTRY_CREDIT_PUBLIC)) {
             throw new FactomRuntimeException("Invalid address type supplied for the default EC address: " + address.getType());
         }
@@ -298,12 +298,12 @@ public class RpcSettingsImpl implements RpcSettings {
                 getFromPropertiesOrEnvironment(SubSystem.WALLETD, "signing-mode", properties, SigningMode.ONLINE_WALLETD.name(), networkName));
     }
 
-    protected static Address getDefaultECAddressFromPropertiesOrEnvironment(Properties properties, Optional<String> networkName) {
+    protected static ECAddress getDefaultECAddressFromPropertiesOrEnvironment(Properties properties, Optional<String> networkName) {
         String address = getFromPropertiesOrEnvironment(SubSystem.WALLETD, "ec-address", properties, null, networkName);
         if (address == null) {
             address = getFromPropertiesOrEnvironment(SubSystem.WALLETD, "entry-credit-address", properties, null, networkName);
         }
-        return address == null ? null : Address.fromString(address);
+        return address == null ? null : ECAddress.fromString(address);
     }
 
     protected static String constructKey(SubSystem subSystem, String key, Optional<String> networkName) {

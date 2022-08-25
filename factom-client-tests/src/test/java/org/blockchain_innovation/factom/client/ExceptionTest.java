@@ -20,6 +20,7 @@ import org.blockchain_innovation.factom.client.api.FactomResponse;
 import org.blockchain_innovation.factom.client.api.errors.FactomException;
 import org.blockchain_innovation.factom.client.api.errors.FactomRuntimeException;
 import org.blockchain_innovation.factom.client.api.model.Address;
+import org.blockchain_innovation.factom.client.api.model.ECAddress;
 import org.blockchain_innovation.factom.client.api.model.Entry;
 import org.blockchain_innovation.factom.client.api.model.response.factomd.CurrentMinuteResponse;
 import org.blockchain_innovation.factom.client.api.settings.RpcSettings;
@@ -76,7 +77,7 @@ public class ExceptionTest extends AbstractClientTest {
 
     @Test(expected = FactomRuntimeException.AssertionException.class)
     public void testCommitNullChain() {
-        walletdClient.composeChain(null, new Address(null)).join();
+        walletdClient.composeChain(null, new ECAddress(null)).join();
     }
 
     @Test(expected = FactomException.ClientException.class)
@@ -98,34 +99,34 @@ public class ExceptionTest extends AbstractClientTest {
 
     @Test(expected = FactomRuntimeException.AssertionException.class)
     public void testWrongAddressType() {
-        Address correctAddress = new Address(EC_SECRET_ADDRESS);
-        Address invalidAddress1 = new Address("Es3Y6U6H1Pfg4wYag8VMtRZEGuEJnfkJ2ZuSyCVcQKweB6y4WvVH");
-        Address invalidAddress2 = new Address("Es3Y6U6H1Pfg4wYag8VMtRZEGuEJnfkJ2ZuSyCVcQKweB6y4WvGD");
+        Address correctAddress = new ECAddress(EC_SECRET_ADDRESS);
+        Address invalidAddress1 = new ECAddress("Es3Y6U6H1Pfg4wYag8VMtRZEGuEJnfkJ2ZuSyCVcQKweB6y4WvVH");
+        Address invalidAddress2 = new ECAddress("Es3Y6U6H1Pfg4wYag8VMtRZEGuEJnfkJ2ZuSyCVcQKweB6y4WvGD");
         List<Address> addresses = Arrays.asList(correctAddress, invalidAddress1, invalidAddress2);
         walletdClient.importAddresses(addresses);
     }
 
     @Test(expected = FactomRuntimeException.AssertionException.class)
     public void testWrongAddressTypeCompose() {
-        Address address = new Address(FCT_PUBLIC_ADDRESS.substring(0, FCT_PUBLIC_ADDRESS.length() - 1));
+        Address address = new ECAddress(FCT_PUBLIC_ADDRESS.substring(0, FCT_PUBLIC_ADDRESS.length() - 1));
         walletdClient.composeEntry(new Entry(), address);
     }
 
     @Test(expected = FactomRuntimeException.AssertionException.class)
     public void testWrongAddressTransaction() {
-        Address address = new Address(FCT_PUBLIC_ADDRESS.substring(0, FCT_PUBLIC_ADDRESS.length() - 1));
+        Address address = new ECAddress(FCT_PUBLIC_ADDRESS.substring(0, FCT_PUBLIC_ADDRESS.length() - 1));
         walletdClient.transactionsByAddress(address).join();
     }
 
     @Test(expected = FactomRuntimeException.AssertionException.class)
     public void testWrongAddressFactoidBalance() {
-        Address address = new Address(EC_PUBLIC_ADDRESS);
+        Address address = new ECAddress(EC_PUBLIC_ADDRESS);
         factomdClient.factoidBalance(address);
     }
 
     @Test(expected = FactomRuntimeException.AssertionException.class)
     public void testWrongAddressCreditBalance() {
-        Address address = new Address(EC_SECRET_ADDRESS);
+        Address address = new ECAddress(EC_SECRET_ADDRESS);
         factomdClient.entryCreditBalance(address);
     }
 

@@ -12,8 +12,8 @@ import java.net.URISyntaxException;
 import java.util.concurrent.CompletableFuture;
 
 public class FactomToAccumulateBridge {
-
     private static final Logger logger = LogFactory.getLogger(FactomToAccumulateBridge.class);
+
     private AccumulateAsyncApi accumulateApi;
 
     FactomToAccumulateBridge() {
@@ -31,6 +31,38 @@ public class FactomToAccumulateBridge {
             case WALLETD:
                 break;
         }
+    }
+
+    public <RpcResult> CompletableFuture<FactomResponse<RpcResult>> commitChain(final String message) {
+        /**
+         * IN
+          chain = {Chain@2198}
+           firstentry = {Entry@2223}
+            chainid = null
+            extids = {Arrays$ArrayList@2224}  size = 2
+             0 = "ChainEntryIT"
+             1 = "Thu Aug 25 11:28:11 CEST 2022"
+            content = "ChainEntry integration test content"
+
+         OUT
+         rpcResponse = {RpcResponse@2212}
+         id = 0
+         jsonrpc = null
+         result = {ComposeResponse@2213}
+         commit = {ComposeResponse$Commit@2214}
+         jsonrpc = "2.0"
+         id = 0
+         params = {ComposeResponse$Commit$Params@2219}
+         message = "000182d4549e245d6db974275641e04b9b23b66a6c42521b26f8430c2a5562d665edb4487b962af886b6f715550291419a1f2ff5111df40a58d87ecc28b8bec31df1974b3f40e1bd378de1950dc6700c592949fd0d4d51b58818e6625aae61a14c722e2d9b85f50bf48167f7f868d6163b4afb49a357829d9bdb2de092374d357424e2318c6f894a5fd696da71429862843ecd8f7b1342f3111cb88c25bd38a955a542d22045f04ea9a2377096075e0e89b1da8a6a3916407cc5db191764e6c436f97d1e540ed803"
+         method = "commit-chain"
+         reveal = {ComposeResponse$Reveal@2215}
+         jsonrpc = "2.0"
+         id = 0
+         params = {ComposeResponse$Reveal$Params@2217}
+         entry = "00cebbfb60b8ed685c968330606b9109252204d2f286bf9f71af6911abaad8b9c9002d000c436861696e456e7472794954001d546875204175672032352031313a32383a313120434553542032303232436861696e456e74727920696e746567726174696f6e207465737420636f6e74656e74"
+         method = "reveal-chain"
+         */
+        return null;
     }
 
     public <RpcResult> CompletableFuture<FactomResponse<RpcResult>> revealChain(String entry, boolean logErrors) {

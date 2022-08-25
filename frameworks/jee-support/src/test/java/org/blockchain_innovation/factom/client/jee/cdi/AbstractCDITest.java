@@ -1,6 +1,6 @@
 package org.blockchain_innovation.factom.client.jee.cdi;
 
-import org.blockchain_innovation.factom.client.api.model.Address;
+import org.blockchain_innovation.factom.client.api.model.ECAddress;
 import org.blockchain_innovation.factom.client.api.settings.RpcSettings;
 import org.blockchain_innovation.factom.client.impl.settings.RpcSettingsImpl;
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -15,7 +15,7 @@ import java.io.InputStream;
 import java.util.Properties;
 
 public abstract class AbstractCDITest {
-    protected static final Address EC_PUBLIC_ADDRESS = new Address(System.getProperty("FACTOM_CLIENT_TEST_EC_PUBLIC_ADDRESS", "EC3cqLZPq5ypwRB5CLfXnud5vkWAV2sd235CFf9KcWcE3FH9GRxv"));
+    protected static final ECAddress EC_PUBLIC_ADDRESS = new ECAddress(System.getProperty("FACTOM_CLIENT_TEST_EC_PUBLIC_ADDRESS", "EC3cqLZPq5ypwRB5CLfXnud5vkWAV2sd235CFf9KcWcE3FH9GRxv"));
 
     @Inject
     protected ManagedClientProducers managedClientProducers;

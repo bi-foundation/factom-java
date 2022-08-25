@@ -5,18 +5,7 @@ import org.blockchain_innovation.factom.client.api.model.Address;
 import org.blockchain_innovation.factom.client.api.model.Chain;
 import org.blockchain_innovation.factom.client.api.model.Entry;
 import org.blockchain_innovation.factom.client.api.model.Range;
-import org.blockchain_innovation.factom.client.api.model.response.walletd.AddressResponse;
-import org.blockchain_innovation.factom.client.api.model.response.walletd.AddressesResponse;
-import org.blockchain_innovation.factom.client.api.model.response.walletd.BlockHeightTransactionsResponse;
-import org.blockchain_innovation.factom.client.api.model.response.walletd.ComposeResponse;
-import org.blockchain_innovation.factom.client.api.model.response.walletd.ComposeTransactionResponse;
-import org.blockchain_innovation.factom.client.api.model.response.walletd.DeleteTransactionResponse;
-import org.blockchain_innovation.factom.client.api.model.response.walletd.ExecutedTransactionResponse;
-import org.blockchain_innovation.factom.client.api.model.response.walletd.GetHeightResponse;
-import org.blockchain_innovation.factom.client.api.model.response.walletd.PropertiesResponse;
-import org.blockchain_innovation.factom.client.api.model.response.walletd.TransactionResponse;
-import org.blockchain_innovation.factom.client.api.model.response.walletd.TransactionsResponse;
-import org.blockchain_innovation.factom.client.api.model.response.walletd.WalletBackupResponse;
+import org.blockchain_innovation.factom.client.api.model.response.walletd.*;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -178,7 +167,7 @@ public interface WalletdClient {
      * @param addresses A list of addresses (Factoids or Entry Credits).
      * @return The Addresses Response promise.
      */
-    CompletableFuture<FactomResponse<AddressesResponse>> importAddresses(List<Address> addresses);
+    CompletableFuture<FactomResponse<AddressesResponse>> importAddresses(List<? extends Address> addresses);
 
     /**
      * Import a Koinify crowd sale address into the wallet. In our examples we used the word "yellow" twelve times, note that in your case the master passphrase will be different.

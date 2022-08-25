@@ -5,6 +5,8 @@ import org.blockchain_innovation.factom.client.api.errors.FactomRuntimeException
 import org.blockchain_innovation.factom.client.api.log.LogFactory;
 import org.blockchain_innovation.factom.client.api.log.Logger;
 import org.blockchain_innovation.factom.client.api.model.Address;
+import org.blockchain_innovation.factom.client.api.model.ECAddress;
+import org.blockchain_innovation.factom.client.api.model.types.AddressType;
 import org.blockchain_innovation.factom.client.api.ops.ByteOperations;
 import org.blockchain_innovation.factom.client.api.ops.Encoding;
 
@@ -63,10 +65,15 @@ public class IoTSASClientImpl implements SignatureProvider {
             throw new IoTSASPort.IoTSASPortException(String.format("Could not read public EC address. Only %d bytes returned instead of 52. Result: %s", count, new String(key, StandardCharsets.UTF_8)));
         }
 
-        Address address = Address.fromBytes(key);
+        ECAddress address = ECAddress.fromBytes(key);
         logger.info(String.format("Retrieved public EC address %s from %s", address, port()));
         return address;
 
+    }
+
+    @Override
+    public AddressType getAddressType() {
+        return getPublicAddress().getType();
     }
 
 

@@ -5,24 +5,13 @@ import org.blockchain_innovation.factom.client.api.errors.FactomRuntimeException
 import org.blockchain_innovation.factom.client.api.model.response.factomd.TransactionResponse;
 import org.blockchain_innovation.factom.client.api.model.types.AddressType;
 import org.blockchain_innovation.factom.client.api.model.types.RCDType;
-import org.blockchain_innovation.factom.client.api.ops.AddressSignatureProvider;
-import org.blockchain_innovation.factom.client.api.ops.ByteOperations;
-import org.blockchain_innovation.factom.client.api.ops.Digests;
-import org.blockchain_innovation.factom.client.api.ops.EncodeOperations;
-import org.blockchain_innovation.factom.client.api.ops.Encoding;
-import org.blockchain_innovation.factom.client.api.ops.SigningOperations;
-import org.blockchain_innovation.factom.client.api.ops.StringUtils;
-import org.blockchain_innovation.factom.client.api.ops.TransactionOperations;
+import org.blockchain_innovation.factom.client.api.ops.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 public class Transaction {
     private final long timestamp;
@@ -176,7 +165,7 @@ public class Transaction {
         }*/
 
         public Builder addInput(long amount, String secretAddress) {
-            return addInput(amount, Address.fromString(secretAddress));
+            return addInput(amount, ECAddress.fromString(secretAddress));
         }
 
         // TODO: 07/08/2021 We need to verify how/what the RCD signs. Right now it signs the header + addresses
@@ -221,10 +210,10 @@ public class Transaction {
             }
             for (TransactionResponse.Transaction.Output output : trans.getOutputs()) {
                 fctOutputs.add(new Output(output.getAmount(),
-                        Address.fromString(StringUtils.isNotEmpty(output.getUserAddress()) ? output.getUserAddress() : CONVERSIONS.rcdHashToFctAddress(output.getAddress().getBytes(StandardCharsets.UTF_8)))));
+                        ECAddress.fromString(StringUtils.isNotEmpty(output.getUserAddress()) ? output.getUserAddress() : CONVERSIONS.rcdHashToFctAddress(output.getAddress().getBytes(StandardCharsets.UTF_8)))));
             }
             for (TransactionResponse.Transaction.Output output : trans.getOutputs()) {
-                ecOutputs.add(new Output(output.getAmount(), Address.fromString(output.getUserAddress())));
+                ecOutputs.add(new Output(output.getAmount(), ECAddress.fromString(output.getUserAddress())));
             }
             this.timestamp = trans.getMilliTimestamp();
             return this;

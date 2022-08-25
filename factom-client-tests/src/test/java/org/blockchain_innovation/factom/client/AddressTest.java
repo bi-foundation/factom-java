@@ -3,6 +3,7 @@ package org.blockchain_innovation.factom.client;
 import org.blockchain_innovation.factom.client.api.AddressKeyConversions;
 import org.blockchain_innovation.factom.client.api.errors.FactomRuntimeException;
 import org.blockchain_innovation.factom.client.api.model.Address;
+import org.blockchain_innovation.factom.client.api.model.ECAddress;
 import org.blockchain_innovation.factom.client.api.model.types.AddressType;
 import org.blockchain_innovation.factom.client.api.ops.Encoding;
 import org.junit.Assert;
@@ -36,7 +37,7 @@ public class AddressTest extends AbstractClientTest {
         } catch (FactomRuntimeException re) {
         }
         try {
-            Address address = new Address("nope");
+            Address address = new ECAddress("nope");
             Assert.fail("Invalid address should have failed here");
         } catch (FactomRuntimeException re) {
         }

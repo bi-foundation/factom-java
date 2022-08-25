@@ -20,6 +20,7 @@ import org.blockchain_innovation.factom.client.api.FactomResponse;
 import org.blockchain_innovation.factom.client.api.errors.FactomException;
 import org.blockchain_innovation.factom.client.api.model.Address;
 import org.blockchain_innovation.factom.client.api.model.Chain;
+import org.blockchain_innovation.factom.client.api.model.ECAddress;
 import org.blockchain_innovation.factom.client.api.model.Entry;
 import org.blockchain_innovation.factom.client.api.model.response.walletd.ComposeResponse;
 import org.junit.Assert;
@@ -34,7 +35,7 @@ public class OfflineChainEntryIT extends ChainEntryIT {
     public void _01_composeChain() throws FactomException.ClientException {
         Chain chain = chain();
 
-        Address address = new Address(EC_SECRET_ADDRESS);
+        Address address = new ECAddress(EC_SECRET_ADDRESS);
         FactomResponse<ComposeResponse> composeResponse = offlineWalletdClient.composeChain(chain, address).join();
 
         composeChain = composeResponse.getResult();
@@ -57,7 +58,7 @@ public class OfflineChainEntryIT extends ChainEntryIT {
     @Test
     public void _04_composeEntry() throws FactomException.ClientException {
         Entry entry = entry(chainId);
-        Address address = new Address(EC_SECRET_ADDRESS);
+        Address address = new ECAddress(EC_SECRET_ADDRESS);
 
         FactomResponse<ComposeResponse> composeResponse = offlineWalletdClient.composeEntry(entry, address).join();
 

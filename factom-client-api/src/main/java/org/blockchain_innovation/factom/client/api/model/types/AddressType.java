@@ -15,13 +15,22 @@ import java.util.stream.Collectors;
  * The different supported Factom addresses.
  */
 public enum AddressType {
-    FACTOID_PUBLIC("FA", "5fb1", Visibility.PUBLIC), FACTOID_SECRET("Fs", "6478", Visibility.PRIVATE),
-    ENTRY_CREDIT_PUBLIC("EC", "592a", Visibility.PUBLIC), ENTRY_CREDIT_SECRET("Es", "5db6", Visibility.PRIVATE),
-    IDENTITY_PUBLIC1("id1", "3fbeba", Visibility.PUBLIC), IDENTITY_PRIVATE1("sk1", "4db6c9", Visibility.PRIVATE),
-    IDENTITY_PUBLIC2("id2", "3fbed8", Visibility.PUBLIC), IDENTITY_PRIVATE2("sk2", "4db6e7", Visibility.PRIVATE),
-    IDENTITY_PUBLIC3("id3", "3fbef6", Visibility.PUBLIC), IDENTITY_PRIVATE3("sk3", "4db705", Visibility.PRIVATE),
-    IDENTITY_PUBLIC4("id4", "3fbf14", Visibility.PUBLIC), IDENTITY_PRIVATE4("sk4", "4db723", Visibility.PRIVATE),
-    IDENTITY_IDPUB("idpub", "0345ef9de0", Visibility.PUBLIC), IDENTITY_IDSEC("idsec", "0345f3d0d6", Visibility.PRIVATE);
+    FACTOID_PUBLIC("FA", "5fb1", Visibility.PUBLIC),
+    FACTOID_SECRET("Fs", "6478", Visibility.PRIVATE),
+
+    ENTRY_CREDIT_PUBLIC("EC", "592a", Visibility.PUBLIC),
+    ENTRY_CREDIT_SECRET("Es", "5db6", Visibility.PRIVATE),
+    IDENTITY_PUBLIC1("id1", "3fbeba", Visibility.PUBLIC),
+    IDENTITY_PRIVATE1("sk1", "4db6c9", Visibility.PRIVATE),
+    IDENTITY_PUBLIC2("id2", "3fbed8", Visibility.PUBLIC),
+    IDENTITY_PRIVATE2("sk2", "4db6e7", Visibility.PRIVATE),
+    IDENTITY_PUBLIC3("id3", "3fbef6", Visibility.PUBLIC),
+    IDENTITY_PRIVATE3("sk3", "4db705", Visibility.PRIVATE),
+    IDENTITY_PUBLIC4("id4", "3fbf14", Visibility.PUBLIC),
+    IDENTITY_PRIVATE4("sk4", "4db723", Visibility.PRIVATE),
+    IDENTITY_IDPUB("idpub", "0345ef9de0", Visibility.PUBLIC),
+    IDENTITY_IDSEC("idsec", "0345f3d0d6", Visibility.PRIVATE),
+    LITE_ACCOUNT("acc:/", "", Visibility.PRIVATE);
 
 
     private final String humanReadablePrefix;
@@ -73,22 +82,30 @@ public enum AddressType {
     public static void assertValidAddress(String address) throws FactomRuntimeException.AssertionException {
         if (StringUtils.isEmpty(address) || address.length() <= 10) {
             throw new FactomRuntimeException.AssertionException(String.format("Address '%s' is not a valid address", address));
-        } else if (!getValidPrefixes().contains(address.substring(0, 2)) && !getValidPrefixes().contains(address.substring(0, 3)) && !getValidPrefixes().contains(address.substring(0, 5))) {
+        } else if (!getValidPrefixes().contains(address.substring(0, 2))
+                && !getValidPrefixes().contains(address.substring(0, 3))
+                && !getValidPrefixes().contains(address.substring(0, 5))) {
             throw new FactomRuntimeException.AssertionException(String.format("Address '%s' does not start with a valid humanReadablePrefix", address));
         }
-        byte[] addressBytes = Encoding.BASE58.decode(address);
-        int length = addressBytes.length;
-        if (length == 38 || length == 39 || length == 41) {
-            byte[] sha256d = Digests.SHA_256.doubleDigest(Arrays.copyOf(addressBytes, length - 4));
-            byte[] checksum = Arrays.copyOf(sha256d, 4);
+        if(address.toLowerCase().startsWith("acc://")) {
+            if(!address.toLowerCase().contains("/acme")) {
+                throw new FactomRuntimeException.AssertionException(String.format("Address '%s' is not a valid ACME lite address!", address.substring(0, address.indexOf("|"))));
+            }
+        } else {
+            byte[] addressBytes = Encoding.BASE58.decode(address);
+            int length = addressBytes.length;
+            if (length == 38 || length == 39 || length == 41) {
+                byte[] sha256d = Digests.SHA_256.doubleDigest(Arrays.copyOf(addressBytes, length - 4));
+                byte[] checksum = Arrays.copyOf(sha256d, 4);
 //            if (length == 41) {
 //                checksum = Arrays.copyOfRange(sha256d, 32 - 4, 32);
 //            }
-            if (!Arrays.equals(checksum, Arrays.copyOfRange(addressBytes, length - 4, length))) {
-                throw new FactomRuntimeException.AssertionException(String.format("Address '%s' checksum mismatch!", address));
+                if (!Arrays.equals(checksum, Arrays.copyOfRange(addressBytes, length - 4, length))) {
+                    throw new FactomRuntimeException.AssertionException(String.format("Address '%s' checksum mismatch!", address));
+                }
+            } else {
+                throw new FactomRuntimeException.AssertionException(String.format("Address '%s' is not 38 bytes long!", address));
             }
-        } else {
-            throw new FactomRuntimeException.AssertionException(String.format("Address '%s' is not 38 bytes long!", address));
         }
     }
 
@@ -96,13 +113,38 @@ public enum AddressType {
      * Asserts the address is valid and of the desired address type.
      *
      * @param address The address to check.
-     * @param type    The desired type.
+     * @param types    The desired type.
      * @throws FactomRuntimeException.AssertionException Whenever the address is invalid, not supported or not of the desired type.
      */
-    public static void assertValidAddress(String address, AddressType type) throws FactomRuntimeException.AssertionException {
+    public static void assertValidAddress(String address, AddressType... types) throws FactomRuntimeException.AssertionException {
         assertValidAddress(address);
-        if (AddressType.getType(address) != type) {
-            throw new FactomRuntimeException.AssertionException(String.format("Address %s is not of type %s", address, type.name()));
+        boolean found = false;
+        for(final AddressType type : types) {
+            if (AddressType.getType(address) == type) {
+                found = true;
+            }
+        }
+        if (!found) {
+            throw new FactomRuntimeException.AssertionException(String.format("Address %s is not of types %s", address, types));
+        }
+    }
+
+    /**
+     * Asserts the address is valid and of the desired address type.
+     *
+     * @param address The address to check.
+     * @param types    The desired type.
+     * @throws FactomRuntimeException.AssertionException Whenever the address is invalid, not supported or not of the desired type.
+     */
+    public static void assertValidAddress(Address address, AddressType... types) throws FactomRuntimeException.AssertionException {
+        boolean found = false;
+        for(final AddressType type : types) {
+            if (address.getType() == type) {
+                found = true;
+            }
+        }
+        if (!found) {
+            throw new FactomRuntimeException.AssertionException(String.format("Address %s is not of types %s", address, types));
         }
     }
 

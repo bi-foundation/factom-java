@@ -30,15 +30,15 @@ public class RCD {
     }
 
     public static RCD fromAddress(RCDType type, String address) {
-        return fromAddress(type, Address.fromString(address));
+        return fromAddress(type, ECAddress.fromString(address));
     }
 
     public static RCD fromHash(RCDType type, byte[] hash) {
-        return new RCD(type, Address.fromString(CONVERSIONS.rcdHashToFctAddress(hash)), hash, Optional.empty());
+        return new RCD(type, ECAddress.fromString(CONVERSIONS.rcdHashToFctAddress(hash)), hash, Optional.empty());
     }
 
     public static RCD fromPublicKey(RCDType type, byte[] publicKey) {
-        final Address address = Address.fromString(CONVERSIONS.keyToAddress(publicKey, AddressType.FACTOID_PUBLIC));
+        final Address address = ECAddress.fromString(CONVERSIONS.keyToAddress(publicKey, AddressType.FACTOID_PUBLIC));
         return new RCD(type, address, CONVERSIONS.fctAddressToRcdHash(address.getValue()), Optional.of(publicKey));
     }
 

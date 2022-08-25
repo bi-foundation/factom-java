@@ -2,6 +2,7 @@ package org.blockchain_innovation.factom.client;
 
 import org.blockchain_innovation.factom.client.api.AddressKeyConversions;
 import org.blockchain_innovation.factom.client.api.model.Address;
+import org.blockchain_innovation.factom.client.api.model.ECAddress;
 import org.blockchain_innovation.factom.client.api.model.RCD;
 import org.blockchain_innovation.factom.client.api.model.Transaction;
 import org.blockchain_innovation.factom.client.api.model.response.factomd.FactoidSubmitResponse;
@@ -21,9 +22,9 @@ public class OfflineTransactionTest extends AbstractClientTest {
 
     @Test
     public void testTransactionMarshalling() {
-        final Address secretInputFctAddress = Address.fromString(FCT_SECRET_ADDRESS);
-        final Address secretOutputFctAddress1 = Address.fromString("Fs1eDBmMknhc2kJZwCjQrgWeWWkjqBWGfDsLcLfUesxVEHv6PxmU");
-        final Address secretOutputFctAddress2 = Address.fromString("Fs1xBWD9ocnxNu3ssPF8NEU9PV8HQ83UMth5zr9cD7WEFoBj4qdb");
+        final Address secretInputFctAddress = ECAddress.fromString(FCT_SECRET_ADDRESS);
+        final Address secretOutputFctAddress1 = ECAddress.fromString("Fs1eDBmMknhc2kJZwCjQrgWeWWkjqBWGfDsLcLfUesxVEHv6PxmU");
+        final Address secretOutputFctAddress2 = ECAddress.fromString("Fs1xBWD9ocnxNu3ssPF8NEU9PV8HQ83UMth5zr9cD7WEFoBj4qdb");
         final Address publicOutputFctAddress1 = CONVERSIONS.addressToPublicAddress(secretOutputFctAddress1);
         final Address publicOutputFctAddress2 = CONVERSIONS.addressToPublicAddress(secretOutputFctAddress2);
         Assert.assertNotNull(publicOutputFctAddress1);
@@ -63,9 +64,9 @@ public class OfflineTransactionTest extends AbstractClientTest {
     // TODO: 13/08/2021 This is an IT, move to separate class
     @Test
     public void testSubmittingBackAndForthTransactions() {
-        final Address secretInputFctAddress = Address.fromString(FCT_SECRET_ADDRESS);
-        final Address secretOutputFctAddress1 = Address.fromString("Fs1eDBmMknhc2kJZwCjQrgWeWWkjqBWGfDsLcLfUesxVEHv6PxmU");
-        final Address secretOutputFctAddress2 = Address.fromString("Fs1xBWD9ocnxNu3ssPF8NEU9PV8HQ83UMth5zr9cD7WEFoBj4qdb");
+        final Address secretInputFctAddress = ECAddress.fromString(FCT_SECRET_ADDRESS);
+        final Address secretOutputFctAddress1 = ECAddress.fromString("Fs1eDBmMknhc2kJZwCjQrgWeWWkjqBWGfDsLcLfUesxVEHv6PxmU");
+        final Address secretOutputFctAddress2 = ECAddress.fromString("Fs1xBWD9ocnxNu3ssPF8NEU9PV8HQ83UMth5zr9cD7WEFoBj4qdb");
         final Address publicOutputFctAddress1 = CONVERSIONS.addressToPublicAddress(secretOutputFctAddress1);
         final Address publicOutputFctAddress2 = CONVERSIONS.addressToPublicAddress(secretOutputFctAddress2);
         System.out.println(String.format("Public Address1: %s", publicOutputFctAddress1));
@@ -78,7 +79,7 @@ public class OfflineTransactionTest extends AbstractClientTest {
 
         final Transaction transaction2 = new Transaction.Builder()
                 .addInput(15100000, secretOutputFctAddress1)
-                .addOutput(15000000, Address.fromString(FCT_PUBLIC_ADDRESS))
+                .addOutput(15000000, ECAddress.fromString(FCT_PUBLIC_ADDRESS))
                 .build();
 
 

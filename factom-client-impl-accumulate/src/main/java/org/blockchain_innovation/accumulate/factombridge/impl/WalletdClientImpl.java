@@ -121,7 +121,7 @@ public class WalletdClientImpl extends AbstractClient implements WalletdClient {
     }
 
     @Override
-    public CompletableFuture<FactomResponse<AddressesResponse>> importAddresses(List<Address> addresses) {
+    public CompletableFuture<FactomResponse<AddressesResponse>> importAddresses(List<? extends Address> addresses) {
         for (Address address : addresses) {
             AddressType.assertVisibility(address.getValue(), AddressType.Visibility.PRIVATE);
         }

@@ -1,5 +1,6 @@
 package org.blockchain_innovation.factom.client.impl;
 
+import com.sun.org.apache.xerces.internal.impl.dv.util.HexBin;
 import org.blockchain_innovation.factom.client.api.AddressKeyConversions;
 import org.blockchain_innovation.factom.client.api.FactomResponse;
 import org.blockchain_innovation.factom.client.api.SignatureProvider;
@@ -10,16 +11,13 @@ import org.blockchain_innovation.factom.client.api.model.Chain;
 import org.blockchain_innovation.factom.client.api.model.Entry;
 import org.blockchain_innovation.factom.client.api.model.response.walletd.ComposeResponse;
 import org.blockchain_innovation.factom.client.api.model.types.AddressType;
-import org.blockchain_innovation.factom.client.api.ops.AddressSignatureProvider;
-import org.blockchain_innovation.factom.client.api.ops.ByteOperations;
-import org.blockchain_innovation.factom.client.api.ops.Digests;
-import org.blockchain_innovation.factom.client.api.ops.Encoding;
-import org.blockchain_innovation.factom.client.api.ops.EntryOperations;
+import org.blockchain_innovation.factom.client.api.ops.*;
 import org.blockchain_innovation.factom.client.api.rpc.RpcResponse;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
@@ -30,6 +28,7 @@ public class OfflineWalletdClientImpl extends WalletdClientImpl {
 
     private final EntryOperations entryOperations = new EntryOperations();
     private final ByteOperations byteOperations = new ByteOperations();
+
     @Override
     public CompletableFuture<FactomResponse<ComposeResponse>> composeChain(Chain chain, SignatureProvider signatureProvider) throws FactomException.ClientException {
         Supplier<FactomResponse<ComposeResponse>> supplier = () -> {
@@ -43,7 +42,7 @@ public class OfflineWalletdClientImpl extends WalletdClientImpl {
 
     @Override
     public CompletableFuture<FactomResponse<ComposeResponse>> composeChain(Chain chain, Address address) throws FactomException.ClientException {
-        AddressType.ENTRY_CREDIT_SECRET.assertValid(address);
+        AddressType.assertValidAddress(address, AddressType.ENTRY_CREDIT_SECRET, AddressType.LITE_ACCOUNT);
         return composeChain(chain, new AddressSignatureProvider(address));
     }
 
@@ -107,10 +106,27 @@ public class OfflineWalletdClientImpl extends WalletdClientImpl {
 
             // 1 byte number of Entry Credits to pay
             byte cost = chainCost(firstEntry.getExternalIds(), firstEntry.getContent(), chainIdHex);
-            return signedCommitMessage(signatureProvider, outputStream, cost);
+            if (signatureProvider.getAddressType() == AddressType.LITE_ACCOUNT) {
+                return encodeLiteAccount(signatureProvider, outputStream);
+            } else {
+                return signedCommitMessage(signatureProvider, outputStream, cost);
+            }
         } catch (IOException e) {
             throw new FactomException.ClientException("failed to compose chain commit message", e);
         }
+    }
+
+    private static String encodeLiteAccount(final SignatureProvider signatureProvider, final ByteArrayOutputStream outputStream) throws IOException {
+        final String liteAccountEncoded = new String(signatureProvider.sign(null), StandardCharsets.UTF_8);
+        final int separator = liteAccountEncoded.indexOf('|');
+        final String adi = liteAccountEncoded.substring(0, separator);
+        final byte[] adiBytes = adi.getBytes(StandardCharsets.UTF_8);
+        outputStream.write(adiBytes.length);
+        outputStream.write(adiBytes);
+        final String privateKeyEncoded = liteAccountEncoded.substring(separator+1);
+        final byte[] privateKey = HexBin.decode(privateKeyEncoded);
+        outputStream.write(privateKey);
+        return Encoding.HEX.encode(outputStream.toByteArray());
     }
 
     /**

@@ -6,6 +6,7 @@ import org.blockchain_innovation.factom.client.api.errors.FactomRuntimeException
 import org.blockchain_innovation.factom.client.api.log.LogFactory;
 import org.blockchain_innovation.factom.client.api.log.Logger;
 import org.blockchain_innovation.factom.client.api.model.Address;
+import org.blockchain_innovation.factom.client.api.model.ECAddress;
 import org.blockchain_innovation.factom.client.api.model.types.AddressType;
 import org.blockchain_innovation.factom.client.api.model.types.RCDType;
 import org.blockchain_innovation.factom.client.api.ops.ByteOperations;
@@ -152,7 +153,10 @@ public class AddressKeyConversions {
      * @return an address
      */
     public Address addressToPublicAddress(Address address) {
-        return new Address(addressToPublicAddress(address.getValue()));
+        if(address.getType() == AddressType.LITE_ACCOUNT) {
+            throw new RuntimeException("addressToPublicAddress is not supported for lite accounts");
+        }
+        return new ECAddress(addressToPublicAddress(address.getValue()));
     }
 
     /**
