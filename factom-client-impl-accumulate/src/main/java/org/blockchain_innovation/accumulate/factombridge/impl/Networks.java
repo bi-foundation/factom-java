@@ -112,7 +112,7 @@ public class Networks {
         String key = networkKey(networkName);
 
         if (!factomdClients.containsKey(key)) {
-            FactomdClientImpl factomdClient = createFactomdClient(networkName, key);
+            FactomdAccumulateClientImpl factomdClient = createFactomdClient(networkName, key);
             register(factomdClient);
         }
 
@@ -142,10 +142,10 @@ public class Networks {
     }
 
 
-    private static FactomdClientImpl createFactomdClient(Optional<String> networkName, String key) {
+    private static FactomdAccumulateClientImpl createFactomdClient(Optional<String> networkName, String key) {
         logger.info(String.format("Network: %s, factomd client not registered yet, starting registration.", key));
         RpcSettings rpcSettings = new RpcSettingsImpl(RpcSettings.SubSystem.FACTOMD, properties, networkName);
-        FactomdClientImpl factomdClient = new FactomdClientImpl();
+        FactomdAccumulateClientImpl factomdClient = new FactomdAccumulateClientImpl();
         factomdClient.setSettings(rpcSettings);
         return factomdClient;
     }

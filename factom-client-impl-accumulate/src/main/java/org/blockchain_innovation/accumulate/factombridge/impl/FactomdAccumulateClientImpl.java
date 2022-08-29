@@ -28,7 +28,7 @@ import java.util.concurrent.CompletableFuture;
 
 @Named
 @SuppressWarnings({"PMD.AvoidDuplicateLiterals", "PMD.TooManyMethods", "PMD.CouplingBetweenObjects", "PMD.ExcessiveImports"})
-public class FactomdClientImpl extends AbstractClient implements FactomdClient {
+public class FactomdAccumulateClientImpl extends AbstractClient implements FactomdClient {
 
     @Override
     public CompletableFuture<FactomResponse<AdminBlockResponse>> adminBlockByHeight(long height) {

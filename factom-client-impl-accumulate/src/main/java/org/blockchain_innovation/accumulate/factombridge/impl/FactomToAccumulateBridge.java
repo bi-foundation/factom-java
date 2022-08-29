@@ -2,12 +2,18 @@ package org.blockchain_innovation.accumulate.factombridge.impl;
 
 import io.accumulatenetwork.sdk.api.v2.AccumulateAsyncApi;
 import io.accumulatenetwork.sdk.api.v2.TransactionQueryResult;
+import io.accumulatenetwork.sdk.commons.codec.DecoderException;
+import io.accumulatenetwork.sdk.commons.codec.binary.Hex;
 import io.accumulatenetwork.sdk.generated.apiv2.TxnQuery;
 import org.blockchain_innovation.factom.client.api.FactomResponse;
 import org.blockchain_innovation.factom.client.api.log.LogFactory;
 import org.blockchain_innovation.factom.client.api.log.Logger;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.CommitChainResponse;
 import org.blockchain_innovation.factom.client.api.settings.RpcSettings;
 
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.concurrent.CompletableFuture;
 
@@ -62,7 +68,28 @@ public class FactomToAccumulateBridge {
          entry = "00cebbfb60b8ed685c968330606b9109252204d2f286bf9f71af6911abaad8b9c9002d000c436861696e456e7472794954001d546875204175672032352031313a32383a313120434553542032303232436861696e456e74727920696e746567726174696f6e207465737420636f6e74656e74"
          method = "reveal-chain"
          */
-        return null;
+
+        return CompletableFuture.supplyAsync(() -> {
+
+
+        try {
+            final DataInputStream inputStream = new DataInputStream(new ByteArrayInputStream(Hex.decodeHex(message)));
+            final byte version = inputStream.readByte();
+            final byte[] timeStamp = new byte[6];
+            inputStream.read(timeStamp);
+            final byte[] chainIdHash = new byte[32];
+            inputStream.read(chainIdHash);
+            final byte[] chainWeld = new byte[32];
+            inputStream.read(chainWeld);
+            final byte[] entryHash = new byte[32];
+            inputStream.read(entryHash);
+            final byte cost = inputStream.readByte();
+            FactomResponse<Result> factomResponse
+            return new CommitChainResponse();
+        } catch (DecoderException | IOException e) {
+            throw new RuntimeException(e);
+        }
+        });
     }
 
     public <RpcResult> CompletableFuture<FactomResponse<RpcResult>> revealChain(String entry, boolean logErrors) {

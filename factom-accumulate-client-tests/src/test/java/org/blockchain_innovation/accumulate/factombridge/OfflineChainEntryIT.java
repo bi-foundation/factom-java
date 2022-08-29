@@ -97,7 +97,7 @@ public class OfflineChainEntryIT extends AbstractClientTest {
     @Test
     public void _04_composeEntry() throws FactomException.ClientException {
         Entry entry = entry(chainId);
-        FactomResponse<ComposeResponse> composeResponse = walletdClient.composeEntry(entry, liteAccount).join();
+        FactomResponse<ComposeResponse> composeResponse = offlineWalletdClient.composeEntry(entry, liteAccount).join();
         assertValidResponse(composeResponse);
 
         composeEntry = composeResponse.getResult();
