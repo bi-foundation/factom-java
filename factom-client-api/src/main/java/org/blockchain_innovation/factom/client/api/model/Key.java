@@ -3,6 +3,7 @@ package org.blockchain_innovation.factom.client.api.model;
 import org.blockchain_innovation.factom.client.api.ops.Encoding;
 
 import java.io.Serializable;
+import java.util.Arrays;
 
 /**
  * Represents a key (public or private).
@@ -20,6 +21,7 @@ public class Key implements Serializable {
 
     /**
      * Get the key as bytes.
+     *
      * @return The key.
      */
     public byte[] getValue() {
@@ -31,10 +33,25 @@ public class Key implements Serializable {
 
     /**
      * Get the key as hex encoded string.
+     *
      * @return The key in hex.
      */
     public String getValueAsHex() {
         return Encoding.HEX.encode(value);
     }
 
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Key)) return false;
+
+        final Key key = (Key) o;
+
+        return Arrays.equals(value, key.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(value);
+    }
 }

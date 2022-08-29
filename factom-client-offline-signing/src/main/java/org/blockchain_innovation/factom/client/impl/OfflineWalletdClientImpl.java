@@ -15,6 +15,7 @@ import org.blockchain_innovation.factom.client.api.ops.*;
 import org.blockchain_innovation.factom.client.api.rpc.RpcResponse;
 
 import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -117,11 +118,12 @@ public class OfflineWalletdClientImpl extends WalletdClientImpl {
     }
 
     private static String encodeLiteAccount(final SignatureProvider signatureProvider, final ByteArrayOutputStream outputStream) throws IOException {
+        final DataOutputStream dataOutputStream = new DataOutputStream(outputStream);
         final String liteAccountEncoded = new String(signatureProvider.sign(null), StandardCharsets.UTF_8);
         final int separator = liteAccountEncoded.indexOf('|');
         final String adi = liteAccountEncoded.substring(0, separator);
         final byte[] adiBytes = adi.getBytes(StandardCharsets.UTF_8);
-        outputStream.write(adiBytes.length);
+        dataOutputStream.writeInt(adiBytes.length);
         outputStream.write(adiBytes);
         final String privateKeyEncoded = liteAccountEncoded.substring(separator+1);
         final byte[] privateKey = HexBin.decode(privateKeyEncoded);

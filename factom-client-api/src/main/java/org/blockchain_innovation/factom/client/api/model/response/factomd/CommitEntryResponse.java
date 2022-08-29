@@ -19,6 +19,16 @@ package org.blockchain_innovation.factom.client.api.model.response.factomd;
 import java.io.Serializable;
 
 public class CommitEntryResponse implements Serializable {
+
+    public CommitEntryResponse() {
+    }
+
+    public CommitEntryResponse(final String message, final String txid, final String entryhash) {
+        this.message = message;
+        this.txid = txid;
+        this.entryhash = entryhash;
+    }
+
     private String message;
     private String txid;
     private String entryhash;

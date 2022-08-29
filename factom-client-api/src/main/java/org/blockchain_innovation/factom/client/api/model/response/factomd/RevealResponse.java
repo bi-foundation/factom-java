@@ -24,6 +24,15 @@ public class RevealResponse implements Serializable {
     private String entryhash;
     private String chainid;
 
+    public RevealResponse() {
+    }
+
+    public RevealResponse(final String message, final String entryHash, final String chainId) {
+        this.message = message;
+        this.entryhash = entryHash;
+        this.chainid = chainId;
+    }
+
     public String getMessage() {
         return message;
     }

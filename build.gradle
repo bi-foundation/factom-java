@@ -281,7 +281,7 @@ project(':factom-client-impl-accumulate') {
     apply plugin: "java"
     dependencies {
         compile project(':factom-client-api')
-        compile 'io.accumulatenetwork:accumulate-java-sdk:1.0-SNAPSHOT'
+        compile 'io.accumulatenetwork:accumulate-java-sdk:1.0-m1-SNAPSHOT'
 
         // Provided by JEE Environment
         compileOnly "javax.enterprise:cdi-api:$libVersions.jee.cdiApi"

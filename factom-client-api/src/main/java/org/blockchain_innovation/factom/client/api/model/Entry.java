@@ -26,7 +26,7 @@ import java.util.List;
 public class Entry implements Serializable {
 
     private String chainid;
-    private List<String> extids;
+    private List<String> extids = new ArrayList<>();
     private String content;
 
     /**
