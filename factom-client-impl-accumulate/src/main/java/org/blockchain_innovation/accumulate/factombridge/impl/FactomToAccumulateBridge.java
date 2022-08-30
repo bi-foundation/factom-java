@@ -1,14 +1,13 @@
 package org.blockchain_innovation.accumulate.factombridge.impl;
 
+import com.iwebpp.crypto.TweetNaclFast;
 import io.accumulatenetwork.sdk.api.v2.AccumulateAsyncApi;
 import io.accumulatenetwork.sdk.api.v2.TransactionQueryResult;
 import io.accumulatenetwork.sdk.commons.codec.DecoderException;
 import io.accumulatenetwork.sdk.commons.codec.binary.Hex;
 import io.accumulatenetwork.sdk.generated.protocol.SignatureType;
 import io.accumulatenetwork.sdk.protocol.FactomEntry;
-import io.accumulatenetwork.sdk.protocol.Principal;
 import io.accumulatenetwork.sdk.protocol.SignatureKeyPair;
-import io.accumulatenetwork.sdk.protocol.Url;
 import org.blockchain_innovation.accumulate.factombridge.model.LiteAccount;
 import org.blockchain_innovation.factom.client.api.FactomResponse;
 import org.blockchain_innovation.factom.client.api.log.LogFactory;
@@ -87,14 +86,10 @@ public class FactomToAccumulateBridge {
                 final byte[] entryHash = new byte[32];
                 inputStream.read(entryHash);
 
-                final int adiLength = inputStream.readInt();
-                final byte[] adiBytes = new byte[adiLength];
-                inputStream.read(adiBytes);
-                final String adiString = new String(adiBytes, StandardCharsets.UTF_8);
-                final Url adiUrl = Url.parse(adiString);
-
                 final byte[] privateKey = new byte[64];
                 inputStream.read(privateKey);
+                final TweetNaclFast.Signature.KeyPair keyPair = TweetNaclFast.Signature.keyPair_fromSecretKey(privateKey);
+                final LiteAccount liteAccount = new LiteAccount(new SignatureKeyPair(keyPair, SignatureType.ED25519)); // FIXME
 
                 final CommitChainResponse commitChainResponse = new CommitChainResponse(
                         MESSAGE_CHAIN_COMMIT_SUCCESS,
@@ -104,8 +99,6 @@ public class FactomToAccumulateBridge {
 
                 final Key entryHashKey = new Key(entryHash);
                 commitChainCache.put(entryHashKey, commitChainResponse);
-
-                final LiteAccount liteAccount = new LiteAccount(adiUrl, new SignatureKeyPair(null, SignatureType.ED25519)); // FIXME
                 liteAccountCache.put(entryHashKey, liteAccount);
                 final RpcResult rpcResult = (RpcResult) commitChainResponse;
                 return new FactomResponseImpl<>(new RpcResponse<>(rpcResult), 200, MESSAGE_CHAIN_COMMIT_SUCCESS);
@@ -126,7 +119,9 @@ public class FactomToAccumulateBridge {
         firstEntry.getExternalIds().forEach(extId -> {
             factomEntry.addExtRef(extId);
         });
-        final CompletableFuture<FactomResponse<RpcResult>> futureResponse = accumulateApi.createLiteDataAccount(new Principal(liteAccount.getAccount(), liteAccount.getSignatureKeyPair()), factomEntry)
+
+
+        final CompletableFuture<FactomResponse<RpcResult>> futureResponse = accumulateApi.createLiteDataAccount(liteAccount, factomEntry)
                 .thenApply(writeDataResult -> {
                     final RevealResponse revealChainResponse = new RevealResponse(MESSAGE_ENTRY_REVEAL_SUCCESS,
                             commitChainResponse.getEntryHash(), firstEntry.getChainId());

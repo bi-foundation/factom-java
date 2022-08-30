@@ -87,14 +87,14 @@ public class OfflineChainEntryIT extends AbstractClientTest {
         Assert.assertEquals("Entry Reveal Success", revealChain.getMessage());
     }
 
-    @Test
+  //  @Test
     public void _03_verifyCommitChain() throws FactomException.ClientException, InterruptedException {
         boolean confirmed = waitOnConfirmation(EntryTransactionResponse.Status.TransactionACK, 15);
         Assert.assertTrue(confirmed);
         Thread.sleep(1000);
     }
 
-    @Test
+   // @Test
     public void _04_composeEntry() throws FactomException.ClientException {
         Entry entry = entry(chainId);
         FactomResponse<ComposeResponse> composeResponse = offlineWalletdClient.composeEntry(entry, liteAccount).join();
@@ -116,7 +116,7 @@ public class OfflineChainEntryIT extends AbstractClientTest {
 
     }
 
-    @Test
+//    @Test
     public void _05_commitEntry() throws FactomException.ClientException {
         String commitEntryMessage = composeEntry.getCommit().getParams().getMessage();
         String revealCommitMessage = composeEntry.getReveal().getParams().getEntry();
@@ -140,7 +140,7 @@ public class OfflineChainEntryIT extends AbstractClientTest {
         Assert.assertNotNull(entryHash);
     }
 
-    @Test
+   // @Test
     public void _06_verifyCommitEntry() throws FactomException.ClientException, InterruptedException {
         boolean confirmed = waitOnConfirmation(EntryTransactionResponse.Status.TransactionACK, 20);
         Assert.assertTrue(confirmed);
