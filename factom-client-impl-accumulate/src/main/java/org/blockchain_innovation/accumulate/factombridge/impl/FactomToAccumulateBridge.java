@@ -5,9 +5,11 @@ import io.accumulatenetwork.sdk.api.v2.AccumulateAsyncApi;
 import io.accumulatenetwork.sdk.api.v2.TransactionQueryResult;
 import io.accumulatenetwork.sdk.commons.codec.DecoderException;
 import io.accumulatenetwork.sdk.commons.codec.binary.Hex;
+import io.accumulatenetwork.sdk.generated.apiv2.TxnQuery;
 import io.accumulatenetwork.sdk.generated.protocol.SignatureType;
 import io.accumulatenetwork.sdk.protocol.FactomEntry;
 import io.accumulatenetwork.sdk.protocol.SignatureKeyPair;
+import io.accumulatenetwork.sdk.protocol.TxID;
 import org.blockchain_innovation.accumulate.factombridge.model.LiteAccount;
 import org.blockchain_innovation.factom.client.api.FactomResponse;
 import org.blockchain_innovation.factom.client.api.log.LogFactory;
@@ -15,6 +17,7 @@ import org.blockchain_innovation.factom.client.api.log.Logger;
 import org.blockchain_innovation.factom.client.api.model.Entry;
 import org.blockchain_innovation.factom.client.api.model.Key;
 import org.blockchain_innovation.factom.client.api.model.response.factomd.CommitChainResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.FactoidTransactionsResponse;
 import org.blockchain_innovation.factom.client.api.model.response.factomd.RevealResponse;
 import org.blockchain_innovation.factom.client.api.ops.EntryOperations;
 import org.blockchain_innovation.factom.client.api.rpc.RpcResponse;
@@ -25,6 +28,7 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -36,8 +40,9 @@ public class FactomToAccumulateBridge {
     private static final Logger logger = LogFactory.getLogger(FactomToAccumulateBridge.class);
 
     private final EntryOperations entryOperations = new EntryOperations();
-    private final Map<Key, CommitChainResponse> commitChainCache = new HashMap<>(); // FIXME
-    private final Map<Key, LiteAccount> liteAccountCache = new HashMap<>(); // FIXME
+    private static final Map<Key, CommitChainResponse> commitChainCache = new HashMap<>(); // FIXME
+    private static final Map<Key, LiteAccount> liteAccountCache = new HashMap<>(); // FIXME
+    private static final Map<Key, TxID> txIdCache = new HashMap<>(); // FIXME
 
     private AccumulateAsyncApi accumulateApi;
 
@@ -123,6 +128,7 @@ public class FactomToAccumulateBridge {
 
         final CompletableFuture<FactomResponse<RpcResult>> futureResponse = accumulateApi.createLiteDataAccount(liteAccount, factomEntry)
                 .thenApply(writeDataResult -> {
+                    txIdCache.put(entryHashKey, writeDataResult.getTxID());
                     final RevealResponse revealChainResponse = new RevealResponse(MESSAGE_ENTRY_REVEAL_SUCCESS,
                             commitChainResponse.getEntryHash(), firstEntry.getChainId());
                     final RpcResult rpcResult = (RpcResult) revealChainResponse;
@@ -135,6 +141,36 @@ public class FactomToAccumulateBridge {
             });
         }
         return futureResponse;
+    }
+
+    public <RpcResult> CompletableFuture<FactomResponse<RpcResult>> ackTransaction(final String chainId, final String hash, final boolean logErrors) {
+        // We need to forge a FactoidTransactionsResponse out of this
+        try {
+            final Key entryHashKey = new Key(Hex.decodeHex(hash));
+            final TxID txId = txIdCache.get(entryHashKey);
+            if(txId == null) {
+                throw new RuntimeException("Could not lookup the TxID for entry hash " + hash);
+            }
+            final CompletableFuture<FactomResponse<RpcResult>> futureResponse = accumulateApi.getTx(new TxnQuery()
+                            .txIdUrl(txId)
+                            .wait(Duration.ofSeconds(2))) // Configurable?
+                    .thenApply(transactionQueryResult -> {
+                        final FactoidTransactionsResponse factoidTransactionsResponse = new FactoidTransactionsResponse();
+                        factoidTransactionsResponse....
+                        final RpcResult rpcResult = (RpcResult) factoidTransactionsResponse;
+                        return new FactomResponseImpl<>(new RpcResponse<>(rpcResult), 200, MESSAGE_ENTRY_REVEAL_SUCCESS);
+
+                    });
+            if (logErrors) {
+                futureResponse.exceptionally(throwable -> {
+                    logger.error(String.format("ackTransaction failed for chain ID %s and entry hash %s", chainId, hash), throwable);
+                    return null;
+                });
+            }
+            return futureResponse;
+        } catch (DecoderException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private <RpcResult> FactomResponse<RpcResult> toFactomResponse(TransactionQueryResult txQueryResult) {

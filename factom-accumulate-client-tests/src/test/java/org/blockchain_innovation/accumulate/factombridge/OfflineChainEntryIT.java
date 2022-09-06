@@ -87,7 +87,7 @@ public class OfflineChainEntryIT extends AbstractClientTest {
         Assert.assertEquals("Entry Reveal Success", revealChain.getMessage());
     }
 
-  //  @Test
+    @Test
     public void _03_verifyCommitChain() throws FactomException.ClientException, InterruptedException {
         boolean confirmed = waitOnConfirmation(EntryTransactionResponse.Status.TransactionACK, 15);
         Assert.assertTrue(confirmed);

@@ -111,7 +111,9 @@ public abstract class AbstractClient implements LowLevelClient {
             case HEIGHTS:
                 throw new NotImplementedException(); // TODO
             case ACK_TRANSACTION:
-                throw new NotImplementedException(); // TODO
+                final String chainId = (String) rpcRequest.getParams().get("chainid");
+                final String hash = (String) rpcRequest.getParams().get("hash");
+                return bridge.ackTransaction(chainId, hash, logErrors);
             case CHAIN_HEAD:
                 throw new NotImplementedException(); // TODO
             case COMMIT_CHAIN:
