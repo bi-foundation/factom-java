@@ -20,6 +20,16 @@ import java.io.Serializable;
 
 public class EntryTransactionResponse implements Serializable {
 
+    public EntryTransactionResponse() {
+    }
+
+    public EntryTransactionResponse(final String committxid, final String entryhash, final CommitData commitdata, final EntryData entrydata) {
+        this.committxid = committxid;
+        this.entryhash = entryhash;
+        this.commitdata = commitdata;
+        this.entrydata = entrydata;
+    }
+
     private String committxid;
     private String entryhash;
     private CommitData commitdata;
@@ -50,6 +60,13 @@ public class EntryTransactionResponse implements Serializable {
 
     public static class CommitData implements Serializable {
 
+        public CommitData() {
+        }
+
+        public CommitData(final Status status) {
+            this.status = status;
+        }
+
         private Status status;
 
         public Status getStatus() {
@@ -58,6 +75,13 @@ public class EntryTransactionResponse implements Serializable {
     }
 
     public static class EntryData implements Serializable {
+        public EntryData() {
+        }
+
+        public EntryData(final String status) {
+            this.status = status;
+        }
+
         private String status;
 
         public String getStatus() {

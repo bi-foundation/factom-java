@@ -20,6 +20,18 @@ import java.io.Serializable;
 
 public class FactoidTransactionsResponse implements Serializable {
 
+    public FactoidTransactionsResponse() {
+    }
+
+    public FactoidTransactionsResponse(final String txid, final long transactiondate, final String transactiondatestring, final long blockdate, final String blockdatestring, final Status status) {
+        this.txid = txid;
+        this.transactiondate = transactiondate;
+        this.transactiondatestring = transactiondatestring;
+        this.blockdate = blockdate;
+        this.blockdatestring = blockdatestring;
+        this.status = status;
+    }
+
     private String txid;
     private long transactiondate;
     private String transactiondatestring;

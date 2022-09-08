@@ -32,7 +32,7 @@ public class OfflineFactomResponseImpl<Result> implements FactomResponse<Result>
 
     @Override
     public int getHTTPResponseCode() {
-        return 0;
+        return 200; // assertValidResponse does not like 0
     }
 
     @Override

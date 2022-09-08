@@ -94,7 +94,7 @@ public class OfflineChainEntryIT extends AbstractClientTest {
         Thread.sleep(1000);
     }
 
-   // @Test
+    @Test
     public void _04_composeEntry() throws FactomException.ClientException {
         Entry entry = entry(chainId);
         FactomResponse<ComposeResponse> composeResponse = offlineWalletdClient.composeEntry(entry, liteAccount).join();
@@ -116,7 +116,7 @@ public class OfflineChainEntryIT extends AbstractClientTest {
 
     }
 
-//    @Test
+     @Test
     public void _05_commitEntry() throws FactomException.ClientException {
         String commitEntryMessage = composeEntry.getCommit().getParams().getMessage();
         String revealCommitMessage = composeEntry.getReveal().getParams().getEntry();
@@ -140,7 +140,7 @@ public class OfflineChainEntryIT extends AbstractClientTest {
         Assert.assertNotNull(entryHash);
     }
 
-   // @Test
+    // @Test
     public void _06_verifyCommitEntry() throws FactomException.ClientException, InterruptedException {
         boolean confirmed = waitOnConfirmation(EntryTransactionResponse.Status.TransactionACK, 20);
         Assert.assertTrue(confirmed);
@@ -154,11 +154,13 @@ public class OfflineChainEntryIT extends AbstractClientTest {
             assertValidResponse(transactionsResponse);
 
             EntryTransactionResponse entryTransaction = transactionsResponse.getResult();
-            System.out.println("---");
             EntryTransactionResponse.Status status = entryTransaction.getCommitData().getStatus();
-            if (seconds > 12 && seconds % 6 == 0 && EntryTransactionResponse.Status.TransactionACK != status) {
+            if (seconds > 12 && seconds % 6 == 0
+                    && (EntryTransactionResponse.Status.TransactionACK != status && EntryTransactionResponse.Status.DBlockConfirmed != status)) {
+                System.out.println("---");
                 System.err.println("Transaction still not in desired status after: " + seconds + "State: " + status + ". Probably will not succeed!");
-            } else if (desiredStatus == status) {
+            } else if (desiredStatus == status
+                    || (desiredStatus == EntryTransactionResponse.Status.TransactionACK && status == EntryTransactionResponse.Status.DBlockConfirmed)) {
                 return true;
             }
             seconds++;

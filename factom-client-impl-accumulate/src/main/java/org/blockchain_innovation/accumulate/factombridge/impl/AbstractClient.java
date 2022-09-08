@@ -119,7 +119,7 @@ public abstract class AbstractClient implements LowLevelClient {
             case COMMIT_CHAIN:
                 return bridge.commitChain((String) rpcRequest.getParams().get("message"));
             case COMMIT_ENTRY:
-                throw new NotImplementedException(); // TODO
+                return bridge.commitEntry((String) rpcRequest.getParams().get("message"));
             case CURRENT_MINUTE:
                 throw new NotImplementedException(); // TODO
             case ENTRY:
@@ -143,10 +143,11 @@ public abstract class AbstractClient implements LowLevelClient {
             case RECEIPT:
                 throw new NotImplementedException(); // TODO
             case REVEAL_CHAIN:
-                final String entry = (String) rpcRequest.getParams().get("entry");
-                return bridge.revealChain(entry, logErrors);
+                final String chainEntry = (String) rpcRequest.getParams().get("entry");
+                return bridge.revealChain(chainEntry, logErrors);
             case REVEAL_ENTRY:
-                throw new NotImplementedException(); // TODO
+                final String entry = (String) rpcRequest.getParams().get("entry");
+                return bridge.revealEntry(entry, logErrors);
             case SEND_RAW_MESSAGE:
                 throw new NotImplementedException(); // TODO
             case TRANSACTION:

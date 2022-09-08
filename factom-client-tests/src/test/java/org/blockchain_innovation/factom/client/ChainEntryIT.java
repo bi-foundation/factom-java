@@ -93,7 +93,7 @@ public class ChainEntryIT extends AbstractClientTest {
 
     @Test
     public void _03_verifyCommitChain() throws FactomException.ClientException, InterruptedException {
-        boolean confirmed = waitOnConfirmation(EntryTransactionResponse.Status.TransactionACK, 15);
+        boolean confirmed = waitOnConfirmation(EntryTransactionResponse.Status.TransactionACK, 15); // TODO what if the transaction commits shortly before block end, can it return DBlockConfirmed instead?
         Assert.assertTrue(confirmed);
         Thread.sleep(1000);
     }

@@ -60,7 +60,7 @@ public class OfflineWalletdClientImpl extends WalletdClientImpl {
 
     @Override
     public CompletableFuture<FactomResponse<ComposeResponse>> composeEntry(Entry entry, Address address) throws FactomException.ClientException {
-        AddressType.ENTRY_CREDIT_SECRET.assertValid(address);
+        AddressType.assertValidAddress(address, AddressType.ENTRY_CREDIT_SECRET, AddressType.LITE_ACCOUNT);
         return composeEntry(entry, new AddressSignatureProvider(address));
     }
 
@@ -149,7 +149,11 @@ public class OfflineWalletdClientImpl extends WalletdClientImpl {
 
             // 1 byte number of entry credits to pay
             byte cost = entryCost(entry.getExternalIds(), entry.getContent(), entry.getChainId());
-            return signedCommitMessage(signatureProvider, outputStream, cost);
+            if (signatureProvider.getAddressType() == AddressType.LITE_ACCOUNT) {
+                return encodeLiteAccount(signatureProvider, outputStream);
+            } else {
+                return signedCommitMessage(signatureProvider, outputStream, cost);
+            }
         } catch (IOException e) {
             throw new FactomException.ClientException("failed to compose entry commit message", e);
         }
