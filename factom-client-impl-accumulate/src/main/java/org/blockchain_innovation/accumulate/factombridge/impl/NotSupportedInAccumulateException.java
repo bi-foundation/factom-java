@@ -6,4 +6,8 @@ public class NotSupportedInAccumulateException extends RuntimeException {
     public NotSupportedInAccumulateException(RpcMethod method) {
         super(String.format("Method \"%s\" is not supported in Accumulate", method.name()));
     }
+
+    public NotSupportedInAccumulateException(final String message) {
+        super(message);
+    }
 }

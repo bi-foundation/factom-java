@@ -26,7 +26,12 @@ import org.blockchain_innovation.factom.client.api.rpc.RpcRequest;
 import org.blockchain_innovation.factom.client.api.settings.RpcSettings;
 
 import java.net.URL;
-import java.util.concurrent.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings("PMD.DoNotUseThreads")
 public abstract class AbstractClient implements LowLevelClient {
@@ -111,19 +116,22 @@ public abstract class AbstractClient implements LowLevelClient {
             case HEIGHTS:
                 throw new NotImplementedException(); // TODO
             case ACK_TRANSACTION:
-                final String chainId = (String) rpcRequest.getParams().get("chainid");
+                final String ackChainId = (String) rpcRequest.getParams().get("chainid");
                 final String hash = (String) rpcRequest.getParams().get("hash");
-                return bridge.ackTransaction(chainId, hash, logErrors);
+                return bridge.ackTransaction(ackChainId, hash, logErrors);
             case CHAIN_HEAD:
-                throw new NotImplementedException(); // TODO
+                final String chChainId = (String) rpcRequest.getParams().get("chainid");
+                return bridge.chainHead(chChainId, logErrors);
             case COMMIT_CHAIN:
                 return bridge.commitChain((String) rpcRequest.getParams().get("message"));
             case COMMIT_ENTRY:
                 return bridge.commitEntry((String) rpcRequest.getParams().get("message"));
+            case ENTRY_BLOCK_BY_KEYMR:
+                return bridge.queryEntriesByChainId((String) rpcRequest.getParams().get("keymr"),logErrors);
             case CURRENT_MINUTE:
                 throw new NotImplementedException(); // TODO
             case ENTRY:
-                throw new NotImplementedException(); // TODO
+                return bridge.getEntry((String) rpcRequest.getParams().get("hash"),logErrors);
             case ENTRY_CREDIT_BALANCE:
                 throw new NotImplementedException(); // TODO
             case ENTRY_CREDIT_RATE:

@@ -129,7 +129,7 @@ public class OfflineChainEntryIT extends AbstractClientTest {
         Assert.assertNotNull(commitEntry.getTxId());
         Assert.assertNotNull(commitEntry.getEntryHash());
 
-        FactomResponse<RevealResponse> revealResponse = factomdClient.revealChain(revealCommitMessage).join();
+        FactomResponse<RevealResponse> revealResponse = factomdClient.revealEntry(revealCommitMessage).join();
         assertValidResponse(revealResponse);
 
         RevealResponse revealEntry = revealResponse.getResult();
@@ -140,7 +140,7 @@ public class OfflineChainEntryIT extends AbstractClientTest {
         Assert.assertNotNull(entryHash);
     }
 
-    // @Test
+    @Test
     public void _06_verifyCommitEntry() throws FactomException.ClientException, InterruptedException {
         boolean confirmed = waitOnConfirmation(EntryTransactionResponse.Status.TransactionACK, 20);
         Assert.assertTrue(confirmed);

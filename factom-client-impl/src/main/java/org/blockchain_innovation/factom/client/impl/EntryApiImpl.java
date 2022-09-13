@@ -182,7 +182,12 @@ public class EntryApiImpl extends AbstractClient implements EntryApi {
                 .thenApplyAsync(entryResponses ->
                                 entryResponses.stream().map(
                                         entryResponse -> encoding == Encoding.UTF_8 ? encodeOperations.decodeHex(entryResponse) : entryResponse).collect(Collectors.toList())
-                        , getExecutorService());
+                        , getExecutorService())
+                .exceptionally(throwable -> {
+                        throwable.printStackTrace();
+                            return null;
+                        }
+                );
     }
 
     @Override

@@ -1,6 +1,11 @@
 package org.blockchain_innovation.accumulate.factombridge.impl;
 
-import org.blockchain_innovation.factom.client.api.*;
+import org.blockchain_innovation.factom.client.api.EntryApi;
+import org.blockchain_innovation.factom.client.api.FactomResponse;
+import org.blockchain_innovation.factom.client.api.FactomdClient;
+import org.blockchain_innovation.factom.client.api.LowLevelClient;
+import org.blockchain_innovation.factom.client.api.SignatureProvider;
+import org.blockchain_innovation.factom.client.api.WalletdClient;
 import org.blockchain_innovation.factom.client.api.errors.FactomException;
 import org.blockchain_innovation.factom.client.api.errors.FactomRuntimeException;
 import org.blockchain_innovation.factom.client.api.listeners.CommitAndRevealListener;
@@ -11,7 +16,12 @@ import org.blockchain_innovation.factom.client.api.model.Chain;
 import org.blockchain_innovation.factom.client.api.model.Entry;
 import org.blockchain_innovation.factom.client.api.model.response.CommitAndRevealChainResponse;
 import org.blockchain_innovation.factom.client.api.model.response.CommitAndRevealEntryResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.*;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.CommitChainResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.CommitEntryResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.EntryBlockResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.EntryResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.EntryTransactionResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.RevealResponse;
 import org.blockchain_innovation.factom.client.api.model.response.walletd.ComposeResponse;
 import org.blockchain_innovation.factom.client.api.ops.Encoding;
 import org.blockchain_innovation.factom.client.api.ops.EntryOperations;
@@ -146,11 +156,7 @@ public class EntryApiImpl extends AbstractClient implements EntryApi {
      */
     @Override
     public CompletableFuture<List<EntryBlockResponse.Entry>> allEntryBlocksEntries(String chainId) {
-        return getFactomdClient().chainHead(chainId)
-                .thenComposeAsync(chainHeadResponse -> {
-                    errorHandling(chainHeadResponse, "Could not get entry blocks for chain Id " + chainId);
-                    return entryBlocksEntriesUpTilKeyMR(chainHeadResponse.getResult().getChainHead());
-                }, getExecutorService());
+        throw new NotSupportedInAccumulateException("allEntryBlocksEntries");
     }
 
 
@@ -164,34 +170,22 @@ public class EntryApiImpl extends AbstractClient implements EntryApi {
         if (encoding != Encoding.HEX && encoding != Encoding.UTF_8) {
             throw new FactomRuntimeException("Encoding needs to be UTF-8 or HEX. Value: " + encoding.name());
         }
-        return getFactomdClient().chainHead(chainId)
-                .thenComposeAsync(chainHeadResponse -> {
-                    errorHandling(chainHeadResponse, "Could not get chain head for chain Id " + chainId);
-                    return entriesUpTilKeyMR(chainHeadResponse.getResult().getChainHead());
-                }, getExecutorService())
-                .thenApplyAsync(entryResponses ->
-                                entryResponses.stream().map(
-                                        entryResponse -> encoding == Encoding.UTF_8 ? encodeOperations.decodeHex(entryResponse) : entryResponse).collect(Collectors.toList())
-                        , getExecutorService());
+        return entriesUpTilKeyMR(chainId);
     }
 
     @Override
     public CompletableFuture<List<EntryResponse>> entriesUpTilKeyMR(String keyMR) {
         return entryBlocksEntriesUpTilKeyMR(keyMR)
-                .thenComposeAsync(entryBlockResponses -> {
-                    List<CompletableFuture<FactomResponse<EntryResponse>>> entryResponses =
-                            entryBlockResponses.stream()
-                                    .map(entry -> factomdClient.entry(entry.getEntryHash())).collect(Collectors.toList());
-                    return CompletableFuture.allOf(entryResponses.toArray(new CompletableFuture[entryResponses.size()]))
-                            .thenApply(aVoid -> entryResponses.stream()
-                                    .map(CompletableFuture::join)
-                                    .map(entryResponse -> {
-                                        errorHandling(entryResponse, "Could not get entry block for keyMr " + keyMR);
-                                        return entryResponse.getResult();
-                                    })
-                                    .collect(Collectors.toList())
-                            );
-                }, getExecutorService());
+                .thenApply(entryBlockResponses -> {
+                    final List<EntryResponse> entryResponses = entryBlockResponses.stream()
+                            .map(entry -> entry.getEntryResponse())
+                            .collect(Collectors.toList());
+                    return entryResponses;
+                })
+                .exceptionally(throwable -> {
+                    throwable.printStackTrace();
+                    return null;
+                });
     }
 
 
@@ -224,12 +218,12 @@ public class EntryApiImpl extends AbstractClient implements EntryApi {
      */
     @Override
     public CompletableFuture<List<EntryBlockResponse.Entry>> entryBlocksEntriesUpTilKeyMR(String keyMR) {
-        List<EntryBlockResponse> entryBlocksUpTilKeyMR = entryBlocksUpTilKeyMR(keyMR).join();
-        List<EntryBlockResponse.Entry> entries = new ArrayList<>();
-        entryBlocksUpTilKeyMR.stream().map(EntryBlockResponse::getEntryList).forEach(entries::addAll);
-        CompletableFuture<List<EntryBlockResponse.Entry>> completableFuture = new CompletableFuture<>();
-        completableFuture.complete(entries);
-        return completableFuture;
+        return entryBlocksUpTilKeyMR(keyMR)
+                .thenApply(entryBlockResponses -> {
+                    List<EntryBlockResponse.Entry> entries = new ArrayList<>();
+                    entryBlockResponses.stream().map(EntryBlockResponse::getEntryList).forEach(entries::addAll);
+                    return entries;
+                });
     }
 
     /**

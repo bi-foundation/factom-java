@@ -12,11 +12,11 @@ import io.accumulatenetwork.sdk.generated.protocol.SignatureType;
 import io.accumulatenetwork.sdk.generated.protocol.TransactionType;
 import io.accumulatenetwork.sdk.protocol.TxID;
 import io.accumulatenetwork.sdk.support.Retry;
+import org.blockchain_innovation.accumulate.factombridge.impl.EntryApiImpl;
 import org.blockchain_innovation.accumulate.factombridge.impl.FactomdAccumulateClientImpl;
 import org.blockchain_innovation.accumulate.factombridge.model.LiteAccount;
 import org.blockchain_innovation.factom.client.api.FactomResponse;
 import org.blockchain_innovation.factom.client.api.settings.RpcSettings;
-import org.blockchain_innovation.factom.client.impl.EntryApiImpl;
 import org.blockchain_innovation.factom.client.impl.OfflineWalletdClientImpl;
 import org.blockchain_innovation.factom.client.impl.settings.RpcSettingsImpl;
 import org.junit.Assert;
@@ -44,7 +44,6 @@ public class AbstractClientTest {
 
     protected final FactomdAccumulateClientImpl factomdClient = new FactomdAccumulateClientImpl();
     protected final EntryApiImpl entryClient = new EntryApiImpl();
-    protected final EntryApiImpl offlineEntryClient = new EntryApiImpl();
     protected final OfflineWalletdClientImpl offlineWalletdClient = new OfflineWalletdClientImpl();
 
     private AccumulateSyncApi accumulate;
@@ -60,12 +59,11 @@ public class AbstractClientTest {
         final RpcSettingsImpl settings = new RpcSettingsImpl(RpcSettings.SubSystem.FACTOMD, getProperties());
         factomdClient.setSettings(settings);
         entryClient.setFactomdClient(factomdClient);
-
-        offlineEntryClient.setFactomdClient(factomdClient);
-        offlineEntryClient.setWalletdClient(offlineWalletdClient);
+        entryClient.setWalletdClient(offlineWalletdClient);
 
         accumulate = new AccumulateSyncApi(settings.getServer().getURL().toURI());
         if(!liteAccountFunded) {
+            faucet();
             faucet();
             waitForAnchor();
             addCreditsToLiteAccount();
@@ -81,8 +79,7 @@ public class AbstractClientTest {
     protected void addCreditsToLiteAccount() {
         final AddCredits addCredits = new AddCredits()
                 .recipient(liteAccount.getAccount().getUrl())
-                .oracle(500)
-                .amount(BigInteger.valueOf(22000000000L));
+                .amount(BigInteger.valueOf(2000000000L));
         final TransactionResult<AddCreditsResult> transactionResult = accumulate.addCredits(liteAccount, addCredits);
         final AddCreditsResult addCreditsResult = transactionResult.getResult();
         assertNotNull(addCreditsResult);

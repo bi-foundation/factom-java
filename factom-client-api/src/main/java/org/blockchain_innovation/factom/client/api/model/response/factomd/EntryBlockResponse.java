@@ -21,6 +21,14 @@ import java.util.List;
 
 public class EntryBlockResponse implements Serializable {
 
+    public EntryBlockResponse() {
+    }
+
+    public EntryBlockResponse(final Header header, final List<Entry> entrylist) {
+        this.header = header;
+        this.entrylist = entrylist;
+    }
+
     private Header header;
     private List<Entry> entrylist;
 
@@ -51,6 +59,10 @@ public class EntryBlockResponse implements Serializable {
             return chainid;
         }
 
+        public void setChainid(final String chainid) {
+            this.chainid = chainid;
+        }
+
         public String getPreviousKeyMR() {
             return prevkeymr;
         }
@@ -63,8 +75,18 @@ public class EntryBlockResponse implements Serializable {
     }
 
     public static class Entry implements Serializable {
+        public Entry() {
+        }
+
+        public Entry(final String entryhash, final EntryResponse entryResponse) {
+            this.entryhash = entryhash;
+            this.entryResponse = entryResponse;
+        }
+
         private String entryhash;
         private long timestamp;
+
+        private EntryResponse entryResponse;
 
         public String getEntryHash() {
             return entryhash;
@@ -72,6 +94,10 @@ public class EntryBlockResponse implements Serializable {
 
         public long getTimestamp() {
             return timestamp;
+        }
+
+        public EntryResponse getEntryResponse() {
+            return entryResponse;
         }
     }
 }
