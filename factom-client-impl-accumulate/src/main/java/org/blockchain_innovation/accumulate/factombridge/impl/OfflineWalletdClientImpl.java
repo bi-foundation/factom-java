@@ -1,4 +1,4 @@
-package org.blockchain_innovation.factom.client.impl;
+package org.blockchain_innovation.accumulate.factombridge.impl;
 
 import org.blockchain_innovation.factom.client.api.AddressKeyConversions;
 import org.blockchain_innovation.factom.client.api.FactomResponse;

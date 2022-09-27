@@ -294,7 +294,7 @@ project(':factom-client-offline-signing') {
 /*
         compileOnly "javax.enterprise:cdi-api:$libVersions.jee.cdiApi"
 */
-        compile project(':factom-client-impl')
+        compileOnly project(':factom-client-impl')
     }
 }
 project(':iot-sas') {

@@ -73,7 +73,7 @@ public class OfflineChainEntryIT extends ChainEntryIT {
         Assert.assertNotNull(composeEntry.getReveal().getId());
         Assert.assertNotNull(composeEntry.getReveal().getParams());
 
-        String revealCommitMessage = composeEntry.getReveal().getParams().getEntry();
+        String revealCommitMessage  = composeEntry.getReveal().getParams().getEntry();
         Assert.assertNotNull(revealCommitMessage);
     }
 }

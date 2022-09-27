@@ -14,11 +14,11 @@ import io.accumulatenetwork.sdk.protocol.TxID;
 import io.accumulatenetwork.sdk.support.Retry;
 import org.blockchain_innovation.accumulate.factombridge.impl.EntryApiImpl;
 import org.blockchain_innovation.accumulate.factombridge.impl.FactomdAccumulateClientImpl;
+import org.blockchain_innovation.accumulate.factombridge.impl.settings.RpcSettingsImpl;
 import org.blockchain_innovation.accumulate.factombridge.model.LiteAccount;
 import org.blockchain_innovation.factom.client.api.FactomResponse;
 import org.blockchain_innovation.factom.client.api.settings.RpcSettings;
 import org.blockchain_innovation.factom.client.impl.OfflineWalletdClientImpl;
-import org.blockchain_innovation.factom.client.impl.settings.RpcSettingsImpl;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -29,8 +29,8 @@ import java.math.BigInteger;
 import java.net.URISyntaxException;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
+import java.util.Optional;
 import java.util.Properties;
-import java.util.Random;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.Assert.*;
@@ -39,8 +39,6 @@ public class AbstractClientTest {
 
     static LiteAccount liteAccount;
     static boolean liteAccountFunded;
-
-    protected String rootADI = "acc://factom-java-test-principal-" + new Random().nextInt() + ".acme"; // TODO make Url
 
     protected final FactomdAccumulateClientImpl factomdClient = new FactomdAccumulateClientImpl();
     protected final EntryApiImpl entryClient = new EntryApiImpl();
@@ -56,7 +54,7 @@ public class AbstractClientTest {
     @Before
     public void setup() throws IOException, URISyntaxException {
 
-        final RpcSettingsImpl settings = new RpcSettingsImpl(RpcSettings.SubSystem.FACTOMD, getProperties());
+        final RpcSettingsImpl settings = new RpcSettingsImpl(RpcSettings.SubSystem.FACTOMD, getProperties(), Optional.of("testnet"));
         factomdClient.setSettings(settings);
         entryClient.setFactomdClient(factomdClient);
         entryClient.setWalletdClient(offlineWalletdClient);

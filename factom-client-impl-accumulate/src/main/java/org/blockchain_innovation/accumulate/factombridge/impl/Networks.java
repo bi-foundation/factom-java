@@ -9,6 +9,7 @@ import org.blockchain_innovation.factom.client.api.errors.FactomException;
 import org.blockchain_innovation.factom.client.api.errors.FactomRuntimeException;
 import org.blockchain_innovation.factom.client.api.log.LogFactory;
 import org.blockchain_innovation.factom.client.api.log.Logger;
+import org.blockchain_innovation.factom.client.api.model.Address;
 import org.blockchain_innovation.factom.client.api.model.ECAddress;
 import org.blockchain_innovation.factom.client.api.settings.RpcSettings;
 
@@ -101,7 +102,7 @@ public class Networks {
         return Optional.empty();
     }
 
-    public static ECAddress getECAddress(Optional<String> networkName, Optional<ECAddress> optionalECAddressToUse) {
+    public static Address getAddress(Optional<String> networkName, Optional<Address> optionalECAddressToUse) {
         return optionalECAddressToUse.orElseGet(() ->
                 getDefaultECAddress(networkName).orElseThrow(
                         () -> new FactomRuntimeException.AssertionException("Need to either configure an EC address or supply an EC address")));
@@ -129,7 +130,7 @@ public class Networks {
         String key = networkKey(networkName);
 
         if (!walletdClients.containsKey(key)) {
-            WalletdClientImpl walletdClient = createWalletdClient(networkName, explicitSigningMode, key);
+            OfflineWalletdClientImpl walletdClient = createWalletdClient(networkName, explicitSigningMode, key);
             register(walletdClient);
         }
 
@@ -150,22 +151,17 @@ public class Networks {
         return factomdClient;
     }
 
-    private static WalletdClientImpl createWalletdClient(Optional<String> networkName, Optional<SigningMode> explicitSigningMode, String key) {
+    private static OfflineWalletdClientImpl createWalletdClient(Optional<String> networkName, Optional<SigningMode> explicitSigningMode, String key) {
         logger.info(String.format("Network: %s, walletd client not registered yet, starting registration.", key));
         RpcSettings rpcSettings = new RpcSettingsImpl(RpcSettings.SubSystem.WALLETD, properties, networkName);
         SigningMode signingMode = explicitSigningMode.orElse(rpcSettings.getSigningMode());
-        WalletdClientImpl walletdClient;
         if (signingMode != SigningMode.OFFLINE) {
-            walletdClient = new WalletdClientImpl();
+            throw new IllegalArgumentException("Only SigingMode.OFFLINE is supported.");
         } else {
-            try {
-                walletdClient = (WalletdClientImpl) Class.forName("org.blockchain_innovation.factom.client.impl.OfflineWalletdClientImpl").newInstance();
-            } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
-                throw new FactomRuntimeException("Could not find offline walletd client on classpath. " + e.getMessage(), e);
-            }
+            final OfflineWalletdClientImpl walletdClient = new OfflineWalletdClientImpl();
+            walletdClient.setSettings(rpcSettings);
+            return walletdClient;
         }
-        walletdClient.setSettings(rpcSettings);
-        return walletdClient;
     }
 
     private static String networkKey(Optional<String> networkName) {

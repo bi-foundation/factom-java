@@ -15,20 +15,13 @@ import io.accumulatenetwork.sdk.generated.query.ResponseDataEntry;
 import io.accumulatenetwork.sdk.protocol.FactomEntry;
 import io.accumulatenetwork.sdk.protocol.SignatureKeyPair;
 import io.accumulatenetwork.sdk.protocol.TxID;
-import org.apache.commons.lang3.NotImplementedException;
 import org.blockchain_innovation.accumulate.factombridge.model.LiteAccount;
 import org.blockchain_innovation.factom.client.api.FactomResponse;
 import org.blockchain_innovation.factom.client.api.log.LogFactory;
 import org.blockchain_innovation.factom.client.api.log.Logger;
 import org.blockchain_innovation.factom.client.api.model.Entry;
 import org.blockchain_innovation.factom.client.api.model.Key;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.ChainHeadResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.CommitChainResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.CommitEntryResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.EntryBlockResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.EntryResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.EntryTransactionResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.RevealResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.*;
 import org.blockchain_innovation.factom.client.api.ops.EntryOperations;
 import org.blockchain_innovation.factom.client.api.rpc.RpcResponse;
 import org.blockchain_innovation.factom.client.api.settings.RpcSettings;
@@ -40,11 +33,7 @@ import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -273,69 +262,90 @@ public class FactomToAccumulateBridge {
     }
 
     public <RpcResult> CompletableFuture<FactomResponse<RpcResult>> chainHead(final String chainId, final boolean logErrors) {
-        final CompletableFuture<FactomResponse<RpcResult>> futureResponse = accumulateApi.queryData(new DataEntrySetQuery()
+        final CompletableFuture<FactomResponse<RpcResult>> futureCountResponse = accumulateApi.queryData(new DataEntrySetQuery()
                         .url(chainId)
                         .start(0)
                         .count(1))
-                .thenApply(response -> {
-                    if (response.getItems() != null && !response.getItems().isEmpty()) {
-                        ChainHeadResponse chainHeadResponse = null;
-                        final ResponseDataEntry firstEntry = response.getItems().get(0);
-                        if (firstEntry != null) {
-                            chainHeadResponse = new ChainHeadResponse(
-                                    Hex.encodeHexString(firstEntry.getEntryHash()), false);
-                        }
-                        final RpcResult rpcResult = (RpcResult) chainHeadResponse;
-                        return new FactomResponseImpl<>(new RpcResponse<>(rpcResult), 200, MESSAGE_ENTRY_REVEAL_SUCCESS);
+                .thenCompose(countResponse -> {
+                    if (countResponse.getTotal() > 0) {
+                        final CompletableFuture<FactomResponse<RpcResult>> futureResponse = accumulateApi.queryData(new DataEntrySetQuery()
+                                        .url(chainId)
+                                        .start(countResponse.getTotal() - 1)
+                                        .count(1))
+                                .thenApply(response -> {
+                                    if (response.getItems() != null && !response.getItems().isEmpty()) {
+                                        ChainHeadResponse chainHeadResponse = null;
+                                        final ResponseDataEntry firstEntry = response.getItems().get(0);
+                                        if (firstEntry != null) {
+                                            chainHeadResponse = new ChainHeadResponse(
+                                                    Hex.encodeHexString(firstEntry.getEntryHash()), false);
+                                        }
+                                        final RpcResult rpcResult = (RpcResult) chainHeadResponse;
+                                        return new FactomResponseImpl<>(new RpcResponse<>(rpcResult), 200, MESSAGE_ENTRY_REVEAL_SUCCESS);
+                                    }
+                                    return null;
+                                });
+                        return futureResponse;
                     }
                     return null;
                 });
         if (logErrors) {
-            futureResponse.exceptionally(throwable -> {
+            futureCountResponse.exceptionally(throwable -> {
                 logger.error(String.format("chainHead failed for chain ID %s", chainId), throwable);
                 return null;
             });
         }
-        return futureResponse;
+        return futureCountResponse;
     }
 
-    public <RpcResult> CompletableFuture<FactomResponse<RpcResult>> queryEntriesByChainId(final String chainId, final boolean logErrors) {
-        final CompletableFuture<FactomResponse<RpcResult>> futureResponse = accumulateApi.queryData(new DataEntrySetQuery()
+    public <RpcResult> CompletableFuture<FactomResponse<RpcResult>> queryEntriesByChainId(final String chainId, final boolean expand, final boolean logErrors) {
+        final List<EntryBlockResponse.Entry> entryList = new ArrayList<>();
+        final EntryBlockResponse.Header header = new EntryBlockResponse.Header();
+        header.setChainid(chainId);
+        final EntryBlockResponse entryBlockResponse = new EntryBlockResponse(header, entryList);
+        final RpcResult rpcResult = (RpcResult) entryBlockResponse;
+
+        final CompletableFuture<FactomResponse<RpcResult>> futureCountResponse = accumulateApi.queryData(new DataEntrySetQuery()
                         .url(chainId)
                         .start(0)
-                        .count(1000)
-                        .expand(true))
-                .thenApply(response -> {
-                    if (response.getItems() != null && !response.getItems().isEmpty()) {
-                        if (response.getTotal() > response.getCount()) {
-                            throw new NotImplementedException("The number of entries is higher than the maximum block count. Block fetching has yet to be implemented.");
-                        }
-                        final EntryBlockResponse.Header header = new EntryBlockResponse.Header();
-                        / TODO Add pagination by placing 0000000000000000000000000000000000000000000000000000000000000000
-                        header.setChainid(chainId);
-                        final List<EntryBlockResponse.Entry> entryList = new ArrayList<>();
-                        response.getItems().forEach(entry -> {
-                            EntryResponse entryResponse = null;
-                            final FactomDataEntry factomDataEntry = (FactomDataEntry) entry.getEntry();
-                            final List<String> extIds = Arrays.stream(factomDataEntry.getExtIds())
-                                    .map(extId -> Hex.encodeHexString(extId))
-                                    .collect(Collectors.toList());
-                            entryResponse = new EntryResponse(chainId, extIds, Hex.encodeHexString(factomDataEntry.getData()));
-                            entryList.add(new EntryBlockResponse.Entry(Hex.encodeHexString(entry.getEntryHash()), entryResponse));
-                        });
-                        final EntryBlockResponse entryBlockResponse = new EntryBlockResponse(header, entryList);
-                        final RpcResult rpcResult = (RpcResult) entryBlockResponse;
-                        return new FactomResponseImpl<>(new RpcResponse<>(rpcResult), 200, MESSAGE_ENTRY_REVEAL_SUCCESS);
+                        .count(1))
+                .thenCompose(countResponse -> {
+                    if (countResponse.getTotal() > 0) {
+                        final CompletableFuture<FactomResponse<RpcResult>> futureResponse = accumulateApi.queryData(new DataEntrySetQuery()
+                                        .url(chainId)
+                                        .start(0)
+                                        .count(countResponse.getTotal())
+                                        .expand(expand))
+                                .thenApply(response -> {
+                                    if (response.getItems() != null && !response.getItems().isEmpty()) {
+                                        Collections.reverse(response.getItems());
+                                        response.getItems().forEach(entry -> {
+                                            EntryResponse entryResponse = null;
+                                            final FactomDataEntry factomDataEntry = (FactomDataEntry) entry.getEntry();
+                                            if (expand) {
+                                                final List<String> extIds = Arrays.stream(factomDataEntry.getExtIds())
+                                                        .map(extId -> Hex.encodeHexString(extId))
+                                                        .collect(Collectors.toList());
+                                                entryResponse = new EntryResponse(chainId, extIds, Hex.encodeHexString(factomDataEntry.getData()));
+                                            } else {
+                                                entryResponse = new EntryResponse(chainId, null, null);
+                                            }
+                                            entryList.add(new EntryBlockResponse.Entry(Hex.encodeHexString(entry.getEntryHash()), entryResponse));
+                                        });
+                                    }
+                                    return new FactomResponseImpl<>(new RpcResponse<>(rpcResult), 200, MESSAGE_ENTRY_REVEAL_SUCCESS);
+                                });
+                        return futureResponse;
                     }
-                    return null;
+                    return CompletableFuture.completedFuture(new FactomResponseImpl<>(new RpcResponse<>(rpcResult), 200, MESSAGE_ENTRY_REVEAL_SUCCESS));
                 });
         if (logErrors) {
-            futureResponse.exceptionally(throwable -> {
-                logger.error(String.format("chainHead failed for chain ID %s", chainId), throwable);
+            futureCountResponse.exceptionally(throwable -> {
+                logger.error(String.format("queryEntriesByChainId failed for chain ID %s", chainId), throwable);
                 return null;
             });
         }
-        return futureResponse;
+        return futureCountResponse;
     }
 
     public <RpcResult> CompletableFuture<FactomResponse<RpcResult>> getEntry(final String queryUrl, final boolean logErrors) {

@@ -1,11 +1,6 @@
 package org.blockchain_innovation.accumulate.factombridge.impl;
 
-import org.blockchain_innovation.factom.client.api.EntryApi;
-import org.blockchain_innovation.factom.client.api.FactomResponse;
-import org.blockchain_innovation.factom.client.api.FactomdClient;
-import org.blockchain_innovation.factom.client.api.LowLevelClient;
-import org.blockchain_innovation.factom.client.api.SignatureProvider;
-import org.blockchain_innovation.factom.client.api.WalletdClient;
+import org.blockchain_innovation.factom.client.api.*;
 import org.blockchain_innovation.factom.client.api.errors.FactomException;
 import org.blockchain_innovation.factom.client.api.errors.FactomRuntimeException;
 import org.blockchain_innovation.factom.client.api.listeners.CommitAndRevealListener;
@@ -16,12 +11,7 @@ import org.blockchain_innovation.factom.client.api.model.Chain;
 import org.blockchain_innovation.factom.client.api.model.Entry;
 import org.blockchain_innovation.factom.client.api.model.response.CommitAndRevealChainResponse;
 import org.blockchain_innovation.factom.client.api.model.response.CommitAndRevealEntryResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.CommitChainResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.CommitEntryResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.EntryBlockResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.EntryResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.EntryTransactionResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.RevealResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.*;
 import org.blockchain_innovation.factom.client.api.model.response.walletd.ComposeResponse;
 import org.blockchain_innovation.factom.client.api.ops.Encoding;
 import org.blockchain_innovation.factom.client.api.ops.EntryOperations;
@@ -170,7 +160,7 @@ public class EntryApiImpl extends AbstractClient implements EntryApi {
         if (encoding != Encoding.HEX && encoding != Encoding.UTF_8) {
             throw new FactomRuntimeException("Encoding needs to be UTF-8 or HEX. Value: " + encoding.name());
         }
-        return entriesUpTilKeyMR(chainId);
+        return entriesUpTilKeyMR(chainId + "|expand"); // Tell the Accumulate bridge to already include the entry details
     }
 
     @Override

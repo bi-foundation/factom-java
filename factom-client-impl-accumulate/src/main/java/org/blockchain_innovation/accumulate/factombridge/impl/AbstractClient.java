@@ -26,12 +26,7 @@ import org.blockchain_innovation.factom.client.api.rpc.RpcRequest;
 import org.blockchain_innovation.factom.client.api.settings.RpcSettings;
 
 import java.net.URL;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.SynchronousQueue;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 @SuppressWarnings("PMD.DoNotUseThreads")
 public abstract class AbstractClient implements LowLevelClient {
@@ -127,11 +122,17 @@ public abstract class AbstractClient implements LowLevelClient {
             case COMMIT_ENTRY:
                 return bridge.commitEntry((String) rpcRequest.getParams().get("message"));
             case ENTRY_BLOCK_BY_KEYMR:
-                return bridge.queryEntriesByChainId((String) rpcRequest.getParams().get("keymr"),logErrors);
+                boolean expand = false;
+                String keymr = (String) rpcRequest.getParams().get("keymr");
+                if (keymr.endsWith("|expand")) {
+                    expand = true;
+                    keymr = keymr.substring(0, keymr.length() - 7);
+                }
+                return bridge.queryEntriesByChainId(keymr, expand, logErrors);
             case CURRENT_MINUTE:
                 throw new NotImplementedException(); // TODO
             case ENTRY:
-                return bridge.getEntry((String) rpcRequest.getParams().get("hash"),logErrors);
+                return bridge.getEntry((String) rpcRequest.getParams().get("hash"), logErrors);
             case ENTRY_CREDIT_BALANCE:
                 throw new NotImplementedException(); // TODO
             case ENTRY_CREDIT_RATE:
