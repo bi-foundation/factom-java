@@ -21,12 +21,19 @@ import org.blockchain_innovation.factom.client.api.FactomRequest;
 import org.blockchain_innovation.factom.client.api.FactomResponse;
 import org.blockchain_innovation.factom.client.api.LowLevelClient;
 import org.blockchain_innovation.factom.client.api.errors.FactomException;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.PendingEntriesResponse;
 import org.blockchain_innovation.factom.client.api.ops.EncodeOperations;
 import org.blockchain_innovation.factom.client.api.rpc.RpcRequest;
+import org.blockchain_innovation.factom.client.api.rpc.RpcResponse;
 import org.blockchain_innovation.factom.client.api.settings.RpcSettings;
 
 import java.net.URL;
-import java.util.concurrent.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings("PMD.DoNotUseThreads")
 public abstract class AbstractClient implements LowLevelClient {
@@ -142,7 +149,8 @@ public abstract class AbstractClient implements LowLevelClient {
             case FACTOID_SUBMIT:
                 throw new NotImplementedException(); // TODO
             case PENDING_ENTRIES:
-                throw new NotImplementedException(); // TODO return 0
+                final RpcResult rpcResult = (RpcResult) new PendingEntriesResponse();
+                return CompletableFuture.completedFuture(new FactomResponseImpl<>(new RpcResponse<>(rpcResult), 200, "success"));
             case PENDING_TRANSACTONS:
                 throw new NotImplementedException(); // TODO
             case PROPERTIES:

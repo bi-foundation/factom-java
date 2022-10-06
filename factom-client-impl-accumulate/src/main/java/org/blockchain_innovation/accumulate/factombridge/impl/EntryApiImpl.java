@@ -133,7 +133,7 @@ public class EntryApiImpl extends AbstractClient implements EntryApi {
                         logger.warn("We did not receive a chainhead for the chain, but also no error. Probably chain {} is not anchored yet", chainId);
                         return CompletableFuture.completedFuture(Collections.EMPTY_LIST);
                     }
-                    return entryBlocksUpTilKeyMR(chainHeadResponse.getResult().getChainHead());
+                    return entryBlocksUpTilKeyMR(chainId); // chainHeadResponse.getResult().getChainHead() -> Accumulate does not have entry blocks, query directly on chainId
                 });
     }
 

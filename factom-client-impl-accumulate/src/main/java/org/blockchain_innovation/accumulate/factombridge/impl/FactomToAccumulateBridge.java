@@ -21,7 +21,13 @@ import org.blockchain_innovation.factom.client.api.log.LogFactory;
 import org.blockchain_innovation.factom.client.api.log.Logger;
 import org.blockchain_innovation.factom.client.api.model.Entry;
 import org.blockchain_innovation.factom.client.api.model.Key;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.*;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.ChainHeadResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.CommitChainResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.CommitEntryResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.EntryBlockResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.EntryResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.EntryTransactionResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.RevealResponse;
 import org.blockchain_innovation.factom.client.api.ops.EntryOperations;
 import org.blockchain_innovation.factom.client.api.rpc.RpcResponse;
 import org.blockchain_innovation.factom.client.api.settings.RpcSettings;
@@ -33,7 +39,12 @@ import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -278,7 +289,7 @@ public class FactomToAccumulateBridge {
                                         final ResponseDataEntry firstEntry = response.getItems().get(0);
                                         if (firstEntry != null) {
                                             chainHeadResponse = new ChainHeadResponse(
-                                                    Hex.encodeHexString(firstEntry.getEntryHash()), false);
+                                                    chainId + '/' + Hex.encodeHexString(firstEntry.getEntryHash()), false);
                                         }
                                         final RpcResult rpcResult = (RpcResult) chainHeadResponse;
                                         return new FactomResponseImpl<>(new RpcResponse<>(rpcResult), 200, MESSAGE_ENTRY_REVEAL_SUCCESS);
@@ -330,7 +341,8 @@ public class FactomToAccumulateBridge {
                                             } else {
                                                 entryResponse = new EntryResponse(chainId, null, null);
                                             }
-                                            entryList.add(new EntryBlockResponse.Entry(Hex.encodeHexString(entry.getEntryHash()), entryResponse));
+                                            // Prepend chain before entryHash, we can't query with only entryHash
+                                            entryList.add(new EntryBlockResponse.Entry(chainId + '/' + Hex.encodeHexString(entry.getEntryHash()), entryResponse));
                                         });
                                     }
                                     return new FactomResponseImpl<>(new RpcResponse<>(rpcResult), 200, MESSAGE_ENTRY_REVEAL_SUCCESS);

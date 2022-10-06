@@ -184,7 +184,7 @@ public class EntryApiImpl extends AbstractClient implements EntryApi {
                                         entryResponse -> encoding == Encoding.UTF_8 ? encodeOperations.decodeHex(entryResponse) : entryResponse).collect(Collectors.toList())
                         , getExecutorService())
                 .exceptionally(throwable -> {
-                        throwable.printStackTrace();
+                            throwable.printStackTrace();
                             return null;
                         }
                 );
@@ -196,7 +196,7 @@ public class EntryApiImpl extends AbstractClient implements EntryApi {
                 .thenComposeAsync(entryBlockResponses -> {
                     List<CompletableFuture<FactomResponse<EntryResponse>>> entryResponses =
                             entryBlockResponses.stream()
-                                    .map(entry -> factomdClient.entry(entry.getEntryHash())).collect(Collectors.toList());
+                                    .map(entry -> factomdClient.entry(keyMR + '/' + entry.getEntryHash())).collect(Collectors.toList());
                     return CompletableFuture.allOf(entryResponses.toArray(new CompletableFuture[entryResponses.size()]))
                             .thenApply(aVoid -> entryResponses.stream()
                                     .map(CompletableFuture::join)
