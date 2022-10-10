@@ -282,6 +282,7 @@ project(':factom-client-impl-accumulate') {
     dependencies {
         compile project(':factom-client-api')
         compile 'io.accumulatenetwork:accumulate-java-sdk:1.0-m1-SNAPSHOT'
+        implementation group: 'net.jodah', name: 'expiringmap', version: '0.5.10'
 
         // Provided by JEE Environment
         compileOnly "javax.enterprise:cdi-api:$libVersions.jee.cdiApi"
