@@ -4,6 +4,7 @@ import org.blockchain_innovation.factom.client.api.model.Address;
 import org.blockchain_innovation.factom.client.api.model.response.factomd.*;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 
 /**
  * This is the factomd client that allows you to access all Rpc Methods of factomd.
@@ -127,6 +128,8 @@ public interface FactomdClient {
      */
     CompletableFuture<FactomResponse<ChainHeadResponse>> chainHead(String chainId);
     CompletableFuture<FactomResponse<ChainHeadResponse>> chainHead(String chainId, boolean throwErrorOnChainNotFound);
+    CompletableFuture<FactomResponse<QueryChainResponse>> accumulateAllEntries(String chainId);
+
 
     /**
      * Send a Chain Commit Message to factomd to create a new Chain. The commit chain hex encoded string is documented here: <a
@@ -426,4 +429,5 @@ public interface FactomdClient {
      * @return The transaction promise.
      */
     CompletableFuture<FactomResponse<TransactionResponse>> transaction(String hash);
+
 }

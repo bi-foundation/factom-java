@@ -129,13 +129,11 @@ public abstract class AbstractClient implements LowLevelClient {
             case COMMIT_ENTRY:
                 return bridge.commitEntry((String) rpcRequest.getParams().get("message"));
             case ENTRY_BLOCK_BY_KEYMR:
-                boolean expand = false;
-                String keymr = (String) rpcRequest.getParams().get("keymr");
-                if (keymr.endsWith("|expand")) {
-                    expand = true;
-                    keymr = keymr.substring(0, keymr.length() - 7);
-                }
-                return bridge.queryEntriesByChainId(keymr, expand, logErrors);
+                final String txId = (String) rpcRequest.getParams().get("keymr");
+                return bridge.entryBlockByTxId(txId, logErrors);
+            case ENTRIES_FOR_CHAIN: // Virtual Accumulate-only feature to enhance performance
+                final String chainId = (String) rpcRequest.getParams().get("chainid");
+                return bridge.queryChain(chainId, true, logErrors);
             case CURRENT_MINUTE:
                 throw new NotImplementedException(); // TODO
             case ENTRY:

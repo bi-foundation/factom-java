@@ -72,6 +72,11 @@ public class FactomdAccumulateClientImpl extends AbstractClient implements Facto
     }
 
     @Override
+    public CompletableFuture<FactomResponse<QueryChainResponse>> accumulateAllEntries(final String chainId) {
+        return exchange(RpcMethod.ENTRIES_FOR_CHAIN.toRequestBuilder().param("chainid", chainId), QueryChainResponse.class, true);
+    }
+
+    @Override
     public CompletableFuture<FactomResponse<CommitChainResponse>> commitChain(String message) {
         return exchange(RpcMethod.COMMIT_CHAIN.toRequestBuilder().param("message", message), CommitChainResponse.class);
     }

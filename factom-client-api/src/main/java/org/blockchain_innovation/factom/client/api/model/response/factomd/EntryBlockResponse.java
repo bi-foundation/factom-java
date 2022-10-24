@@ -63,6 +63,14 @@ public class EntryBlockResponse implements Serializable {
             this.chainid = chainid;
         }
 
+        public void setPrevkeymr(final String prevkeymr) {
+            this.prevkeymr = prevkeymr;
+        }
+
+        public void setDbheight(final long dbheight) {
+            this.dbheight = dbheight;
+        }
+
         public String getPreviousKeyMR() {
             return prevkeymr;
         }
@@ -71,7 +79,13 @@ public class EntryBlockResponse implements Serializable {
             return dbheight;
         }
 
+        public void setBlocksequencenumber(final long blocksequencenumber) {
+            this.blocksequencenumber = blocksequencenumber;
+        }
 
+        public void setTimestamp(final long timestamp) {
+            this.timestamp = timestamp;
+        }
     }
 
     public static class Entry implements Serializable {

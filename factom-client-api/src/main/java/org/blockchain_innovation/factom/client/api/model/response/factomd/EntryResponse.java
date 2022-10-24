@@ -22,7 +22,8 @@ import java.util.List;
 public class EntryResponse implements Serializable {
     public EntryResponse() {
     }
-    public EntryResponse(String chainid, List<String>extids, String content) {
+
+    public EntryResponse(String chainid, List<String> extids, String content) {
         this.chainid = chainid;
         this.extids = extids;
         this.content = content;

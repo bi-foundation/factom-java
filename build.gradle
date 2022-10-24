@@ -71,7 +71,8 @@ ext {
             ":service-providers:json-converter-gson",
             ":service-providers:json-converter-jee",
             ":frameworks:jee-support",
-            ":frameworks:spring-boot-support"
+            ":frameworks:spring-boot-support",
+            ":frameworks:spring-boot-support-accumulate",
     ]
 
     // the password needs to be specified via command line
@@ -365,6 +366,7 @@ project(':frameworks:jee-support') {
     }
 }
 
+
 project(':frameworks:spring-boot-support') {
 
     repositories {
@@ -390,9 +392,32 @@ project(':frameworks:spring-boot-support') {
         testCompile "org.springframework.boot:spring-boot-starter-test:$libVersions.spring.boot"
 
     }
-
 }
 
+project(':frameworks:spring-boot-support-accumulate') {
+    repositories {
+        jcenter()
+    }
+    apply plugin: "java"
+//    apply plugin: "org.springframework.boot"
+    apply plugin: "io.spring.dependency-management"
+
+    dependencies {
+        annotationProcessor "org.springframework.boot:spring-boot-configuration-processor:$libVersions.spring.boot"
+        compile project(':factom-client-impl-accumulate')
+        // Explicit dep on CDI, since it might not be on classpath of the spring boot application
+        compile "javax.enterprise:cdi-api:$libVersions.jee.cdiApi"
+        compileOnly "org.springframework.boot:spring-boot-starter:$libVersions.spring.boot"
+        compile project(":factom-client-offline-signing")
+        testCompile project(":service-providers:logger-slf4j")
+        testCompile project(":service-providers:json-converter-gson")
+        testCompile "com.google.code.gson:gson:$libVersions.gson"
+        testCompile "junit:junit:$testVersions.junit4"
+
+        testCompile "org.springframework.boot:spring-boot-starter:$libVersions.spring.boot"
+        testCompile "org.springframework.boot:spring-boot-starter-test:$libVersions.spring.boot"
+    }
+}
 
 project(':frameworks:osgi') {
 

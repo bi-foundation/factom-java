@@ -41,6 +41,7 @@ import org.blockchain_innovation.factom.client.api.model.response.factomd.Height
 import org.blockchain_innovation.factom.client.api.model.response.factomd.PendingEntriesResponse;
 import org.blockchain_innovation.factom.client.api.model.response.factomd.PendingTransactionsResponse;
 import org.blockchain_innovation.factom.client.api.model.response.factomd.PropertiesResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.QueryChainResponse;
 import org.blockchain_innovation.factom.client.api.model.response.factomd.RawDataResponse;
 import org.blockchain_innovation.factom.client.api.model.response.factomd.ReceiptResponse;
 import org.blockchain_innovation.factom.client.api.model.response.factomd.RevealResponse;
@@ -95,6 +96,11 @@ public class FactomdClientImpl extends AbstractClient implements FactomdClient {
     @Override
     public CompletableFuture<FactomResponse<ChainHeadResponse>> chainHead(String chainId, boolean throwErrorOnChainNotFound) {
         return exchange(RpcMethod.CHAIN_HEAD.toRequestBuilder().param("chainid", chainId), ChainHeadResponse.class, throwErrorOnChainNotFound);
+    }
+
+    @Override
+    public CompletableFuture<FactomResponse<QueryChainResponse>> accumulateAllEntries(final String chainId) {
+        throw new RuntimeException("accumulateAllEntries is NOT SUPPORTED");
     }
 
     @Override

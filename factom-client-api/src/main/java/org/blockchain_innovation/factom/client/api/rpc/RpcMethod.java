@@ -59,6 +59,8 @@ public enum RpcMethod {
     SEND_RAW_MESSAGE("send-raw-message"),
     TRANSACTION("transaction"),
 
+    ENTRIES_FOR_CHAIN("entries-for-chain"),
+
     // wallet api
     ADD_ENTRY_CREDIT_OUTPUT("add-ec-output"),
     ADD_FEE("add-fee"),
