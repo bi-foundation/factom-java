@@ -113,5 +113,17 @@ public class EntryBlockResponse implements Serializable {
         public EntryResponse getEntryResponse() {
             return entryResponse;
         }
+
+        public void setEntryhash(final String entryhash) {
+            this.entryhash = entryhash;
+        }
+
+        public void setTimestamp(final long timestamp) {
+            this.timestamp = timestamp;
+        }
+
+        public void setEntryResponse(final EntryResponse entryResponse) {
+            this.entryResponse = entryResponse;
+        }
     }
 }

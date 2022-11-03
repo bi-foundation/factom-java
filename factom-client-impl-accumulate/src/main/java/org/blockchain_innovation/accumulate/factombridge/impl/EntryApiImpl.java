@@ -1,11 +1,8 @@
 package org.blockchain_innovation.accumulate.factombridge.impl;
 
-import org.blockchain_innovation.factom.client.api.EntryApi;
-import org.blockchain_innovation.factom.client.api.FactomResponse;
-import org.blockchain_innovation.factom.client.api.FactomdClient;
-import org.blockchain_innovation.factom.client.api.LowLevelClient;
-import org.blockchain_innovation.factom.client.api.SignatureProvider;
-import org.blockchain_innovation.factom.client.api.WalletdClient;
+import io.accumulatenetwork.sdk.protocol.TxID;
+import io.accumulatenetwork.sdk.protocol.Url;
+import org.blockchain_innovation.factom.client.api.*;
 import org.blockchain_innovation.factom.client.api.errors.FactomException;
 import org.blockchain_innovation.factom.client.api.errors.FactomRuntimeException;
 import org.blockchain_innovation.factom.client.api.listeners.CommitAndRevealListener;
@@ -16,13 +13,7 @@ import org.blockchain_innovation.factom.client.api.model.Chain;
 import org.blockchain_innovation.factom.client.api.model.Entry;
 import org.blockchain_innovation.factom.client.api.model.response.CommitAndRevealChainResponse;
 import org.blockchain_innovation.factom.client.api.model.response.CommitAndRevealEntryResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.CommitChainResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.CommitEntryResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.EntryBlockResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.EntryResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.EntryTransactionResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.QueryChainResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.RevealResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.*;
 import org.blockchain_innovation.factom.client.api.model.response.walletd.ComposeResponse;
 import org.blockchain_innovation.factom.client.api.ops.Encoding;
 import org.blockchain_innovation.factom.client.api.ops.EntryOperations;
@@ -44,7 +35,7 @@ import java.util.stream.Collectors;
 @SuppressWarnings({"PMD.GodClass", "PMD.TooManyMethods"})
 public class EntryApiImpl extends AbstractClient implements EntryApi {
 
-    public static final String NO_PREVIOUS_KEY_MERKLE_ROOT = "0000000000000000000000000000000000000000000000000000000000000000";
+    private static final TxID NULL_TX_ID = new TxID(Url.toAccURL("acc://0@0"));
     private static final int ENTRY_REVEAL_WAIT = 2000;
     private static final Logger logger = LogFactory.getLogger(EntryApiImpl.class);
     private int transactionAcknowledgeTimeout = 10000; // 10 sec
@@ -215,7 +206,7 @@ public class EntryApiImpl extends AbstractClient implements EntryApi {
 
         String currentKeyMR = keyMR;
 
-        while (StringUtils.isNotEmpty(currentKeyMR) && !NO_PREVIOUS_KEY_MERKLE_ROOT.equals(currentKeyMR)) {
+        while (StringUtils.isNotEmpty(currentKeyMR) && !NULL_TX_ID.getUrl().string().equals(currentKeyMR)) {
             FactomResponse<EntryBlockResponse> currentBlock = factomdClient.entryBlockByKeyMerkleRoot(currentKeyMR).join();
             errorHandling(currentBlock, "Could not get entry block for keyMr " + currentKeyMR);
             currentKeyMR = currentBlock.getResult().getHeader().getPreviousKeyMR();

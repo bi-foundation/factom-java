@@ -13,28 +13,17 @@ import io.accumulatenetwork.sdk.generated.protocol.FactomDataEntry;
 import io.accumulatenetwork.sdk.generated.protocol.SignatureType;
 import io.accumulatenetwork.sdk.generated.protocol.WriteDataTo;
 import io.accumulatenetwork.sdk.generated.query.ResponseDataEntry;
-import io.accumulatenetwork.sdk.protocol.FactomEntry;
-import io.accumulatenetwork.sdk.protocol.MultiResponse;
-import io.accumulatenetwork.sdk.protocol.SignatureKeyPair;
-import io.accumulatenetwork.sdk.protocol.TxID;
-import io.accumulatenetwork.sdk.protocol.Url;
+import io.accumulatenetwork.sdk.protocol.*;
 import net.jodah.expiringmap.ExpiringMap;
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.blockchain_innovation.accumulate.factombridge.model.LiteAccount;
 import org.blockchain_innovation.factom.client.api.FactomResponse;
 import org.blockchain_innovation.factom.client.api.log.LogFactory;
 import org.blockchain_innovation.factom.client.api.log.Logger;
 import org.blockchain_innovation.factom.client.api.model.Entry;
 import org.blockchain_innovation.factom.client.api.model.Key;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.ChainEntry;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.ChainHeadResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.CommitChainResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.CommitEntryResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.EntryBlockResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.EntryResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.EntryTransactionResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.QueryChainResponse;
-import org.blockchain_innovation.factom.client.api.model.response.factomd.RevealResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.*;
 import org.blockchain_innovation.factom.client.api.ops.EntryOperations;
 import org.blockchain_innovation.factom.client.api.rpc.RpcResponse;
 import org.blockchain_innovation.factom.client.api.settings.RpcSettings;
@@ -45,12 +34,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -71,12 +55,12 @@ public class FactomToAccumulateBridge {
             .build();
     private static final Map<Key, TxID> txIdCache = ExpiringMap.builder()
             .maxSize(150000)
-            .expiration(10, TimeUnit.MINUTES)
+            .expiration(20, TimeUnit.MINUTES)
             .build();
 
     private static final Map<Url, Map<TxID, TxID>> previousTxIdCache = ExpiringMap.builder()
             .maxSize(150000)
-            .expiration(10, TimeUnit.MINUTES)
+            .expiration(20, TimeUnit.MINUTES)
             .build();
     private final EntryOperations entryOperations = new EntryOperations();
 
@@ -342,9 +326,9 @@ public class FactomToAccumulateBridge {
                                 .thenApply(response -> {
                                     if (response.getItems() != null && !response.getItems().isEmpty()) {
                                         ChainHeadResponse chainHeadResponse = null;
-                                        final ResponseDataEntry firstEntry = response.getItems().get(0);
-                                        if (firstEntry != null) {
-                                            final TxID txId = ObjectUtils.firstNonNull(firstEntry.getCauseTxId(), firstEntry.getTxId());
+                                        final ResponseDataEntry lastEntry = response.getItems().get(0);
+                                        if (lastEntry != null) {
+                                            final TxID txId = ObjectUtils.firstNonNull(lastEntry.getCauseTxId(), lastEntry.getTxId());
                                             chainHeadResponse = new ChainHeadResponse(txId.getUrl().string(), false);
                                         }
                                         final RpcResult rpcResult = (RpcResult) chainHeadResponse;
@@ -379,7 +363,7 @@ public class FactomToAccumulateBridge {
                         final CompletableFuture<FactomResponse<RpcResult>> futureResponse = accumulateApi.queryData(new DataEntrySetQuery()
                                         .url(chainId)
                                         .start(0)
-                                        .count(countResponse.getTotal())
+                                        .count(countResponse.getTotal())  // FIXME blocks of max 1000
                                         .expand(expand))
                                 .thenApply(response -> {
                                     if (response.getItems() != null && !response.getItems().isEmpty()) {
@@ -391,9 +375,9 @@ public class FactomToAccumulateBridge {
                                                 final TxID txId = ObjectUtils.firstNonNull(responseDataEntry.getCauseTxId(), responseDataEntry.getTxId());
                                                 try {
                                                     final TransactionQueryResult transactionQueryResult = accumulateApi.getTx(new TxnQuery()
-                                                            .txIdUrl(txId)
-                                                            .prove(true)
-                                                            .expand(false))
+                                                                    .txIdUrl(txId)
+                                                                    .prove(true)
+                                                                    .expand(false))
                                                             .get();
                                                     final TransactionQueryResponse queryResponse = transactionQueryResult.getQueryResponse();
                                                     final List<String> extIds = Arrays.stream(factomDataEntry.getExtIds())
@@ -446,7 +430,7 @@ public class FactomToAccumulateBridge {
                     final WriteDataTo writeDataTo = (WriteDataTo) queryResponse.getTransaction().getBody();
                     final FactomDataEntry dataEntry = (FactomDataEntry) writeDataTo.getEntry();
                     final Url chainIdUrl = Url.toAccURL(Hex.encodeHexString(dataEntry.getAccountId()));
-                    final String chainId = chainIdUrl.string();
+                    final String chainId = chainIdUrl.authority();
                     header.setChainid(chainId);
                     Arrays.stream(queryResponse.getReceipts()).findFirst().ifPresent(txReceipt -> {
                         header.setPrevkeymr(getPreviousTxId(chainIdUrl, txID));
@@ -454,11 +438,11 @@ public class FactomToAccumulateBridge {
                         header.setTimestamp(txReceipt.getLocalBlockTime().toInstant().toEpochMilli());
                     });
 
-                    final List<String> extIds = Arrays.stream(dataEntry.getExtIds())
-                            .map(extId -> Hex.encodeHexString(extId))
-                            .collect(Collectors.toList());
-                    final EntryResponse entryResponse = new EntryResponse(chainId, extIds, Hex.encodeHexString(dataEntry.getData()));
-                    entryList.add(new EntryBlockResponse.Entry(chainId + '/' + Hex.encodeHexString(queryResponse.getTransactionHash()), entryResponse));
+                    final EntryResponse entryResponse = buildEntryResponse(dataEntry, chainId);
+                    final byte[] entryHash = reconstructEntryHash(dataEntry, chainIdUrl);
+                    final EntryBlockResponse.Entry entry = new EntryBlockResponse.Entry(chainId + '/' + Hex.encodeHexString(entryHash), entryResponse);
+                    entry.setTimestamp(header.getTimestamp());
+                    entryList.add(entry);
                     return new FactomResponseImpl<>(new RpcResponse<>(rpcResult), 200, MESSAGE_GET_ENTRY_SUCCESS);
                 });
 
@@ -471,6 +455,24 @@ public class FactomToAccumulateBridge {
         return futureFinalResponse;
     }
 
+    private static EntryResponse buildEntryResponse(final FactomDataEntry dataEntry, final String chainId) {
+        final List<String> hexExtIds = Arrays.stream(dataEntry.getExtIds())
+                .map(extId -> Hex.encodeHexString(extId))
+                .collect(Collectors.toList());
+        final String hexContent = new String(dataEntry.getData(), StandardCharsets.UTF_8);
+        final EntryResponse entryResponse = new EntryResponse(chainId, hexExtIds, hexContent);
+        return entryResponse;
+    }
+
+    private byte[] reconstructEntryHash(final FactomDataEntry dataEntry, final Url chainIdUrl) {
+        final List<String> strExtIds = Arrays.stream(dataEntry.getExtIds())
+                .map(extId -> new String(extId, StandardCharsets.UTF_8))
+                .collect(Collectors.toList());
+        final String stringContent = new String(dataEntry.getData(), StandardCharsets.UTF_8);
+        final byte[] entryHash = entryOperations.calculateEntryHash(strExtIds, stringContent, chainIdUrl.authority());
+        return entryHash;
+    }
+
     private String getPreviousTxId(final Url chainId, final TxID txId) {
         final Map<TxID, TxID> prevTxIdMap = previousTxIdCache.computeIfAbsent(chainId, k -> new HashMap<>());
         TxID prevTxId = prevTxIdMap.get(txId);
@@ -481,14 +483,12 @@ public class FactomToAccumulateBridge {
         if (prevTxId == null) {
             throw new RuntimeException("TxID " + txId.getUrl().string() + " could not be found");
         }
-        if (prevTxId.equals(NULL_TX_ID)) {
-            return null;
-        }
         return prevTxId.getUrl().string();
     }
 
     private void loadTxIdMap(final Url chainId, final Map<TxID, TxID> prevTxIdMap) {
         try {
+            prevTxIdMap.clear();
             final MultiResponse<ResponseDataEntry> countResponse = accumulateApi.queryData(new DataEntrySetQuery()
                     .url(chainId)
                     .count(1)
@@ -501,11 +501,14 @@ public class FactomToAccumulateBridge {
                         .start(start)
                         .count(1024)
                         .expand(true)).get();
-                response.getItems().forEach(dataEntry -> {
-                    final TxID txId = ObjectUtils.firstNonNull(dataEntry.getCauseTxId(), dataEntry.getTxId());
-                    prevTxIdMap.put(txId, prevTxId[0]);
-                    prevTxId[0] = txId;
-                });
+                response.getItems().stream()
+                        .map(ResponseDataEntry::getCauseTxId)
+                        .forEach(txId -> {
+                            if (!prevTxIdMap.containsKey(txId) && !prevTxIdMap.containsValue(prevTxId[0]) && !txId.equals(prevTxId[0])) {
+                                prevTxIdMap.put(txId, prevTxId[0]);
+                                prevTxId[0] = txId;
+                            }
+                        });
                 start += 1024;
             }
         } catch (InterruptedException | ExecutionException e) {
@@ -514,7 +517,11 @@ public class FactomToAccumulateBridge {
     }
 
     public <RpcResult> CompletableFuture<FactomResponse<RpcResult>> getEntry(final String queryUrl, final boolean logErrors) {
-        final int split = queryUrl.indexOf('/');
+        if (StringUtils.length(queryUrl) < 64) {
+            throw new IllegalArgumentException("Invalid query URL, the minimum length of an entry is 64");
+        }
+        final int protocolIndex = Math.max(queryUrl.indexOf("//"), 0) + 2;
+        final int split = queryUrl.indexOf('/', protocolIndex);
         if (split < 0) {
             throw new IllegalArgumentException("Accumulate entry has to be fetched in acc://<chain id>/<entry hash> format.");
         }
