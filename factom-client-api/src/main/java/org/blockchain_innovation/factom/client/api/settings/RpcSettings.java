@@ -34,7 +34,7 @@ public interface RpcSettings {
      * The subsystem to apply this configuration to.
      */
     enum SubSystem {
-        FACTOMD, WALLETD, LEVELDBSERVER;
+        FACTOMD, WALLETD, INDEXDB;
 
         /**
          * Translates the sybsystem to a configuration value key.

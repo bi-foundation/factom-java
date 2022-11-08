@@ -33,6 +33,10 @@ public class AccumulateFactomIndexDB {
     private final JsonConverter jsonConverter = JsonConverter.Provider.newInstance();
 
     byte[] get(final IndexDB db, final DbKey dbKey) throws KeyNotFoundException {
+        if (uri == null) {
+            throw new RuntimeException("IndexDBSettings not configured!");
+        }
+
         final URI requestUri = uri.resolve(String.format("/%s?key=base64(%s)", db.getValue(), dbKey.getBase64Key()));
         final var request = HttpRequest.newBuilder()
                 .uri(requestUri)
@@ -56,7 +60,7 @@ public class AccumulateFactomIndexDB {
 
     List<byte[]> getAll(final IndexDB db, final DbKey dbKey, final Integer cutPosition) throws KeyNotFoundException {
         if (uri == null) {
-            throw new RuntimeException("IndexDBSettings configured!");
+            throw new RuntimeException("IndexDBSettings not configured!");
         }
 
         final String base64Key = dbKey.getBase64Key();
@@ -90,6 +94,10 @@ public class AccumulateFactomIndexDB {
 
 
     void put(final IndexDB db, final DbKey dbKey, final byte[] value) {
+        if (uri == null) {
+            throw new RuntimeException("IndexDBSettings not configured!");
+        }
+
         final URI requestUri = uri.resolve(String.format("/%s?key=base64(%s)", db.getValue(), dbKey.getBase64Key()));
         final var request = HttpRequest.newBuilder()
                 .uri(requestUri)
@@ -111,7 +119,7 @@ public class AccumulateFactomIndexDB {
 
     void configure(final RpcSettings settings) {
         switch (settings.getSubSystem()) {
-            case LEVELDBSERVER:
+            case INDEXDB:
                 try {
                     this.uri = settings.getServer().getURL().toURI();
                 } catch (URISyntaxException e) {

@@ -60,7 +60,7 @@ public class OfflineWalletdClientImpl extends WalletdClientImpl {
 
     @Override
     public CompletableFuture<FactomResponse<ComposeResponse>> composeEntry(Entry entry, Address address) throws FactomException.ClientException {
-        AddressType.assertValidAddress(address, AddressType.ENTRY_CREDIT_SECRET, AddressType.LITE_TOKEN_ACCOUNT);
+        AddressType.assertValidAddress(address, AddressType.ENTRY_CREDIT_SECRET, AddressType.LITE_TOKEN_ACCOUNT, AddressType.LITE_IDENTITY);
         return composeEntry(entry, new AddressSignatureProvider(address));
     }
 
@@ -106,7 +106,7 @@ public class OfflineWalletdClientImpl extends WalletdClientImpl {
 
             // 1 byte number of Entry Credits to pay
             byte cost = chainCost(firstEntry.getExternalIds(), firstEntry.getContent(), chainIdHex);
-            if (signatureProvider.getAddressType() == AddressType.LITE_TOKEN_ACCOUNT || signatureProvider.getAddressType() == AddressType.LITE_IDENTITY) {
+            if (isLiteType(signatureProvider)) {
                 return encodeLitePrincipal(signatureProvider, outputStream);
             } else {
                 return signedCommitMessage(signatureProvider, outputStream, cost);
@@ -157,7 +157,7 @@ public class OfflineWalletdClientImpl extends WalletdClientImpl {
 
             // 1 byte number of entry credits to pay
             byte cost = entryCost(entry.getExternalIds(), entry.getContent(), entry.getChainId());
-            if (signatureProvider.getAddressType() == AddressType.LITE_TOKEN_ACCOUNT) {
+            if (isLiteType(signatureProvider)) {
                 return encodeLitePrincipal(signatureProvider, outputStream);
             } else {
                 return signedCommitMessage(signatureProvider, outputStream, cost);
@@ -165,6 +165,10 @@ public class OfflineWalletdClientImpl extends WalletdClientImpl {
         } catch (IOException e) {
             throw new FactomException.ClientException("failed to compose entry commit message", e);
         }
+    }
+
+    private static boolean isLiteType(final SignatureProvider signatureProvider) {
+        return signatureProvider.getAddressType() == AddressType.LITE_TOKEN_ACCOUNT || signatureProvider.getAddressType() == AddressType.LITE_IDENTITY;
     }
 
     private String signedCommitMessage(SignatureProvider signatureProvider, ByteArrayOutputStream outputStream, byte cost) throws IOException {

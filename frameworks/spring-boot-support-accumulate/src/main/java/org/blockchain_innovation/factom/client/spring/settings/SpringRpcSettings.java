@@ -8,11 +8,7 @@ import org.blockchain_innovation.factom.client.api.settings.RpcSettings;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Properties;
+import java.util.*;
 
 @Configuration
 @ConfigurationProperties
@@ -21,6 +17,7 @@ public class SpringRpcSettings {
 
     private Factomd factomd;
     private Walletd walletd;
+    private IndexDB indexdb;
     private transient Optional<String> networkName = Optional.empty();
 
     private String ecAddress;
@@ -37,6 +34,9 @@ public class SpringRpcSettings {
         }
         if (walletd != null) {
             syncNames(walletd);
+        }
+        if (indexdb != null) {
+            syncNames(indexdb);
         }
     }
 
@@ -93,6 +93,12 @@ public class SpringRpcSettings {
         }
     }
 
+    public static class IndexDB extends RpcSettingsImpl.ServerImpl implements RpcSettings.Server {
+        public IndexDB() {
+            super(RpcSettings.SubSystem.INDEXDB);
+        }
+    }
+
     public void setFactomd(Factomd factomd) {
         syncNames(factomd);
         this.factomd = factomd;
@@ -102,6 +108,12 @@ public class SpringRpcSettings {
         syncNames(walletd);
 
         this.walletd = walletd;
+    }
+
+    public void setIndexdb(IndexDB indexdb) {
+        syncNames(indexdb);
+
+        this.indexdb = indexdb;
     }
 
     private void syncNames(RpcSettingsImpl.ServerImpl server) {
@@ -128,6 +140,10 @@ public class SpringRpcSettings {
 //            throw new FactomException.ClientException("Please configure Walletd settings");
         }
         return walletd;
+    }
+
+    public IndexDB getIndexdb() {
+        return indexdb;
     }
 
     protected RpcSettings getRpcSettings(RpcSettings.SubSystem subSystem) {

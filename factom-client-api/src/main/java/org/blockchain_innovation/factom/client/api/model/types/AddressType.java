@@ -2,6 +2,7 @@ package org.blockchain_innovation.factom.client.api.model.types;
 
 import org.blockchain_innovation.factom.client.api.errors.FactomRuntimeException;
 import org.blockchain_innovation.factom.client.api.model.Address;
+import org.blockchain_innovation.factom.client.api.ops.Digests;
 import org.blockchain_innovation.factom.client.api.ops.Encoding;
 import org.blockchain_innovation.factom.client.api.ops.StringUtils;
 
@@ -87,8 +88,7 @@ public enum AddressType {
                 && !getValidPrefixes().contains(address.substring(0, 5))) {
             throw new FactomRuntimeException.AssertionException(String.format("Address '%s' does not start with a valid humanReadablePrefix", address));
         }
-        if(address.toLowerCase().startsWith("acc://")) {
-/* FIXME
+        if(!address.toLowerCase().startsWith("acc://")) {
             int splitPos  = address.indexOf('/');
             final String addressOnly = splitPos > -1 ? address.substring(0, splitPos) : address;
             byte[] addressBytes = Encoding.BASE58.decode(addressOnly);
@@ -105,7 +105,7 @@ public enum AddressType {
             } else {
                 throw new FactomRuntimeException.AssertionException(String.format("Address '%s' is not 38 bytes long!", address));
             }
-*/
+
         }
     }
 

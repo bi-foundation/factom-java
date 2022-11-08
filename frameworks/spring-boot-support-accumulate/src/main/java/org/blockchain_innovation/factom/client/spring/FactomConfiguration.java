@@ -35,6 +35,8 @@ public class FactomConfiguration {
         RpcSettingsImpl settings = new RpcSettingsImpl(RpcSettings.SubSystem.FACTOMD, specificSettings.getFactomd());
         settings.setDefaultECAddress(specificSettings.getEcAddress());
         factomdClient.setSettings(settings);
+        RpcSettingsImpl indexDbRpcSettings = new RpcSettingsImpl(RpcSettings.SubSystem.INDEXDB, specificSettings.getIndexdb());
+        factomdClient.setIndexDBSettings(indexDbRpcSettings);
         factomdClient.setExecutorService(Executors.newFixedThreadPool(specificSettings.getFactomd().getThreads()));
         return factomdClient;
     }

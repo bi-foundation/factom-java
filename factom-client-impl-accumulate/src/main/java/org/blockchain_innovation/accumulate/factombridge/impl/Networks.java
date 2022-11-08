@@ -148,6 +148,8 @@ public class Networks {
         final RpcSettings rpcSettings = new RpcSettingsImpl(RpcSettings.SubSystem.FACTOMD, properties, networkName);
         final FactomdAccumulateClientImpl factomdClient = new FactomdAccumulateClientImpl();
         factomdClient.setSettings(rpcSettings);
+        RpcSettingsImpl indexDbRpcSettings = new RpcSettingsImpl(RpcSettings.SubSystem.INDEXDB, properties, networkName);
+        factomdClient.setIndexDBSettings(indexDbRpcSettings);
         return factomdClient;
     }
 

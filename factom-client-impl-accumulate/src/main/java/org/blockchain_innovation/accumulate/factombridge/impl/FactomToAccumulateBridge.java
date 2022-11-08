@@ -77,7 +77,7 @@ public class FactomToAccumulateBridge {
                     throw new RuntimeException(e);
                 }
                 break;
-            case LEVELDBSERVER:
+            case INDEXDB:
             case WALLETD:
                 break;
         }

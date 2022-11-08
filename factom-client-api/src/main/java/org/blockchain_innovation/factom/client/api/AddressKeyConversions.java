@@ -153,7 +153,7 @@ public class AddressKeyConversions {
      * @return an address
      */
     public Address addressToPublicAddress(Address address) {
-        if(address.getType() == AddressType.LITE_TOKEN_ACCOUNT) {
+        if(address.getType() == AddressType.LITE_TOKEN_ACCOUNT || address.getType() == AddressType.LITE_IDENTITY) {
             throw new RuntimeException("addressToPublicAddress is not supported for lite accounts");
         }
         return new ECAddress(addressToPublicAddress(address.getValue()));

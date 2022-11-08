@@ -41,7 +41,7 @@ public class OfflineWalletdClientImpl extends WalletdClientImpl {
 
     @Override
     public CompletableFuture<FactomResponse<ComposeResponse>> composeChain(Chain chain, Address address) throws FactomException.ClientException {
-        AddressType.assertValidAddress(address, AddressType.ENTRY_CREDIT_SECRET, AddressType.LITE_TOKEN_ACCOUNT);
+        AddressType.assertValidAddress(address, AddressType.ENTRY_CREDIT_SECRET, AddressType.LITE_TOKEN_ACCOUNT, AddressType.LITE_IDENTITY);
         return composeChain(chain, new AddressSignatureProvider(address));
     }
 
@@ -59,7 +59,7 @@ public class OfflineWalletdClientImpl extends WalletdClientImpl {
 
     @Override
     public CompletableFuture<FactomResponse<ComposeResponse>> composeEntry(Entry entry, Address address) throws FactomException.ClientException {
-        AddressType.assertValidAddress(address, AddressType.ENTRY_CREDIT_SECRET, AddressType.LITE_TOKEN_ACCOUNT);
+        AddressType.assertValidAddress(address, AddressType.ENTRY_CREDIT_SECRET, AddressType.LITE_TOKEN_ACCOUNT, AddressType.LITE_IDENTITY);
         return composeEntry(entry, new AddressSignatureProvider(address));
     }
 
@@ -105,7 +105,7 @@ public class OfflineWalletdClientImpl extends WalletdClientImpl {
 
             // 1 byte number of Entry Credits to pay
             byte cost = chainCost(firstEntry.getExternalIds(), firstEntry.getContent(), chainIdHex);
-            if (signatureProvider.getAddressType() == AddressType.LITE_TOKEN_ACCOUNT) {
+            if (signatureProvider.getAddressType() == AddressType.LITE_TOKEN_ACCOUNT || signatureProvider.getAddressType() == AddressType.LITE_IDENTITY) {
                 return encodeLiteAccount(signatureProvider, outputStream);
             } else {
                 return signedCommitMessage(signatureProvider, outputStream, cost);
@@ -118,7 +118,7 @@ public class OfflineWalletdClientImpl extends WalletdClientImpl {
     private static String encodeLiteAccount(final SignatureProvider signatureProvider, final ByteArrayOutputStream outputStream) throws IOException {
         final String liteAccountEncoded = new String(signatureProvider.sign(null), StandardCharsets.UTF_8);
         final int separator = liteAccountEncoded.indexOf('|');
-        final String privateKeyEncoded = liteAccountEncoded.substring(separator+1);
+        final String privateKeyEncoded = liteAccountEncoded.substring(separator + 1);
         final byte[] privateKey = Encoding.HEX.decode(privateKeyEncoded);
         outputStream.write(privateKey);
         return Encoding.HEX.encode(outputStream.toByteArray());
@@ -148,7 +148,7 @@ public class OfflineWalletdClientImpl extends WalletdClientImpl {
 
             // 1 byte number of entry credits to pay
             byte cost = entryCost(entry.getExternalIds(), entry.getContent(), entry.getChainId());
-            if (signatureProvider.getAddressType() == AddressType.LITE_TOKEN_ACCOUNT) {
+            if (signatureProvider.getAddressType() == AddressType.LITE_TOKEN_ACCOUNT || signatureProvider.getAddressType() == AddressType.LITE_IDENTITY) {
                 return encodeLiteAccount(signatureProvider, outputStream);
             } else {
                 return signedCommitMessage(signatureProvider, outputStream, cost);
