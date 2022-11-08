@@ -19,23 +19,28 @@ package org.blockchain_innovation.factom.client.api.model.response.factomd;
 import java.io.Serializable;
 
 public class ChainHeadResponse implements Serializable {
-    public ChainHeadResponse() {
-    }
 
-    public ChainHeadResponse(final String chainhead, final boolean chaininprocesslist) {
-        this.chainhead = chainhead;
-        this.chaininprocesslist = chaininprocesslist;
-    }
+    private final String entryHash;
 
-    private String chainhead;
+    private String keyMr;
+
     private boolean chaininprocesslist;
-
-    public String getChainHead() {
-        return chainhead;
+    public String getKeyMR() {
+        return keyMr;
     }
 
     public boolean isChainInProcessList() {
         return chaininprocesslist;
+    }
+
+    public String getEntryHash() {
+        return entryHash;
+    }
+
+    public ChainHeadResponse(final String keyMr, final boolean chaininprocesslist, final String entryHash) {
+        this.keyMr = keyMr;
+        this.chaininprocesslist = chaininprocesslist;
+        this.entryHash = entryHash;
     }
 
 }

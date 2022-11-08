@@ -21,6 +21,7 @@ import org.blockchain_innovation.factom.client.api.rpc.RpcErrorResponse;
 import org.blockchain_innovation.factom.client.api.rpc.RpcResponse;
 
 import java.lang.reflect.Type;
+import java.util.Map;
 import java.util.Properties;
 import java.util.ServiceLoader;
 
@@ -90,6 +91,8 @@ public interface JsonConverter {
      * @return The name of the implementation.
      */
     String getName();
+
+    Map<String, String> getStringMap(String jsonContent);
 
     /**
      * SPI specific details are contained in this class.

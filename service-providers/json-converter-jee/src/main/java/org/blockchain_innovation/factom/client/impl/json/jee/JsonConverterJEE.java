@@ -40,7 +40,10 @@ import javax.json.stream.JsonGenerator;
 import javax.json.stream.JsonParser;
 import java.lang.reflect.*;
 import java.nio.CharBuffer;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Properties;
 
 import static javax.json.bind.config.PropertyOrderStrategy.LEXICOGRAPHICAL;
 
@@ -142,6 +145,25 @@ public class JsonConverterJEE implements JsonConverter {
     @Override
     public String getName() {
         return NAME;
+    }
+
+    // FIXME this is not really flexible and only suitable for leveldb-server responses
+    private class ValuesContainer {
+        private Map<String, String> values;
+
+        public  Map<String, String> getValues() {
+            return values;
+        }
+
+        public void setValues(final  Map<String, String> values) {
+            this.values = values;
+        }
+    }
+
+    @Override
+    public Map<String, String> getStringMap(final String jsonContent) {
+        final ValuesContainer container = jsonb().fromJson(jsonContent, ValuesContainer.class);
+        return container.getValues();
     }
 
 

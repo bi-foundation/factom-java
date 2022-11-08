@@ -55,9 +55,11 @@ public class EntryBlockResponse implements Serializable {
             return blocksequencenumber;
         }
 
+
         public String getChainId() {
             return chainid;
         }
+
 
         public void setChainid(final String chainid) {
             this.chainid = chainid;

@@ -125,7 +125,7 @@ public class FactomdClientTest extends AbstractClientTest {
 
         ChainHeadResponse chainHead = response.getResult();
         Assert.assertNotNull(chainHead);
-        Assert.assertNotNull(chainHead.getChainHead());
+        Assert.assertNotNull(chainHead.getKeyMR());
     }
 
     @Test

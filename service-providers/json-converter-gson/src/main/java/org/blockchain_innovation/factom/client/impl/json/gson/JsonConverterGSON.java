@@ -141,4 +141,10 @@ public class JsonConverterGSON implements JsonConverter {
     public String getName() {
         return NAME;
     }
+
+    @Override
+    public Map<String, String> getStringMap(final String source) {
+        final Map<String, String> resultMap = new Gson().fromJson(source, Map.class);
+        return resultMap;
+    }
 }

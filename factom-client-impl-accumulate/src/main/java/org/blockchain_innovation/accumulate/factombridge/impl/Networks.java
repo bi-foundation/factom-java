@@ -145,8 +145,8 @@ public class Networks {
 
     private static FactomdAccumulateClientImpl createFactomdClient(Optional<String> networkName, String key) {
         logger.info(String.format("Network: %s, factomd client not registered yet, starting registration.", key));
-        RpcSettings rpcSettings = new RpcSettingsImpl(RpcSettings.SubSystem.FACTOMD, properties, networkName);
-        FactomdAccumulateClientImpl factomdClient = new FactomdAccumulateClientImpl();
+        final RpcSettings rpcSettings = new RpcSettingsImpl(RpcSettings.SubSystem.FACTOMD, properties, networkName);
+        final FactomdAccumulateClientImpl factomdClient = new FactomdAccumulateClientImpl();
         factomdClient.setSettings(rpcSettings);
         return factomdClient;
     }

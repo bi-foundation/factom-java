@@ -56,6 +56,9 @@ public class AbstractClientTest {
 
         final RpcSettingsImpl settings = new RpcSettingsImpl(RpcSettings.SubSystem.FACTOMD, getProperties(), Optional.of("testnet"));
         factomdClient.setSettings(settings);
+        final RpcSettings indexDbRpcSettings = new RpcSettingsImpl(RpcSettings.SubSystem.LEVELDBSERVER, getProperties(), Optional.of("testnet"));
+        factomdClient.setIndexDBSettings(indexDbRpcSettings);
+
         entryClient.setFactomdClient(factomdClient);
         entryClient.setWalletdClient(offlineWalletdClient);
 

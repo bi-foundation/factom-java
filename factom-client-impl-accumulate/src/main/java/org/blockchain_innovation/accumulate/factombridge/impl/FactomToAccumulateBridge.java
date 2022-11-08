@@ -9,15 +9,14 @@ import io.accumulatenetwork.sdk.generated.apiv2.DataEntryQuery;
 import io.accumulatenetwork.sdk.generated.apiv2.DataEntrySetQuery;
 import io.accumulatenetwork.sdk.generated.apiv2.TransactionQueryResponse;
 import io.accumulatenetwork.sdk.generated.apiv2.TxnQuery;
-import io.accumulatenetwork.sdk.generated.protocol.FactomDataEntry;
-import io.accumulatenetwork.sdk.generated.protocol.SignatureType;
-import io.accumulatenetwork.sdk.generated.protocol.WriteDataTo;
+import io.accumulatenetwork.sdk.generated.protocol.*;
 import io.accumulatenetwork.sdk.generated.query.ResponseDataEntry;
 import io.accumulatenetwork.sdk.protocol.*;
 import net.jodah.expiringmap.ExpiringMap;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.blockchain_innovation.accumulate.factombridge.model.LiteAccount;
+import org.blockchain_innovation.accumulate.factombridge.model.LiteIdentity;
+import org.blockchain_innovation.accumulate.factombridge.model.*;
 import org.blockchain_innovation.factom.client.api.FactomResponse;
 import org.blockchain_innovation.factom.client.api.log.LogFactory;
 import org.blockchain_innovation.factom.client.api.log.Logger;
@@ -45,28 +44,28 @@ public class FactomToAccumulateBridge {
     private static final String MESSAGE_CHAIN_REVEAL_SUCCESS = "Chain Reveal Success";
     private static final String MESSAGE_ENTRY_COMMIT_SUCCESS = "Entry Commit Success";
     private static final String MESSAGE_ENTRY_REVEAL_SUCCESS = "Entry Reveal Success";
-    private static final String MESSAGE_GET_ENTRY_SUCCESS = "Get Entry Success";
+    public static final String MESSAGE_CHAIN_HEAD_SUCCESS = "Chain Head Success";
+    public static final String MESSAGE_GET_ENTRY_SUCCESS = "Get Entry Success";
     private static final String MESSAGE_QUERY_CHAIN_SUCCESS = "Query Chain Success";
     private static final Logger logger = LogFactory.getLogger(FactomToAccumulateBridge.class);
     private static final TxID NULL_TX_ID = new TxID(Url.toAccURL("acc://0@0"));
-    private static final Map<Key, LiteAccount> liteAccountCache = ExpiringMap.builder()
+    private static final String NULL_HASH = "0000000000000000000000000000000000000000000000000000000000000000";
+    private static final Map<Key, Principal> principalCache = ExpiringMap.builder()
             .maxSize(150000)
             .expiration(24, TimeUnit.HOURS)
             .build();
-    private static final Map<Key, TxID> txIdCache = ExpiringMap.builder()
-            .maxSize(150000)
-            .expiration(20, TimeUnit.MINUTES)
-            .build();
-
     private static final Map<Url, Map<TxID, TxID>> previousTxIdCache = ExpiringMap.builder()
             .maxSize(150000)
             .expiration(20, TimeUnit.MINUTES)
             .build();
+    public static final byte[] EMPTY_VALUE = new byte[0];
     private final EntryOperations entryOperations = new EntryOperations();
 
     private AccumulateAsyncApi accumulateApi;
+    private AccumulateFactomIndexDB indexDb;
 
-    FactomToAccumulateBridge() {
+    FactomToAccumulateBridge(final AccumulateFactomIndexDB indexDb) {
+        this.indexDb = indexDb;
     }
 
     void configure(final RpcSettings settings) {
@@ -78,6 +77,7 @@ public class FactomToAccumulateBridge {
                     throw new RuntimeException(e);
                 }
                 break;
+            case LEVELDBSERVER:
             case WALLETD:
                 break;
         }
@@ -111,9 +111,10 @@ public class FactomToAccumulateBridge {
                 final byte[] entryHash = new byte[32];
                 inputStream.read(entryHash);
 
+                final AccountType accountType = AccountType.fromValue(inputStream.read());
                 final byte[] privateKey = new byte[64];
                 inputStream.read(privateKey);
-                final LiteAccount liteAccount = liteAccountFromPrivateKey(privateKey);
+                final Principal principal = principalFromPrivateKey(accountType, privateKey);
                 final CommitChainResponse commitChainResponse = new CommitChainResponse(
                         MESSAGE_CHAIN_COMMIT_SUCCESS,
                         "NA",
@@ -121,7 +122,7 @@ public class FactomToAccumulateBridge {
                         Hex.encodeHexString(chainIdHash));
 
                 final Key entryHashKey = new Key(entryHash);
-                liteAccountCache.put(entryHashKey, liteAccount);
+                principalCache.put(entryHashKey, principal);
                 final RpcResult rpcResult = (RpcResult) commitChainResponse;
                 return new FactomResponseImpl<>(new RpcResponse<>(rpcResult), 200, MESSAGE_CHAIN_COMMIT_SUCCESS);
             } catch (DecoderException | IOException e) {
@@ -134,9 +135,9 @@ public class FactomToAccumulateBridge {
         final Entry firstEntry = decodeEntry(revealMessage);
         final byte[] entryHash = entryOperations.calculateEntryHash(firstEntry.getExternalIds(), firstEntry.getContent(), firstEntry.getChainId());
         final Key entryHashKey = new Key(entryHash);
-        final LiteAccount liteAccount = liteAccountCache.remove(entryHashKey);
-        if (liteAccount == null) {
-            throw new RuntimeException(String.format("LiteAccount could not be found for entryHash %s, call commitChain first", Hex.encodeHexString(entryHash)));
+        final Principal principal = principalCache.remove(entryHashKey);
+        if (principal == null) {
+            throw new RuntimeException(String.format("Principal could not be found for entryHash %s, call commitChain first", Hex.encodeHexString(entryHash)));
         }
 
         final FactomEntry factomEntry = new FactomEntry(firstEntry.getContent());
@@ -144,9 +145,11 @@ public class FactomToAccumulateBridge {
             factomEntry.addExtRef(extId);
         });
 
-        final CompletableFuture<FactomResponse<RpcResult>> futureResponse = accumulateApi.createLiteDataAccount(liteAccount, factomEntry)
+        final CompletableFuture<FactomResponse<RpcResult>> futureResponse = accumulateApi.createLiteDataAccount(principal, factomEntry)
                 .thenApply(writeDataResult -> {
-                    txIdCache.put(entryHashKey, writeDataResult.getTxID());
+                    final TxID txId = writeDataResult.getTxID();
+                    saveEntryToIndexDB(firstEntry, entryHash, txId, true);
+
                     final RevealResponse revealChainResponse = new RevealResponse(MESSAGE_ENTRY_REVEAL_SUCCESS,
                             Hex.encodeHexString(entryHash), firstEntry.getChainId());
                     final RpcResult rpcResult = (RpcResult) revealChainResponse;
@@ -163,59 +166,67 @@ public class FactomToAccumulateBridge {
 
     public <RpcResult> CompletableFuture<FactomResponse<RpcResult>> ackTransaction(final String chainId, final String hash, final boolean logErrors) {
         // We need to forge a FactoidTransactionsResponse out of this
-        try {
-            final Key entryHashKey = new Key(Hex.decodeHex(hash));
-            final TxID txId = txIdCache.get(entryHashKey);
-            if (txId == null) {
-                throw new RuntimeException("Could not lookup the TxID for entry hash " + hash);
-            }
+        final IndexRecord indexRecord = fetchIndexRecord(hash);
+        final TxID txId = new TxID(Url.toAccURL(indexRecord.getTxId()));
 
-            final CompletableFuture<FactomResponse<RpcResult>> futureResponse = accumulateApi.getTx(new TxnQuery()
-                            .txIdUrl(txId)
-                            .wait(Duration.ofSeconds(2))) // Configurable?
-                    .thenApply(txResult -> {
-                        final TransactionQueryResponse queryResponse = txResult.getQueryResponse();
+        final CompletableFuture<FactomResponse<RpcResult>> futureResponse = accumulateApi.getTx(new TxnQuery()
+                        .txIdUrl(txId)
+                        .wait(Duration.ofSeconds(2))) // Configurable?
+                .thenApply(txResult -> {
+                    final TransactionQueryResponse queryResponse = txResult.getQueryResponse();
 
-                        EntryTransactionResponse.Status status;
-                        switch (queryResponse.getStatus().getCode()) {
-                            case OK:
-                            case DELIVERED:
-                                if (allDelivered(txResult.getQueryResponse().getProduced())) {
-                                    status = EntryTransactionResponse.Status.DBlockConfirmed;
-                                } else {
-                                    // Accumulate's pending state is short, but the entry is not queryable until the produced synth txns have been synced
-                                    status = EntryTransactionResponse.Status.NotConfirmed;
-                                }
-                                break;
-/*
-                            case PENDING:
-                                status = EntryTransactionResponse.Status.TransactionACK;
-                                break;
-*/
-                            case REMOTE:
-                                status = EntryTransactionResponse.Status.Unknown;
-                                break;
-                            default:
+                    EntryTransactionResponse.Status status;
+                    switch (queryResponse.getStatus().getCode()) {
+                        case OK:
+                        case DELIVERED:
+                            if (allDelivered(txResult.getQueryResponse().getProduced())) {
+                                status = EntryTransactionResponse.Status.DBlockConfirmed;
+                            } else {
+                                // Accumulate's pending state is short, but the entry is not queryable until the produced synth txns have been synced
                                 status = EntryTransactionResponse.Status.NotConfirmed;
-                                break;
-                        }
-                        final String entryHash = Hex.encodeHexString(queryResponse.getTransactionHash());
-                        final EntryTransactionResponse.EntryData entryData = new EntryTransactionResponse.EntryData(status.name());
-                        final EntryTransactionResponse entryTransactionResponse = new EntryTransactionResponse(
-                                txId.toString(), entryHash, new EntryTransactionResponse.CommitData(status), entryData);
+                            }
+                            break;
+/*
+                        case PENDING:
+                            status = EntryTransactionResponse.Status.TransactionACK;
+                            break;
+*/
+                        case REMOTE:
+                            status = EntryTransactionResponse.Status.Unknown;
+                            break;
+                        default:
+                            status = EntryTransactionResponse.Status.NotConfirmed;
+                            break;
+                    }
+                    final String entryHash = Hex.encodeHexString(queryResponse.getTransactionHash());
+                    final EntryTransactionResponse.EntryData entryData = new EntryTransactionResponse.EntryData(status.name());
+                    final EntryTransactionResponse entryTransactionResponse = new EntryTransactionResponse(
+                            txId.toString(), entryHash, new EntryTransactionResponse.CommitData(status), entryData);
 
-                        final RpcResult rpcResult = (RpcResult) entryTransactionResponse;
-                        return new FactomResponseImpl<>(new RpcResponse<>(rpcResult), 200, MESSAGE_ENTRY_REVEAL_SUCCESS);
+                    final RpcResult rpcResult = (RpcResult) entryTransactionResponse;
+                    return new FactomResponseImpl<>(new RpcResponse<>(rpcResult), 200, MESSAGE_ENTRY_REVEAL_SUCCESS);
 
-                    });
-            if (logErrors) {
-                futureResponse.exceptionally(throwable -> {
-                    logger.error(String.format("ackTransaction failed for chain ID %s and entry hash %s", chainId, hash), throwable);
-                    return null;
                 });
+        if (logErrors) {
+            futureResponse.exceptionally(throwable -> {
+                logger.error(String.format("ackTransaction failed for chain ID %s and entry hash %s", chainId, hash), throwable);
+                return null;
+            });
+        }
+        return futureResponse;
+    }
+
+    public IndexRecord fetchIndexRecord(final String txIdOrEntryHash) {
+        try {
+            if (StringUtils.contains(txIdOrEntryHash, '@')) {
+                try {
+                    final Url txId = Url.parse(txIdOrEntryHash);
+                    return new IndexRecord(indexDb.get(IndexDB.ACCUMULATE_INDEX, new AccUrlKey(DbBucket.ENTRY_HASHES, txId)));
+                } catch (URISyntaxException e) {
+                }
             }
-            return futureResponse;
-        } catch (DecoderException e) {
+            return new IndexRecord(indexDb.get(IndexDB.ACCUMULATE_INDEX, new HexStringKey(DbBucket.ENTRY_HASHES, txIdOrEntryHash)));
+        } catch (KeyNotFoundException e) {
             throw new RuntimeException(e);
         }
     }
@@ -258,9 +269,10 @@ public class FactomToAccumulateBridge {
                 final byte[] entryHash = new byte[32];
                 inputStream.read(entryHash);
 
+                final AccountType accountType = AccountType.fromValue(inputStream.read());
                 final byte[] privateKey = new byte[64];
                 inputStream.read(privateKey);
-                final LiteAccount liteAccount = liteAccountFromPrivateKey(privateKey);
+                final Principal principal = principalFromPrivateKey(accountType, privateKey);
 
                 final CommitEntryResponse commitEntryResponse = new CommitEntryResponse(
                         MESSAGE_ENTRY_COMMIT_SUCCESS,
@@ -268,7 +280,7 @@ public class FactomToAccumulateBridge {
                         Hex.encodeHexString(entryHash));
 
                 final Key entryHashKey = new Key(entryHash);
-                liteAccountCache.put(entryHashKey, liteAccount);
+                principalCache.put(entryHashKey, principal);
                 final RpcResult rpcResult = (RpcResult) commitEntryResponse;
                 return new FactomResponseImpl<>(new RpcResponse<>(rpcResult), 200, MESSAGE_CHAIN_COMMIT_SUCCESS);
             } catch (DecoderException | IOException e) {
@@ -277,38 +289,86 @@ public class FactomToAccumulateBridge {
         });
     }
 
-    private static LiteAccount liteAccountFromPrivateKey(final byte[] privateKey) {
+    private static Principal principalFromPrivateKey(final AccountType accountType, final byte[] privateKey) {
         final TweetNaclFast.Signature.KeyPair keyPair = TweetNaclFast.Signature.keyPair_fromSecretKey(privateKey);
-        final LiteAccount liteAccount = new LiteAccount(new SignatureKeyPair(keyPair, SignatureType.ED25519)); // FIXME ED25519 is hardcoded
-        return liteAccount;
+        switch (accountType) {
+            case LITE_TOKEN_ACCOUNT:
+                return new LiteAccount(new SignatureKeyPair(keyPair, SignatureType.ED25519)); // FIXME ED25519 is hardcoded;
+            case LITE_IDENTITY:
+                return new LiteIdentity(new SignatureKeyPair(keyPair, SignatureType.ED25519)); // FIXME ED25519 is hardcoded;
+        }
+        throw new IllegalArgumentException(String.format("AccountType %s is not supported.", accountType));
     }
 
     public <RpcResult> CompletableFuture<FactomResponse<RpcResult>> revealEntry(String revealMessage, boolean logErrors) {
-        final Entry firstEntry = decodeEntry(revealMessage);
-        final byte[] entryHash = entryOperations.calculateEntryHash(firstEntry.getExternalIds(), firstEntry.getContent(), firstEntry.getChainId());
+        final Entry entry = decodeEntry(revealMessage);
+        final byte[] entryHash = entryOperations.calculateEntryHash(entry.getExternalIds(), entry.getContent(), entry.getChainId());
         final Key entryHashKey = new Key(entryHash);
-        final LiteAccount liteAccount = liteAccountCache.remove(entryHashKey);
+        final Principal principal = principalCache.remove(entryHashKey);
 
-        final FactomEntry factomEntry = new FactomEntry(firstEntry.getContent());
-        firstEntry.getExternalIds().forEach(extId -> {
+        final FactomEntry factomEntry = new FactomEntry(entry.getContent());
+        entry.getExternalIds().forEach(extId -> {
             factomEntry.addExtRef(extId);
         });
 
-        final CompletableFuture<FactomResponse<RpcResult>> futureResponse = accumulateApi.writeFactomData(liteAccount, firstEntry.getChainId(), factomEntry)
+        final CompletableFuture<FactomResponse<RpcResult>> futureResponse = accumulateApi.writeFactomData(principal, entry.getChainId(), factomEntry)
                 .thenApply(writeDataResult -> {
-                    txIdCache.put(entryHashKey, writeDataResult.getTxID());
+                    final TxID txId = writeDataResult.getTxID();
+                    saveEntryToIndexDB(entry, entryHash, txId, false);
+
                     final RevealResponse revealEntryResponse = new RevealResponse(MESSAGE_ENTRY_REVEAL_SUCCESS,
-                            Hex.encodeHexString(entryHash), firstEntry.getChainId());
+                            Hex.encodeHexString(entryHash), entry.getChainId());
                     final RpcResult rpcResult = (RpcResult) revealEntryResponse;
                     return new FactomResponseImpl<>(new RpcResponse<>(rpcResult), 200, MESSAGE_ENTRY_REVEAL_SUCCESS);
                 });
         if (logErrors) {
             futureResponse.exceptionally(throwable -> {
-                logger.error(String.format("revealChain failed for chain ID %s", firstEntry.getChainId()), throwable);
+                logger.error(String.format("revealChain failed for chain ID %s", entry.getChainId()), throwable);
                 return null;
             });
         }
         return futureResponse;
+    }
+
+    private void saveEntryToIndexDB(final Entry entry, final byte[] entryHash, final TxID txId, final boolean isFirstEntry) {
+        try {
+            final IndexRecord indexRecord = isFirstEntry ? buildFirstEntryIndexRecord(entry, txId) : buildIndexRecord(entry, txId);
+            final byte[] indexRecordData = indexRecord.marshalBinary();
+            final String entryHashHex = Hex.encodeHexString(entryHash);
+            indexDb.put(IndexDB.ACCUMULATE_INDEX, new HexStringKey(DbBucket.ENTRY_HASHES, entryHashHex), indexRecordData);
+            indexDb.put(IndexDB.ACCUMULATE_INDEX, new AccUrlKey(DbBucket.ENTRY_HASHES, txId.getUrl()), indexRecordData);
+            indexDb.put(IndexDB.ACCUMULATE_INDEX, new HexStringKey(DbBucket.CHAIN_HEAD, entry.getChainId()), entryHash);
+            indexDb.put(IndexDB.ACCUMULATE_INDEX, new HexStringKey(DbBucket.CHAIN_ENTRIES, entry.getChainId(), entryHashHex), EMPTY_VALUE);
+        } catch (KeyNotFoundException | ExecutionException | InterruptedException e) {
+            throw new RuntimeException(e);
+        } catch (Throwable t) {
+            throw new RuntimeException(t);
+        }
+    }
+
+    private IndexRecord buildIndexRecord(final Entry entry, final TxID txId) throws KeyNotFoundException, InterruptedException, ExecutionException {
+        // Get chain head
+        String chainHeadKeyMR = null;
+        String chainHeadEntryHash = null;
+        final byte[] buffer;
+        buffer = indexDb.get(IndexDB.ACCUMULATE_INDEX, new HexStringKey(DbBucket.CHAIN_HEAD, entry.getChainId()));
+        chainHeadEntryHash = Hex.encodeHexString(buffer);
+        var chainHeadIndexRecord = fetchIndexRecord(chainHeadEntryHash);
+        if (chainHeadIndexRecord.isAccumulate()) {
+            // Get from Accumulate tbs, it's not static like Factom is now
+            final CompletableFuture<FactomResponse<ChainHeadResponse>> accResult = chainHead(entry.getChainId(), false);
+            final ChainHeadResponse result = accResult.get().getResult();
+            chainHeadKeyMR = result.getKeyMR();
+            chainHeadEntryHash = result.getEntryHash();
+
+        } else if (chainHeadIndexRecord.isFactom()) {
+            chainHeadKeyMR = chainHeadIndexRecord.getTxId();
+        }
+        return new IndexRecord(entry.getChainId(), txId, chainHeadKeyMR, chainHeadEntryHash);
+    }
+
+    private IndexRecord buildFirstEntryIndexRecord(final Entry entry, final TxID txId) throws KeyNotFoundException, InterruptedException, ExecutionException {
+        return new IndexRecord(entry.getChainId(), txId, NULL_TX_ID.getUrl().string(), NULL_HASH);
     }
 
     public <RpcResult> CompletableFuture<FactomResponse<RpcResult>> chainHead(final String chainId, final boolean logErrors) {
@@ -329,10 +389,10 @@ public class FactomToAccumulateBridge {
                                         final ResponseDataEntry lastEntry = response.getItems().get(0);
                                         if (lastEntry != null) {
                                             final TxID txId = ObjectUtils.firstNonNull(lastEntry.getCauseTxId(), lastEntry.getTxId());
-                                            chainHeadResponse = new ChainHeadResponse(txId.getUrl().string(), false);
+                                            chainHeadResponse = new ChainHeadResponse(txId.getUrl().string(), false, Hex.encodeHexString(lastEntry.getEntryHash()));
                                         }
                                         final RpcResult rpcResult = (RpcResult) chainHeadResponse;
-                                        return new FactomResponseImpl<>(new RpcResponse<>(rpcResult), 200, MESSAGE_ENTRY_REVEAL_SUCCESS);
+                                        return new FactomResponseImpl<>(new RpcResponse<>(rpcResult), 200, MESSAGE_CHAIN_HEAD_SUCCESS);
                                     }
                                     return null;
                                 });
@@ -363,39 +423,14 @@ public class FactomToAccumulateBridge {
                         final CompletableFuture<FactomResponse<RpcResult>> futureResponse = accumulateApi.queryData(new DataEntrySetQuery()
                                         .url(chainId)
                                         .start(0)
-                                        .count(countResponse.getTotal())  // FIXME blocks of max 1000
-                                        .expand(expand))
+                                        .count(countResponse.getTotal())  // FIXME has a maximum?
+                                        .expand(false)) // We will expand in getTx()
                                 .thenApply(response -> {
                                     if (response.getItems() != null && !response.getItems().isEmpty()) {
                                         Collections.reverse(response.getItems());
                                         response.getItems().forEach(responseDataEntry -> {
-                                            ChainEntry chainEntry = new ChainEntry(chainId);
-                                            final FactomDataEntry factomDataEntry = (FactomDataEntry) responseDataEntry.getEntry();
-                                            if (expand) {
-                                                final TxID txId = ObjectUtils.firstNonNull(responseDataEntry.getCauseTxId(), responseDataEntry.getTxId());
-                                                try {
-                                                    final TransactionQueryResult transactionQueryResult = accumulateApi.getTx(new TxnQuery()
-                                                                    .txIdUrl(txId)
-                                                                    .prove(true)
-                                                                    .expand(false))
-                                                            .get();
-                                                    final TransactionQueryResponse queryResponse = transactionQueryResult.getQueryResponse();
-                                                    final List<String> extIds = Arrays.stream(factomDataEntry.getExtIds())
-                                                            .map(extId -> Hex.encodeHexString(extId))
-                                                            .collect(Collectors.toList());
-                                                    chainEntry.setExtIds(extIds);
-                                                    chainEntry.setContent(Hex.encodeHexString(factomDataEntry.getData()));
-                                                    chainEntry.setStatus(queryResponse.getStatus().getCode().getApiName());
-                                                    Arrays.stream(queryResponse.getReceipts())
-                                                            .findFirst().ifPresent(txReceipt -> {
-                                                                chainEntry.setBlockTime(txReceipt.getLocalBlockTime());
-                                                                chainEntry.setBlock(txReceipt.getLocalBlock());
-                                                            });
-                                                } catch (InterruptedException | ExecutionException e) {
-                                                    throw new RuntimeException(e);
-                                                }
-                                            }
-                                            chainEntry.setEntryHash(responseDataEntry.getEntryHash());
+                                            final TxID txId = ObjectUtils.firstNonNull(responseDataEntry.getCauseTxId(), responseDataEntry.getTxId());
+                                            final ChainEntry chainEntry = createChainEntry(chainId, responseDataEntry.getEntryHash(), expand, txId);
                                             chainEntries.add(chainEntry);
                                         });
                                     }
@@ -414,7 +449,49 @@ public class FactomToAccumulateBridge {
         return futureFinalResponse;
     }
 
-    public <RpcResult> CompletableFuture<FactomResponse<RpcResult>> entryBlockByTxId(final String txId, final boolean logErrors) {
+    public ChainEntry createChainEntry(final String chainId, final byte[] entryHash, final boolean expand, final TxID txId) {
+        ChainEntry chainEntry = new ChainEntry(chainId);
+        if (expand) {
+            try {
+                final TransactionQueryResult transactionQueryResult = accumulateApi.getTx(new TxnQuery()
+                                .txIdUrl(txId)
+                                .prove(true)
+                                .expand(false))
+                        .get();
+                final TransactionQueryResponse queryResponse = transactionQueryResult.getQueryResponse();
+                final FactomDataEntry factomDataEntry = getFactomDataEntry(queryResponse.getTransaction().getBody());
+                final List<String> extIds = Arrays.stream(factomDataEntry.getExtIds())
+                        .map(extId -> Hex.encodeHexString(extId))
+                        .collect(Collectors.toList());
+                chainEntry.setExtIds(extIds);
+                chainEntry.setContent(Hex.encodeHexString(factomDataEntry.getData()));
+                chainEntry.setStatus(queryResponse.getStatus().getCode().getApiName());
+                Arrays.stream(queryResponse.getReceipts())
+                        .findFirst().ifPresent(txReceipt -> {
+                            chainEntry.setBlockTime(txReceipt.getLocalBlockTime());
+                            chainEntry.setBlock(txReceipt.getLocalBlock());
+                        });
+            } catch (InterruptedException | ExecutionException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        chainEntry.setEntryHash(entryHash);
+        return chainEntry;
+    }
+
+    private static FactomDataEntry getFactomDataEntry(final TransactionBody body) {
+        FactomDataEntry factomDataEntry = null;
+        if (body instanceof SyntheticWriteData) {
+            final var syntheticWriteData = (SyntheticWriteData) body;
+            factomDataEntry = (FactomDataEntry) syntheticWriteData.getEntry();
+        } else if (body instanceof WriteDataTo) {
+            final var writeDataTo = (WriteDataTo) body;
+            factomDataEntry = (FactomDataEntry) writeDataTo.getEntry();
+        }
+        return factomDataEntry;
+    }
+
+    public <RpcResult> CompletableFuture<FactomResponse<RpcResult>> entryBlockByTxId(final String txId, final String prevTxId, final boolean logErrors) {
         final TxID txID = new TxID(Url.toAccURL(txId));
         final List<EntryBlockResponse.Entry> entryList = new ArrayList<>();
         final EntryBlockResponse.Header header = new EntryBlockResponse.Header();
@@ -433,9 +510,9 @@ public class FactomToAccumulateBridge {
                     final String chainId = chainIdUrl.authority();
                     header.setChainid(chainId);
                     Arrays.stream(queryResponse.getReceipts()).findFirst().ifPresent(txReceipt -> {
-                        header.setPrevkeymr(getPreviousTxId(chainIdUrl, txID));
+                        header.setPrevkeymr(prevTxId);
                         header.setBlocksequencenumber(txReceipt.getLocalBlock());
-                        header.setTimestamp(txReceipt.getLocalBlockTime().toInstant().toEpochMilli());
+                        header.setTimestamp(txReceipt.getLocalBlockTime().toInstant().toEpochMilli() / 60000);
                     });
 
                     final EntryResponse entryResponse = buildEntryResponse(dataEntry, chainId);
@@ -455,7 +532,7 @@ public class FactomToAccumulateBridge {
         return futureFinalResponse;
     }
 
-    private static EntryResponse buildEntryResponse(final FactomDataEntry dataEntry, final String chainId) {
+    public static EntryResponse buildEntryResponse(final FactomDataEntry dataEntry, final String chainId) {
         final List<String> hexExtIds = Arrays.stream(dataEntry.getExtIds())
                 .map(extId -> Hex.encodeHexString(extId))
                 .collect(Collectors.toList());
@@ -538,7 +615,7 @@ public class FactomToAccumulateBridge {
                                 .collect(Collectors.toList());
                         final EntryResponse entryResponse = new EntryResponse(chainId, extIds, Hex.encodeHexString(factomDataEntry.getData()));
                         final RpcResult rpcResult = (RpcResult) entryResponse;
-                        return new FactomResponseImpl<>(new RpcResponse<>(rpcResult), 200, MESSAGE_ENTRY_REVEAL_SUCCESS);
+                        return new FactomResponseImpl<>(new RpcResponse<>(rpcResult), 200, MESSAGE_GET_ENTRY_SUCCESS);
                     }
                     return null;
                 });
@@ -555,7 +632,7 @@ public class FactomToAccumulateBridge {
         final Entry entry = new Entry();
         try {
             final DataInputStream inputStream = new DataInputStream(new ByteArrayInputStream(Hex.decodeHex(message)));
-            final byte version = inputStream.readByte(); // TODO cleanup unused stuff here
+            inputStream.skipBytes(1);
             final byte[] chainId = new byte[32];
             inputStream.read(chainId);
             entry.setChainId(Hex.encodeHexString(chainId));
@@ -568,6 +645,8 @@ public class FactomToAccumulateBridge {
                 entry.getExternalIds().add(new String(extId, StandardCharsets.UTF_8));
                 externalIdBufferSize -= externalIdLength + 2;
             }
+
+
             final int contentLength = inputStream.available();
             if (contentLength > 0) {
                 final byte[] content = new byte[contentLength];

@@ -2,7 +2,6 @@ package org.blockchain_innovation.factom.client.api.model.types;
 
 import org.blockchain_innovation.factom.client.api.errors.FactomRuntimeException;
 import org.blockchain_innovation.factom.client.api.model.Address;
-import org.blockchain_innovation.factom.client.api.ops.Digests;
 import org.blockchain_innovation.factom.client.api.ops.Encoding;
 import org.blockchain_innovation.factom.client.api.ops.StringUtils;
 
@@ -30,7 +29,8 @@ public enum AddressType {
     IDENTITY_PRIVATE4("sk4", "4db723", Visibility.PRIVATE),
     IDENTITY_IDPUB("idpub", "0345ef9de0", Visibility.PUBLIC),
     IDENTITY_IDSEC("idsec", "0345f3d0d6", Visibility.PRIVATE),
-    LITE_ACCOUNT("acc:/", "", Visibility.PRIVATE);
+    LITE_TOKEN_ACCOUNT("acc:/", "", Visibility.PRIVATE),
+    LITE_IDENTITY("acc:/", "", Visibility.PRIVATE);
 
 
     private final String humanReadablePrefix;
@@ -88,11 +88,10 @@ public enum AddressType {
             throw new FactomRuntimeException.AssertionException(String.format("Address '%s' does not start with a valid humanReadablePrefix", address));
         }
         if(address.toLowerCase().startsWith("acc://")) {
-            if(!address.toLowerCase().contains("/acme")) {
-                throw new FactomRuntimeException.AssertionException(String.format("Address '%s' is not a valid ACME lite address!", address.substring(0, address.indexOf("|"))));
-            }
-        } else {
-            byte[] addressBytes = Encoding.BASE58.decode(address);
+/* FIXME
+            int splitPos  = address.indexOf('/');
+            final String addressOnly = splitPos > -1 ? address.substring(0, splitPos) : address;
+            byte[] addressBytes = Encoding.BASE58.decode(addressOnly);
             int length = addressBytes.length;
             if (length == 38 || length == 39 || length == 41) {
                 byte[] sha256d = Digests.SHA_256.doubleDigest(Arrays.copyOf(addressBytes, length - 4));
@@ -106,6 +105,7 @@ public enum AddressType {
             } else {
                 throw new FactomRuntimeException.AssertionException(String.format("Address '%s' is not 38 bytes long!", address));
             }
+*/
         }
     }
 

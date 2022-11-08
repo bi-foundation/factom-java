@@ -61,7 +61,7 @@ public class AddressSignatureProvider implements SignatureProvider {
     public byte[] sign(byte[] message) {
 
         final Address address = getAddress();
-        if(address.getType() == AddressType.LITE_ACCOUNT) {
+        if(address.getType() == AddressType.LITE_TOKEN_ACCOUNT) {
             return getAddress().getValue().getBytes(StandardCharsets.UTF_8);
         } else {
             byte[] privateKey = CONVERSIONS.addressToKey(address);

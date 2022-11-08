@@ -41,7 +41,7 @@ public class OfflineWalletdClientImpl extends WalletdClientImpl {
 
     @Override
     public CompletableFuture<FactomResponse<ComposeResponse>> composeChain(Chain chain, Address address) throws FactomException.ClientException {
-        AddressType.assertValidAddress(address, AddressType.ENTRY_CREDIT_SECRET, AddressType.LITE_ACCOUNT);
+        AddressType.assertValidAddress(address, AddressType.ENTRY_CREDIT_SECRET, AddressType.LITE_TOKEN_ACCOUNT);
         return composeChain(chain, new AddressSignatureProvider(address));
     }
 
@@ -59,7 +59,7 @@ public class OfflineWalletdClientImpl extends WalletdClientImpl {
 
     @Override
     public CompletableFuture<FactomResponse<ComposeResponse>> composeEntry(Entry entry, Address address) throws FactomException.ClientException {
-        AddressType.assertValidAddress(address, AddressType.ENTRY_CREDIT_SECRET, AddressType.LITE_ACCOUNT);
+        AddressType.assertValidAddress(address, AddressType.ENTRY_CREDIT_SECRET, AddressType.LITE_TOKEN_ACCOUNT);
         return composeEntry(entry, new AddressSignatureProvider(address));
     }
 
@@ -105,7 +105,7 @@ public class OfflineWalletdClientImpl extends WalletdClientImpl {
 
             // 1 byte number of Entry Credits to pay
             byte cost = chainCost(firstEntry.getExternalIds(), firstEntry.getContent(), chainIdHex);
-            if (signatureProvider.getAddressType() == AddressType.LITE_ACCOUNT) {
+            if (signatureProvider.getAddressType() == AddressType.LITE_TOKEN_ACCOUNT) {
                 return encodeLiteAccount(signatureProvider, outputStream);
             } else {
                 return signedCommitMessage(signatureProvider, outputStream, cost);
@@ -148,7 +148,7 @@ public class OfflineWalletdClientImpl extends WalletdClientImpl {
 
             // 1 byte number of entry credits to pay
             byte cost = entryCost(entry.getExternalIds(), entry.getContent(), entry.getChainId());
-            if (signatureProvider.getAddressType() == AddressType.LITE_ACCOUNT) {
+            if (signatureProvider.getAddressType() == AddressType.LITE_TOKEN_ACCOUNT) {
                 return encodeLiteAccount(signatureProvider, outputStream);
             } else {
                 return signedCommitMessage(signatureProvider, outputStream, cost);

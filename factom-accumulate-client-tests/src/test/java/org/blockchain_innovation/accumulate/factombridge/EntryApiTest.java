@@ -291,8 +291,8 @@ public class EntryApiTest extends AbstractClientTest {
 
         final CompletableFuture<List<EntryResponse>> future = entryClient.allEntries(chainId);
         future.thenAccept(entryResponses -> {
-            Assert.assertEquals(2, entryResponses.size());
-            Assert.assertEquals(Encoding.HEX.encode(Encoding.UTF_8.decode("abcdef")), entryResponses.get(0).getContent());
+            Assert.assertEquals( entryResponses.size(), 2);
+            Assert.assertEquals(Encoding.HEX.encode(Encoding.UTF_8.decode("abcdef")), entryResponses.get(1).getContent());
         }).exceptionally(throwable -> {
             throwable.printStackTrace();
             Assert.fail("allEntries failed");

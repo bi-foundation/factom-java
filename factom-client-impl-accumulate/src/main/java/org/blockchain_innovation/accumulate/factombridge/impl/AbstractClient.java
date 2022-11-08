@@ -28,12 +28,7 @@ import org.blockchain_innovation.factom.client.api.rpc.RpcResponse;
 import org.blockchain_innovation.factom.client.api.settings.RpcSettings;
 
 import java.net.URL;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.SynchronousQueue;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 @SuppressWarnings("PMD.DoNotUseThreads")
 public abstract class AbstractClient implements LowLevelClient {
@@ -43,7 +38,9 @@ public abstract class AbstractClient implements LowLevelClient {
     private RpcSettings settings;
     private ExecutorService executorService;
 
-    private FactomToAccumulateBridge bridge = new FactomToAccumulateBridge();
+    private final AccumulateFactomIndexDB indexDb = new AccumulateFactomIndexDB();
+    private final FactomToAccumulateBridge bridge = new FactomToAccumulateBridge(indexDb);
+    private final AccumulateFactomIndexDBLayer indexDbLayer = new AccumulateFactomIndexDBLayer(indexDb, bridge);
 
     protected static ThreadFactory threadFactory(final String name, final boolean daemon) {
         return runnable -> {
@@ -75,6 +72,11 @@ public abstract class AbstractClient implements LowLevelClient {
         bridge.configure(settings);
         return this;
     }
+
+    public void setIndexDBSettings(final RpcSettings indexDBSettings) {
+        indexDb.configure(indexDBSettings);
+    }
+
 
     @Override
     public URL getUrl() {
@@ -123,21 +125,21 @@ public abstract class AbstractClient implements LowLevelClient {
                 return bridge.ackTransaction(ackChainId, hash, logErrors);
             case CHAIN_HEAD:
                 final String chChainId = (String) rpcRequest.getParams().get("chainid");
-                return bridge.chainHead(chChainId, logErrors);
+                return indexDbLayer.chainHead(chChainId, logErrors);
             case COMMIT_CHAIN:
                 return bridge.commitChain((String) rpcRequest.getParams().get("message"));
             case COMMIT_ENTRY:
                 return bridge.commitEntry((String) rpcRequest.getParams().get("message"));
             case ENTRY_BLOCK_BY_KEYMR:
                 final String txId = (String) rpcRequest.getParams().get("keymr");
-                return bridge.entryBlockByTxId(txId, logErrors);
+                return indexDbLayer.entryBlockByTxId(txId, logErrors);
             case ENTRIES_FOR_CHAIN: // Virtual Accumulate-only feature to enhance performance
                 final String chainId = (String) rpcRequest.getParams().get("chainid");
-                return bridge.queryChain(chainId, true, logErrors);
+                return indexDbLayer.queryChain(chainId, true, logErrors);
             case CURRENT_MINUTE:
                 throw new NotImplementedException(); // TODO
             case ENTRY:
-                return bridge.getEntry((String) rpcRequest.getParams().get("hash"), logErrors);
+                return indexDbLayer.getEntry((String) rpcRequest.getParams().get("hash"), logErrors);
             case ENTRY_CREDIT_BALANCE:
                 throw new NotImplementedException(); // TODO
             case ENTRY_CREDIT_RATE:

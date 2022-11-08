@@ -113,7 +113,7 @@ public class EntryApiImpl extends AbstractClient implements EntryApi {
         String chainId = Encoding.HEX.encode(entryOperations.calculateChainId(chain.getFirstEntry().getExternalIds()));
         return factomdClient.chainHead(chainId, false)
                 .thenApplyAsync(response -> response.getResult() != null &&
-                        StringUtils.isNotEmpty(response.getResult().getChainHead()), getExecutorService())
+                        StringUtils.isNotEmpty(response.getResult().getKeyMR()), getExecutorService())
                 .exceptionally(throwable -> false);
 
     }
@@ -127,13 +127,13 @@ public class EntryApiImpl extends AbstractClient implements EntryApi {
         return factomdClient.chainHead(chainId, false)
                 .thenCompose(chainHeadResponse -> {
                     errorHandling(chainHeadResponse, "Could not get entry blocks for chain Id " + chainId);
-                    if (StringUtils.isEmpty(chainHeadResponse.getResult().getChainHead())) {
+                    if (StringUtils.isEmpty(chainHeadResponse.getResult().getKeyMR())) {
                         // The factom RPC api returns an empty string when the chain has not been anchored yet.
                         // That means there is no entry block yet, so return an empty list
                         logger.warn("We did not receive a chainhead for the chain, but also no error. Probably chain {} is not anchored yet", chainId);
                         return CompletableFuture.completedFuture(Collections.EMPTY_LIST);
                     }
-                    return entryBlocksUpTilKeyMR(chainHeadResponse.getResult().getChainHead());
+                    return entryBlocksUpTilKeyMR(chainHeadResponse.getResult().getKeyMR());
                 });
     }
 
@@ -149,7 +149,7 @@ public class EntryApiImpl extends AbstractClient implements EntryApi {
         return getFactomdClient().chainHead(chainId)
                 .thenComposeAsync(chainHeadResponse -> {
                     errorHandling(chainHeadResponse, "Could not get entry blocks for chain Id " + chainId);
-                    return entryBlocksEntriesUpTilKeyMR(chainHeadResponse.getResult().getChainHead());
+                    return entryBlocksEntriesUpTilKeyMR(chainHeadResponse.getResult().getKeyMR());
                 }, getExecutorService());
     }
 
@@ -167,7 +167,7 @@ public class EntryApiImpl extends AbstractClient implements EntryApi {
         return getFactomdClient().chainHead(chainId)
                 .thenComposeAsync(chainHeadResponse -> {
                     errorHandling(chainHeadResponse, "Could not get chain head for chain Id " + chainId);
-                    return entriesUpTilKeyMR(chainHeadResponse.getResult().getChainHead());
+                    return entriesUpTilKeyMR(chainHeadResponse.getResult().getKeyMR());
                 }, getExecutorService())
                 .thenApplyAsync(entryResponses ->
                                 entryResponses.stream().map(
